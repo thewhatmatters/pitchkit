@@ -2,7 +2,7 @@
 
 A hosted **media kit** for Instagram creators. They sign in with Instagram, see their numbers, and send brands a link. Live site: **pitchkit.app**. Public kit: `https://pitchkit.app/k/[handle]`.
 
-**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [AGENTS](./AGENTS.md)
+**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [glossary](./GLOSSARY.md) · [AGENTS](./AGENTS.md)
 
 The app is not built yet. This repo is the spec and the starting point. GitHub: [thewhatmatters/pitchkit](https://github.com/thewhatmatters/pitchkit).
 
@@ -33,6 +33,7 @@ On the connect screen, before they tap Instagram:
 | [PLAN.md](./PLAN.md) | Product and build brief |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | How the pieces connect (Workers, Graph, Neon, R2) |
 | [DATA.md](./DATA.md) | Database tables and column names |
+| [GLOSSARY.md](./GLOSSARY.md) | What each kit number means (and when it hides) |
 | [AGENTS.md](./AGENTS.md) | Short lock list for coding agents |
 
 No application source yet. When the app exists, this table will point at the folders.

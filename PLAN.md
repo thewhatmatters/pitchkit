@@ -1,8 +1,8 @@
 # Pitchkit MVP plan
 
-**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [AGENTS](./AGENTS.md)
+**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [glossary](./GLOSSARY.md) · [AGENTS](./AGENTS.md)
 
-Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md).
+Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md). Stats vocabulary: [GLOSSARY.md](./GLOSSARY.md).
 
 **Look:** WMDS (`@whatmatters/wmds`). Name on the site is Pitchkit.
 
@@ -60,19 +60,27 @@ No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “c
 
 ## Kit math (locked)
 
-**Source:** User Research + Design, 2026-09-02.
+**Source:** User Research + Design, 2026-09-02. Meanings and copy: [GLOSSARY.md](./GLOSSARY.md). Backend must confirm live Graph names against the current IG version before wiring.
 
 **Headline:** name and handle. Followers are **scale context**, not the headline.
 
-**Engagement rate** is the hire/no-hire number: `(likes + comments) / followers` on those six, when followers > 0. Render with a WMDS **Stat** (label + number). ER emphasis is primary.
+**Ordered Stat row (ER still primary).** Do not pad to five. Row length follows the data. Chart is a trend object, not a fifth Stat.
+
+1. **Engagement rate** — always. Hire/no-hire. WMDS Stat (label + number). Insights: `(likes + comments + saves + shares) / followers` on the six, when followers > 0. Public only: `(likes + comments) / followers` — the tooltip must say which.
+2. **Typical reach** — Insights only. Median unique accounts on recent posts, not a spike. Hide until connected.
+3. **Followers** — always. Scale / sanity vs reach.
+4. **Saves** — Insights only. Intent. Hide until connected.
+5. Then the **30-day chart** (reach). Insights only.
+
+**Row:** 2 without Insights (ER + Followers). 4 + chart with Insights. Horizontal scroll is allowed later. Do not invent a fifth to fill a grid. Do not lock stats to a 2×2.
 
 **Six posts:** among posts we fetched with `posted_at` in the **last 30 days**, rank **saves, then reach, then likes** (missing Insights sort last). Fill from older fetched posts only if we do not have six in-window.
 
-**Insights-gated:** reach, saves, and the 30-day chart **only when Insights exist**. Empty > zeros — do not paint missing Insights as 0. If Insights are missing, still show ER from public likes and comments; **hide reach, saves, and the chart**.
+**Insights-gated:** typical reach, saves, and the 30-day chart **only when Insights exist**. Empty > zeros — do not paint missing Insights as 0. If Insights are missing, still show ER from public likes and comments; **hide typical reach, saves, and the chart**.
 
 **Carousel:** first child frame (cover) into R2. **Video:** poster only on the kit, never the file.
 
-**Not on the kit in v1:** geo, rates, bio.
+**Not on the kit in v1:** geo, rates, bio. Not a v1 Stat: impressions, comments, likes, conversion, media count, profile visits, 90-day growth (see [GLOSSARY.md](./GLOSSARY.md)).
 
 ---
 
@@ -160,8 +168,8 @@ Landing (disclosure + Professional note + support)
 
 | Who | Job |
 |---|---|
-| Brand on `/k/[handle]` | Spend or pass in ~30s — is the audience real, how many people actually see a post. |
-| Creator on Insights | Will this kit survive a brand checking the public grid before they share the link. |
+| Brand on `/k/[handle]` | Spend or pass in ~30s — is the audience real, how many people actually see a post, is the content worth keeping. |
+| Creator on Insights | Same numbers as `/k/[handle]`, labeled — will this kit survive a brand checking the public grid before they share the link. |
 
 | Route | Who | What |
 |---|---|---|
@@ -171,7 +179,7 @@ Landing (disclosure + Professional note + support)
 | `/k/[handle]` | public | Card only + support footer |
 | `/privacy`, `/delete` | public | Meta review |
 
-Name/handle is the headline on both Insights and the public card. Followers are scale. ER is the hire/no-hire Stat. Reach, saves, and the 30-day chart only when Insights exist (empty > zeros). **Stats row is fluid** (Randy, 2026-09-02) — design follows the data; maybe five Stats, maybe a horizontal scroll. Do not lock stats to a 2×2. Posts: **2×3** on a phone.
+Name/handle is the headline on both Insights and the public card. Followers are scale. ER is the hire/no-hire Stat. Vocabulary: [GLOSSARY.md](./GLOSSARY.md). **Stats row is fluid** (Randy, 2026-09-02): 2 without Insights (ER + Followers), 4 + chart with Insights. Do not pad to five. Do not lock stats to a 2×2. Posts: **2×3** on a phone.
 
 Personal fail, OAuth cancel → landing with the Professional message or unchanged landing. Empty grid is OK. No blank Insights: “Pulling your grid…” until R2 catches up.
 

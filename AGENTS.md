@@ -1,8 +1,8 @@
 # Pitchkit
 
-**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [AGENTS](./AGENTS.md)
+**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [glossary](./GLOSSARY.md) · [AGENTS](./AGENTS.md)
 
-Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md). Spec: [PLAN.md](./PLAN.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md). Columns: [DATA.md](./DATA.md).
+Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md). Spec: [PLAN.md](./PLAN.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md). Columns: [DATA.md](./DATA.md). Stats vocabulary: [GLOSSARY.md](./GLOSSARY.md).
 
 ## Product lock
 
@@ -13,7 +13,7 @@ Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md)
   > We only use your public posts and Instagram Insights to build your media kit. We don’t read DMs, who you follow, or unfollowers. Disconnect deletes your kit and the copies we stored.
 
 - After login: **Insights**, then Media kit tab. Brands never see Insights.
-- **v1 stats (User Research + Design, 2026-09-02):** name/handle is the headline; followers are scale. ER is the hire/no-hire number (`(likes + comments) / followers` on the six; WMDS Stat, ER primary). Reach/saves/30-day chart only when Insights exist — empty > zeros, never paint missing as 0. Six posts: last 30 days, **saves then reach then likes**. Stats row is fluid (Randy, 2026-09-02) — design follows the data; not a 2×2 lock. Posts stay **2×3**. Brand on `/k/[handle]`: spend or pass in ~30s. Creator on Insights: will this kit survive a brand checking the public grid. No geo, rates, or bio.
+- **v1 stats (User Research + Design, 2026-09-02):** meanings and copy in [GLOSSARY.md](./GLOSSARY.md). Name/handle is the headline; followers are scale. ER is the hire/no-hire Stat (`primary`). Insights ER: `(likes + comments + saves + shares) / followers` on the six; public-only: likes + comments — tooltip must say which. Typical reach / saves / 30-day chart only when Insights exist — empty > zeros. Six posts: last 30 days, **saves then reach then likes**. Stats row is fluid: **2** without Insights (ER + Followers), **4 + chart** with Insights. Do not pad to five. Not a 2×2 lock. Chart is a trend, not a fifth Stat. Posts stay **2×3**. Brand on `/k/[handle]`: spend or pass in ~30s. Creator: same numbers, labeled, survive a grid check. No geo, rates, or bio. Backend must confirm live Graph names before wiring.
 - Carousel: first frame. Video: poster only. R2 public read for kit images.
 - Disconnect: delete SQL + R2 `{user_id}/` within 24 hours. `consent_index` default off.
 - Scopes: `instagram_business_basic` + `instagram_business_manage_insights` only.
@@ -31,4 +31,4 @@ Do not add Graph columns we do not get from public posts + Insights. Do not inve
 
 ## After each turn
 
-Locks → [PLAN.md](./PLAN.md). Picture → [ARCHITECTURE.md](./ARCHITECTURE.md). Columns → [DATA.md](./DATA.md). Humans → [README.md](./README.md).
+Locks → [PLAN.md](./PLAN.md). Picture → [ARCHITECTURE.md](./ARCHITECTURE.md). Columns → [DATA.md](./DATA.md). Stats words → [GLOSSARY.md](./GLOSSARY.md). Humans → [README.md](./README.md).
