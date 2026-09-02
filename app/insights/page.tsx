@@ -1,5 +1,5 @@
-import { cardTitleClasses } from "@whatmatters/wmds";
 import { OwnerChrome } from "@/components/owner-chrome";
+import { PageTitle } from "@/components/page-card";
 import { SupportFooter } from "@/components/support-footer";
 import { demoEngagementRate, demoHasInsights, demoPosts, demoUser } from "@/lib/demo";
 
@@ -13,7 +13,7 @@ export default async function InsightsPage({ searchParams }: InsightsProps) {
 
   return (
     <main className="max-w-lg mx-auto px-4 py-8 flex flex-col gap-6">
-      <h1 className={cardTitleClasses}>Insights</h1>
+      <PageTitle>Insights</PageTitle>
       <p>Owner chrome — stub, no session cookie yet. Brands never see this page.</p>
       <OwnerChrome
         user={demoUser}

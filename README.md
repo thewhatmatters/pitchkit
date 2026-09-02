@@ -63,7 +63,7 @@ Disconnect deletes the creator, their posts, and their files. Anonymous weekly t
 | Auth | Instagram Login + httpOnly cookie |
 | Charts | Nivo via WMDS Chart (not CSS, not in this app yet) |
 
-Install WMDS from `github:thewhatmatters/wmds` (CI cannot use `../wmds`). `prepare` builds `dist/`. Local `npm install ../wmds` still works. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md), WMDS [`CONSUMING.md`](https://github.com/thewhatmatters/wmds/blob/main/CONSUMING.md).
+Install WMDS from `github:thewhatmatters/wmds` (CI cannot use `../wmds`). `prepare` builds `dist/`. Local `npm install ../wmds` still works. `postinstall` copies Geist font files into the WMDS `dist/files` path that `styles.css` expects. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md), WMDS [`CONSUMING.md`](https://github.com/thewhatmatters/wmds/blob/main/CONSUMING.md).
 
 Cloudflare and Support (for now): randy@whatmatters.so. Neon region is chosen when we create the database.
 

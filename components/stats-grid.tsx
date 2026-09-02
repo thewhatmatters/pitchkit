@@ -1,4 +1,6 @@
-import { Card, cardBodyTextClasses, cardTitleClasses } from "@whatmatters/wmds";
+"use client";
+
+import { Card, cardBodyTextClasses, cardTitleClasses } from "@/components/wmds";
 import { formatCount, formatEngagementRate } from "@/lib/engagement";
 
 type StatsGridProps = {

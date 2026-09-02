@@ -1,4 +1,6 @@
-import { Badge, Card, cardBodyTextClasses, cardTitleClasses } from "@whatmatters/wmds";
+"use client";
+
+import { Badge, Card, cardBodyTextClasses, cardTitleClasses } from "@/components/wmds";
 import type { DemoPost, DemoUser } from "@/lib/demo";
 import { formatCount, formatEngagementRate } from "@/lib/engagement";
 import { PostGrid } from "@/components/post-grid";

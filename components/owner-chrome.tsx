@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@whatmatters/wmds";
+import { Button } from "@/components/wmds";
 import { Copy, Share } from "lucide-react";
 import { ChartSlot } from "@/components/chart-slot";
 import { EmptyGrid } from "@/components/empty-grid";

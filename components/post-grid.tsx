@@ -1,4 +1,6 @@
-import { Card, cardBodyTextClasses } from "@whatmatters/wmds";
+"use client";
+
+import { Card, cardBodyTextClasses } from "@/components/wmds";
 import type { DemoPost } from "@/lib/demo";
 import { formatCount } from "@/lib/engagement";
 

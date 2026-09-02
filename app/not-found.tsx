@@ -1,26 +1,15 @@
-import { Button, Card, cardBodyTextClasses, cardTitleClasses } from "@whatmatters/wmds";
+import { PageButton, PageCard, PageCopy } from "@/components/page-card";
 import { SupportFooter } from "@/components/support-footer";
 
 export default function NotFound() {
   return (
     <main className="max-w-lg mx-auto px-4 py-8 flex flex-col gap-6">
-      <Card variant="outlined" shape="rounded" padding="none">
-        <Card.Header>
-          <h1 className={cardTitleClasses}>Not found</h1>
-        </Card.Header>
-        <Card.Body>
-          <div className="flex flex-col gap-4 p-3">
-            <p className={cardBodyTextClasses}>
-              This kit is missing or disconnected.
-            </p>
-            <form action="/">
-              <Button type="submit" role="secondary">
-                Back to Pitchkit
-              </Button>
-            </form>
-          </div>
-        </Card.Body>
-      </Card>
+      <PageCard title="Not found">
+        <PageCopy>This kit is missing or disconnected.</PageCopy>
+        <form action="/">
+          <PageButton>Back to Pitchkit</PageButton>
+        </form>
+      </PageCard>
       <SupportFooter />
     </main>
   );
