@@ -80,13 +80,15 @@ No extra onboarding. No PDF in v1. No TikTok in v1. Steal vs skip: [GLOSSARY.md]
 
 **Carousel:** first child frame (cover) into R2. **Video:** poster only on the kit, never the file.
 
-**Own objects (Randy unlocked country, age, gender 2026-09-02):** not Stats. Meanings: [GLOSSARY.md](./GLOSSARY.md). Later/IG: need ≥100 followers to see audience data; empty copy, not zeros. Not “no geo in v1.” Not “countries only.”
+**Own objects (Randy unlocked country, age, gender 2026-09-02):** not Stats. Meanings: [GLOSSARY.md](./GLOSSARY.md). `follower_demographics` breakdowns `country` / `city` / `age` / `gender` are live (v25/v26 Insights, Instagram Login). ≥100 followers or the metric is omitted — hide the object; don’t paint zeros. Empty dataset: hide the object. Top 45 only. Graph returns integer counts in `total_value.breakdowns.results.value`, not percents. Our math: % of located sample = `value / sum(results)`. **Never** % of `followers_count`. Backend persists those counts as objects when Insights lands; no extra Graph columns.
 
-- **Country mix** — own object. Insights only. Hide until connected. ≥100 followers or empty copy, not zeros. Top countries + %. `follower_demographics` / `country`. Ranked % bars or a short ranked list. **Not a map.**
-- **City mix** — finer country job. `follower_demographics` / `city`. Same paint. Audience city ≠ hometown.
-- **Age mix** + **gender mix** — still v1 own objects (Randy; not skipped). Same Graph family. Insights only. Hide if missing. Age = API brackets as bars (don’t invent bands). Gender = what Meta returns (don’t add buckets).
-- **Bio** — only if sourced from IG profile (`biography`); hide if empty. Not a typed Later blurb.
-- **Website** — sourced if you need a link. Graph: IG User `website`. Hide if empty.
+- **Country mix** — own object. Insights only. Hide until connected / omitted / empty. Top 45. Ranked % of located sample. **Not a map.**
+- **City mix** — finer country job. Same Graph path / math. Audience city ≠ hometown.
+- **Age mix** + **gender mix** — still v1 own objects (Randy; not skipped). Same Graph family and math. Age = API brackets as bars. Gender = what Meta returns.
+- **Bio** — IG User `biography` (Public). Hide if empty. Not a typed Later blurb.
+- **Website** — IG User `website` (Public). Hide if empty.
+
+No IG User location field. No industry. Impressions stay off.
 
 **Later skip:** Rates / From $100 / Contact Me. Stories as a kit section. Profile views + bio-link clicks in the overview. Average likes as a Stat. Stats as a prose paragraph. Look: gallery, themes, colors. Impressions (deprecated). Industry unless sourced (Later form, not Graph). Creator location unless sourced from IG (none today). Shares: media insights `shares` (not media object `shares_count`, Facebook Login only) — fifth Stat only if the row has room.
 

@@ -100,7 +100,7 @@ No columns for:
 - industry / category (unsourced; Later form)
 - creator location / hometown (unsourced; audience city ≠ hometown)
 - rates, “contact for collab”
-- lat/lng or geocoded maps (country / city mix are Insights name+count objects — no new columns until we persist them)
+- lat/lng or geocoded maps (`follower_demographics` counts persist as objects when Insights lands — no extra Graph columns)
 - bio / website (sourced from IG `biography` / `website` if we show them — no column until we persist)
 - Stories (unless we add them to kit consent later)
 - other people’s accounts
