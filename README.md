@@ -1,8 +1,8 @@
 # Pitchkit
 
-A hosted **media kit** for Instagram creators. They sign in with Instagram, see their numbers, and send brands a link (and a PDF). Live site: **pitchkit.app**.
+A hosted **media kit** for Instagram creators. They sign in with Instagram, see their numbers, and send brands a link. Live site: **pitchkit.app**. Public kit: `https://pitchkit.app/k/[handle]`.
 
-The app is not built yet. This repo is the spec and the starting point.
+The app is not built yet. This repo is the spec and the starting point. GitHub: [thewhatmatters/pitchkit](https://github.com/thewhatmatters/pitchkit).
 
 ---
 
@@ -16,7 +16,7 @@ The app is not built yet. This repo is the spec and the starting point.
 
 Handle is taken from the Instagram username at signup and **does not change**. Local/demo kit: `/k/demo`.
 
-TikTok can be added later from Insights. It is not a second way to create an account.
+If they rename on Instagram, this URL stays put. TikTok, PDF, and extra profile fields are written in the plan as later — not v1.
 
 On the connect screen, before they tap Instagram:
 
@@ -28,8 +28,9 @@ On the connect screen, before they tap Instagram:
 
 | File | What it is |
 |---|---|
-| [plan.md](./plan.md) | Product and build brief (screens, auth, export, what we are not building) |
-| [data.md](./data.md) | Database tables and column names — the list to keep in sync |
+| [plan.md](./plan.md) | Product and build brief |
+| [architecture.md](./architecture.md) | How the pieces connect (Workers, Graph, Neon, R2) |
+| [data.md](./data.md) | Database tables and column names |
 | [AGENTS.md](./AGENTS.md) | Short lock list for coding agents |
 
 No application source yet. When the app exists, this table will point at the folders.
@@ -52,6 +53,8 @@ Disconnect deletes the creator, their posts, and their files. Anonymous weekly t
 - Domain: pitchkit.app
 
 Look: cream, serif, oxblood. The name on the site is Pitchkit (mocks may say Atelier).
+
+Cloudflare and Support (for now): randy@whatmatters.so. Neon region is chosen when we create the database.
 
 ---
 

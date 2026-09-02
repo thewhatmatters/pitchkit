@@ -1,38 +1,30 @@
 # Pitchkit
 
-Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md). Spec: [plan.md](./plan.md). Columns: [data.md](./data.md). Read those before changing product, stack, or schema.
+Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md). Spec: [plan.md](./plan.md). Picture: [architecture.md](./architecture.md). Columns: [data.md](./data.md).
 
 ## Product lock
 
-- Instagram is login and sign-up (Professional accounts only). No email. No password.
-- Connect screen, **before** Continue with Instagram (not after OAuth):
+- Kit URL: `pitchkit.app/k/[handle]`. Public on first successful connect. Handle frozen; IG rename does not move our URL. Missing/disconnected → 404.
+- Instagram is login (Professional only). Pitchkit session = httpOnly cookie.
+- Connect **before** the button (`disclosure_version` = 1):
 
   > We only use your public posts and Instagram Insights to build your media kit. We don’t read DMs, who you follow, or unfollowers. Disconnect deletes your kit and the copies we stored.
 
-  Short under the button: *Public posts and Insights only. No DMs. No following list. Disconnect deletes everything we stored.*
+- After login: **Insights**, then Media kit tab. Brands never see Insights.
+- Six posts: last 30 days, **saves then reach then likes**. ER: `(likes + comments) / followers` on those six; if Insights missing, still show ER, hide reach/saves/chart.
+- Carousel: first frame. Video: poster only. R2 public read for kit images.
+- Disconnect: delete SQL + R2 `{user_id}/` within 24 hours. `consent_index` default off.
+- Scopes: `instagram_business_basic` + `instagram_business_manage_insights` only.
+- Postgres: [data.md](./data.md). Empty `detections` and `weekly_counts`. Stub and live OAuth use the same schema.
+- `TOKEN_KEY` is a Workers secret. Never git.
+- Cloudflare and Support (for now): **randy@whatmatters.so**. Neon region: pick when we create the database.
 
-  Connect-screen copy version is `disclosure_version` = 1. Meta still shows its own permission list.
-  `consent_index` is a **bool**, default **off** — opt-in to anonymized `weekly_counts` only. Not the connect-screen disclosure.
-- After login: **Insights**, then **Media kit**. No extra onboarding form.
-- Brands open `pitchkit.app/k/[handle]`. They never see Insights.
-- Handle is frozen from the Instagram username. Seed demo: `/k/demo`.
-- TikTok is optional, from Insights, after they already have an account.
-- Kit is a link and a PDF. App works on a phone.
-- Look: cream, serif, oxblood (the Atelier mocks). Name on the site is Pitchkit.
-- Postgres: see [data.md](./data.md). `users` + `media` from Instagram Login + Insights only. Empty `detections` and `weekly_counts` now.
+## Do not build
 
-## Do not
+CV, TikTok, PDF, brand dashboard, kit-view analytics for sale, Browser Run, D1, bio/website/rates/contact/geo on the kit.
 
-- Add email login, Google, Apple, or TikTok as a second way to create an account.
-- Add a post-login wizard, editable handle, computer vision, or a separate analytics product.
-- Put image files in the database. Put them in object storage.
-- Add Graph columns we do not already get from public posts + Insights, including “for later.”
-- Invent product rules that contradict `plan.md`. Change the plan first if the lock is wrong.
+Do not add Graph columns we do not get from public posts + Insights. Do not invent rules that contradict `plan.md`.
 
 ## After each turn
 
-If a lock changed, update `plan.md`. If a column or table changed, update `data.md`. Do not leave the new rule only in chat.
-
-## Commands
-
-None yet. App is not scaffolded.
+Locks → `plan.md`. Columns → `data.md`.

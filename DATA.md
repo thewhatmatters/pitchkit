@@ -2,7 +2,7 @@
 
 Canonical list of Postgres tables and columns. Product rules: [plan.md](./plan.md).
 
-Photos live in object storage (R2). SQL stores keys, not image bytes.
+Photos live in object storage (R2), **publicly readable** for kit objects (already public posts). Do not use expiring signed URLs for the kit. SQL stores keys, not image bytes.
 
 **Rule:** only Instagram Login + Insights. If Graph does not send it under public posts + Insights, do not add a column.
 
@@ -76,9 +76,13 @@ Create now. **Leave empty** until computer vision exists.
 
 Create now. **Leave empty** until rollups exist.
 
-Hashed / anonymous aggregates only. Write only when `users.consent_index` is true. **No** `user_id`, handle, or `ig_user_id`.
+Write only when `users.consent_index` is true.
 
-Column list TBD when we define a rollup that cannot identify a person. Do not invent identifying columns in the meantime.
+**Allowed:** time bucket, metric name, hashed or global cohort, integer count.
+
+**Forbidden:** `user_id`, `ig_user_id`, handle, name, tokens, captions, permalinks, or anything that identifies a creator.
+
+Column names TBD when the first rollup exists. Empty table is enough for v1. Do not invent identifying columns.
 
 ---
 
@@ -92,8 +96,7 @@ No columns for:
 - unfollowers
 - emails
 - industry / category
-- bio
-- website
+- bio, website, rates, “contact for collab,” geo (not on the kit in v1)
 - location beyond the public profile
 - Stories (unless we add them to kit consent later)
 - other people’s accounts
@@ -107,8 +110,9 @@ No columns for:
 | What | Where |
 |---|---|
 | Profile photo | R2, key on `users.avatar_r2_key` |
-| Post image or video poster | R2, key on `media.r2_key` |
-| Prefix on disconnect | R2 `{user_id}/` |
+| Post image or video poster | R2, key on `media.r2_key` (carousel: first frame; video: poster only) |
+| Prefix on disconnect | R2 `{user_id}/` — start immediately, finish within 24 hours |
+| Bucket | `pitchkit-media` (planned name) |
 
 ---
 
@@ -120,6 +124,10 @@ Delete `users` + `media` + R2 `{user_id}/`.
 
 ---
 
+## Graph hygiene (not extra columns)
+
+On poll: if Instagram no longer returns a post, delete that `media` row and its R2 object. Token revoke does not delete the kit; owner reconnects.
+
 ## TikTok
 
-Not in this file yet. When we persist it: new tables from TikTok Display API only. Do not add Instagram columns for TikTok.
+Do not build. No tables in this file until we persist Display API data.
