@@ -28,7 +28,7 @@ export default async function InsightsPage({ searchParams }: InsightsProps) {
   return (
     <main className="max-w-lg mx-auto px-4 py-8 flex flex-col gap-6">
       <PageTitle>Insights</PageTitle>
-      <p>Owner Insights. Brands never see this page.</p>
+      <p>Owner Insights. Brands never see this page. Inventory below is example data for Design — not a layout lock.</p>
       <OwnerChrome
         user={kit.user}
         posts={kit.posts}

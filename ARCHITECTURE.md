@@ -38,7 +38,7 @@ Creator → Workers (OpenNext)
             → Instagram Login + Graph   (connect, refresh, Insights poll)
             → Neon via Hyperdrive        = rows
             → R2                         = photos (public read)
-         → /insights                     (owner, cookie)
+         → /insights                     (owner, cookie; example inventory this round)
          → /k/[handle]                   (anyone; Postgres + R2; no Graph)
 
 Brand  → /k/[handle] → same Worker → rows + public photos
@@ -56,7 +56,7 @@ Same table as [PLAN.md](./PLAN.md#stack-locked). Short version:
 - **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers.
 - **Icons:** Lucide through WMDS props. **Motion:** `motion` peer when WMDS needs it.
 - **Install WMDS:** `github:thewhatmatters/wmds` (CI cannot use `../wmds`). Local `../wmds` still works; `prepare` builds `dist/`.
-- **Charts:** Nivo via WMDS Chart (not CSS, not in this app yet). Empty Insights slot; hide when Insights are missing.
+- **Charts:** Nivo via WMDS Chart (not CSS, not in this app yet). `/insights` this round shows a labeled empty “30-day reach chart” slot in the example inventory. Do not invent a Chart atom here.
 - **Seed:** In-repo rows match [DATA.md](./DATA.md). `TOKEN_KEY` not required (seed tokens are null). Disconnect columns exist; no live delete yet.
 
 ---

@@ -52,7 +52,7 @@ Seed: `/k/demo`.
 | Creator | Continue with Instagram (Professional). Land on Insights. Share the kit URL. Reconnect, sign out, disconnect. Phone works. |
 | Brand | Open the kit. No account. |
 
-No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “contact for collab,” or geo on the kit.
+No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “contact for collab,” or geo on the **public kit**. Insights may show those as a labeled example inventory this round.
 
 ---
 
@@ -149,7 +149,7 @@ Landing (disclosure + Professional note + support)
 | Route | Who | What |
 |---|---|---|
 | `/` | anyone | Pitch, disclosure, Continue with Instagram, Professional note, support |
-| `/insights` | owner cookie | Last 30 days, stats, chart, six posts, reconnect / disconnect / sign out |
+| `/insights` | owner cookie | Last 30 days. **This round:** stacked **example** inventory of every locked kit object (not a layout lock). Reconnect / disconnect / sign out |
 | `/insights` Media kit tab | owner | Same card as public + copy / share link |
 | `/k/[handle]` | public | Card only + support footer |
 | `/privacy`, `/delete` | public | Meta review |
@@ -189,4 +189,6 @@ CV / filling `detections`. TikTok. PDF. Brand dashboard. Kit-view analytics for 
 
 ## Skip unless they are on the kit
 
-Bio, website, rates, “contact for collab,” geo. Easy to add columns later. Not why someone connects. No columns in [DATA.md](./DATA.md) until we show them.
+Rates, “contact for collab,” creator hometown / industry. Easy to add columns later. Not why someone connects.
+
+**Insights inventory (WHA-299):** `/insights` dumps locked objects for Design — ER, followers, typical reach, saves, 30-day reach chart *slot*, six posts, country / city / age / gender mix, bio, website. Sample numbers are **example data — not live**. Ranked % lists, not a map. No new WMDS atoms (no Stat / Chart / bar in this app). `/k/[handle]` stays the public card; do not dump this inventory there. Bio / website / mix are **not** Postgres columns this round.

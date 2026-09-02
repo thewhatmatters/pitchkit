@@ -35,14 +35,16 @@ On the connect screen, before they tap Instagram:
 | [DATA.md](./DATA.md) | Database tables and column names |
 | [AGENTS.md](./AGENTS.md) | Short lock list for coding agents |
 | `app/` | Next.js App Router routes |
-| `components/` | Kit, stats, posts, owner chrome (WMDS composition) |
+| `components/` | Kit, inventory, posts, owner chrome (WMDS composition) |
 | `db/` | Postgres schema from [DATA.md](./DATA.md) (`users`, `media`, empty `detections` + `weekly_counts`) |
-| `lib/` | Schema types, in-repo seed, kit math (six-post rank + ER) |
+| `lib/` | Schema types, in-repo seed, kit math (six-post rank + ER), example Insights inventory |
 | `public/demo/` | Placeholder kit images (`r2_key` maps here until R2) |
 
 Until Hyperdrive exists, `/k/demo` and `/insights` read the in-repo seed (`lib/seed.ts`). Same `User` / `Media` types as live. `TOKEN_KEY` is not required for seed. Unknown handle (`/k/nope`) is 404. No Neon or Instagram token yet.
 
 Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays public (no cookie).
+
+`/insights` (after the stub cookie) is a stacked **example inventory** of every locked kit object so Design can see what to design. Numbers are marked **Example data — not live**. Not a layout lock. `/k/demo` is still the public kit card.
 
 ---
 
@@ -88,7 +90,7 @@ Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=perso
 npm test
 ```
 
-Tests cover six-post rank (saves → reach → likes), ER when Insights are missing, and set/clear of the Pitchkit session cookie plus the Insights gate.
+Tests cover six-post rank (saves → reach → likes), ER when Insights are missing, the example Insights inventory (not live), and set/clear of the Pitchkit session cookie plus the Insights gate.
 
 Production-shaped local Workers runtime (official OpenNext):
 

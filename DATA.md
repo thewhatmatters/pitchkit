@@ -100,7 +100,7 @@ No columns for:
 - unfollowers
 - emails
 - industry / category
-- bio, website, rates, “contact for collab,” geo (not on the kit in v1)
+- bio, website, rates, “contact for collab,” geo (not on the public kit; no columns this round). `/insights` may paint **example** bio / website / country / city / age / gender mix for Design. Do not persist them until we store Graph values.
 - location beyond the public profile
 - Stories (unless we add them to kit consent later)
 - other people’s accounts
