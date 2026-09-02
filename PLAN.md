@@ -171,7 +171,7 @@ Landing (disclosure + Professional note + support)
 | `/k/[handle]` | public | Card only + support footer |
 | `/privacy`, `/delete` | public | Meta review |
 
-Name/handle is the headline on both Insights and the public card. Followers are scale. ER is the hire/no-hire Stat. Reach, saves, and the 30-day chart only when Insights exist (empty > zeros). Responsive: 2×2 stats and 2×3 posts on a phone.
+Name/handle is the headline on both Insights and the public card. Followers are scale. ER is the hire/no-hire Stat. Reach, saves, and the 30-day chart only when Insights exist (empty > zeros). **Stats row is fluid** (Randy, 2026-09-02) — design follows the data; maybe five Stats, maybe a horizontal scroll. Do not lock stats to a 2×2. Posts: **2×3** on a phone.
 
 Personal fail, OAuth cancel → landing with the Professional message or unchanged landing. Empty grid is OK. No blank Insights: “Pulling your grid…” until R2 catches up.
 

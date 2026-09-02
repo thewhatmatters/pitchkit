@@ -13,7 +13,7 @@ Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md)
   > We only use your public posts and Instagram Insights to build your media kit. We don’t read DMs, who you follow, or unfollowers. Disconnect deletes your kit and the copies we stored.
 
 - After login: **Insights**, then Media kit tab. Brands never see Insights.
-- **v1 stats (User Research + Design, 2026-09-02):** name/handle is the headline; followers are scale. ER is the hire/no-hire number (`(likes + comments) / followers` on the six; WMDS Stat, ER primary). Reach/saves/30-day chart only when Insights exist — empty > zeros, never paint missing as 0. Six posts: last 30 days, **saves then reach then likes**. Brand on `/k/[handle]`: spend or pass in ~30s. Creator on Insights: will this kit survive a brand checking the public grid. No geo, rates, or bio.
+- **v1 stats (User Research + Design, 2026-09-02):** name/handle is the headline; followers are scale. ER is the hire/no-hire number (`(likes + comments) / followers` on the six; WMDS Stat, ER primary). Reach/saves/30-day chart only when Insights exist — empty > zeros, never paint missing as 0. Six posts: last 30 days, **saves then reach then likes**. Stats row is fluid (Randy, 2026-09-02) — design follows the data; not a 2×2 lock. Posts stay **2×3**. Brand on `/k/[handle]`: spend or pass in ~30s. Creator on Insights: will this kit survive a brand checking the public grid. No geo, rates, or bio.
 - Carousel: first frame. Video: poster only. R2 public read for kit images.
 - Disconnect: delete SQL + R2 `{user_id}/` within 24 hours. `consent_index` default off.
 - Scopes: `instagram_business_basic` + `instagram_business_manage_insights` only.
