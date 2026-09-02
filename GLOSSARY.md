@@ -8,7 +8,7 @@ Desk research, interviews unrun. Locked with Design 2026-09-02. User Research ow
 Share of followers who interact with a typical post. Brands use this first: is the audience real, or a quiet list? Average recent posts: interactions ÷ followers. With Insights, interactions are likes + comments + saves + shares. Without Insights, likes + comments only — the tooltip must say which. A smaller account with a high ER often beats a big one that nobody talks to.
 - Brand ~30s: hire or pass — is the audience real?
 - Hide: never (public kit still has it).
-- Graph: none; computed. Insights: (likes + comments + saves + shares) ÷ followers. Public only: (likes + comments) ÷ followers.
+- Graph: none; computed. Insights: (likes + comments + saves + shares) ÷ followers. Public only: (likes + comments) ÷ followers. Denominator is followers until Randy/UR change it. Later uses ÷ reach; tooltip must print ours.
 
 **Typical reach** — Insights only; hide if missing.
 Unique accounts that usually see a post. This is what a brand is buying — not the follower total, not one viral. Median of recent posts, not a best-ever spike. If the public grid shows ~20k and the kit says 60k, the deal dies. Never paint 0.
@@ -80,10 +80,10 @@ Randy unlocked 2026-09-02. Insights only. Hide until connected. Empty > zeros. L
 
 **Profile visits** — later. Graph: `profile_views` (confirm live; older docs still list it).
 
-**Bio-link / outbound clicks** — later, and bio is out of v1. Graph: `website_clicks` if live.
+**Bio-link / outbound clicks** — later. Bio only if sourced from IG (hide if empty). Graph: `website_clicks` if live.
 
 **Audience mix (followers vs non)** — later. Graph: `reach` breakdown `follow_type`.
 
-**Insights** — Instagram account analytics the creator connected. Reach, saves, and the chart require this. Public-only kits still show ER + Followers.
+**Insights** — Instagram account analytics the creator connected. Typical reach, saves, the chart, and country / age / gender mix require this. Public-only kits still show ER + Followers.
 
-Geo / age / gender are v1 objects (not Stats). City, rates, Stories, and impressions are not. Do not paint impressions as a Stat (deprecated per UR unless Backend confirms a live field). Don’t file city / rates / Stories as a Stat even if Later/Mobbin show them.
+Country / age / gender mix are v1 objects (not Stats). Bio / location only if sourced from IG. Industry is a Later form field, not Graph — don’t add unless sourced. Skip rates. Table stories. Do not paint impressions unless Backend confirms a live field. Empty > zeros. Don’t file city / rates / Stories as a Stat even if Later/Mobbin show them.
