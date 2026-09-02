@@ -4,6 +4,7 @@ export {
   Badge,
   Button,
   Card,
+  Chip,
   StatusDot,
   cardBodyTextClasses,
   cardTitleClasses,

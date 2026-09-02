@@ -37,12 +37,14 @@ On the connect screen, before they tap Instagram:
 | `app/` | Next.js App Router routes |
 | `components/` | Kit, stats, posts, owner chrome (WMDS composition) |
 | `db/` | Postgres schema from [DATA.md](./DATA.md) (`users`, `media`, empty `detections` + `weekly_counts`) |
-| `lib/` | Schema types, in-repo seed, kit math (six-post rank + ER) |
+| `lib/` | Schema types, in-repo seed, kit math (six-post rank + ER), Insights inventory examples (`inventory.ts`) |
 | `public/demo/` | Placeholder kit images (`r2_key` maps here until R2) |
 
 Until Hyperdrive exists, `/k/demo` and `/insights` read the in-repo seed (`lib/seed.ts`). Same `User` / `Media` types as live. `TOKEN_KEY` is not required for seed. Unknown handle (`/k/nope`) is 404. No Neon or Instagram token yet.
 
-Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays public (no cookie).
+Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays public (no cookie) and does **not** dump the Insights inventory.
+
+`/insights` keeps the existing 2×2 stats + six posts, then stacks a **static inventory** of locked kit objects (engagement rate, followers, typical reach, saves, 30-day reach chart slot, six posts, country/city/age/gender mix, bio, website) so Design can see what to design. Invented samples are labeled example data, not live Instagram. No new Postgres columns.
 
 ---
 

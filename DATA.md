@@ -100,7 +100,7 @@ No columns for:
 - unfollowers
 - emails
 - industry / category
-- bio, website, rates, “contact for collab,” geo (not on the kit in v1)
+- bio, website, rates, “contact for collab,” geo (not on the kit in v1; `/insights` Design inventory uses in-file example objects in `lib/inventory.ts`, not columns)
 - location beyond the public profile
 - Stories (unless we add them to kit consent later)
 - other people’s accounts

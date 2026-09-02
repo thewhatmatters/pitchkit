@@ -52,7 +52,7 @@ Seed: `/k/demo`.
 | Creator | Continue with Instagram (Professional). Land on Insights. Share the kit URL. Reconnect, sign out, disconnect. Phone works. |
 | Brand | Open the kit. No account. |
 
-No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “contact for collab,” or geo on the kit.
+No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “contact for collab,” or geo on the **public kit**. `/insights` may dump those locked objects as a static Design inventory (empty bio/website = “hidden when blank”; mixes as ranked % lists, not a map). No new Postgres columns for that dump.
 
 ---
 
@@ -149,9 +149,9 @@ Landing (disclosure + Professional note + support)
 | Route | Who | What |
 |---|---|---|
 | `/` | anyone | Pitch, disclosure, Continue with Instagram, Professional note, support |
-| `/insights` | owner cookie | Last 30 days, stats, chart, six posts, reconnect / disconnect / sign out |
+| `/insights` | owner cookie | Last 30 days, stats, chart, six posts, reconnect / disconnect / sign out. Additive **static inventory** of locked kit objects (WHA-299) for Design — stacked Cards, not a look lock. Sample geo/age/gender/reach/saves are in-file examples, not live Instagram. |
 | `/insights` Media kit tab | owner | Same card as public + copy / share link |
-| `/k/[handle]` | public | Card only + support footer |
+| `/k/[handle]` | public | Card only + support footer. No Insights inventory dump. |
 | `/privacy`, `/delete` | public | Meta review |
 
 Responsive: 2×2 stats and 2×3 posts on a phone.

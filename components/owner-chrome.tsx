@@ -6,6 +6,7 @@ import { Copy, Share } from "lucide-react";
 import { ChartSlot } from "@/components/chart-slot";
 import { EmptyGrid } from "@/components/empty-grid";
 import { KitCard } from "@/components/kit-card";
+import { KitInventory } from "@/components/kit-inventory";
 import { PostGrid } from "@/components/post-grid";
 import { StatsGrid } from "@/components/stats-grid";
 import { STUB_DISCONNECT } from "@/lib/copy";
@@ -94,6 +95,7 @@ export function OwnerChrome({
           ) : (
             <EmptyGrid />
           )}
+          <KitInventory user={user} posts={posts} engagementRate={engagementRate} />
         </div>
       ) : (
         <div className="flex flex-col gap-4">
