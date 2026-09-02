@@ -8,9 +8,10 @@ import { EmptyGrid } from "@/components/empty-grid";
 import { KitCard } from "@/components/kit-card";
 import { PostGrid } from "@/components/post-grid";
 import { StatsGrid } from "@/components/stats-grid";
-import { STUB_SESSION } from "@/lib/copy";
+import { STUB_DISCONNECT } from "@/lib/copy";
 import { kitPath } from "@/lib/kit";
 import type { Media, User } from "@/lib/schema";
+import { AUTH_CONNECT_PATH, AUTH_SIGNOUT_PATH } from "@/lib/session";
 
 type OwnerChromeProps = {
   user: User;
@@ -34,8 +35,8 @@ export function OwnerChrome({
 
   const kitHref = kitPath(user.handle);
 
-  function showStub() {
-    setNotice(STUB_SESSION);
+  function showDisconnectStub() {
+    setNotice(STUB_DISCONNECT);
   }
 
   async function copyLink() {
@@ -118,13 +119,17 @@ export function OwnerChrome({
       )}
 
       <div className="flex flex-wrap gap-2">
-        <Button role="secondary" onClick={showStub}>
-          Reconnect Instagram
-        </Button>
-        <Button role="secondary" onClick={showStub}>
-          Sign out
-        </Button>
-        <Button role="destructive" onClick={showStub}>
+        <form action={AUTH_CONNECT_PATH} method="post">
+          <Button type="submit" role="secondary">
+            Reconnect Instagram
+          </Button>
+        </form>
+        <form action={AUTH_SIGNOUT_PATH} method="post">
+          <Button type="submit" role="secondary">
+            Sign out
+          </Button>
+        </form>
+        <Button role="destructive" onClick={showDisconnectStub}>
           Disconnect
         </Button>
       </div>

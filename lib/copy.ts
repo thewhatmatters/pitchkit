@@ -12,8 +12,8 @@ export const SUPPORT_EMAIL = "randy@whatmatters.so";
 
 export const EMPTY_GRID = "Pulling your grid…";
 
-export const STUB_SESSION =
-  "Stub — Pitchkit has no session cookie yet. This does not call Instagram or delete anything.";
+export const STUB_DISCONNECT =
+  "Disconnect deletes your kit and the copies we stored. That control does not run yet.";
 
 export const STUB_CONNECT =
-  "Stub connect — no Instagram token yet. Continues to Insights with demo data.";
+  "Stub connect — no Instagram token. Sets a Pitchkit session for demo and continues to Insights.";

@@ -16,8 +16,8 @@ export default function DeletePage() {
           The kit URL returns 404. We start immediately and finish within 24 hours.
         </PageCopy>
         <PageCopy>
-          Stub — there is no session cookie yet, so this page does not delete anything.
-          When login exists, Disconnect on Insights runs this.
+          Stub — this page does not delete anything yet. Disconnect on Insights is
+          the same control; live delete is not wired.
         </PageCopy>
       </PageCard>
       <SupportFooter />

@@ -1,12 +1,6 @@
 import { assemblePublicKit, type PublicKit } from "./kit";
 import type { Detection, WeeklyCount } from "./schema";
-import {
-  DEMO_HANDLE,
-  seedDetections,
-  seedMedia,
-  seedUsers,
-  seedWeeklyCounts,
-} from "./seed";
+import { seedDetections, seedMedia, seedUsers, seedWeeklyCounts } from "./seed";
 
 /**
  * Until Hyperdrive exists, /k/[handle] and /insights read the in-repo seed.
@@ -26,9 +20,9 @@ export function loadPublicKit(handle: string, now: Date = new Date()): PublicKit
   return assemblePublicKit(user, media, now);
 }
 
-/** Owner Insights. Cookie comes later; same seed types until Hyperdrive + session. */
-export function loadOwnerKit(now: Date = new Date()): PublicKit | null {
-  return loadPublicKit(DEMO_HANDLE, now);
+/** Owner Insights for the session handle. Same seed types until Hyperdrive. */
+export function loadOwnerKit(handle: string, now: Date = new Date()): PublicKit | null {
+  return loadPublicKit(handle, now);
 }
 
 export function loadDetections(): Detection[] {

@@ -42,6 +42,8 @@ On the connect screen, before they tap Instagram:
 
 Until Hyperdrive exists, `/k/demo` and `/insights` read the in-repo seed (`lib/seed.ts`). Same `User` / `Media` types as live. `TOKEN_KEY` is not required for seed. Unknown handle (`/k/nope`) is 404. No Neon or Instagram token yet.
 
+Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays public (no cookie).
+
 ---
 
 ## Data, in one sentence
@@ -80,13 +82,13 @@ cp .dev.vars.example .dev.vars
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=personal`, `/insights`, `/insights?tab=kit`, `/insights?grid=pulling`, `/k/demo`, `/k/nope` (404), `/privacy`, `/delete`.
+Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=personal`, `/auth/instagram` (stub connect), `/auth/sign-out`, `/insights`, `/insights?tab=kit`, `/insights?grid=pulling`, `/k/demo`, `/k/nope` (404), `/privacy`, `/delete`.
 
 ```bash
 npm test
 ```
 
-Tests cover six-post rank (saves → reach → likes) and ER when Insights are missing.
+Tests cover six-post rank (saves → reach → likes), ER when Insights are missing, and set/clear of the Pitchkit session cookie plus the Insights gate.
 
 Production-shaped local Workers runtime (official OpenNext):
 
