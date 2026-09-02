@@ -23,6 +23,8 @@ Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCH
 | Auth | Instagram Login + Pitchkit httpOnly cookie |
 | Charts | CSS |
 
+Randy overwrote **Charts: CSS** with **Nivo in WMDS**. Chart ships in the design system first. Do not implement Nivo in this repo.
+
 **Not used:** D1, Vercel, shadcn, Browser Run, Queues, Workers AI.
 
 **Storybook** lives in the WMDS repo. Copy patterns from there; do not add Storybook to Pitchkit.
@@ -58,11 +60,19 @@ No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “c
 
 ## Kit math (locked)
 
+**Source:** User Research + Design, 2026-09-02.
+
+**Headline:** name and handle. Followers are **scale context**, not the headline.
+
+**Engagement rate** is the hire/no-hire number: `(likes + comments) / followers` on those six, when followers > 0. Render with a WMDS **Stat** (label + number). ER emphasis is primary.
+
 **Six posts:** among posts we fetched with `posted_at` in the **last 30 days**, rank **saves, then reach, then likes** (missing Insights sort last). Fill from older fetched posts only if we do not have six in-window.
 
-**Engagement rate:** `(likes + comments) / followers` on those six, when followers > 0. If Insights are missing, still show that ER from public likes and comments; **hide reach, saves, and the chart**.
+**Insights-gated:** reach, saves, and the 30-day chart **only when Insights exist**. Empty > zeros — do not paint missing Insights as 0. If Insights are missing, still show ER from public likes and comments; **hide reach, saves, and the chart**.
 
 **Carousel:** first child frame (cover) into R2. **Video:** poster only on the kit, never the file.
+
+**Not on the kit in v1:** geo, rates, bio.
 
 ---
 
@@ -146,6 +156,13 @@ Landing (disclosure + Professional note + support)
 
 ## Product surface
 
+**Jobs (locked, User Research + Design, 2026-09-02):**
+
+| Who | Job |
+|---|---|
+| Brand on `/k/[handle]` | Spend or pass in ~30s — is the audience real, how many people actually see a post. |
+| Creator on Insights | Will this kit survive a brand checking the public grid before they share the link. |
+
 | Route | Who | What |
 |---|---|---|
 | `/` | anyone | Pitch, disclosure, Continue with Instagram, Professional note, support |
@@ -154,7 +171,7 @@ Landing (disclosure + Professional note + support)
 | `/k/[handle]` | public | Card only + support footer |
 | `/privacy`, `/delete` | public | Meta review |
 
-Responsive: 2×2 stats and 2×3 posts on a phone.
+Name/handle is the headline on both Insights and the public card. Followers are scale. ER is the hire/no-hire Stat. Reach, saves, and the 30-day chart only when Insights exist (empty > zeros). Responsive: 2×2 stats and 2×3 posts on a phone.
 
 Personal fail, OAuth cancel → landing with the Professional message or unchanged landing. Empty grid is OK. No blank Insights: “Pulling your grid…” until R2 catches up.
 

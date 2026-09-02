@@ -13,7 +13,7 @@ Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md)
   > We only use your public posts and Instagram Insights to build your media kit. We don’t read DMs, who you follow, or unfollowers. Disconnect deletes your kit and the copies we stored.
 
 - After login: **Insights**, then Media kit tab. Brands never see Insights.
-- Six posts: last 30 days, **saves then reach then likes**. ER: `(likes + comments) / followers` on those six; if Insights missing, still show ER, hide reach/saves/chart.
+- **v1 stats (User Research + Design, 2026-09-02):** name/handle is the headline; followers are scale. ER is the hire/no-hire number (`(likes + comments) / followers` on the six; WMDS Stat, ER primary). Reach/saves/30-day chart only when Insights exist — empty > zeros, never paint missing as 0. Six posts: last 30 days, **saves then reach then likes**. Brand on `/k/[handle]`: spend or pass in ~30s. Creator on Insights: will this kit survive a brand checking the public grid. No geo, rates, or bio.
 - Carousel: first frame. Video: poster only. R2 public read for kit images.
 - Disconnect: delete SQL + R2 `{user_id}/` within 24 hours. `consent_index` default off.
 - Scopes: `instagram_business_basic` + `instagram_business_manage_insights` only.
@@ -21,7 +21,7 @@ Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md)
 - `TOKEN_KEY` is a Workers secret. Never git.
 - Cloudflare and Support (for now): **randy@whatmatters.so**. Neon region: pick when we create the database.
 - **UI:** `@whatmatters/wmds` (pattern-first, import `styles.css`). Layout Tailwind only. Lucide via WMDS. No shadcn. No Storybook in this repo. Install from `../wmds` or `github:thewhatmatters/wmds`; build WMDS `dist/` first.
-- **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers. Charts: CSS.
+- **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers. Charts: CSS — Randy overwrote this with Nivo in WMDS (Chart ships in WMDS first; do not implement Nivo here).
 
 ## Do not build
 
