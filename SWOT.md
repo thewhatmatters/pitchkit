@@ -41,19 +41,21 @@ Feature compare is evidence only. Spine:
 
 ### Opportunities
 
-- Live `/k/` that does not rot like a Canva PDF.
-- Creators who will not pay a scheduler (Later Starter is a paid-plan kit; confirm checkout) just to send a kit.
+- Live `/k/` vs a Canva PDF that rots.
+- Kit without Later tax. Official Starter is $18.75/mo billed yearly ([later.com/pricing-v3](https://later.com/pricing-v3)). Share kit = current paid plans.
+- Not “nobody else is free”: Beacons Free already ships a daily-updating kit at $0.
 - Anti-padded kit: survive the public grid check.
-- Honest Instagram Insights kit without a link-in-bio suite. Beacons sells kit + daily sync inside a broader product — confirm public price.
+- Honest Instagram Insights kit. Closest analog: OwlScran (labeled ER; missing omitted, not zeroed).
 
 ### Threats
 
-- Later already bundles kit + campaigns + scheduler in one login.
-- InfluenceFlow kit is free (take rate on payments).
+- Later bundles kit + campaigns + scheduler in one login. Share kit = paid plans.
+- Beacons Free $0 daily-updating kit.
+- InfluenceFlow $0. mediakit.bio $0 / $15. CollabKit $0 / $5.
 - Brands still ask for rates.
 - Meta deprecations (impressions already dead).
-- Stale the moment Insights are not connected.
-- Connoisseur: no creator-kit product found (Fine Art Connoisseur / radio only). Best analog, not a brand, until someone drops a URL.
+- Stale if Insights are off.
+- Connoisseur still not a kit product.
 
 ## Public kit contract
 
@@ -99,24 +101,28 @@ This round’s Insights dump ([WHA-299](https://linear.app/whatmatters/issue/WHA
 
 ## Landscape (evidence)
 
-Pricing is **unconfirmed** until a public page or checkout is captured. Do not copy roundup dollars into product copy.
+UR 2026-09-02. Official $ cited where a public page rendered. Third-party $ labeled. Do not invent dollars. Do not copy roundup $ into product copy.
 
-| Product | What it is | Kit job | vs Pitchkit |
+| Product | Price (cited) | Kit job | vs Pitchkit |
 | --- | --- | --- |
-| Later | Scheduler with a kit bolted onto paid plans (create + share on Starter+). | Mixed: rates + look + 3-month prose (followers, ER, profile views, bio-link clicks), then country / age / gender. Buries typical reach and saves. ER they publish ÷ reach. | Analog for honesty + country bars. Skip rates, stories, map, vanity, 90-day window, ÷ reach ER. Scheduler tax to share a kit. |
-| Beacons Media Kit Pro | Kit-as-product inside a link-in-bio suite. Daily sync claimed. | Live kit + rates. | Closer kit-as-product. Confirm price. We should not need their suite. |
-| CreatorsJet | Kit-as-product. | Rates on the kit. | Confirm public page. |
-| MySocial | Kit + multi-platform. | TikTok already. | Our IG-only weakness. |
-| InfluenceFlow | Free kit, take rate on payments. | Rate card in the kit. | Free kit threat. |
+| Later | Official yearly Starter $18.75/mo billed yearly ([later.com/pricing-v3](https://later.com/pricing-v3)). Help: share kit = current paid plans. Third-party 2026-07-21 monthly $25 / $50 / $110. | Followers, ER `(L+C+saves+shares) ÷ (Reels + static reach)`, avg post reach, top countries / age / gender, bio, rates, profile views. Saves in ER only, not an own field. Update 1×/24h. IG + TikTok. | Scheduler tax. Skip rates, stories, map, vanity, 90-day window, ÷ reach ER. |
+| Beacons | Free $0 includes daily-updating kit. Creator $10/mo or $8.33 annual. Old Media Kit Pro $10 SKU gone. | Link + PDF. Rates yes. Stories only with Full IG. ER formula unpublished. | Free daily kit is the $0 threat. We should not need their suite. |
+| CreatorsJet | Official $ page did not render. Third-party 2026-07-16 Free / ~$10–12 / ~$19–24. | Handle scrape, not Insights. PDF paid. | Confirm official page. Not an Insights analog. |
+| MySocial | Basic kit free. Creator Memory $490/yr. | Daily official APIs claimed. ER unpublished. | TikTok already. Our IG-only weakness. |
+| InfluenceFlow | $0 + processing fees. | ER copy contradicts. Insights claims unverified. | Free kit threat. |
+| mediakit.bio | $0 / $15/mo. | Kit-as-product. | Free / cheap kit threat. |
+| OwlScran | Free (paid $ unpublished). | Meta Insights. ER `(L+C+saves+shares) ÷ avg views`. Missing omitted, not zeroed. | Closest honesty analog. |
+| CollabKit | $0 / $5/mo. | Demo via screenshot upload. | Cheap kit, not Insights. |
 | Canva | PDF template. | Stale-number job. | Not a competitor to a live `/k/` link. |
+| Connoisseur | Not a product. | — | Fine Art Connoisseur / radio only. Not a kit brand. |
 
 Later contrast (not a lock flip): ~90-day vs our 30-day; their ER ÷ reach including saves / shares vs ours likes + comments ÷ followers; “Average” vs our labeled formula; empty > zeros we keep.
 
 ## Open
 
 - Randy: visual references for why these Insights exist (still incoming).
-- Confirm Later / Beacons / CreatorsJet / MySocial / InfluenceFlow pricing on primary pages.
-- Connoisseur URL if it was a product, not a figure of speech.
+- CreatorsJet official $ page (did not render). OwlScran paid $. MySocial ER formula. InfluenceFlow Insights claims.
+- Connoisseur still not a kit product.
 - Backend: live Graph names for identity fields (`name`, `username`, `profile_picture_url`) and any shares field. Do not paint unconfirmed Graph keys.
 - Interviews still unrun.
 
