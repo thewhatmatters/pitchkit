@@ -17,6 +17,8 @@ import {
   EXAMPLE_GENDER_MIX,
   EXAMPLE_TYPICAL_REACH,
   EXAMPLE_TYPICAL_SAVES,
+  GLOSSARY_DEFINITION_MISSING,
+  GLOSSARY_FIRST_SENTENCE,
   HIDDEN_WHEN_BLANK,
   INVENTORY_BIO,
   INVENTORY_INTRO,
@@ -45,16 +47,27 @@ function ExampleChip() {
   );
 }
 
+function GlossaryDefinition({ id }: { id: InventoryItemId }) {
+  const sentence = GLOSSARY_FIRST_SENTENCE[id] ?? GLOSSARY_DEFINITION_MISSING;
+  return (
+    <p className={cardBodyTextClasses} data-glossary-definition={id}>
+      {sentence}
+    </p>
+  );
+}
+
 function InventoryCard({
   id,
   title,
   example,
+  value,
   children,
 }: {
   id: InventoryItemId;
   title: string;
   example?: boolean;
-  children: ReactNode;
+  value?: ReactNode;
+  children?: ReactNode;
 }) {
   return (
     <Card variant="outlined" shape="rounded" padding="none" data-inventory-item={id}>
@@ -65,7 +78,13 @@ function InventoryCard({
         </div>
       </Card.Header>
       <Card.Body>
-        <div className="flex flex-col gap-2 p-3">{children}</div>
+        <div className="flex flex-col gap-2 p-3">
+          <div className="flex flex-wrap items-baseline gap-3">
+            {value}
+            <GlossaryDefinition id={id} />
+          </div>
+          {children}
+        </div>
       </Card.Body>
     </Card>
   );
@@ -106,8 +125,11 @@ export function KitInventory({ user, posts, engagementRate }: KitInventoryProps)
         </Card.Body>
       </Card>
 
-      <InventoryCard id="engagement-rate" title="Engagement rate">
-        <p className={cardTitleClasses}>{formatEngagementRate(engagementRate)}</p>
+      <InventoryCard
+        id="engagement-rate"
+        title="Engagement rate"
+        value={<p className={cardTitleClasses}>{formatEngagementRate(engagementRate)}</p>}
+      >
         <p className={cardBodyTextClasses}>{ENGAGEMENT_FORMULA}</p>
         <p className={cardBodyTextClasses}>
           Demo seed math from public likes and comments on the six posts. Seed Insights are
@@ -115,18 +137,29 @@ export function KitInventory({ user, posts, engagementRate }: KitInventoryProps)
         </p>
       </InventoryCard>
 
-      <InventoryCard id="followers" title="Followers">
-        <p className={cardTitleClasses}>{formatCount(user.followers)}</p>
+      <InventoryCard
+        id="followers"
+        title="Followers"
+        value={<p className={cardTitleClasses}>{formatCount(user.followers)}</p>}
+      >
         <p className={cardBodyTextClasses}>Count from the demo seed profile.</p>
       </InventoryCard>
 
-      <InventoryCard id="typical-reach" title="Typical reach" example>
-        <p className={cardTitleClasses}>{formatCount(EXAMPLE_TYPICAL_REACH)}</p>
+      <InventoryCard
+        id="typical-reach"
+        title="Typical reach"
+        example
+        value={<p className={cardTitleClasses}>{formatCount(EXAMPLE_TYPICAL_REACH)}</p>}
+      >
         <p className={cardBodyTextClasses}>{TYPICAL_REACH_CAPTION}</p>
       </InventoryCard>
 
-      <InventoryCard id="saves" title="Saves" example>
-        <p className={cardTitleClasses}>{formatCount(EXAMPLE_TYPICAL_SAVES)}</p>
+      <InventoryCard
+        id="saves"
+        title="Saves"
+        example
+        value={<p className={cardTitleClasses}>{formatCount(EXAMPLE_TYPICAL_SAVES)}</p>}
+      >
         <p className={cardBodyTextClasses}>{TYPICAL_SAVES_CAPTION}</p>
       </InventoryCard>
 
@@ -160,13 +193,17 @@ export function KitInventory({ user, posts, engagementRate }: KitInventoryProps)
         <ShareList rows={EXAMPLE_GENDER_MIX} />
       </InventoryCard>
 
-      <InventoryCard id="bio" title="Bio">
-        <HiddenWhenBlank value={INVENTORY_BIO} />
-      </InventoryCard>
+      <InventoryCard
+        id="bio"
+        title="Bio"
+        value={<HiddenWhenBlank value={INVENTORY_BIO} />}
+      />
 
-      <InventoryCard id="website" title="Website">
-        <HiddenWhenBlank value={INVENTORY_WEBSITE} />
-      </InventoryCard>
+      <InventoryCard
+        id="website"
+        title="Website"
+        value={<HiddenWhenBlank value={INVENTORY_WEBSITE} />}
+      />
     </section>
   );
 }

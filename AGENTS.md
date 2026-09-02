@@ -1,8 +1,8 @@
 # Pitchkit
 
-**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [AGENTS](./AGENTS.md)
+**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [glossary](./GLOSSARY.md) · [AGENTS](./AGENTS.md)
 
-Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md). Spec: [PLAN.md](./PLAN.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md). Columns: [DATA.md](./DATA.md).
+Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md). Spec: [PLAN.md](./PLAN.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md). Columns: [DATA.md](./DATA.md). Stats vocabulary: [GLOSSARY.md](./GLOSSARY.md).
 
 ## Product lock
 
@@ -12,7 +12,7 @@ Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md)
 
   > We only use your public posts and Instagram Insights to build your media kit. We don’t read DMs, who you follow, or unfollowers. Disconnect deletes your kit and the copies we stored.
 
-- After login: **Insights**, then Media kit tab. Brands never see Insights. `/insights` also dumps a static inventory of locked kit objects (WHA-299) for Design — not a look lock, not on `/k/[handle]`. Example geo/age/gender/reach/saves stay in-file (`lib/inventory.ts`). Seed Insights stay null.
+- After login: **Insights**, then Media kit tab. Brands never see Insights. `/insights` also dumps a static inventory of locked kit objects (WHA-299) for Design — not a look lock, not on `/k/[handle]`. Each object shows the first sentence from [GLOSSARY.md](./GLOSSARY.md) next to the number. Example geo/age/gender/reach/saves stay in-file (`lib/inventory.ts`). Seed Insights stay null.
 - Six posts: last 30 days, **saves then reach then likes**. ER: `(likes + comments) / followers` on those six; if Insights missing, still show ER, hide reach/saves/chart.
 - Carousel: first frame. Video: poster only. R2 public read for kit images.
 - Disconnect: delete SQL + R2 `{user_id}/` within 24 hours. `consent_index` default off.
@@ -31,4 +31,4 @@ Do not add Graph columns we do not get from public posts + Insights. Do not inve
 
 ## After each turn
 
-Locks → [PLAN.md](./PLAN.md). Picture → [ARCHITECTURE.md](./ARCHITECTURE.md). Columns → [DATA.md](./DATA.md). Humans → [README.md](./README.md).
+Locks → [PLAN.md](./PLAN.md). Picture → [ARCHITECTURE.md](./ARCHITECTURE.md). Columns → [DATA.md](./DATA.md). Stats words → [GLOSSARY.md](./GLOSSARY.md). Humans → [README.md](./README.md).

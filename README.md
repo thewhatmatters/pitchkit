@@ -2,7 +2,7 @@
 
 A hosted **media kit** for Instagram creators. They sign in with Instagram, see their numbers, and send brands a link. Live site: **pitchkit.app**. Public kit: `https://pitchkit.app/k/[handle]`.
 
-**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [AGENTS](./AGENTS.md)
+**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [glossary](./GLOSSARY.md) · [AGENTS](./AGENTS.md)
 
 GitHub: [thewhatmatters/pitchkit](https://github.com/thewhatmatters/pitchkit).
 
@@ -33,6 +33,7 @@ On the connect screen, before they tap Instagram:
 | [PLAN.md](./PLAN.md) | Product and build brief |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | How the pieces connect (Workers, Graph, Neon, R2) |
 | [DATA.md](./DATA.md) | Database tables and column names |
+| [GLOSSARY.md](./GLOSSARY.md) | What each kit number means (first sentence is the Insights inventory definition) |
 | [AGENTS.md](./AGENTS.md) | Short lock list for coding agents |
 | `app/` | Next.js App Router routes |
 | `components/` | Kit, stats, posts, owner chrome (WMDS composition) |
@@ -44,7 +45,7 @@ Until Hyperdrive exists, `/k/demo` and `/insights` read the in-repo seed (`lib/s
 
 Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays public (no cookie) and does **not** dump the Insights inventory.
 
-`/insights` keeps the existing 2×2 stats + six posts, then stacks a **static inventory** of locked kit objects (engagement rate, followers, typical reach, saves, 30-day reach chart slot, six posts, country/city/age/gender mix, bio, website) so Design can see what to design. Invented samples are labeled example data, not live Instagram. No new Postgres columns.
+`/insights` keeps the existing 2×2 stats + six posts, then stacks a **static inventory** of locked kit objects (engagement rate, followers, typical reach, saves, 30-day reach chart slot, six posts, country/city/age/gender mix, bio, website) so Design can see what to design. Each object shows the first sentence from [GLOSSARY.md](./GLOSSARY.md) next to the number. Invented samples are labeled example data, not live Instagram. No new Postgres columns.
 
 ---
 

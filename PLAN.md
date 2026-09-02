@@ -1,8 +1,8 @@
 # Pitchkit MVP plan
 
-**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [AGENTS](./AGENTS.md)
+**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [glossary](./GLOSSARY.md) · [AGENTS](./AGENTS.md)
 
-Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md).
+Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md). Stats vocabulary: [GLOSSARY.md](./GLOSSARY.md).
 
 **Look:** WMDS (`@whatmatters/wmds`). Name on the site is Pitchkit.
 
@@ -149,7 +149,7 @@ Landing (disclosure + Professional note + support)
 | Route | Who | What |
 |---|---|---|
 | `/` | anyone | Pitch, disclosure, Continue with Instagram, Professional note, support |
-| `/insights` | owner cookie | Last 30 days, stats, chart, six posts, reconnect / disconnect / sign out. Additive **static inventory** of locked kit objects (WHA-299) for Design — stacked Cards, not a look lock. Sample geo/age/gender/reach/saves are in-file examples, not live Instagram. |
+| `/insights` | owner cookie | Last 30 days, stats, chart, six posts, reconnect / disconnect / sign out. Additive **static inventory** of locked kit objects (WHA-299) for Design — stacked Cards, not a look lock. Each object shows the first sentence from [GLOSSARY.md](./GLOSSARY.md) next to the number. Sample geo/age/gender/reach/saves are in-file examples, not live Instagram. |
 | `/insights` Media kit tab | owner | Same card as public + copy / share link |
 | `/k/[handle]` | public | Card only + support footer. No Insights inventory dump. |
 | `/privacy`, `/delete` | public | Meta review |

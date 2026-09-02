@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, it } from "node:test";
 import {
   AGE_BRACKETS,
@@ -11,6 +13,7 @@ import {
   EXAMPLE_DATA_NOTE,
   EXAMPLE_GENDER_MIX,
   GENDER_BUCKETS,
+  GLOSSARY_FIRST_SENTENCE,
   HIDDEN_WHEN_BLANK,
   INVENTORY_BIO,
   INVENTORY_ITEM_IDS,
@@ -91,5 +94,17 @@ describe("insights static inventory", () => {
       seedMedia.every((row) => row.reach == null && row.saves == null),
       true,
     );
+  });
+
+  it("copies the first GLOSSARY.md sentence for every inventory object", () => {
+    const glossary = readFileSync(join(process.cwd(), "GLOSSARY.md"), "utf8");
+    assert.match(glossary, /Tooltip = first sentence/);
+    for (const id of INVENTORY_ITEM_IDS) {
+      const sentence = GLOSSARY_FIRST_SENTENCE[id];
+      assert.ok(sentence, id);
+      assert.match(sentence, /[.]$|[?]$/, id);
+      assert.equal(glossary.includes(sentence), true, id);
+    }
+    assert.equal(Object.keys(GLOSSARY_FIRST_SENTENCE).length, 12);
   });
 });

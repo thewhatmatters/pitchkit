@@ -54,6 +54,28 @@ export const INVENTORY_ITEM_IDS = [
 
 export type InventoryItemId = (typeof INVENTORY_ITEM_IDS)[number];
 
+/**
+ * First sentence only from GLOSSARY.md (PR 2 / cursor/v1-stats-lock-43e8).
+ * Tooltip = first sentence. Do not invent if a term is missing.
+ */
+export const GLOSSARY_FIRST_SENTENCE: Record<InventoryItemId, string> = {
+  "engagement-rate": "Share of followers who interact with a typical post.",
+  followers: "Accounts following this profile right now.",
+  "typical-reach": "Unique accounts that usually see a post.",
+  saves: "People who bookmarked a typical post to come back.",
+  "reach-chart":
+    "Reach over the last 30 days so a brand (and the creator before they share) can see typical vs a spike.",
+  "six-posts": "Recent work a brand can match to the public grid.",
+  "country-mix": "Are they in my market?",
+  "city-mix": "Which cities, same job finer.",
+  "age-mix": "Are they the buying age?",
+  "gender-mix": "Does the split match the customer?",
+  bio: "IG User `biography` (Public).",
+  website: "IG User `website` (Public).",
+};
+
+export const GLOSSARY_DEFINITION_MISSING = "Definition missing — GLOSSARY.md";
+
 export type RankedShare = {
   label: string;
   percent: number;
