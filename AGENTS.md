@@ -17,8 +17,8 @@ Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md)
 - Carousel: first frame. Video: poster only. R2 public read for kit images.
 - Disconnect: delete SQL + R2 `{user_id}/` within 24 hours. `consent_index` default off.
 - Scopes: `instagram_business_basic` + `instagram_business_manage_insights` only.
-- Postgres: [DATA.md](./DATA.md). Empty `detections` and `weekly_counts`. Stub and live OAuth use the same schema.
-- `TOKEN_KEY` is a Workers secret. Never git.
+- Postgres: [DATA.md](./DATA.md). Empty `detections` and `weekly_counts`. Stub and live OAuth use the same schema. SQL in `db/`. Until Hyperdrive exists, `/k/demo` and `/insights` read `lib/seed.ts` (same types). Handle `demo` is frozen.
+- `TOKEN_KEY` is a Workers secret. Never git. Not required for the seed (tokens stay null). Disconnect columns exist; no live delete yet.
 - Cloudflare and Support (for now): **randy@whatmatters.so**. Neon region: pick when we create the database.
 - **UI:** `@whatmatters/wmds` (pattern-first, import `styles.css`). Layout Tailwind only. Lucide via WMDS. No shadcn. No Storybook in this repo. Install from `github:thewhatmatters/wmds` (CI cannot use `../wmds`); `prepare` builds `dist/`.
 - **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers. Charts: Nivo via WMDS Chart (not CSS, not in this app yet).

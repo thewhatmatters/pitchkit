@@ -9,12 +9,12 @@ import { KitCard } from "@/components/kit-card";
 import { PostGrid } from "@/components/post-grid";
 import { StatsGrid } from "@/components/stats-grid";
 import { STUB_SESSION } from "@/lib/copy";
-import type { DemoPost, DemoUser } from "@/lib/demo";
-import { kitPath } from "@/lib/demo";
+import { kitPath } from "@/lib/kit";
+import type { Media, User } from "@/lib/schema";
 
 type OwnerChromeProps = {
-  user: DemoUser;
-  posts: DemoPost[];
+  user: User;
+  posts: Media[];
   engagementRate: number | null;
   hasInsights: boolean;
   gridReady: boolean;

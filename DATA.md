@@ -4,6 +4,8 @@
 
 Canonical list of Postgres tables and columns. Product rules: [PLAN.md](./PLAN.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md).
 
+SQL: `db/001_users.sql`, `db/002_media.sql`, `db/003_detections.sql`, `db/004_weekly_counts.sql`. Types: `lib/schema.ts`. In-repo seed (same columns, not Graph): `lib/seed.ts`. Handle `demo` is frozen. Until Hyperdrive exists the Worker reads that seed. `TOKEN_KEY` is not required for seed rows (tokens stay null).
+
 Photos live in object storage (R2), **publicly readable** for kit objects (already public posts). Do not use expiring signed URLs for the kit. SQL stores keys, not image bytes.
 
 **Rule:** only Instagram Login + Insights. If Graph does not send it under public posts + Insights, do not add a column.
@@ -84,7 +86,7 @@ Write only when `users.consent_index` is true.
 
 **Forbidden:** `user_id`, `ig_user_id`, handle, name, tokens, captions, permalinks, or anything that identifies a creator.
 
-Column names TBD when the first rollup exists. Empty table is enough for v1. Do not invent identifying columns.
+Column names TBD when the first rollup exists. Empty table is enough for v1. Do not invent identifying columns. `db/004_weekly_counts.sql` uses a non-identifying `_placeholder` so Postgres can create the table; drop it when real columns land. No rows.
 
 ---
 

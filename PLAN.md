@@ -172,7 +172,7 @@ Personal fail, OAuth cancel → landing with the Professional message or unchang
 ## Build order
 
 1. Next.js App Router + Tailwind v4 on OpenNext Workers. Install WMDS from `github:thewhatmatters/wmds` (local `../wmds` still fine). Neon + Hyperdrive + R2. Env names in README.  
-2. Schema from [DATA.md](./DATA.md) including empty `detections` and `weekly_counts`. Seed `demo`.  
+2. Schema from [DATA.md](./DATA.md) including empty `detections` and `weekly_counts`. Seed `demo`. SQL in `db/`. Until Hyperdrive exists, `/k/demo` and `/insights` read the in-repo seed (`lib/seed.ts`) with the same types. `TOKEN_KEY` not required for seed.  
 3. Insights + public `/k/demo` (responsive, OG tags).  
 4. Cookie + stub Instagram → Insights.  
 5. Live Instagram for testers.  

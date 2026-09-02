@@ -1,13 +1,14 @@
 "use client";
 
 import { Badge, Card, cardBodyTextClasses, cardTitleClasses } from "@/components/wmds";
-import type { DemoPost, DemoUser } from "@/lib/demo";
-import { formatCount, formatEngagementRate } from "@/lib/engagement";
 import { PostGrid } from "@/components/post-grid";
+import { formatCount, formatEngagementRate } from "@/lib/engagement";
+import { publicObjectUrl } from "@/lib/r2";
+import type { Media, User } from "@/lib/schema";
 
 type KitCardProps = {
-  user: DemoUser;
-  posts: DemoPost[];
+  user: User;
+  posts: Media[];
   engagementRate: number | null;
   hasInsights: boolean;
 };
@@ -17,7 +18,7 @@ export function KitCard({ user, posts, engagementRate, hasInsights }: KitCardPro
     <Card variant="outlined" shape="rounded" padding="none">
       <Card.Header>
         <div className="flex items-center gap-3">
-          <img src={user.avatar_src} alt="" width={56} height={56} />
+          <img src={publicObjectUrl(user.avatar_r2_key)} alt="" width={56} height={56} />
           <div>
             <p className={cardTitleClasses}>{user.name}</p>
             <p className={cardBodyTextClasses}>@{user.handle}</p>

@@ -36,10 +36,11 @@ On the connect screen, before they tap Instagram:
 | [AGENTS.md](./AGENTS.md) | Short lock list for coding agents |
 | `app/` | Next.js App Router routes |
 | `components/` | Kit, stats, posts, owner chrome (WMDS composition) |
-| `lib/` | Demo seed and locked ER math |
-| `public/demo/` | Placeholder kit images |
+| `db/` | Postgres schema from [DATA.md](./DATA.md) (`users`, `media`, empty `detections` + `weekly_counts`) |
+| `lib/` | Schema types, in-repo seed, kit math (six-post rank + ER) |
+| `public/demo/` | Placeholder kit images (`r2_key` maps here until R2) |
 
-This scaffold uses **static demo data** (`/k/demo`, `/insights`). Same columns as [DATA.md](./DATA.md). No Neon or Instagram token yet.
+Until Hyperdrive exists, `/k/demo` and `/insights` read the in-repo seed (`lib/seed.ts`). Same `User` / `Media` types as live. `TOKEN_KEY` is not required for seed. Unknown handle (`/k/nope`) is 404. No Neon or Instagram token yet.
 
 ---
 
@@ -80,6 +81,12 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=personal`, `/insights`, `/insights?tab=kit`, `/insights?grid=pulling`, `/k/demo`, `/k/nope` (404), `/privacy`, `/delete`.
+
+```bash
+npm test
+```
+
+Tests cover six-post rank (saves → reach → likes) and ER when Insights are missing.
 
 Production-shaped local Workers runtime (official OpenNext):
 

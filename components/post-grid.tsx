@@ -1,11 +1,12 @@
 "use client";
 
 import { Card, cardBodyTextClasses } from "@/components/wmds";
-import type { DemoPost } from "@/lib/demo";
 import { formatCount } from "@/lib/engagement";
+import { publicObjectUrl } from "@/lib/r2";
+import type { Media } from "@/lib/schema";
 
 type PostGridProps = {
-  posts: DemoPost[];
+  posts: Media[];
   hasInsights: boolean;
 };
 
@@ -15,9 +16,9 @@ export function PostGrid({ posts, hasInsights }: PostGridProps) {
       {posts.map((post) => (
         <Card key={post.id} variant="outlined" shape="rounded" padding="none">
           <Card.Body>
-            {/* Carousel: first frame. Video: poster only. */}
+            {/* Carousel: first frame. Video: poster only. r2_key placeholders until R2. */}
             <img
-              src={post.image_src}
+              src={publicObjectUrl(post.r2_key)}
               alt=""
               width={400}
               height={400}
