@@ -1,6 +1,13 @@
 # Pitchkit glossary
 
-Desk research, interviews unrun. Locked with Design 2026-09-02. User Research owns the meanings; Design owns look. Tooltip = first sentence. Longer help can sit under the chart. Graph names below are **Backend-confirmed against Instagram Login Graph v25** (not Facebook Login). Graph returns empty, not 0. Empty > zeros.
+Desk research, interviews unrun. Locked with Design 2026-09-02. User Research owns the meanings; Design owns look. Tooltip = first sentence. Longer help can sit under the chart. Graph names below are **Backend-confirmed live** against Instagram Login Graph v25 (not Facebook Login). Empty dataset over zeros is correct.
+
+**Live Graph stamp (Backend confirmed):**
+- Media object `saved_count` / `shares_count` are **Facebook Login only** — Pitchkit uses Instagram Login; do not use those fields.
+- Post kit: media insights `saved` / `shares` / `reach`.
+- Account chart: user insights `reach` `time_series` (includes stories + ads). Different from typical post `reach`.
+- If we ever label account-level saves: user insights `saves`, not `saved`.
+- ER stays `(likes + comments) ÷ followers`. Insights ER is not overwritten.
 
 ## v1 Stat row (ordered)
 
@@ -27,13 +34,13 @@ Accounts following this profile right now. Scale only. Not how many people saw t
 People who bookmarked a typical post to come back. Intent, not applause. Stronger commercial signal than a like. Never paint 0.
 - Brand ~30s: was the post worth keeping (intent > likes).
 - Hide: until Insights. Never paint 0.
-- Graph (v25, Instagram Login): media insights `saved` (FEED/REELS). Typical/median. Not account insights `saves`. Not `saved_count` (Facebook Login only).
+- Graph (live, Instagram Login): media insights `saved`. Typical/median. Not user insights `saves`. Not media object `saved_count` (Facebook Login only).
 
 **30-day chart** — Insights only; trend object, not a fifth Stat.
 Reach over the last 30 days so a brand (and the creator before they share) can see typical vs a spike. Never paint an empty chart as zeros. This is **not** the same number as typical post reach.
 - Brand ~30s: typical vs a spike before they share.
 - Hide: until Insights. Empty > zeros.
-- Graph (v25, Instagram Login): `GET /{ig-user-id}/insights?metric=reach&period=day&metric_type=time_series` — account unique reach (includes stories/ads). **Different number** from typical post media insights `reach`.
+- Graph (live, Instagram Login): user insights `reach` `time_series` (`GET /{ig-user-id}/insights?metric=reach&period=day&metric_type=time_series`) — account unique reach (includes stories + ads). **Different number** from typical post media insights `reach`.
 
 **Six posts** — ranked saves → reach → likes.
 Recent work a brand can match to the public grid. Likes-first would look like a vanity kit.
@@ -103,7 +110,7 @@ Does the split match the customer?
 
 ## Not v1 (do not paint on the Stat row)
 
-**Shares** — people who sent the post onward. Same intent family as saves. Fifth Stat only if Insights return it and the row has room. Empty > zeros. Graph (v25, Instagram Login): media insights `shares`. Not `shares_count` (Facebook Login only).
+**Shares** — people who sent the post onward. Same intent family as saves. Fifth Stat only if Insights return it and the row has room. Empty > zeros. Graph (live, Instagram Login): media insights `shares`. Not media object `shares_count` (Facebook Login only).
 
 **Views** — times content played or displayed. Not unique people. Graph: `views`. `views` ≠ `reach`. Not a Stat; don’t use as typical reach.
 

@@ -60,7 +60,7 @@ No extra onboarding. No PDF in v1. No TikTok in v1. Steal vs skip: [GLOSSARY.md]
 
 ## Kit math (locked)
 
-**Source:** User Research + Design, 2026-09-02. Meanings and copy: [GLOSSARY.md](./GLOSSARY.md). Graph names are **Backend-confirmed against Instagram Login Graph v25** (not Facebook Login). Graph returns empty, not 0. Empty > zeros.
+**Source:** User Research + Design, 2026-09-02. Meanings and copy: [GLOSSARY.md](./GLOSSARY.md). **Live Graph (Backend confirmed, Instagram Login):** media object `saved_count` / `shares_count` are Facebook Login only — do not use. Post kit: media insights `saved` / `shares` / `reach`. Account chart: user insights `reach` `time_series` (includes stories + ads) — different from typical post `reach`. If we ever label account-level saves: user insights `saves`, not `saved`. Empty dataset over zeros is correct. ER stays `(likes + comments) ÷ followers`; Insights ER is not overwritten.
 
 **Headline:** name and handle. Lead pair on the card: **Followers (context) + ER (hire)** as numbers, not Later’s prose sentence. Followers are scale, not the headline.
 
@@ -69,8 +69,8 @@ No extra onboarding. No PDF in v1. No TikTok in v1. Steal vs skip: [GLOSSARY.md]
 1. **Engagement rate** — always, `primary`. Hire/no-hire. WMDS Stat (label + number). **Locked:** `(likes + comments) ÷ followers` on the six, when followers > 0. Same formula with or without Insights. Public and Insights kits use the same formula. Tooltip must say **of followers** and **likes + comments only**, so nobody thinks this is Later’s ÷ reach number. Do not use ÷ reach. Do not add saves/shares to the numerator unless Randy reopens it. Likes/comments are media `like_count` / `comments_count` — not insights.
 2. **Typical reach** — Insights only. Media insights `reach` (lifetime, unique). Median of recent posts, not a spike, not account 30-day unique, not `followers_count`. Hide until connected. **Different number** from the 30-day chart.
 3. **Followers** — always. Scale / sanity vs reach. User `followers_count` (store `followers`).
-4. **Saves** — Insights only. Media insights `saved` (FEED/REELS). Not account insights `saves`. Not `saved_count` (Facebook Login only). Hide until connected.
-5. Then the **30-day reach chart** (trend object, not a Stat). Insights only. `GET /{ig-user-id}/insights?metric=reach&period=day&metric_type=time_series` — account unique reach (includes stories/ads). **Different number** from typical post `reach`.
+4. **Saves** — Insights only. Media insights `saved`. Not user insights `saves`. Not media object `saved_count` (Facebook Login only). Hide until connected.
+5. Then the **30-day reach chart** (trend object, not a Stat). Insights only. User insights `reach` `time_series` (includes stories + ads). **Different number** from typical post media insights `reach`.
 
 **Row:** 2 without Insights (ER + Followers). 4 + chart with Insights. Don’t pad to five. Horizontal scroll is allowed later. Vocabulary: [GLOSSARY.md](./GLOSSARY.md).
 
@@ -88,7 +88,7 @@ No extra onboarding. No PDF in v1. No TikTok in v1. Steal vs skip: [GLOSSARY.md]
 - **Bio** — only if sourced from IG profile (`biography`); hide if empty. Not a typed Later blurb.
 - **Website** — sourced if you need a link. Graph: IG User `website`. Hide if empty.
 
-**Later skip:** Rates / From $100 / Contact Me. Stories as a kit section. Profile views + bio-link clicks in the overview. Average likes as a Stat. Stats as a prose paragraph. Look: gallery, themes, colors. Impressions (deprecated). Industry unless sourced (Later form, not Graph). Creator location unless sourced from IG (none today). Shares: media insights `shares` (not `shares_count`) — fifth Stat only if the row has room.
+**Later skip:** Rates / From $100 / Contact Me. Stories as a kit section. Profile views + bio-link clicks in the overview. Average likes as a Stat. Stats as a prose paragraph. Look: gallery, themes, colors. Impressions (deprecated). Industry unless sourced (Later form, not Graph). Creator location unless sourced from IG (none today). Shares: media insights `shares` (not media object `shares_count`, Facebook Login only) — fifth Stat only if the row has room.
 
 ---
 
