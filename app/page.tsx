@@ -2,7 +2,6 @@ import { ConnectButton } from "@/components/connect-button";
 import { PageCard, PageCopy } from "@/components/page-card";
 import { SupportFooter } from "@/components/support-footer";
 import { DISCLOSURE, PERSONAL_FAIL, PROFESSIONAL_NOTE, STUB_CONNECT } from "@/lib/copy";
-import { AUTH_CONNECT_PATH } from "@/lib/session";
 
 type LandingProps = {
   searchParams: Promise<{ error?: string }>;
@@ -26,7 +25,7 @@ export default async function LandingPage({ searchParams }: LandingProps) {
         ) : (
           <PageCopy>{PROFESSIONAL_NOTE}</PageCopy>
         )}
-        <form action={AUTH_CONNECT_PATH} method="post">
+        <form action="/auth/instagram" method="post">
           <ConnectButton />
         </form>
         <PageCopy>{STUB_CONNECT}</PageCopy>

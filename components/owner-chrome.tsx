@@ -11,7 +11,6 @@ import { StatsGrid } from "@/components/stats-grid";
 import { STUB_DISCONNECT } from "@/lib/copy";
 import { kitPath } from "@/lib/kit";
 import type { Media, User } from "@/lib/schema";
-import { AUTH_CONNECT_PATH, AUTH_SIGNOUT_PATH } from "@/lib/session";
 
 type OwnerChromeProps = {
   user: User;
@@ -119,12 +118,12 @@ export function OwnerChrome({
       )}
 
       <div className="flex flex-wrap gap-2">
-        <form action={AUTH_CONNECT_PATH} method="post">
+        <form action="/auth/instagram" method="post">
           <Button type="submit" role="secondary">
             Reconnect Instagram
           </Button>
         </form>
-        <form action={AUTH_SIGNOUT_PATH} method="post">
+        <form action="/auth/sign-out" method="post">
           <Button type="submit" role="secondary">
             Sign out
           </Button>

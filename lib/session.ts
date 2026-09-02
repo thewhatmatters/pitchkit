@@ -3,9 +3,10 @@ import { DEMO_HANDLE, seedUsers } from "./seed";
 /** Pitchkit session cookie — our login, not an Instagram token. */
 export const SESSION_COOKIE = "pitchkit_session";
 
-/** Stub and future live Instagram Login share this path. */
+/** Stub and future live Instagram Login share this path. FE posts here; cookie write stays here. */
 export const AUTH_CONNECT_PATH = "/auth/instagram";
 
+/** FE posts here; cookie clear stays here. */
 export const AUTH_SIGNOUT_PATH = "/auth/sign-out";
 
 export const SESSION_MAX_AGE = 60 * 60 * 24 * 30;
