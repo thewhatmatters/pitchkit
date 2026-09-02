@@ -13,7 +13,7 @@ Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md)
   > We only use your public posts and Instagram Insights to build your media kit. We don’t read DMs, who you follow, or unfollowers. Disconnect deletes your kit and the copies we stored.
 
 - After login: **Insights**, then Media kit tab. Brands never see Insights.
-- **v1 stats (User Research + Design, 2026-09-02):** meanings and copy in [GLOSSARY.md](./GLOSSARY.md). Name/handle is the headline; followers are scale. ER is the hire/no-hire Stat (`primary`). Insights ER: `(likes + comments + saves + shares) / followers` on the six; public-only: likes + comments — tooltip must say which. Typical reach / saves / 30-day chart only when Insights exist — empty > zeros. Six posts: last 30 days, **saves then reach then likes**. Stats row is fluid: **2** without Insights (ER + Followers), **4 + chart** with Insights. Do not pad to five. Not a 2×2 lock. Chart is a trend, not a fifth Stat. Posts stay **2×3**. Brand on `/k/[handle]`: spend or pass in ~30s. Creator: same numbers, labeled, survive a grid check. No geo, rates, or bio. Backend must confirm live Graph names before wiring.
+- **v1 stats (User Research + Design, 2026-09-02):** meanings and copy in [GLOSSARY.md](./GLOSSARY.md). Name/handle is the headline; followers are scale. ER is the hire/no-hire Stat (`primary`). Insights ER: `(likes + comments + saves + shares) / followers` on the six; public-only: likes + comments — tooltip must say which. Typical reach / saves / 30-day chart only when Insights exist — empty > zeros. Six posts: last 30 days, **saves then reach then likes**. Stats row is fluid: **2** without Insights (ER + Followers), **4 + chart** with Insights. Do not pad to five. Not a 2×2 lock. Chart is a trend, not a fifth Stat. Posts stay **2×3**. Brand on `/k/[handle]`: spend or pass in ~30s. Creator: same numbers, labeled, survive a grid check. Country / age / gender mix are own objects (Insights only, empty > zeros), not Stats. City, rates, Stories, impressions-as-Stat are not. Bio only if sourced. Backend must confirm live Graph names before wiring.
 - Carousel: first frame. Video: poster only. R2 public read for kit images.
 - Disconnect: delete SQL + R2 `{user_id}/` within 24 hours. `consent_index` default off.
 - Scopes: `instagram_business_basic` + `instagram_business_manage_insights` only.
@@ -25,7 +25,7 @@ Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md)
 
 ## Do not build
 
-CV, TikTok, PDF, brand dashboard, kit-view analytics for sale, Browser Run, D1, Vercel, shadcn, Storybook here, bio/website/rates/contact/geo on the kit.
+CV, TikTok, PDF, brand dashboard, kit-view analytics for sale, Browser Run, D1, Vercel, shadcn, Storybook here, website/rates/contact, city-level geo, Stories, impressions-as-Stat on the kit.
 
 Do not add Graph columns we do not get from public posts + Insights. Do not invent rules that contradict [PLAN.md](./PLAN.md).
 

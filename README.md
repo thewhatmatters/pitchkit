@@ -16,7 +16,7 @@ The app is not built yet. This repo is the spec and the starting point. GitHub: 
 4. They land on **Insights** (private). **Media kit** is the shareable page.
 5. Brands open `https://pitchkit.app/k/[handle]`. They do not sign in.
 
-Handle is taken from the Instagram username at signup and **does not change**. Local/demo kit: `/k/demo`. The kit leads with name and handle; engagement rate is the hire number, followers are scale, and reach/saves/chart appear only when Insights exist (never as zeros).
+Handle is taken from the Instagram username at signup and **does not change**. Local/demo kit: `/k/demo`. The kit leads with name and handle; engagement rate is the hire number, followers are scale, and reach/saves/chart appear only when Insights exist (never as zeros). Country, age, and gender mix are Insights objects, not Stats — words in [GLOSSARY.md](./GLOSSARY.md).
 
 If they rename on Instagram, this URL stays put. TikTok, PDF, and extra profile fields are written in the plan as later — not v1.
 

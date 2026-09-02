@@ -54,7 +54,7 @@ Seed: `/k/demo`.
 | Creator | Continue with Instagram (Professional). Land on Insights. Share the kit URL. Reconnect, sign out, disconnect. Phone works. |
 | Brand | Open the kit. No account. |
 
-No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “contact for collab,” or geo on the kit.
+No extra onboarding. No PDF in v1. No TikTok in v1. No website, rates, or “contact for collab.” Country / age / gender mix are v1 objects (Insights, not Stats). City, rates, Stories, and impressions-as-Stat are not. Bio only if sourced.
 
 ---
 
@@ -80,7 +80,9 @@ No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “c
 
 **Carousel:** first child frame (cover) into R2. **Video:** poster only on the kit, never the file.
 
-**Not on the kit in v1:** geo, rates, bio. Not a v1 Stat: impressions, comments, likes, conversion, media count, profile visits, 90-day growth (see [GLOSSARY.md](./GLOSSARY.md)).
+**Own objects (Randy, 2026-09-02):** country mix, age mix, gender mix — not Stats. Insights only; hide until connected; empty > zeros. Meanings: [GLOSSARY.md](./GLOSSARY.md).
+
+**Not on the kit in v1:** city, rates, Stories, impressions-as-Stat. Bio only if sourced (hide if empty). Industry only if UR sources it. Not a v1 Stat: impressions, comments, likes, conversion, media count, profile visits, 90-day growth (see [GLOSSARY.md](./GLOSSARY.md)).
 
 ---
 
@@ -214,4 +216,4 @@ CV / filling `detections`. TikTok. PDF. Brand dashboard. Kit-view analytics for 
 
 ## Skip unless they are on the kit
 
-Bio, website, rates, “contact for collab,” geo. Easy to add columns later. Not why someone connects. No columns in [DATA.md](./DATA.md) until we show them.
+Website, rates, “contact for collab,” city-level geo, Stories. Country / age / gender mix are already kit objects — no new columns in [DATA.md](./DATA.md) until we persist them. Bio only if sourced.

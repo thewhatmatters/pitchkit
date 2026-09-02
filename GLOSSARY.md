@@ -42,6 +42,22 @@ Recent work a brand can match to the public grid. Likes-first would look like a 
 
 Row length follows the data: 2 without Insights (ER + Followers), 4 + chart with Insights. Don’t pad to five.
 
+## Own objects (not Stats)
+
+Randy unlocked 2026-09-02. Insights only. Hide until connected. Empty > zeros. Later’s kit Top Countries bar is the visual cousin; do not add UI here.
+
+**Country mix** — own object, not a fifth Stat. Graph: `follower_demographics` / `country`. Hide until Insights. Empty > zeros. City still later — do not paint city even if Later/Mobbin show it.
+
+**Age mix** — own object, not a Stat. Graph: `follower_demographics` / `age` (UR to confirm exact breakdown). Hide until Insights. Empty > zeros.
+
+**Gender mix** — own object, not a Stat. Graph: `follower_demographics` / `gender`. Hide until Insights. Empty > zeros.
+
+**Bio** — IG profile biography if present; hide if empty. Not a Stat. Only if sourced.
+
+**Location** — only if a sourced profile or city-mix field exists; don’t invent. Not a Stat.
+
+**Industry** — Later form field, not Graph. Do not add as a v1 field unless UR sources it.
+
 ## Not v1 (do not paint on the Stat row)
 
 **Shares** — people who sent the post onward. Same intent family as saves. Fifth Stat only if Insights return it and the row has room. Empty > zeros. Graph: media `shares` / account `shares`.
@@ -70,4 +86,4 @@ Row length follows the data: 2 without Insights (ER + Followers), 4 + chart with
 
 **Insights** — Instagram account analytics the creator connected. Reach, saves, and the chart require this. Public-only kits still show ER + Followers.
 
-Do not add geo, rates, or bio in v1. Don’t file geo/age/gender as a Stat even if Later/Mobbin show it.
+Geo / age / gender are v1 objects (not Stats). City, rates, Stories, and impressions are not. Do not paint impressions as a Stat (deprecated per UR unless Backend confirms a live field). Don’t file city / rates / Stories as a Stat even if Later/Mobbin show them.
