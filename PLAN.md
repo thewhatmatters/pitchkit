@@ -60,13 +60,13 @@ No extra onboarding. No PDF in v1. No TikTok in v1. Steal vs skip: [GLOSSARY.md]
 
 ## Kit math (locked)
 
-**Source:** User Research + Design, 2026-09-02. Meanings and copy: [GLOSSARY.md](./GLOSSARY.md). **Live Graph (Backend confirmed, Instagram Login):** media object `saved_count` / `shares_count` are Facebook Login only — do not use. Post kit: media insights `saved` / `shares` / `reach`. Account chart: user insights `reach` `time_series` (includes stories + ads) — different from typical post `reach`. If we ever label account-level saves: user insights `saves`, not `saved`. Empty dataset over zeros is correct. ER stays `(likes + comments) ÷ followers`; Insights ER is not overwritten.
+**Source:** User Research + Design, 2026-09-02. Meanings and copy: [GLOSSARY.md](./GLOSSARY.md). **Live Graph (Backend confirmed, Instagram Login):** media object `saved_count` / `shares_count` are Facebook Login only — do not use. Post kit: media insights `saved` / `shares` / `reach`. Account chart: user insights `reach` `time_series` (includes stories + ads) — different from typical post `reach`. If we ever label account-level saves: user insights `saves`, not `saved`. Empty dataset over zeros is correct. ER is locked: `(likes + comments) ÷ followers`, Insights or not. Tooltip: of followers, likes + comments only.
 
 **Headline:** name and handle. Lead pair on the card: **Followers (context) + ER (hire)** as numbers, not Later’s prose sentence. Followers are scale, not the headline.
 
 **Ordered Stat row (ER still primary).** Do not pad to five. Row length follows the data. Chart is a trend object, not a fifth Stat. Surface typical reach, saves, and the 30-day chart (Later buries these; we don’t). Analytics only after Insights connect. 30-day chart, not Later’s 3-month overview.
 
-1. **Engagement rate** — always, `primary`. Hire/no-hire. WMDS Stat (label + number). **Locked:** `(likes + comments) ÷ followers` on the six, when followers > 0. Same formula with or without Insights. Public and Insights kits use the same formula. Tooltip must say **of followers** and **likes + comments only**, so nobody thinks this is Later’s ÷ reach number. Do not use ÷ reach. Do not add saves/shares to the numerator unless Randy reopens it. Likes/comments are media `like_count` / `comments_count` — not insights.
+1. **Engagement rate** — always, `primary`. Hire/no-hire. WMDS Stat (label + number). **Locked:** `(likes + comments) ÷ followers` on the six, when followers > 0. Insights or not. Tooltip: **of followers**, **likes + comments only**. Do not use ÷ reach. Do not add saves/shares to the numerator. Likes/comments are media `like_count` / `comments_count` — not insights.
 2. **Typical reach** — Insights only. Media insights `reach` (lifetime, unique). Median of recent posts, not a spike, not account 30-day unique, not `followers_count`. Hide until connected. **Different number** from the 30-day chart.
 3. **Followers** — always. Scale / sanity vs reach. User `followers_count` (store `followers`).
 4. **Saves** — Insights only. Media insights `saved`. Not user insights `saves`. Not media object `saved_count` (Facebook Login only). Hide until connected.
@@ -91,6 +91,8 @@ No extra onboarding. No PDF in v1. No TikTok in v1. Steal vs skip: [GLOSSARY.md]
 No IG User location field. No industry. Impressions stay off.
 
 **Later skip:** Rates / From $100 / Contact Me. Stories as a kit section. Profile views + bio-link clicks in the overview. Average likes as a Stat. Stats as a prose paragraph. Look: gallery, themes, colors. Impressions (deprecated). Industry unless sourced (Later form, not Graph). Creator location unless sourced from IG (none today). Shares: media insights `shares` (not media object `shares_count`, Facebook Login only) — fifth Stat only if the row has room.
+
+**Later vs us (note, not a lock flip):** Later public kit period is last 90 days; we locked a 30-day reach chart. Later IG kit ER is `(likes + comments + saves + shares) ÷ (reel reach + post reach)` — we do not use that; ours is ÷ followers. Later labels “Average” but docs say median (outliers removed) for post/story stats; our typical reach is already median. Later also lists profile views, avg impressions, stories, reels as separate sections — we skip those. If no posts in 90 days, Later omits (not zeros); same honesty: empty > zeros.
 
 ---
 
@@ -224,4 +226,4 @@ CV / filling `detections`. TikTok. PDF. Brand dashboard. Kit-view analytics for 
 
 ## Skip unless they are on the kit
 
-Later skip: Rates / From $100 / Contact Me, Stories as a kit section, profile views + bio-link clicks, average likes as a Stat, stats as a prose paragraph, gallery/themes/colors, impressions, industry unless sourced, creator location unless sourced. Country / city / age / gender mix are already kit objects — no new columns in [DATA.md](./DATA.md) until we persist them. Bio only if sourced from IG (`biography`, hide if empty).
+Later skip: Rates / From $100 / Contact Me, Stories as a kit section, profile views + bio-link clicks, average likes as a Stat, stats as a prose paragraph, gallery/themes/colors, impressions, industry unless sourced, creator location unless sourced. Country / city / age / gender mix persist as Insights objects (counts, not extra Graph columns). `biography` / `website` are Public; hide if empty. No IG User location. No industry. Impressions stay off.

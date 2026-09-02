@@ -9,7 +9,7 @@ Desk research, interviews unrun. Locked with Design 2026-09-02. User Research ow
 - If we ever label account-level saves: user insights `saves`, not `saved`.
 - `follower_demographics` breakdowns `country` / `city` / `age` / `gender` are live (v25/v26 Insights, Instagram Login). ≥100 followers or the metric is omitted — hide the object; don’t paint zeros. Top 45 only. Graph returns integer counts in `total_value.breakdowns.results.value`, not percents. Our math: % of located sample = `value / sum(results)`. **Never** % of `followers_count` (sums can be less than followers because Meta only counts people with demo data). Empty dataset: hide the object. Backend persists those counts as objects when Insights lands; no extra Graph columns.
 - IG User `biography` and `website` are Public. Hide if empty. No IG User location field. No industry. Impressions stay off.
-- ER stays `(likes + comments) ÷ followers`. Insights ER is not overwritten.
+- ER is locked: `(likes + comments) ÷ followers`, Insights or not. Tooltip: of followers, likes + comments only.
 
 ## v1 Stat row (ordered)
 
@@ -17,7 +17,7 @@ Desk research, interviews unrun. Locked with Design 2026-09-02. User Research ow
 Share of followers who interact with a typical post. Brands use this first: is the audience real, or a quiet list? Average recent posts: (likes + comments) ÷ followers. A smaller account with a high ER often beats a big one that nobody talks to.
 - Brand ~30s: hire or pass — is the audience real?
 - Hide: never (public kit still has it).
-- Formula (locked): `(likes + comments) ÷ followers` on the six, when followers > 0. Same formula with or without Insights. Public and Insights kits use the same formula. Tooltip must say **of followers** and **likes + comments only**, so nobody thinks this is Later’s ÷ reach number. Do not use ÷ reach. Do not add saves/shares to the numerator unless Randy reopens it.
+- Formula (locked): `(likes + comments) ÷ followers` on the six, when followers > 0. Same formula with or without Insights. Tooltip: **of followers**, **likes + comments only**. Do not use ÷ reach. Do not add saves/shares to the numerator.
 - Graph (v25, Instagram Login): none; computed. Likes/comments are media `like_count` / `comments_count` — not insights. Followers denominator is user `followers_count` (store `followers`).
 
 **Typical reach** — Insights only; hide if missing.
@@ -71,6 +71,14 @@ Row length follows the data: 2 without Insights (ER + Followers), 4 + chart with
 - Impressions (deprecated)
 - Industry unless sourced (Later form field, not Graph)
 - Bio / creator location only if sourced from IG profile; hide if empty
+
+## Later vs us (note, not a lock flip)
+
+- Later public kit reporting period is last 90 days; we locked a **30-day** reach chart.
+- Later Instagram kit ER is `(likes + comments + saves + shares) ÷ (reel reach + post reach)`. We do not use that. Ours is `(likes + comments) ÷ followers`.
+- Later labels “Average” but their docs say they use a median that removes outliers for post/story stats. Typical reach for us is already median.
+- Later kit also lists profile views, avg impressions, stories, reels as separate sections. We skip those.
+- If no posts in 90 days, Later pulls no data for that profile (omit, not zeros). Same honesty: empty > zeros.
 
 ## Own objects (not Stats)
 
