@@ -3,18 +3,8 @@
 import type { ReactNode } from "react";
 import { Card, Chip, cardBodyTextClasses, cardTitleClasses } from "@/components/wmds";
 import { EmptyGrid } from "@/components/empty-grid";
-import {
-  CHART_SLOT_LABEL,
-  CHART_SLOT_NOTE,
-  CITY_MIX_CAPTION,
-  COUNTRY_MIX_CAPTION,
-  ER_FORMULA,
-  ER_TOOLTIP,
-  EXAMPLE_DATA_NOTE,
-  HIDDEN_WHEN_BLANK,
-  SAVES_CAPTION,
-  TYPICAL_REACH_CAPTION,
-} from "@/lib/copy";
+import { CHART_SLOT_NOTE, EXAMPLE_DATA_NOTE } from "@/lib/copy";
+import { ER_FORMULA, ER_TOOLTIP, GLOSSARY } from "@/lib/glossary";
 import { formatCount, formatEngagementRate } from "@/lib/engagement";
 import { buildExampleInventory } from "@/lib/inventory-example";
 import { publicObjectUrl } from "@/lib/r2";
@@ -35,20 +25,26 @@ function ExampleChip() {
 }
 
 function InventoryCard({
-  label,
+  name,
+  definition,
+  help,
   children,
 }: {
-  label: string;
+  name: string;
+  definition: string;
+  help: string;
   children: ReactNode;
 }) {
   return (
     <Card variant="outlined" shape="rounded" padding="md">
       <div className="flex flex-col gap-2">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className={cardTitleClasses}>{label}</p>
+        <div className="flex flex-wrap items-baseline gap-2">
+          <p className={cardTitleClasses}>{name}</p>
+          <p className={cardBodyTextClasses}>{definition}</p>
           <ExampleChip />
         </div>
         {children}
+        <p className={cardBodyTextClasses}>{help}</p>
       </div>
     </Card>
   );
@@ -78,7 +74,11 @@ export function KitInventory({ posts, followers, gridReady }: KitInventoryProps)
         </div>
       </Card>
 
-      <InventoryCard label="Engagement rate">
+      <InventoryCard
+        name={GLOSSARY.engagementRate.name}
+        definition={GLOSSARY.engagementRate.definition}
+        help={GLOSSARY.engagementRate.help}
+      >
         <p className={cardTitleClasses}>{formatEngagementRate(inventory.engagementRate)}</p>
         <p className={cardBodyTextClasses} title={ER_TOOLTIP}>
           {ER_FORMULA}
@@ -86,41 +86,53 @@ export function KitInventory({ posts, followers, gridReady }: KitInventoryProps)
         <p className={cardBodyTextClasses}>{ER_TOOLTIP}</p>
       </InventoryCard>
 
-      <InventoryCard label="Followers">
+      <InventoryCard
+        name={GLOSSARY.followers.name}
+        definition={GLOSSARY.followers.definition}
+        help={GLOSSARY.followers.help}
+      >
         <p className={cardTitleClasses}>{formatCount(inventory.followers)}</p>
       </InventoryCard>
 
-      <InventoryCard label="Typical reach">
+      <InventoryCard
+        name={GLOSSARY.typicalReach.name}
+        definition={GLOSSARY.typicalReach.definition}
+        help={GLOSSARY.typicalReach.help}
+      >
         <p className={cardTitleClasses}>{formatCount(inventory.typicalReach)}</p>
-        <p className={cardBodyTextClasses}>{TYPICAL_REACH_CAPTION}</p>
       </InventoryCard>
 
-      <InventoryCard label="Saves">
+      <InventoryCard
+        name={GLOSSARY.saves.name}
+        definition={GLOSSARY.saves.definition}
+        help={GLOSSARY.saves.help}
+      >
         <p className={cardTitleClasses}>{formatCount(inventory.typicalSaves)}</p>
-        <p className={cardBodyTextClasses}>{SAVES_CAPTION}</p>
       </InventoryCard>
 
-      <InventoryCard label={CHART_SLOT_LABEL}>
+      <InventoryCard
+        name={GLOSSARY.chart.name}
+        definition={GLOSSARY.chart.definition}
+        help={GLOSSARY.chart.help}
+      >
         <div
           data-chart-slot="empty"
           className="min-h-32"
-          aria-label={CHART_SLOT_LABEL}
+          aria-label="30-day reach chart"
         />
         <p className={cardBodyTextClasses}>{CHART_SLOT_NOTE}</p>
       </InventoryCard>
 
-      <InventoryCard label="Six posts">
-        <p className={cardBodyTextClasses}>Ranked saves → reach → likes. Last 30 days.</p>
+      <InventoryCard
+        name={GLOSSARY.sixPosts.name}
+        definition={GLOSSARY.sixPosts.definition}
+        help={GLOSSARY.sixPosts.help}
+      >
         {gridReady ? (
           <ol className="flex flex-col gap-3">
             {inventory.posts.map((post, index) => (
               <li key={post.id} className="flex gap-3">
-                <img
-                  src={publicObjectUrl(post.r2_key)}
-                  alt=""
-                  width={72}
-                  height={72}
-                />
+                <img src={publicObjectUrl(post.r2_key)} alt="" width={72} height={72} />
                 <div className="flex flex-col gap-1">
                   <p className={cardTitleClasses}>
                     {index + 1}. {post.media_type}
@@ -138,17 +150,27 @@ export function KitInventory({ posts, followers, gridReady }: KitInventoryProps)
         )}
       </InventoryCard>
 
-      <InventoryCard label="Country mix">
-        <p className={cardBodyTextClasses}>{COUNTRY_MIX_CAPTION}</p>
+      <InventoryCard
+        name={GLOSSARY.countryMix.name}
+        definition={GLOSSARY.countryMix.definition}
+        help={GLOSSARY.countryMix.help}
+      >
         <ShareList rows={inventory.countryMix} />
       </InventoryCard>
 
-      <InventoryCard label="City mix">
-        <p className={cardBodyTextClasses}>{CITY_MIX_CAPTION}</p>
+      <InventoryCard
+        name={GLOSSARY.cityMix.name}
+        definition={GLOSSARY.cityMix.definition}
+        help={GLOSSARY.cityMix.help}
+      >
         <ShareList rows={inventory.cityMix} />
       </InventoryCard>
 
-      <InventoryCard label="Age mix">
+      <InventoryCard
+        name={GLOSSARY.ageMix.name}
+        definition={GLOSSARY.ageMix.definition}
+        help={GLOSSARY.ageMix.help}
+      >
         <ShareList
           rows={inventory.ageMix.map((row) => ({
             label: row.bracket,
@@ -157,7 +179,11 @@ export function KitInventory({ posts, followers, gridReady }: KitInventoryProps)
         />
       </InventoryCard>
 
-      <InventoryCard label="Gender mix">
+      <InventoryCard
+        name={GLOSSARY.genderMix.name}
+        definition={GLOSSARY.genderMix.definition}
+        help={GLOSSARY.genderMix.help}
+      >
         <ShareList
           rows={inventory.genderMix.map((row) => ({
             label: `${row.label} (${row.bucket})`,
@@ -166,14 +192,16 @@ export function KitInventory({ posts, followers, gridReady }: KitInventoryProps)
         />
       </InventoryCard>
 
-      <InventoryCard label="Bio">
+      <InventoryCard name={GLOSSARY.bio.name} definition={GLOSSARY.bio.definition} help={GLOSSARY.bio.help}>
         <p className={cardBodyTextClasses}>{inventory.bio}</p>
-        <p className={cardBodyTextClasses}>{HIDDEN_WHEN_BLANK}</p>
       </InventoryCard>
 
-      <InventoryCard label="Website">
+      <InventoryCard
+        name={GLOSSARY.website.name}
+        definition={GLOSSARY.website.definition}
+        help={GLOSSARY.website.help}
+      >
         <p className={cardBodyTextClasses}>{inventory.website}</p>
-        <p className={cardBodyTextClasses}>{HIDDEN_WHEN_BLANK}</p>
       </InventoryCard>
     </div>
   );
