@@ -1,8 +1,31 @@
 # Pitchkit MVP plan
 
-Product lives on **pitchkit.app**. Columns: [data.md](./data.md). Picture: [architecture.md](./architecture.md).
+**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [AGENTS](./AGENTS.md)
 
-**Look:** cream, serif, oxblood. Name on the site is Pitchkit.
+Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md).
+
+**Look:** WMDS (`@whatmatters/wmds`). Name on the site is Pitchkit.
+
+---
+
+## Stack (locked)
+
+| Piece | Choice |
+|---|---|
+| App | Next.js App Router + TypeScript + Tailwind v4 |
+| UI | **WMDS** (`@whatmatters/wmds`) — pattern-first. Import components and `@whatmatters/wmds/styles.css`. Layout (`grid`, `gap`, `max-w`) stays in the app. No shadcn. No ad-hoc `rounded-full bg-*` buttons. |
+| Icons | Lucide via WMDS props |
+| Motion | `motion` peer when a WMDS component needs it |
+| Install | Git/path to `thewhatmatters/wmds` until the package is published (`npm install ../wmds` or `github:thewhatmatters/wmds`). Build WMDS (`npm run build`) so `dist/` exists. How to consume: WMDS `CONSUMING.md`. |
+| Compute | Cloudflare Workers via **OpenNext** (official adapter only) |
+| DB | Neon Postgres + Hyperdrive (`HYPERDRIVE` / `HYPERDRIVE_PREVIEW`) |
+| Files | R2 `pitchkit-media` |
+| Auth | Instagram Login + Pitchkit httpOnly cookie |
+| Charts | CSS |
+
+**Not used:** D1, Vercel, shadcn, Browser Run, Queues, Workers AI.
+
+**Storybook** lives in the WMDS repo. Copy patterns from there; do not add Storybook to Pitchkit.
 
 ---
 
@@ -103,7 +126,7 @@ A rollup **may** contain: a time bucket, a metric name, a hashed or global cohor
 | Secrets | `IG_APP_ID`, `IG_APP_SECRET`, `TOKEN_KEY`, Hyperdrive. Never commit values |
 | Support | **randy@whatmatters.so** on the connect page and the public kit (footer), until we change it. Not a Postgres column. |
 
-No D1. No Browser Run.
+No D1. No Vercel. No Browser Run. No shadcn. No Storybook in this repo.
 
 ---
 
@@ -148,8 +171,8 @@ Personal fail, OAuth cancel → landing with the Professional message or unchang
 
 ## Build order
 
-1. Next.js on Workers + Neon + Hyperdrive + R2 + env names in README.  
-2. Schema from [data.md](./data.md) including empty `detections` and `weekly_counts`. Seed `demo`.  
+1. Next.js App Router + Tailwind v4 on OpenNext Workers. Install WMDS from `../wmds` (build `dist/` first). Neon + Hyperdrive + R2. Env names in README.  
+2. Schema from [DATA.md](./DATA.md) including empty `detections` and `weekly_counts`. Seed `demo`.  
 3. Insights + public `/k/demo` (responsive, OG tags).  
 4. Cookie + stub Instagram → Insights.  
 5. Live Instagram for testers.  
@@ -160,10 +183,10 @@ Personal fail, OAuth cancel → landing with the Professional message or unchang
 
 ## Write down, do not build
 
-CV / filling `detections`. TikTok. PDF. Brand dashboard. Kit-view analytics for sale. Browser Run. D1. Empty `detections` and `weekly_counts` tables are enough.
+CV / filling `detections`. TikTok. PDF. Brand dashboard. Kit-view analytics for sale. Browser Run. D1. Vercel. shadcn. Storybook in this repo. Empty `detections` and `weekly_counts` tables are enough.
 
 ---
 
 ## Skip unless they are on the kit
 
-Bio, website, rates, “contact for collab,” geo. Easy to add columns later. Not why someone connects. No columns in [data.md](./data.md) until we show them.
+Bio, website, rates, “contact for collab,” geo. Easy to add columns later. Not why someone connects. No columns in [DATA.md](./DATA.md) until we show them.

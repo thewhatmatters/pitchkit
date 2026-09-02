@@ -1,6 +1,8 @@
 # Pitchkit architecture
 
-Living picture of v1. Product: [plan.md](./plan.md). Columns: [data.md](./data.md).
+**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [AGENTS](./AGENTS.md)
+
+Living picture of v1. Product: [PLAN.md](./PLAN.md). Columns: [DATA.md](./DATA.md).
 
 The Phase 0 diagram is **mostly right**: Next.js on Cloudflare Workers, Instagram Login + Graph, Neon through Hyperdrive, photos in R2, public kit at `/k/[handle]`, never put image bytes in SQL.
 
@@ -46,6 +48,17 @@ Brand  → /k/[handle] → same Worker → rows + public photos
 
 ---
 
+## Stack (locked)
+
+Same table as [PLAN.md](./PLAN.md#stack-locked). Short version:
+
+- **UI:** `@whatmatters/wmds` pattern-first + `styles.css`. App owns layout Tailwind only. No shadcn. No Storybook here (copy from WMDS Storybook).
+- **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers.
+- **Icons:** Lucide through WMDS props. **Motion:** `motion` peer when WMDS needs it.
+- **Install WMDS:** `../wmds` or `github:thewhatmatters/wmds`; `npm run build` in WMDS so `dist/` exists.
+
+---
+
 ## What each box does
 
 | Piece | Role |
@@ -61,7 +74,7 @@ Brand  → /k/[handle] → same Worker → rows + public photos
 
 ## What is not in this picture (on purpose)
 
-D1, queues, Browser Run, Workers AI, a second database, TikTok, PDF, signed URLs for kit images, live Graph on the public kit.
+D1, Vercel, shadcn, queues, Browser Run, Workers AI, Storybook in Pitchkit, a second database, TikTok, PDF, signed URLs for kit images, live Graph on the public kit.
 
 ---
 
