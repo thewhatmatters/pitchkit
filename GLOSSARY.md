@@ -41,11 +41,31 @@ Recent work a brand can match to the public grid. Likes-first would look like a 
 - Hide: never if we have media.
 - Graph (v25, Instagram Login): rank insights `saved` → insights `reach` → field `like_count`. `like_count` is public (not insights); `saved`/`reach` need Insights.
 
-Row length follows the data: 2 without Insights (ER + Followers), 4 + chart with Insights. Don’t pad to five.
+Row length follows the data: 2 without Insights (ER + Followers), 4 + chart with Insights. Don’t pad to five. Lead pair is **Followers (context) + ER (hire)** as numbers, not Later’s prose sentence.
+
+## Later steal vs skip (UR + Randy, 2026-09-02)
+
+**Steal**
+- Followers (context) + ER (hire) as the lead pair. Numbers, not Later’s prose sentence. Don’t overwrite ER until Randy answers the widget. Shipped: `(likes + comments) ÷ followers`.
+- Country mix, age mix, gender mix: own objects, not Stats. Randy unlocked all three. Insights only. Hide until Insights. Later/IG: need ≥100 followers to see audience data; empty copy, not zeros. Country = top countries + %. Age/gender same Graph family (`follower_demographics`). City mix is the finer country job — not “countries only,” not “no geo in v1.”
+- Six posts ranked saves → reach → likes. Surface typical reach, saves, and the 30-day chart (Later buries these; we don’t).
+- Analytics only after Insights connect. 30-day chart, not Later’s 3-month overview.
+- Chart is account unique reach (includes stories/ads) ≠ typical post reach.
+
+**Skip**
+- Rates / From $100 / Contact Me
+- Stories as a kit section
+- Profile views + bio-link clicks in the overview
+- Average likes as a Stat
+- Stats as a prose paragraph
+- Look: gallery, themes, colors
+- Impressions (deprecated)
+- Industry unless sourced (Later form field, not Graph)
+- Bio / creator location only if sourced from IG profile; hide if empty
 
 ## Own objects (not Stats)
 
-Randy unlocked 2026-09-02. Mix objects are Insights only. Hide until Insights. Empty > zeros. Tooltip = first sentence. Percents are of the located demographic sample, not of all followers. Graph is names + counts, not lat/lng. Do not geocode. Do not paint a map. BE confirms live Graph names. Later’s kit Top Countries bar is the visual cousin; do not add UI here.
+Randy unlocked country, age, and gender mix 2026-09-02 (city mix is the finer country job). Insights only. Hide until Insights. Later/IG: need ≥100 followers to see audience data; empty copy, not zeros. Tooltip = first sentence. Percents are of the located demographic sample, not of all followers. Graph is names + counts, not lat/lng. Do not geocode. Do not paint a map. BE confirms live Graph names. Later’s kit Top Countries bar is the visual cousin; do not add UI here.
 
 **Country mix** — own object, not a Stat.
 Are they in my market?
@@ -75,7 +95,7 @@ Does the split match the customer?
 - Paint: what Meta returns. Don’t add buckets.
 - Graph: `follower_demographics` breakdown `gender`.
 
-**Bio** — locked. IG User `biography` if present; hide if empty. Not a Stat. Not a typed Later blurb.
+**Bio** — only if sourced from IG profile. IG User `biography` if present; hide if empty. Not a Stat. Not a typed Later blurb.
 
 **Website** — sourced if you need a link. Not a Stat.
 - Hide: if empty.
@@ -109,4 +129,4 @@ Does the split match the customer?
 
 **Insights** — Instagram account analytics the creator connected. Typical reach, saves, the chart, and country / city / age / gender mix require this. Public-only kits still show ER + Followers.
 
-Country / city / age / gender mix are v1 objects (not Stats): ranked % bars or a short ranked list — not a map; no geocode. Bio is locked (IG User `biography`, hide if empty). Industry and creator location still unsourced. Audience city ≠ hometown. Do not add: creator location, industry, rates, impressions (deprecated), stories as a second product, profile views / bio-link clicks as Stats. ER stays `(likes + comments) ÷ followers`. Empty > zeros.
+Country / city / age / gender mix are v1 objects (not Stats): ranked % bars or a short ranked list — not a map; no geocode; not “countries only.” Bio / creator location only if sourced from IG; hide if empty. Industry unless sourced (Later form). Skip rates / From $100 / Contact Me, Stories as a kit section, profile views + bio-link clicks in the overview, average likes as a Stat, stats as a prose paragraph, gallery/themes/colors, impressions (deprecated). ER stays `(likes + comments) ÷ followers` until Randy answers the widget. Empty copy, not zeros.

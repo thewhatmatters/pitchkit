@@ -54,7 +54,7 @@ Seed: `/k/demo`.
 | Creator | Continue with Instagram (Professional). Land on Insights. Share the kit URL. Reconnect, sign out, disconnect. Phone works. |
 | Brand | Open the kit. No account. |
 
-No extra onboarding. No PDF in v1. No TikTok in v1. No rates or “contact for collab.” Country / city / age / gender mix are v1 objects (Insights, not Stats): ranked % bars or a short list — not a map; no geocode. Bio locked (`biography`, hide if empty). Website only if sourced. Industry and creator location still unsourced. Audience city ≠ hometown. Do not add rates, impressions, stories as a second product, or profile views / bio-link clicks as Stats.
+No extra onboarding. No PDF in v1. No TikTok in v1. Steal vs skip: [GLOSSARY.md](./GLOSSARY.md). Lead pair is Followers + ER as numbers. Country / city / age / gender mix are own objects (Randy unlocked; Insights; ≥100 followers; empty copy not zeros). Not “no geo in v1.” Not “countries only.” Skip rates / From $100 / Contact Me, Stories as a kit section, profile views + bio-link clicks, average likes as a Stat, stats as prose, gallery/themes/colors, impressions, industry unless sourced. Bio / creator location only if sourced from IG; hide if empty.
 
 ---
 
@@ -62,9 +62,9 @@ No extra onboarding. No PDF in v1. No TikTok in v1. No rates or “contact for c
 
 **Source:** User Research + Design, 2026-09-02. Meanings and copy: [GLOSSARY.md](./GLOSSARY.md). Graph names are **Backend-confirmed against Instagram Login Graph v25** (not Facebook Login), except Insights ER numerator (pending Randy). Graph returns empty, not 0. Empty > zeros.
 
-**Headline:** name and handle. Followers are **scale context**, not the headline.
+**Headline:** name and handle. Lead pair on the card: **Followers (context) + ER (hire)** as numbers, not Later’s prose sentence. Followers are scale, not the headline.
 
-**Ordered Stat row (ER still primary).** Do not pad to five. Row length follows the data. Chart is a trend object, not a fifth Stat.
+**Ordered Stat row (ER still primary).** Do not pad to five. Row length follows the data. Chart is a trend object, not a fifth Stat. Surface typical reach, saves, and the 30-day chart (Later buries these; we don’t). Analytics only after Insights connect. 30-day chart, not Later’s 3-month overview.
 
 1. **Engagement rate** — always, `primary`. Hire/no-hire. WMDS Stat (label + number). **Do not overwrite until Randy says.** Public ER (shipped): `(likes + comments) ÷ followers` on the six, when followers > 0. Insights ER is **pending Randy** — UR wants +saves+shares in the numerator, still ÷ followers. Later uses ÷ reach. Tooltip must print ours (÷ followers). Likes/comments are media `like_count` / `comments_count` — not insights.
 2. **Typical reach** — Insights only. Media insights `reach` (lifetime, unique). Median of recent posts, not a spike, not account 30-day unique, not `followers_count`. Hide until connected. **Different number** from the 30-day chart.
@@ -80,15 +80,15 @@ No extra onboarding. No PDF in v1. No TikTok in v1. No rates or “contact for c
 
 **Carousel:** first child frame (cover) into R2. **Video:** poster only on the kit, never the file.
 
-**Own objects (Randy + UR, 2026-09-02):** not Stats. Meanings: [GLOSSARY.md](./GLOSSARY.md). Tooltip = first sentence. Percents are of the located sample, not of all followers. Graph is names + counts, not lat/lng. Do not geocode. **Not a map.**
+**Own objects (Randy unlocked country, age, gender 2026-09-02):** not Stats. Meanings: [GLOSSARY.md](./GLOSSARY.md). Later/IG: need ≥100 followers to see audience data; empty copy, not zeros. Not “no geo in v1.” Not “countries only.”
 
-- **Country mix** + **city mix** — ranked % bars (or a short ranked list). Insights only. Hide if missing. Sample is top 45 and can sum under `followers_count`. Audience city ≠ hometown.
-- **Age mix** — API brackets as bars. Don’t invent bands. Insights only. Hide if missing.
-- **Gender mix** — what Meta returns. Don’t add buckets. Insights only. Hide if missing.
-- **Bio** — locked. IG User `biography` if present; hide if empty. Not a typed Later blurb.
+- **Country mix** — top countries + %. `follower_demographics` / `country`. Ranked % bars or a short ranked list. **Not a map.** Insights only. Hide if missing.
+- **City mix** — finer country job. `follower_demographics` / `city`. Same paint. Audience city ≠ hometown.
+- **Age mix** + **gender mix** — same Graph family. Age = API brackets as bars (don’t invent bands). Gender = what Meta returns (don’t add buckets).
+- **Bio** — only if sourced from IG profile (`biography`); hide if empty. Not a typed Later blurb.
 - **Website** — sourced if you need a link. Graph: IG User `website`. Hide if empty.
 
-**Do not add:** creator location (unsourced; no IG User location field), industry (unsourced; Later form), rates, impressions (deprecated v22+; don’t paint; `views` ≠ `reach`), stories as a second product, profile views / bio-link clicks as Stats. Shares: media insights `shares` (not `shares_count`) — fifth Stat only if the row has room. Not a v1 Stat: impressions, comments, likes, conversion, media count, profile visits, 90-day growth (see [GLOSSARY.md](./GLOSSARY.md)).
+**Later skip:** Rates / From $100 / Contact Me. Stories as a kit section. Profile views + bio-link clicks in the overview. Average likes as a Stat. Stats as a prose paragraph. Look: gallery, themes, colors. Impressions (deprecated). Industry unless sourced (Later form, not Graph). Creator location unless sourced from IG (none today). Shares: media insights `shares` (not `shares_count`) — fifth Stat only if the row has room.
 
 ---
 
@@ -187,7 +187,7 @@ Landing (disclosure + Professional note + support)
 | `/k/[handle]` | public | Card only + support footer |
 | `/privacy`, `/delete` | public | Meta review |
 
-Name/handle is the headline on both Insights and the public card. Followers are scale. ER is the hire/no-hire Stat (`primary`): `(likes + comments) ÷ followers`. Vocabulary: [GLOSSARY.md](./GLOSSARY.md). Stat row: **2** without Insights (ER + Followers), **4 + chart** with Insights. Don’t pad to five. Country / city / age / gender mix are own objects (Insights only, hide if missing): ranked % bars or a short list — not a map. Posts: **2×3** on a phone, ranked saves → reach → likes. Empty > zeros.
+Name/handle is the headline. Lead pair: Followers (context) + ER (hire) as numbers, not a prose sentence. ER stays `(likes + comments) ÷ followers` until Randy answers the widget. Vocabulary: [GLOSSARY.md](./GLOSSARY.md). Stat row: **2** without Insights (ER + Followers), **4 + chart** with Insights. Don’t pad to five. Surface typical reach, saves, 30-day chart after Insights (not Later’s 3-month overview). Country / city / age / gender mix are own objects (Insights; ≥100 followers; empty copy not zeros). Posts: **2×3**, ranked saves → reach → likes.
 
 Personal fail, OAuth cancel → landing with the Professional message or unchanged landing. Empty grid is OK. No blank Insights: “Pulling your grid…” until R2 catches up.
 
@@ -222,4 +222,4 @@ CV / filling `detections`. TikTok. PDF. Brand dashboard. Kit-view analytics for 
 
 ## Skip unless they are on the kit
 
-Rates, “contact for collab,” Stories, creator location, industry. Country / city / age / gender mix are already kit objects (ranked % bars, not a map; no geocode) — no new columns in [DATA.md](./DATA.md) until we persist them. Bio is locked (`biography`, hide if empty). Website only if sourced. Industry and creator location still unsourced.
+Later skip: Rates / From $100 / Contact Me, Stories as a kit section, profile views + bio-link clicks, average likes as a Stat, stats as a prose paragraph, gallery/themes/colors, impressions, industry unless sourced, creator location unless sourced. Country / city / age / gender mix are already kit objects — no new columns in [DATA.md](./DATA.md) until we persist them. Bio only if sourced from IG (`biography`, hide if empty).
