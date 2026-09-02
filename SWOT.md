@@ -37,7 +37,7 @@ Feature compare is evidence only. Spine:
 - Instagram only. Later and MySocial already do TikTok.
 - Demo sample: ≥100 followers, top-45 media.
 - Interviews still unrun. Desk research only.
-- Creator-typed holes: contact email, past brands. Niche only if bio is not doing the job. Testimonials later.
+- Typed holes vs a typical brand kit: no contact door; no past-brand proof. Niche only if bio isn’t doing it. Testimonials later.
 
 ### Opportunities
 
@@ -82,6 +82,8 @@ Hide when missing. Dash, not zero.
 ### Do not add
 
 Impressions. Stories. Profile views. Bio-link clicks. Media count. Hometown. Industry. Map. Heatmap. Rates (skipped). Testimonials (later, not 30s).
+
+Profile views, bio-link clicks, and shares are skip (Later vanity), not Weaknesses. Shares stay parked, not a fifth Stat. Sourced on `/k/` that is not a hole: name, handle, avatar, bio, website. Insights objects hide when missing.
 
 ### Creator-typed (not Graph)
 
