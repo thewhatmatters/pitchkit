@@ -1,14 +1,14 @@
 # Pitchkit glossary
 
-Desk research, interviews unrun. Locked with Design 2026-09-02. User Research owns the meanings; Design owns look. Tooltip = first sentence. Longer help can sit under the chart. Graph names below are **Backend-confirmed against Instagram Login Graph v25** (not Facebook Login), except Insights ER numerator (pending Randy). Graph returns empty, not 0. Empty > zeros.
+Desk research, interviews unrun. Locked with Design 2026-09-02. User Research owns the meanings; Design owns look. Tooltip = first sentence. Longer help can sit under the chart. Graph names below are **Backend-confirmed against Instagram Login Graph v25** (not Facebook Login). Graph returns empty, not 0. Empty > zeros.
 
 ## v1 Stat row (ordered)
 
 **Engagement rate (ER)** — always, `primary`.
-Share of followers who interact with a typical post. Brands use this first: is the audience real, or a quiet list? Average recent posts: interactions ÷ followers. A smaller account with a high ER often beats a big one that nobody talks to.
+Share of followers who interact with a typical post. Brands use this first: is the audience real, or a quiet list? Average recent posts: (likes + comments) ÷ followers. Tooltip must say likes + comments only. A smaller account with a high ER often beats a big one that nobody talks to.
 - Brand ~30s: hire or pass — is the audience real?
 - Hide: never (public kit still has it).
-- Formula (do not overwrite until Randy says): public ER is `(likes + comments) ÷ followers`. Insights ER is **pending Randy** — UR wants likes + comments + saves + shares in the numerator, still ÷ followers. Later uses ÷ reach. Tooltip must print the formula we actually use (ours is ÷ followers).
+- Formula (Randy skipped the Insights overwrite): `(likes + comments) ÷ followers` on the six, when followers > 0. Same formula with or without Insights. Tooltip must say **likes + comments only**. Do not add saves/shares to the numerator. Do not use ÷ reach. Later’s ÷ reach is not ours.
 - Graph (v25, Instagram Login): none; computed. Likes/comments are media `like_count` / `comments_count` — not insights. Followers denominator is user `followers_count` (store `followers`).
 
 **Typical reach** — Insights only; hide if missing.
@@ -46,7 +46,7 @@ Row length follows the data: 2 without Insights (ER + Followers), 4 + chart with
 ## Later steal vs skip (UR + Randy, 2026-09-02)
 
 **Steal**
-- Followers (context) + ER (hire) as the lead pair. Numbers, not Later’s prose sentence. Don’t overwrite ER until Randy answers the widget. Shipped: `(likes + comments) ÷ followers`.
+- Followers (context) + ER (hire) as the lead pair. Numbers, not Later’s prose sentence. ER locked: `(likes + comments) ÷ followers`. Tooltip: likes + comments only. Same formula on public and Insights kits.
 - Country mix, age mix, gender mix: own objects, not Stats. Randy unlocked all three. Insights only. Hide until Insights. Later/IG: need ≥100 followers to see audience data; empty copy, not zeros. Country = top countries + %. Age/gender same Graph family (`follower_demographics`). City mix is the finer country job — not “countries only,” not “no geo in v1.”
 - Six posts ranked saves → reach → likes. Surface typical reach, saves, and the 30-day chart (Later buries these; we don’t).
 - Analytics only after Insights connect. 30-day chart, not Later’s 3-month overview.
@@ -129,4 +129,4 @@ Does the split match the customer?
 
 **Insights** — Instagram account analytics the creator connected. Typical reach, saves, the chart, and country / city / age / gender mix require this. Public-only kits still show ER + Followers.
 
-Country / city / age / gender mix are v1 objects (not Stats): ranked % bars or a short ranked list — not a map; no geocode; not “countries only.” Bio / creator location only if sourced from IG; hide if empty. Industry unless sourced (Later form). Skip rates / From $100 / Contact Me, Stories as a kit section, profile views + bio-link clicks in the overview, average likes as a Stat, stats as a prose paragraph, gallery/themes/colors, impressions (deprecated). ER stays `(likes + comments) ÷ followers` until Randy answers the widget. Empty copy, not zeros.
+Country / city / age / gender mix are v1 objects (not Stats): ranked % bars or a short ranked list — not a map; no geocode; not “countries only.” Bio / creator location only if sourced from IG; hide if empty. Industry unless sourced (Later form). Skip rates / From $100 / Contact Me, Stories as a kit section, profile views + bio-link clicks in the overview, average likes as a Stat, stats as a prose paragraph, gallery/themes/colors, impressions (deprecated). ER is `(likes + comments) ÷ followers` (Insights or not). Empty copy, not zeros.
