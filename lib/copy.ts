@@ -24,6 +24,11 @@ export const EXAMPLE_DATA_BANNER = "Example data — not live";
 export const EXAMPLE_DATA_NOTE =
   "Stacked inventory for Design. Not a layout lock. Sample numbers are example data, not live Instagram. Definitions are GLOSSARY.md first sentences.";
 
+export const BRAND_KIT_NOTE =
+  "Shareable /k/ is the brand kit. Insights objects live there when connected. Hide when missing.";
+
+export const EMPTY_TYPED_SLOT = "—";
+
 export const CHART_SLOT_NOTE =
   "Empty slot. WMDS Chart is not published in this app yet. Not a fifth number.";
 

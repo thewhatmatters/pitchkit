@@ -25,6 +25,30 @@ describe("glossary first sentences", () => {
     assert.equal(GLOSSARY.genderMix.definition, "Does the split match the customer?");
     assert.equal(GLOSSARY.bio.definition, "IG User biography (Public).");
     assert.equal(GLOSSARY.website.definition, "IG User website (Public).");
+    assert.equal(GLOSSARY.name.definition, "IG User name (Public).");
+    assert.equal(GLOSSARY.username.definition, "IG User username (Public).");
+    assert.equal(GLOSSARY.profilePicture.definition, "IG User profile_picture_url (Public).");
+    assert.equal(GLOSSARY.contact.definition, "Highest missing hire job.");
+    assert.equal(GLOSSARY.pastBrands.definition, "Typed by the creator. Do not scrape logos.");
+    assert.equal(GLOSSARY.niche.definition, "Bio comes first.");
+    assert.equal(GLOSSARY.lastUpdated.definition, "Creator-before-share.");
+  });
+
+  it("does not add skipped objects as glossary names", () => {
+    const names = new Set(Object.values(GLOSSARY).map((entry) => entry.name));
+    for (const banned of [
+      "Impressions",
+      "Stories",
+      "Profile views",
+      "Bio-link clicks",
+      "Media count",
+      "Hometown",
+      "Industry",
+      "Rates",
+      "Testimonials",
+    ]) {
+      assert.equal(names.has(banned), false, banned);
+    }
   });
 
   it("keeps the locked ER formula and of-followers tooltip", () => {

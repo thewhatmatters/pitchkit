@@ -100,7 +100,7 @@ No columns for:
 - unfollowers
 - emails
 - industry / category
-- bio, website, rates, “contact for collab,” geo (not on the public kit; no columns this round). `/insights` may paint **example** bio / website / country / city / age / gender mix for Design. Mix percents are of the located sample, not of `followers`. Do not persist them until we store Graph values.
+- bio, website, rates, “contact for collab,” geo, contact email, past brands (not on the public kit; no columns this round). `/insights` may paint **example** identity / bio / website / mix and **typed empty** contact + past-brands holes for Design. Mix percents are of the located sample, not of `followers`. Do not persist them until we store Graph values.
 - location beyond the public profile
 - Stories (unless we add them to kit consent later)
 - other people’s accounts

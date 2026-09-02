@@ -76,7 +76,7 @@ export function OwnerChrome({
       </div>
 
       {tab === "insights" ? (
-        <KitInventory posts={posts} followers={user.followers} gridReady={gridReady} />
+        <KitInventory user={user} posts={posts} gridReady={gridReady} />
       ) : (
         <div className="flex flex-col gap-4">
           <KitCard

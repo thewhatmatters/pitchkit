@@ -44,7 +44,7 @@ Until Hyperdrive exists, `/k/demo` and `/insights` read the in-repo seed (`lib/s
 
 Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays public (no cookie).
 
-`/insights` (after the stub cookie) is a stacked **example inventory** of every locked kit object so Design can see what to design. Each block shows the name, an example (marked), and the GLOSSARY.md first sentence. Numbers are marked **Example data — not live**. Not a layout lock. `/k/demo` is still the public kit card.
+`/insights` (after the stub cookie) is a stacked **example inventory** of every locked kit object so Design can see what to design. Each block shows the name, an example or typed hole (marked), and the first-sentence definition. Identity, last-updated, contact/past-brands holes, and a bio-first niche note are on the dump. Numbers are marked **Example data — not live**. Not a layout lock. `/k/` is the brand kit. `/k/demo` is still the public card.
 
 ---
 

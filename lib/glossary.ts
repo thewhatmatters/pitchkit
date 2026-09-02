@@ -82,4 +82,39 @@ export const GLOSSARY = {
     definition: "IG User website (Public).",
     help: "Hide if empty. Not a Stat.",
   },
+  name: {
+    name: "Name",
+    definition: "IG User name (Public).",
+    help: "Display name from Graph.",
+  },
+  username: {
+    name: "Username",
+    definition: "IG User username (Public).",
+    help: "Pitchkit handle is frozen at first connect. An Instagram rename does not move our URL.",
+  },
+  profilePicture: {
+    name: "Profile picture",
+    definition: "IG User profile_picture_url (Public).",
+    help: "Hide if none.",
+  },
+  contact: {
+    name: "Contact (email)",
+    definition: "Highest missing hire job.",
+    help: "Typed by the creator. Not Graph.",
+  },
+  pastBrands: {
+    name: "Past brands / one proof result",
+    definition: "Typed by the creator. Do not scrape logos.",
+    help: "Not Graph.",
+  },
+  niche: {
+    name: "Niche",
+    definition: "Bio comes first.",
+    help: "No niche form.",
+  },
+  lastUpdated: {
+    name: "Last updated",
+    definition: "Creator-before-share.",
+    help: "Stamp on the dump so the creator can see freshness before they share.",
+  },
 } as const satisfies Record<string, GlossaryEntry>;
