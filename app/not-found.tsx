@@ -1,3 +1,5 @@
+"use client";
+
 import { PageButton, PageCard, PageCopy } from "@/components/page-card";
 import { SupportFooter } from "@/components/support-footer";
 

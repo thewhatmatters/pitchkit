@@ -18,6 +18,7 @@ type OwnerChromeProps = {
   engagementRate: number | null;
   hasInsights: boolean;
   gridReady: boolean;
+  initialTab?: "insights" | "kit";
 };
 
 export function OwnerChrome({
@@ -26,8 +27,9 @@ export function OwnerChrome({
   engagementRate,
   hasInsights,
   gridReady,
+  initialTab = "insights",
 }: OwnerChromeProps) {
-  const [tab, setTab] = useState<"insights" | "kit">("insights");
+  const [tab, setTab] = useState<"insights" | "kit">(initialTab);
   const [notice, setNotice] = useState<string | null>(null);
 
   const kitHref = kitPath(user.handle);

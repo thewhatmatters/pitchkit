@@ -79,7 +79,7 @@ cp .dev.vars.example .dev.vars
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=personal`, `/insights`, `/insights?grid=pulling`, `/k/demo`, `/k/nope` (404), `/privacy`, `/delete`.
+Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=personal`, `/insights`, `/insights?tab=kit`, `/insights?grid=pulling`, `/k/demo`, `/k/nope` (404), `/privacy`, `/delete`.
 
 Production-shaped local Workers runtime (official OpenNext):
 
