@@ -66,7 +66,7 @@ No extra onboarding. No PDF in v1. No TikTok in v1. Steal vs skip: [GLOSSARY.md]
 
 **Ordered Stat row (ER still primary).** Do not pad to five. Row length follows the data. Chart is a trend object, not a fifth Stat. Surface typical reach, saves, and the 30-day chart (Later buries these; we don’t). Analytics only after Insights connect. 30-day chart, not Later’s 3-month overview.
 
-1. **Engagement rate** — always, `primary`. Hire/no-hire. WMDS Stat (label + number). **Locked (Randy skipped the Insights overwrite):** `(likes + comments) ÷ followers` on the six, when followers > 0. Same formula with or without Insights. Tooltip must say **likes + comments only**. Do not add saves/shares to the numerator. Do not use ÷ reach. Likes/comments are media `like_count` / `comments_count` — not insights.
+1. **Engagement rate** — always, `primary`. Hire/no-hire. WMDS Stat (label + number). **Locked:** `(likes + comments) ÷ followers` on the six, when followers > 0. Same formula with or without Insights. Public and Insights kits use the same formula. Tooltip must say **of followers** and **likes + comments only**, so nobody thinks this is Later’s ÷ reach number. Do not use ÷ reach. Do not add saves/shares to the numerator unless Randy reopens it. Likes/comments are media `like_count` / `comments_count` — not insights.
 2. **Typical reach** — Insights only. Media insights `reach` (lifetime, unique). Median of recent posts, not a spike, not account 30-day unique, not `followers_count`. Hide until connected. **Different number** from the 30-day chart.
 3. **Followers** — always. Scale / sanity vs reach. User `followers_count` (store `followers`).
 4. **Saves** — Insights only. Media insights `saved` (FEED/REELS). Not account insights `saves`. Not `saved_count` (Facebook Login only). Hide until connected.
@@ -82,9 +82,9 @@ No extra onboarding. No PDF in v1. No TikTok in v1. Steal vs skip: [GLOSSARY.md]
 
 **Own objects (Randy unlocked country, age, gender 2026-09-02):** not Stats. Meanings: [GLOSSARY.md](./GLOSSARY.md). Later/IG: need ≥100 followers to see audience data; empty copy, not zeros. Not “no geo in v1.” Not “countries only.”
 
-- **Country mix** — top countries + %. `follower_demographics` / `country`. Ranked % bars or a short ranked list. **Not a map.** Insights only. Hide if missing.
+- **Country mix** — own object. Insights only. Hide until connected. ≥100 followers or empty copy, not zeros. Top countries + %. `follower_demographics` / `country`. Ranked % bars or a short ranked list. **Not a map.**
 - **City mix** — finer country job. `follower_demographics` / `city`. Same paint. Audience city ≠ hometown.
-- **Age mix** + **gender mix** — same Graph family. Age = API brackets as bars (don’t invent bands). Gender = what Meta returns (don’t add buckets).
+- **Age mix** + **gender mix** — still v1 own objects (Randy; not skipped). Same Graph family. Insights only. Hide if missing. Age = API brackets as bars (don’t invent bands). Gender = what Meta returns (don’t add buckets).
 - **Bio** — only if sourced from IG profile (`biography`); hide if empty. Not a typed Later blurb.
 - **Website** — sourced if you need a link. Graph: IG User `website`. Hide if empty.
 
@@ -187,7 +187,7 @@ Landing (disclosure + Professional note + support)
 | `/k/[handle]` | public | Card only + support footer |
 | `/privacy`, `/delete` | public | Meta review |
 
-Name/handle is the headline. Lead pair: Followers (context) + ER (hire) as numbers, not a prose sentence. ER is `(likes + comments) ÷ followers` (Insights or not); tooltip says likes + comments only. Vocabulary: [GLOSSARY.md](./GLOSSARY.md). Stat row: **2** without Insights (ER + Followers), **4 + chart** with Insights. Don’t pad to five. Surface typical reach, saves, 30-day chart after Insights (not Later’s 3-month overview). Country / city / age / gender mix are own objects (Insights; ≥100 followers; empty copy not zeros). Posts: **2×3**, ranked saves → reach → likes.
+Name/handle is the headline. Lead pair: Followers (context) + ER (hire) as numbers, not a prose sentence. ER is `(likes + comments) ÷ followers` (Insights or not); tooltip says of followers and likes + comments only (not Later’s ÷ reach). Vocabulary: [GLOSSARY.md](./GLOSSARY.md). Stat row: **2** without Insights (ER + Followers), **4 + chart** with Insights. Don’t pad to five. Surface typical reach, saves, 30-day chart after Insights (not Later’s 3-month overview). Country / city / age / gender mix are own objects (Insights; ≥100 followers; empty copy not zeros). Posts: **2×3**, ranked saves → reach → likes.
 
 Personal fail, OAuth cancel → landing with the Professional message or unchanged landing. Empty grid is OK. No blank Insights: “Pulling your grid…” until R2 catches up.
 
