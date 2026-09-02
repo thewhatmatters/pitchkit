@@ -97,10 +97,11 @@ No columns for:
 - `follows_count`
 - unfollowers
 - emails
-- industry / category (Later form; not Graph unless UR sources it)
-- website, rates, “contact for collab”
-- city-level geo (country / age / gender mix are Insights objects — no new columns until we persist them)
-- bio (only if sourced from the IG profile; hide if empty — no column until we show it)
+- industry / category (unsourced; Later form)
+- creator location / hometown (unsourced; audience city ≠ hometown)
+- rates, “contact for collab”
+- lat/lng or geocoded maps (country / city mix are Insights name+count objects — no new columns until we persist them)
+- bio / website (sourced from IG `biography` / `website` if we show them — no column until we persist)
 - Stories (unless we add them to kit consent later)
 - other people’s accounts
 - scrape-derived panels
