@@ -4,7 +4,7 @@ A hosted **media kit** for Instagram creators. They sign in with Instagram, see 
 
 **Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [AGENTS](./AGENTS.md)
 
-The app is not built yet. This repo is the spec and the starting point. GitHub: [thewhatmatters/pitchkit](https://github.com/thewhatmatters/pitchkit).
+GitHub: [thewhatmatters/pitchkit](https://github.com/thewhatmatters/pitchkit).
 
 ---
 
@@ -34,8 +34,17 @@ On the connect screen, before they tap Instagram:
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | How the pieces connect (Workers, Graph, Neon, R2) |
 | [DATA.md](./DATA.md) | Database tables and column names |
 | [AGENTS.md](./AGENTS.md) | Short lock list for coding agents |
+| `app/` | Next.js App Router routes |
+| `components/` | Kit, inventory, posts, owner chrome (WMDS composition) |
+| `db/` | Postgres schema from [DATA.md](./DATA.md) (`users`, `media`, empty `detections` + `weekly_counts`) |
+| `lib/` | Schema types, in-repo seed, kit math (six-post rank + ER), example Insights inventory |
+| `public/demo/` | Placeholder kit images (`r2_key` maps here until R2) |
 
-No application source yet. When the app exists, this table will point at the folders.
+Until Hyperdrive exists, `/k/demo` and `/insights` read the in-repo seed (`lib/seed.ts`). Same `User` / `Media` types as live. `TOKEN_KEY` is not required for seed. Unknown handle (`/k/nope`) is 404. No Neon or Instagram token yet.
+
+Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays public (no cookie).
+
+`/insights` (after the stub cookie) is a stacked **example inventory** of every locked kit object so Design can see what to design. Each block shows the name, an example or typed hole (marked), and the first-sentence definition. Identity, last-updated, contact/past-brands holes, and a bio-first niche note are on the dump. Numbers are marked **Example data — not live**. Not a layout lock. `/k/` is the brand kit. `/k/demo` is still the public card.
 
 ---
 
@@ -53,27 +62,50 @@ Disconnect deletes the creator, their posts, and their files. Anonymous weekly t
 |---|---|
 | App | Next.js App Router, TypeScript, Tailwind v4 |
 | UI | WMDS (`@whatmatters/wmds`). No shadcn. Storybook stays in the WMDS repo. |
-| Compute | Cloudflare Workers, official OpenNext |
+| Compute | Cloudflare Workers, official OpenNext (`@opennextjs/cloudflare`) |
 | DB | Neon Postgres + Hyperdrive |
 | Files | R2 `pitchkit-media` |
 | Auth | Instagram Login + httpOnly cookie |
-| Charts | CSS |
+| Charts | Nivo via WMDS Chart (not CSS, not in this app yet) |
 
-Install WMDS from `../wmds` or GitHub until it is published; run `npm run build` there so `dist/` exists. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md).
+Install WMDS from `github:thewhatmatters/wmds` (CI cannot use `../wmds`). `prepare` builds `dist/`. Local `npm install ../wmds` still works. `postinstall` copies Geist font files into the WMDS `dist/files` path that `styles.css` expects. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md), WMDS [`CONSUMING.md`](https://github.com/thewhatmatters/wmds/blob/main/CONSUMING.md).
 
 Cloudflare and Support (for now): randy@whatmatters.so. Neon region is chosen when we create the database.
+
+Env **names** only (see `.env.example`): `IG_APP_ID`, `IG_APP_SECRET`, `TOKEN_KEY`, plus Hyperdrive notes. Never commit values.
 
 ---
 
 ## Run it
 
-Nothing to run until the app is scaffolded. After that, commands go here.
+```bash
+npm install
+cp .dev.vars.example .dev.vars
+npm run dev
+```
 
----
+Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=personal`, `/auth/instagram` (stub connect), `/auth/sign-out`, `/insights`, `/insights?tab=kit`, `/insights?grid=pulling`, `/k/demo`, `/k/nope` (404), `/privacy`, `/delete`.
 
-## If you are changing the product
+```bash
+npm test
+```
 
-1. Read [PLAN.md](./PLAN.md).
-2. If the picture of the stack changes, update [ARCHITECTURE.md](./ARCHITECTURE.md).
-3. If columns change, update [DATA.md](./DATA.md) in the same change.
-4. Keep [AGENTS.md](./AGENTS.md) in line with those.
+Tests cover six-post rank (saves → reach → likes), ER when Insights are missing, the example Insights inventory (not live), and set/clear of the Pitchkit session cookie plus the Insights gate.
+
+Production-shaped local Workers runtime (official OpenNext):
+
+```bash
+npm run preview
+```
+
+Build only:
+
+```bash
+npm run build
+```
+
+Deploy to Workers (needs Cloudflare auth and bindings):
+
+```bash
+npm run deploy
+```

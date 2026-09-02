@@ -38,7 +38,7 @@ Creator → Workers (OpenNext)
             → Instagram Login + Graph   (connect, refresh, Insights poll)
             → Neon via Hyperdrive        = rows
             → R2                         = photos (public read)
-         → /insights                     (owner, cookie)
+         → /insights                     (owner, cookie; example inventory this round)
          → /k/[handle]                   (anyone; Postgres + R2; no Graph)
 
 Brand  → /k/[handle] → same Worker → rows + public photos
@@ -55,7 +55,9 @@ Same table as [PLAN.md](./PLAN.md#stack-locked). Short version:
 - **UI:** `@whatmatters/wmds` pattern-first + `styles.css`. App owns layout Tailwind only. No shadcn. No Storybook here (copy from WMDS Storybook).
 - **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers.
 - **Icons:** Lucide through WMDS props. **Motion:** `motion` peer when WMDS needs it.
-- **Install WMDS:** `../wmds` or `github:thewhatmatters/wmds`; `npm run build` in WMDS so `dist/` exists.
+- **Install WMDS:** `github:thewhatmatters/wmds` (CI cannot use `../wmds`). Local `../wmds` still works; `prepare` builds `dist/`.
+- **Charts:** Nivo via WMDS Chart (not CSS, not in this app yet). `/insights` this round shows a labeled empty “30-day reach chart” slot in the example inventory. Do not invent a Chart atom here.
+- **Seed:** In-repo rows match [DATA.md](./DATA.md). `TOKEN_KEY` not required (seed tokens are null). Disconnect columns exist; no live delete yet.
 
 ---
 
@@ -63,10 +65,11 @@ Same table as [PLAN.md](./PLAN.md#stack-locked). Short version:
 
 | Piece | Role |
 |---|---|
-| Workers / OpenNext | All HTML and APIs. Sets the httpOnly session cookie. Encrypts tokens with `TOKEN_KEY` before SQL. |
-| Instagram | Login and Graph **only while the creator is connecting or we are polling**. Pin `GRAPH_API_VERSION`. No webhooks in v1. |
-| Hyperdrive → Neon | `users`, `media`, empty `detections` and `weekly_counts`. Bindings: `HYPERDRIVE` / `HYPERDRIVE_PREVIEW`. |
+| Workers / OpenNext | All HTML and APIs. Sets the httpOnly session cookie. Encrypts tokens with `TOKEN_KEY` before SQL. Until live OAuth, stub `/auth/instagram` sets `pitchkit_session` for seed `demo` (not a token). `/auth/sign-out` clears it. |
+| Instagram | Login and Graph **only while the creator is connecting or we are polling**. Pin `GRAPH_API_VERSION`. No webhooks in v1. Stub connect does not call Graph. |
+| Hyperdrive → Neon | `users`, `media`, empty `detections` and `weekly_counts`. Bindings: `HYPERDRIVE` / `HYPERDRIVE_PREVIEW`. Until Hyperdrive exists, `/k/demo` and `/insights` read `lib/seed.ts` — same types as live. Schema SQL: `db/*.sql`. |
 | R2 `pitchkit-media` | Bytes. Public read for kit objects. Keys on `avatar_r2_key` / `r2_key`. Prefix `{user_id}/`. |
+| `/insights` | Owner cookie. This round: stacked example inventory (identity, stats, mix, typed contact/brands holes, last-updated). `/k/` is the brand kit. `/k/demo` stays the public card. |
 | `/k/[handle]` | Last stored snapshot. If the token is dead, this page still works. |
 | Cloudflare / Support | randy@whatmatters.so until we change it |
 

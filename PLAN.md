@@ -16,12 +16,12 @@ Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCH
 | UI | **WMDS** (`@whatmatters/wmds`) — pattern-first. Import components and `@whatmatters/wmds/styles.css`. Layout (`grid`, `gap`, `max-w`) stays in the app. No shadcn. No ad-hoc `rounded-full bg-*` buttons. |
 | Icons | Lucide via WMDS props |
 | Motion | `motion` peer when a WMDS component needs it |
-| Install | Git/path to `thewhatmatters/wmds` until the package is published (`npm install ../wmds` or `github:thewhatmatters/wmds`). Build WMDS (`npm run build`) so `dist/` exists. How to consume: WMDS `CONSUMING.md`. |
+| Install | GitHub `github:thewhatmatters/wmds` (CI cannot use `../wmds`). Local path still works. `prepare` builds `dist/`. How to consume: WMDS `CONSUMING.md`. |
 | Compute | Cloudflare Workers via **OpenNext** (official adapter only) |
 | DB | Neon Postgres + Hyperdrive (`HYPERDRIVE` / `HYPERDRIVE_PREVIEW`) |
 | Files | R2 `pitchkit-media` |
 | Auth | Instagram Login + Pitchkit httpOnly cookie |
-| Charts | CSS |
+| Charts | Nivo via WMDS Chart (not CSS, not in this app yet) |
 
 **Not used:** D1, Vercel, shadcn, Browser Run, Queues, Workers AI.
 
@@ -37,7 +37,7 @@ Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCH
 
 **Public from first successful connect.** No publish switch. Ingest builds the kit; `/k/[handle]` is live as soon as the `users` row exists.
 
-**Session:** Instagram proves who they are. Pitchkit still sets an **httpOnly cookie** for Insights, disconnect, and refresh. The cookie is our login, not the Instagram token.
+**Session:** Instagram proves who they are. Pitchkit still sets an **httpOnly cookie** for Insights, disconnect, and refresh. The cookie is our login, not the Instagram token. Until live OAuth, stub Continue (GET/POST `/auth/instagram`) sets that cookie for seed handle `demo`. Sign out clears it. `/insights` without the cookie goes `/`. `/k/[handle]` does not need it.
 
 Owner home: `/insights`. Media kit tab is owner chrome over the same card. Brands only get `/k/[handle]`.
 
@@ -52,7 +52,7 @@ Seed: `/k/demo`.
 | Creator | Continue with Instagram (Professional). Land on Insights. Share the kit URL. Reconnect, sign out, disconnect. Phone works. |
 | Brand | Open the kit. No account. |
 
-No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “contact for collab,” or geo on the kit.
+No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “contact for collab,” or geo on the **public kit**. Insights may show those as a labeled example inventory this round.
 
 ---
 
@@ -149,7 +149,7 @@ Landing (disclosure + Professional note + support)
 | Route | Who | What |
 |---|---|---|
 | `/` | anyone | Pitch, disclosure, Continue with Instagram, Professional note, support |
-| `/insights` | owner cookie | Last 30 days, stats, chart, six posts, reconnect / disconnect / sign out |
+| `/insights` | owner cookie | Last 30 days. **This round:** stacked **example** inventory of every locked kit object (not a layout lock). Each object: name, example, GLOSSARY.md first sentence. Reconnect / disconnect / sign out |
 | `/insights` Media kit tab | owner | Same card as public + copy / share link |
 | `/k/[handle]` | public | Card only + support footer |
 | `/privacy`, `/delete` | public | Meta review |
@@ -171,8 +171,8 @@ Personal fail, OAuth cancel → landing with the Professional message or unchang
 
 ## Build order
 
-1. Next.js App Router + Tailwind v4 on OpenNext Workers. Install WMDS from `../wmds` (build `dist/` first). Neon + Hyperdrive + R2. Env names in README.  
-2. Schema from [DATA.md](./DATA.md) including empty `detections` and `weekly_counts`. Seed `demo`.  
+1. Next.js App Router + Tailwind v4 on OpenNext Workers. Install WMDS from `github:thewhatmatters/wmds` (local `../wmds` still fine). Neon + Hyperdrive + R2. Env names in README.  
+2. Schema from [DATA.md](./DATA.md) including empty `detections` and `weekly_counts`. Seed `demo`. SQL in `db/`. Until Hyperdrive exists, `/k/demo` and `/insights` read the in-repo seed (`lib/seed.ts`) with the same types. `TOKEN_KEY` not required for seed.  
 3. Insights + public `/k/demo` (responsive, OG tags).  
 4. Cookie + stub Instagram → Insights.  
 5. Live Instagram for testers.  
@@ -189,4 +189,6 @@ CV / filling `detections`. TikTok. PDF. Brand dashboard. Kit-view analytics for 
 
 ## Skip unless they are on the kit
 
-Bio, website, rates, “contact for collab,” geo. Easy to add columns later. Not why someone connects. No columns in [DATA.md](./DATA.md) until we show them.
+Rates, “contact for collab,” creator hometown / industry. Easy to add columns later. Not why someone connects.
+
+**Insights inventory (WHA-299):** `/insights` dumps locked objects for Design — last-updated, name, username, profile picture (hide if none), ER, followers, typical reach, saves, 30-day chart *slot*, six posts, country / city / age / gender mix, bio, niche *note* (bio comes first; no form), website, plus typed empty holes for contact (email) and past brands / one proof result. Each block: name, example or typed (marked), first sentence (tooltip = first sentence; longer help under the number or chart). Sample numbers are **example data — not live**. Mix percents are of people Instagram located, not of the follower total. Ranked % lists, not a map. No new WMDS atoms (no Stat / Chart / bar in this app). `/k/[handle]` is the brand kit; Insights objects live there when connected; hide when missing. Do not dump this inventory on `/k/demo`. Bio / website / mix / contact / brands are **not** Postgres columns this round. Do not paint impressions, stories, profile views, bio-link clicks, media count, hometown, industry, rates, testimonials.
