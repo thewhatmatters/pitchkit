@@ -1,0 +1,30 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
+  "name": "pitchkit",
+  "compatibility_date": "2026-09-02",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  "observability": {
+    "enabled": true,
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "pitchkit",
+    },
+  ],
+  // Neon via Hyperdrive — add binding ids when the database exists.
+  // Prod: HYPERDRIVE. Preview: HYPERDRIVE_PREVIEW.
+  // "hyperdrive": [
+  //   { "binding": "HYPERDRIVE", "id": "" },
+  //   { "binding": "HYPERDRIVE_PREVIEW", "id": "" },
+  // ],
+  // Kit images — bucket name planned as pitchkit-media. Public read for kit objects.
+  // "r2_buckets": [
+  //   { "binding": "MEDIA", "bucket_name": "pitchkit-media" },
+  // ],
+}

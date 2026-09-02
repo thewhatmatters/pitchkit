@@ -4,7 +4,7 @@ A hosted **media kit** for Instagram creators. They sign in with Instagram, see 
 
 **Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [AGENTS](./AGENTS.md)
 
-The app is not built yet. This repo is the spec and the starting point. GitHub: [thewhatmatters/pitchkit](https://github.com/thewhatmatters/pitchkit).
+GitHub: [thewhatmatters/pitchkit](https://github.com/thewhatmatters/pitchkit).
 
 ---
 
@@ -34,8 +34,12 @@ On the connect screen, before they tap Instagram:
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | How the pieces connect (Workers, Graph, Neon, R2) |
 | [DATA.md](./DATA.md) | Database tables and column names |
 | [AGENTS.md](./AGENTS.md) | Short lock list for coding agents |
+| `app/` | Next.js App Router routes |
+| `components/` | Kit, stats, posts, owner chrome (WMDS composition) |
+| `lib/` | Demo seed and locked ER math |
+| `public/demo/` | Placeholder kit images |
 
-No application source yet. When the app exists, this table will point at the folders.
+This scaffold uses **static demo data** (`/k/demo`, `/insights`). Same columns as [DATA.md](./DATA.md). No Neon or Instagram token yet.
 
 ---
 
@@ -53,27 +57,44 @@ Disconnect deletes the creator, their posts, and their files. Anonymous weekly t
 |---|---|
 | App | Next.js App Router, TypeScript, Tailwind v4 |
 | UI | WMDS (`@whatmatters/wmds`). No shadcn. Storybook stays in the WMDS repo. |
-| Compute | Cloudflare Workers, official OpenNext |
+| Compute | Cloudflare Workers, official OpenNext (`@opennextjs/cloudflare`) |
 | DB | Neon Postgres + Hyperdrive |
 | Files | R2 `pitchkit-media` |
 | Auth | Instagram Login + httpOnly cookie |
-| Charts | CSS |
+| Charts | Nivo via WMDS Chart (not CSS, not in this app yet) |
 
-Install WMDS from `../wmds` or GitHub until it is published; run `npm run build` there so `dist/` exists. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md).
+Install WMDS from `github:thewhatmatters/wmds` (CI cannot use `../wmds`). `prepare` builds `dist/`. Local `npm install ../wmds` still works. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md), WMDS [`CONSUMING.md`](https://github.com/thewhatmatters/wmds/blob/main/CONSUMING.md).
 
 Cloudflare and Support (for now): randy@whatmatters.so. Neon region is chosen when we create the database.
+
+Env **names** only (see `.env.example`): `IG_APP_ID`, `IG_APP_SECRET`, `TOKEN_KEY`, plus Hyperdrive notes. Never commit values.
 
 ---
 
 ## Run it
 
-Nothing to run until the app is scaffolded. After that, commands go here.
+```bash
+npm install
+cp .dev.vars.example .dev.vars
+npm run dev
+```
 
----
+Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=personal`, `/insights`, `/insights?grid=pulling`, `/k/demo`, `/k/nope` (404), `/privacy`, `/delete`.
 
-## If you are changing the product
+Production-shaped local Workers runtime (official OpenNext):
 
-1. Read [PLAN.md](./PLAN.md).
-2. If the picture of the stack changes, update [ARCHITECTURE.md](./ARCHITECTURE.md).
-3. If columns change, update [DATA.md](./DATA.md) in the same change.
-4. Keep [AGENTS.md](./AGENTS.md) in line with those.
+```bash
+npm run preview
+```
+
+Build only:
+
+```bash
+npm run build
+```
+
+Deploy to Workers (needs Cloudflare auth and bindings):
+
+```bash
+npm run deploy
+```

@@ -16,12 +16,12 @@ Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCH
 | UI | **WMDS** (`@whatmatters/wmds`) — pattern-first. Import components and `@whatmatters/wmds/styles.css`. Layout (`grid`, `gap`, `max-w`) stays in the app. No shadcn. No ad-hoc `rounded-full bg-*` buttons. |
 | Icons | Lucide via WMDS props |
 | Motion | `motion` peer when a WMDS component needs it |
-| Install | Git/path to `thewhatmatters/wmds` until the package is published (`npm install ../wmds` or `github:thewhatmatters/wmds`). Build WMDS (`npm run build`) so `dist/` exists. How to consume: WMDS `CONSUMING.md`. |
+| Install | GitHub `github:thewhatmatters/wmds` (CI cannot use `../wmds`). Local path still works. `prepare` builds `dist/`. How to consume: WMDS `CONSUMING.md`. |
 | Compute | Cloudflare Workers via **OpenNext** (official adapter only) |
 | DB | Neon Postgres + Hyperdrive (`HYPERDRIVE` / `HYPERDRIVE_PREVIEW`) |
 | Files | R2 `pitchkit-media` |
 | Auth | Instagram Login + Pitchkit httpOnly cookie |
-| Charts | CSS |
+| Charts | Nivo via WMDS Chart (not CSS, not in this app yet) |
 
 **Not used:** D1, Vercel, shadcn, Browser Run, Queues, Workers AI.
 
@@ -171,7 +171,7 @@ Personal fail, OAuth cancel → landing with the Professional message or unchang
 
 ## Build order
 
-1. Next.js App Router + Tailwind v4 on OpenNext Workers. Install WMDS from `../wmds` (build `dist/` first). Neon + Hyperdrive + R2. Env names in README.  
+1. Next.js App Router + Tailwind v4 on OpenNext Workers. Install WMDS from `github:thewhatmatters/wmds` (local `../wmds` still fine). Neon + Hyperdrive + R2. Env names in README.  
 2. Schema from [DATA.md](./DATA.md) including empty `detections` and `weekly_counts`. Seed `demo`.  
 3. Insights + public `/k/demo` (responsive, OG tags).  
 4. Cookie + stub Instagram → Insights.  

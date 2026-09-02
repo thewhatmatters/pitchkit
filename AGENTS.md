@@ -20,8 +20,8 @@ Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md)
 - Postgres: [DATA.md](./DATA.md). Empty `detections` and `weekly_counts`. Stub and live OAuth use the same schema.
 - `TOKEN_KEY` is a Workers secret. Never git.
 - Cloudflare and Support (for now): **randy@whatmatters.so**. Neon region: pick when we create the database.
-- **UI:** `@whatmatters/wmds` (pattern-first, import `styles.css`). Layout Tailwind only. Lucide via WMDS. No shadcn. No Storybook in this repo. Install from `../wmds` or `github:thewhatmatters/wmds`; build WMDS `dist/` first.
-- **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers. Charts: CSS.
+- **UI:** `@whatmatters/wmds` (pattern-first, import `styles.css`). Layout Tailwind only. Lucide via WMDS. No shadcn. No Storybook in this repo. Install from `github:thewhatmatters/wmds` (CI cannot use `../wmds`); `prepare` builds `dist/`.
+- **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers. Charts: Nivo via WMDS Chart (not CSS, not in this app yet).
 
 ## Do not build
 

@@ -55,7 +55,8 @@ Same table as [PLAN.md](./PLAN.md#stack-locked). Short version:
 - **UI:** `@whatmatters/wmds` pattern-first + `styles.css`. App owns layout Tailwind only. No shadcn. No Storybook here (copy from WMDS Storybook).
 - **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers.
 - **Icons:** Lucide through WMDS props. **Motion:** `motion` peer when WMDS needs it.
-- **Install WMDS:** `../wmds` or `github:thewhatmatters/wmds`; `npm run build` in WMDS so `dist/` exists.
+- **Install WMDS:** `github:thewhatmatters/wmds` (CI cannot use `../wmds`). Local `../wmds` still works; `prepare` builds `dist/`.
+- **Charts:** Nivo via WMDS Chart (not CSS, not in this app yet). Empty Insights slot; hide when Insights are missing.
 
 ---
 
