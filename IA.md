@@ -11,7 +11,7 @@ Paid SKU is one rec (not a lock): PDF + custom domain + strip badge — see `LIG
 ```text
 /                         Continue
 /insights                 Insights (owner)
-  └ settings              Settings
+  └ settings              Settings (contact, past brands)
 /k/[handle]               Public kit (full when sourced)
 unknown / disconnected    404
 ```
@@ -84,12 +84,12 @@ IA grayscales sit on the WMDS app grid spine (main `64c995a` / Foundation → Gr
 
 ## Past brands (UR + Design 2026-09-03)
 
-Typed proof slot. Not Graph. Hide when empty. No `GLOSSARY.md` Past brands term yet.
+Lock. Interviews unrun.
 
-- **Public `/k/`** — wrap row of typed name chips. Display-only. Hide when empty. 1–4 one line; 5+ wrap. No marquee in v1.
-- **Settings** — name + optional one proof line (campaign / year — not quote, rate, or logo URL). Hide proof if empty. Order = Settings list order. Not a new URL.
+- **Public `/k/`:** wrap row of typed **name chips**, display-only. Hide the section when empty. 1–4 one line; 5+ wrap. **No** auto-scroll marquee v1 (fights the 30s scan; names must stay screenshotable).
+- **Settings:** name + optional one **proof line** (campaign/year — not a quote, not a rate, not a logo URL). Hide the proof line if empty. Display order = Settings list order. Not a new URL.
 - **Never:** logo scrape, logo upload, marquee, testimonials-as-past-brands.
-- **Peers (note):** Later typed; Beacons logos skip; OwlScran no section.
+- Peers: Later Past Collaborations = typed field. Beacons wants logos/testimonials — skip both. OwlScran doesn’t make past brands a kit section. Connoisseur not a creator-kit product.
 
 ## Related
 

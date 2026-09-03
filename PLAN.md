@@ -2,7 +2,7 @@
 
 **Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [glossary](./GLOSSARY.md) · [AGENTS](./AGENTS.md)
 
-Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md). Stats vocabulary: [GLOSSARY.md](./GLOSSARY.md). Kit-space SWOT SoT: [SWOT.md](./SWOT.md). Free-promise / lights-on SoT: [LIGHTS-ON.md](./LIGHTS-ON.md). IA SoT: [IA.md](./IA.md). Structure (WMDS grid): [IA.md](./IA.md#structure-wmds-grid).
+Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md). Stats vocabulary: [GLOSSARY.md](./GLOSSARY.md). Kit-space SWOT SoT: [SWOT.md](./SWOT.md). Free-promise / lights-on SoT: [LIGHTS-ON.md](./LIGHTS-ON.md). IA SoT: [IA.md](./IA.md). Structure (WMDS grid): [IA.md](./IA.md#structure-wmds-grid). Past brands: [IA.md](./IA.md#past-brands-ur--design-2026-09-03).
 
 **Look:** WMDS (`@whatmatters/wmds`). Name on the site is Pitchkit.
 

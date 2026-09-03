@@ -2,7 +2,7 @@
 
 **Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [glossary](./GLOSSARY.md) · [AGENTS](./AGENTS.md)
 
-Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md). Spec: [PLAN.md](./PLAN.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md). Columns: [DATA.md](./DATA.md). Stats vocabulary: [GLOSSARY.md](./GLOSSARY.md). Kit-space SWOT SoT: [SWOT.md](./SWOT.md). Free-promise / lights-on SoT: [LIGHTS-ON.md](./LIGHTS-ON.md). IA SoT: [IA.md](./IA.md). Structure (WMDS grid): [IA.md](./IA.md#structure-wmds-grid).
+Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md). Spec: [PLAN.md](./PLAN.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md). Columns: [DATA.md](./DATA.md). Stats vocabulary: [GLOSSARY.md](./GLOSSARY.md). Kit-space SWOT SoT: [SWOT.md](./SWOT.md). Free-promise / lights-on SoT: [LIGHTS-ON.md](./LIGHTS-ON.md). IA SoT: [IA.md](./IA.md). Structure (WMDS grid): [IA.md](./IA.md#structure-wmds-grid). Past brands: [IA.md](./IA.md#past-brands-ur--design-2026-09-03).
 
 ## Product lock
 
