@@ -27,10 +27,10 @@ Security: do not sell the list or rates. Ads never on kit fields. No pixel that 
 One SKU. Not three products.
 
 1. PDF export
-2. Custom domain on the same kit. **Both URLs:** `their.domain` `/` serves the same public kit as `pitchkit.app/k/[handle]`. No redirect either way. Insights stays on pitchkit.app (cookie never on their host). Not a second product and not a paywall of `/k/`. Not built this round. Cloudflare for SaaS later. Apex later. Subdomain CNAME first when we paint it. Diagram: [ARCHITECTURE.md](./ARCHITECTURE.md) / [WHA-302](https://linear.app/whatmatters/issue/WHA-302) — do not duplicate Backend’s diagram here.
+2. Custom domain on the same kit. **Both URLs:** `their.domain` `/` serves the same public kit as `pitchkit.app/k/[handle]`. No redirect either way. Insights stays on pitchkit.app (cookie never on their host). Not a second product and not a paywall of `/k/`. Cloudflare for SaaS is **already ON** the existing `pitchkit.app` zone (zero custom hostnames, fallback origin empty, enable was $0). Do not say “Cloudflare for SaaS later.” Hostname meter: first 100 included, then $0.10 each. Apex is extra — skip at the $9 rec (subdomain CNAME first). Fallback origin still empty; painting hostnames is still later, SaaS itself is on. Diagram: [ARCHITECTURE.md](./ARCHITECTURE.md) / [WHA-302](https://linear.app/whatmatters/issue/WHA-302) — do not duplicate Backend’s diagram here.
 3. Strip the Pitchkit badge
 
-**Entry price: $9/mo or $90/yr.**
+**Rec (not a lock): $9/mo or $90/yr.** Vault: rec not lock. Do not present it as signed.
 
 - Under Later Starter **$18.75/mo** yearly ([later.com/pricing-v3](https://later.com/pricing-v3)) — and they charge that *to share*.
 - At Beacons Creator **$10/mo** ([beacons.ai/i/pricing](https://beacons.ai/i/pricing)) without copying their ~9% store fee.
@@ -62,7 +62,7 @@ See `SWOT.md` for the full landscape.
 
 ## Rec
 
-Keep `/k/` fully free, including Insights. If we charge: one SKU (PDF + custom domain + strip badge) at **$9/mo or $90/yr**. Ads only off-kit if we need them sooner. Do not copy Later’s paid-to-share.
+Keep `/k/` fully free, including Insights. If we charge: one SKU (PDF + custom domain + strip badge). **Rec (not a lock): $9/mo or $90/yr.** Ads only off-kit if we need them sooner. Do not copy Later’s paid-to-share.
 
 ## Related
 
