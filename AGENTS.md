@@ -2,7 +2,7 @@
 
 **Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [glossary](./GLOSSARY.md) · [AGENTS](./AGENTS.md)
 
-Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md). Spec: [PLAN.md](./PLAN.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md). Columns: [DATA.md](./DATA.md). Stats vocabulary: [GLOSSARY.md](./GLOSSARY.md). Kit-space SWOT SoT: [SWOT.md](./SWOT.md).
+Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md). Spec: [PLAN.md](./PLAN.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md). Columns: [DATA.md](./DATA.md). Stats vocabulary: [GLOSSARY.md](./GLOSSARY.md). Kit-space SWOT SoT: [SWOT.md](./SWOT.md). Free-promise / lights-on SoT: [LIGHTS-ON.md](./LIGHTS-ON.md).
 
 ## Product lock
 
@@ -31,4 +31,4 @@ Do not add Graph columns we do not get from public posts + Insights. Do not inve
 
 ## After each turn
 
-Locks → [PLAN.md](./PLAN.md). Picture → [ARCHITECTURE.md](./ARCHITECTURE.md). Columns → [DATA.md](./DATA.md). Stats words → [GLOSSARY.md](./GLOSSARY.md). Kit-space SWOT → [SWOT.md](./SWOT.md). Humans → [README.md](./README.md).
+Locks → [PLAN.md](./PLAN.md). Picture → [ARCHITECTURE.md](./ARCHITECTURE.md). Columns → [DATA.md](./DATA.md). Stats words → [GLOSSARY.md](./GLOSSARY.md). Kit-space SWOT → [SWOT.md](./SWOT.md). Free promise → [LIGHTS-ON.md](./LIGHTS-ON.md). Humans → [README.md](./README.md).
