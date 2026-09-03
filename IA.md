@@ -1,34 +1,65 @@
 # Pitchkit IA
 
-Design + User Research. 2026-09-02. Not a layout lock. Interviews unrun.
+Design + User Research. 2026-09-02. Re-review. Not a layout lock. Interviews unrun.
 
-Bench SoT with `GLOSSARY.md`, `PLAN.md`, `AGENTS.md`, `SWOT.md`, `LIGHTS-ON.md`. Terms live in `GLOSSARY.md`. This file is the UR-locked screen list. Do not invent screens.
+Bench SoT with `GLOSSARY.md`, `PLAN.md`, `AGENTS.md`, `SWOT.md`, `LIGHTS-ON.md`. Terms live in `GLOSSARY.md`. This file is the page tree plus need and entry. States are not pages. Do not invent screens.
 
 Linear: [WHA-303](https://linear.app/whatmatters/issue/WHA-303/pitchkit-ia-grayscale-mocks-for-storybook).
 
-Hide/swap lives on Insights (later, not this dump). Paid SKU is one rec (not a lock): PDF + custom domain + strip badge — see `LIGHTS-ON.md`. Both-URLs later; not a chapter.
+Paid SKU is one rec (not a lock): PDF + custom domain + strip badge — see `LIGHTS-ON.md`. Both-URLs later; not a chapter.
 
-## Brand
+```text
+/                         Continue
+/insights                 Insights (owner)
+  └ settings              Settings
+/k/[handle]               Public kit (full when sourced)
+unknown / disconnected    404
+```
 
-1. **Full kit** — `/k/[handle]`. Insights connected. Spend or pass in ~30s.
-2. **Public-only** — `/k/[handle]`. ER + Followers. Insights objects hidden.
-3. **Unknown 404** — missing or disconnected handle.
-4. **Hide missing field** — dash, not zeros. Empty > zeros on any missing object.
+## Pages
 
-## Creator
+### Continue `/`
 
-5. **Continue** — `/`. Disclosure + Professional note + support before the button. This is the Instagram door. Cookie missing → redirect `/`.
-6. **Killed (Randy 2026-09-02)** — not a distinct Connect screen. After Continue they are on Insights with whatever Graph returned — hide missing objects, do not restage Connect. Do not show a fake thin kit (that is public-only #2).
-7. **Denied / token dead — reconnect** — public kit stays on last snapshot. Owner sees Reconnect Instagram. Token dead later, not a second first-run Connect.
-8. **Personal / no Insights — professional required** — copy on Home or a line on Insights. Not a second OAuth.
-9. **Owner connected** — `/insights`. Same numbers as `/k/[handle]`, labeled. Auto six, ranked saves → reach → likes. Hide missing objects.
-10. **No media — empty six, not a picker** — empty kit if they pick from scratch is a fail. Hide when missing. No zeros.
+- **Need:** start Instagram. Disclosure + Professional note + support before the button. This is the Instagram door.
+- **Entry:** open pitchkit.app. Cookie missing → `/`.
+- **Not:** a dashboard.
 
-## Settings
+### Insights owner `/insights`
 
-11. **Contact** — typed email door. Not Graph.
-12. **Past brands** — typed proof slot. Not a featured-upload gallery.
-13. **Reconnect / sign out** — plus disconnect (delete). Paid SKU rec (not lock) if shown.
+- **Need:** creator-before-share. Same numbers as `/k/[handle]`, labeled. Whatever Graph returned — hide missing objects. Auto six, ranked saves → reach → likes. Hide/swap later (not this dump).
+- **Entry:** after Continue. Cookie required; missing → `/`.
+- **Not:** a second Connect. Do not restage Continue here.
+
+### Settings
+
+- **Need:** typed contact, typed past brands, reconnect / sign out / disconnect. Paid SKU rec (not lock) if shown.
+- **Entry:** from Insights (owner chrome).
+- **Not:** rates. Not a featured-upload gallery.
+
+### Public kit `/k/[handle]` (full)
+
+- **Need:** brand spend or pass in ~30s. Same objects as Insights when sourced.
+- **Entry:** shared `pitchkit.app/k/[handle]`. Public on first successful connect.
+- **Not:** a second kit. Insights is not a second page of numbers for the brand.
+
+### 404
+
+- **Need:** unknown or disconnected handle.
+- **Entry:** `/k/[handle]` when missing or disconnected.
+
+## States (not pages)
+
+- **Token dead** — public kit stays on last snapshot. Owner sees Reconnect on Insights / Settings. Not a second first-run Connect.
+- **No media** — empty six, not a picker. Empty kit if they pick from scratch is a fail. Hide when missing. No zeros.
+- **Insights missing** — hide typical reach, saves, chart, mix. Dash, not zeros. Still Insights owner, not a thin-kit page.
+- **Thin kit** — `/k/[handle]` with public-only objects (ER + Followers). A state of the public kit, not its own page.
+- **Field missing** — hide that object. Dash, not zeros. Not a page.
+
+## Killed
+
+- Second Connect on `/insights` (Randy 2026-09-02). Continue on `/` is the door.
+- Personal / no Insights as its own Insights page. Copy on Home or a line on Insights. Not a second OAuth.
+- Hide-missing as a page. It is a rule on every surface.
 
 ## Never screens
 
