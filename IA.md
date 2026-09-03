@@ -71,9 +71,20 @@ unknown / disconnected    404
 - Vanity metrics
 - Ads on the kit
 
+## Structure (WMDS grid)
+
+IA grayscales sit on the WMDS app grid spine (main `64c995a` / Foundation → Grid). Wrap `grid-page` + band. Place by column line. Desktop 12 / mobile 4. Baseline 8 / leading-base 24. `--spacing` stays 4px. `g` overlay same content box. Copy from WMDS — no Pitchkit Grid molecule. Structure only; look in Storybook. Kit layout held until Design locks Stat / Empty / Avatar / Chart.
+
+### Surfaces
+
+- **Continue `/`** — cols 3–10.
+- **Insights** — header 1–6, Share 10–12; four Stats ×3; Chart full; posts + audience split.
+- **`/k/`** — mobile 4-col: identity → stats 2+2 → chart → 2-up posts → audience → contact / brands.
+- **Settings** — cols 3–10.
+
 ## Related
 
 - `GLOSSARY.md` — terms, hide-when-missing, Graph.
 - `SWOT.md` — public kit contract.
 - `LIGHTS-ON.md` — free `/k/`, paid SKU rec not lock.
-- `PLAN.md` / `AGENTS.md` — point here for IA.
+- `PLAN.md` / `AGENTS.md` — point here for IA. Structure: this section.
