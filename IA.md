@@ -1,72 +1,43 @@
 # Pitchkit IA
 
-Design + User Research. 2026-09-02. Not a layout lock. Grayscale mocks later for Storybook — not this file.
+Design + User Research. 2026-09-02. Not a layout lock. Interviews unrun.
 
-Bench SoT with `GLOSSARY.md`, `PLAN.md`, `AGENTS.md`, `SWOT.md`, `LIGHTS-ON.md`. Terms live in `GLOSSARY.md`. This file is every surface, who it is for, and the entry path. Do not invent screens.
+Bench SoT with `GLOSSARY.md`, `PLAN.md`, `AGENTS.md`, `SWOT.md`, `LIGHTS-ON.md`. Terms live in `GLOSSARY.md`. This file is the UR-locked screen list. Do not invent screens.
 
 Linear: [WHA-303](https://linear.app/whatmatters/issue/WHA-303/pitchkit-ia-grayscale-mocks-for-storybook).
 
-## Surfaces
+Hide/swap lives on Insights (later, not this dump). Paid SKU is one rec (not a lock): PDF + custom domain + strip badge — see `LIGHTS-ON.md`. Both-URLs later; not a chapter.
 
-### Home `/`
+## Brand
 
-- **Who:** anyone, not logged in.
-- **Entry:** open pitchkit.app. Disclosure + Professional note + support before Continue with Instagram.
-- **Job:** start connect. Not a dashboard.
+1. **Full kit** — `/k/[handle]`. Insights connected. Spend or pass in ~30s.
+2. **Public-only** — `/k/[handle]`. ER + Followers. Insights objects hidden.
+3. **Unknown 404** — missing or disconnected handle.
+4. **Hide missing field** — dash, not zeros. Empty > zeros on any missing object.
 
-### Connect fail
+## Creator
 
-- **Who:** creator whose Instagram login failed (personal account or cancel).
-- **Entry:** Home `/` → Continue with Instagram → fail.
-- **Job:** land back on Home with the Professional message, or unchanged Home. No blank Insights.
+5. **Continue** — `/`. Disclosure + Professional note + support before the button.
+6. **Insights not connected** — owner cookie, no Insights yet. ER + Followers. Hide reach / saves / chart / mix.
+7. **Denied / token dead — reconnect** — public kit stays on last snapshot. Owner sees Reconnect Instagram.
+8. **Personal / no Insights — professional required** — Home with the Professional message.
+9. **Owner connected** — `/insights`. Same numbers as `/k/[handle]`, labeled. Auto six, ranked saves → reach → likes.
+10. **No media — empty six, not a picker** — empty kit if they pick from scratch is a fail. Hide when missing. No zeros.
 
-### Insights connected
+## Settings
 
-- **Who:** owner cookie. Insights exist.
-- **Entry:** successful connect, or cookie return to `/insights`.
-- **Job:** creator-before-share. Same numbers as `/k/[handle]`, labeled. Last-updated. Hide/swap later (not this dump). Auto six, ranked saves → reach → likes.
+11. **Contact** — typed email door. Not Graph.
+12. **Past brands** — typed proof slot. Not a featured-upload gallery.
+13. **Reconnect / sign out** — plus disconnect (delete). Paid SKU rec (not lock) if shown.
 
-### Insights no Insights
-
-- **Who:** owner cookie. Public likes/comments only — Graph Insights missing.
-- **Entry:** same as Insights connected.
-- **Job:** still show ER + Followers. Hide typical reach, saves, 30-day chart, and mix objects. Dash, not zeros. Empty kit if they have to pick posts from scratch is a fail.
-
-### Settings
-
-- **Who:** owner cookie.
-- **Entry:** from Insights (owner chrome).
-- **On it:** contact (typed), past brands (typed), reconnect / sign out / disconnect. Paid SKU rec (not a lock): PDF + custom domain + strip badge — see `LIGHTS-ON.md`.
-- **Not on it:** rates.
-
-### Public kit `/k/[handle]`
-
-- **Who:** brand. No account.
-- **Entry:** shared `pitchkit.app/k/[handle]`. Public on first successful connect.
-- **Job:** spend or pass in ~30s. Same objects as Insights when sourced. Hide when missing. Dash, not zeros.
-
-### Public kit thin
-
-- **Who:** brand. Insights not connected or objects missing.
-- **Entry:** same `/k/[handle]`.
-- **Job:** still name/handle, Followers, ER (likes + comments) ÷ followers. Hide Insights objects. Dash, not zeros. Auto six from public likes if we have media.
-
-### Custom host later, same kit
-
-- **Who:** brand on `their.domain` `/`.
-- **Entry:** paid SKU item 2 (rec, not lock). Not built this round. Painting hostnames later. Cloudflare for SaaS already ON.
-- **Job:** **same** public kit as `pitchkit.app/k/[handle]`. No redirect either way. Insights stays on pitchkit.app (cookie never on their host). Not a paywall of `/k/`. Diagram: `ARCHITECTURE.md` / [WHA-302](https://linear.app/whatmatters/issue/WHA-302).
-
-## Not screens
-
-Do not invent these:
+## Never screens
 
 - Rates
 - Stories
-- Uploaded highlights (Later Featured Media)
+- Pick-from-scratch empty kit
+- Featured / uploaded highlights
 - Map
-- Vanity metrics (profile views, bio-link clicks, impressions, average likes)
-- Marketplace
+- Vanity metrics
 - Ads on the kit
 
 ## Related
