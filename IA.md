@@ -1,6 +1,6 @@
 # Pitchkit IA
 
-Design + User Research. 2026-09-02. Re-review. Not a layout lock. Interviews unrun.
+Design + User Research. 2026-09-03. Re-review. Not a layout lock. Interviews unrun.
 
 Bench SoT with `GLOSSARY.md`, `PLAN.md`, `AGENTS.md`, `SWOT.md`, `LIGHTS-ON.md`. Terms live in `GLOSSARY.md`. This file is the page tree plus need and entry. States are not pages. Do not invent screens.
 
@@ -82,9 +82,18 @@ IA grayscales sit on the WMDS app grid spine (main `64c995a` / Foundation → Gr
 - **`/k/`** — mobile 4-col: identity → stats 2+2 → chart → 2-up posts → audience → contact / brands.
 - **Settings** — cols 3–10.
 
+## Past brands (UR + Design 2026-09-03)
+
+Typed proof slot. Not Graph. Hide when empty. No `GLOSSARY.md` Past brands term yet.
+
+- **Public `/k/`** — wrap row of typed name chips. Display-only. Hide when empty. 1–4 one line; 5+ wrap. No marquee in v1.
+- **Settings** — name + optional one proof line (campaign / year — not quote, rate, or logo URL). Hide proof if empty. Order = Settings list order. Not a new URL.
+- **Never:** logo scrape, logo upload, marquee, testimonials-as-past-brands.
+- **Peers (note):** Later typed; Beacons logos skip; OwlScran no section.
+
 ## Related
 
-- `GLOSSARY.md` — terms, hide-when-missing, Graph.
+- `GLOSSARY.md` — terms, hide-when-missing, Graph. No Past brands term.
 - `SWOT.md` — public kit contract.
 - `LIGHTS-ON.md` — free `/k/`, paid SKU rec not lock.
 - `PLAN.md` / `AGENTS.md` — point here for IA. Structure: this section.
