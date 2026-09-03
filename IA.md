@@ -17,11 +17,11 @@ Hide/swap lives on Insights (later, not this dump). Paid SKU is one rec (not a l
 
 ## Creator
 
-5. **Continue** — `/`. Disclosure + Professional note + support before the button.
-6. **Insights not connected** — `/insights`. Connect Instagram (Business/Creator). Do not show ER + Followers here — that is public-only kit #2. Don’t strand them on a fake thin kit.
-7. **Denied / token dead — reconnect** — public kit stays on last snapshot. Owner sees Reconnect Instagram.
-8. **Personal / no Insights — professional required** — Home with the Professional message.
-9. **Owner connected** — `/insights`. Same numbers as `/k/[handle]`, labeled. Auto six, ranked saves → reach → likes.
+5. **Continue** — `/`. Disclosure + Professional note + support before the button. This is the Instagram door. Cookie missing → redirect `/`.
+6. **Killed (Randy 2026-09-02)** — not a distinct Connect screen. After Continue they are on Insights with whatever Graph returned — hide missing objects, do not restage Connect. Do not show a fake thin kit (that is public-only #2).
+7. **Denied / token dead — reconnect** — public kit stays on last snapshot. Owner sees Reconnect Instagram. Token dead later, not a second first-run Connect.
+8. **Personal / no Insights — professional required** — copy on Home or a line on Insights. Not a second OAuth.
+9. **Owner connected** — `/insights`. Same numbers as `/k/[handle]`, labeled. Auto six, ranked saves → reach → likes. Hide missing objects.
 10. **No media — empty six, not a picker** — empty kit if they pick from scratch is a fail. Hide when missing. No zeros.
 
 ## Settings
