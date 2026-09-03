@@ -24,8 +24,9 @@ flowchart TB
   PG[(Neon Postgres via Hyperdrive)]
   R2[(R2 — public kit images)]
 
-  C -->|cookie after OAuth| W
+  C -->|cookie → /insights on pitchkit.app only| W
   B -->|GET /k/handle| W
+  B -.->|their.domain / — locked, not built| W
   W <-->|OAuth and poll — owner paths only| IG
   W -->|users and media rows| PG
   W -->|image bytes| R2
@@ -38,13 +39,24 @@ Creator → Workers (OpenNext)
             → Instagram Login + Graph   (connect, refresh, Insights poll)
             → Neon via Hyperdrive        = rows
             → R2                         = photos (public read)
-         → /insights                     (owner, cookie)
+         → /insights on pitchkit.app     (owner, httpOnly cookie; never on a custom host)
          → /k/[handle]                   (anyone; Postgres + R2; no Graph)
 
-Brand  → /k/[handle] → same Worker → rows + public photos
+Brand  → pitchkit.app/k/[handle] → same Worker → same public kit
+Brand  → their.domain /          → same Worker → same public kit
+         (custom host: locked, not built; dashed; no redirect either way)
 ```
 
 **Postgres = index cards. R2 = photos. Never store image bytes in SQL.**
+
+### Custom domains (locked, not built)
+
+Product lock only. The dashed Brand edge is **not live**. Do not implement a `Host` lookup. Do not add a `users.custom_hostname` column.
+
+- **Both URLs, same kit.** `pitchkit.app/k/[handle]` stays the share URL. `their.domain` `/` is the same public kit. No forced redirect either way.
+- **Insights stays on `pitchkit.app`.** The httpOnly session cookie is set and read there only. Custom hosts never get the session.
+- **Mechanism (when we build, not now):** Cloudflare for SaaS on the `pitchkit.app` zone. The Worker is the fallback origin (`*/*` route). Custom Hostnames API. `Host` header maps to handle. Creators CNAME `kit.brand.com` → `customers.pitchkit.app`. HTTPS is Cloudflare’s certificate — never paste keys. Cloudflare Access stays off public kits. The preview Worker must not accept production custom hostnames. R2 and other assets can stay on `pitchkit.app`.
+- **Apex is out of this lock.** Cloudflare Apex Proxying is Enterprise. Subdomain CNAME first.
 
 ---
 
