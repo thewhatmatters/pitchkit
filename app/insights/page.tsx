@@ -7,11 +7,11 @@ import { insightsGate, parseSessionValue, SESSION_COOKIE } from "@/lib/session";
 import { loadOwnerKit } from "@/lib/store";
 
 type InsightsProps = {
-  searchParams: Promise<{ grid?: string; tab?: string }>;
+  searchParams: Promise<{ grid?: string }>;
 };
 
 export default async function InsightsPage({ searchParams }: InsightsProps) {
-  const { grid, tab } = await searchParams;
+  const { grid } = await searchParams;
   const cookieStore = await cookies();
   const session = parseSessionValue(cookieStore.get(SESSION_COOKIE)?.value);
   if (!insightsGate(session)) {
@@ -19,7 +19,6 @@ export default async function InsightsPage({ searchParams }: InsightsProps) {
   }
 
   const gridReady = grid !== "pulling";
-  const initialTab = tab === "kit" ? "kit" : "insights";
   const kit = loadOwnerKit(session.handle);
   if (!kit) {
     redirect("/");
@@ -33,9 +32,7 @@ export default async function InsightsPage({ searchParams }: InsightsProps) {
         user={kit.user}
         posts={kit.posts}
         engagementRate={kit.engagementRate}
-        hasInsights={kit.hasInsights}
         gridReady={gridReady}
-        initialTab={initialTab}
       />
       <SupportFooter />
     </main>

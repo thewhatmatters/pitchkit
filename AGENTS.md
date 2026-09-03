@@ -12,7 +12,7 @@ Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md)
 
   > We only use your public posts and Instagram Insights to build your media kit. We don’t read DMs, who you follow, or unfollowers. Disconnect deletes your kit and the copies we stored.
 
-- After login: **Insights**, then Media kit tab. Brands never see Insights. `/insights` also dumps a static inventory of locked kit objects (WHA-299) for Design — not a look lock, not on `/k/[handle]`. Each object shows the first sentence from [GLOSSARY.md](./GLOSSARY.md) next to the number. Example geo/age/gender/reach/saves stay in-file (`lib/inventory.ts`). Seed Insights stay null.
+- After login: **Insights** inventory (no Insights / Media kit tabs). Copy / share stay as buttons. Brands never see Insights. `/insights` dumps locked kit objects (WHA-299) as stacked Cards — not a look lock, not on `/k/[handle]`. Do not also paint StatsGrid / ChartSlot / a six-post grid above that dump. GLOSSARY first sentence only when the term exists. Example geo/age/gender/reach/saves stay in-file (`lib/inventory.ts`). Identity reads seed `name` / handle / avatar / `fetched_at`. Contact and past brands are empty typed holes. Seed Insights stay null.
 - Six posts: last 30 days, **saves then reach then likes**. ER: `(likes + comments) / followers` on those six; if Insights missing, still show ER, hide reach/saves/chart.
 - Carousel: first frame. Video: poster only. R2 public read for kit images.
 - Disconnect: delete SQL + R2 `{user_id}/` within 24 hours. `consent_index` default off.

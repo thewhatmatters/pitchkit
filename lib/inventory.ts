@@ -31,13 +31,39 @@ export const CITY_MIX_CAPTION = "Ranked city mix. Not hometown. Not pins.";
 
 export const HIDDEN_WHEN_BLANK = "hidden when blank";
 
+export const NAME_CAPTION = "Sourced identity from the demo seed when present.";
+
+export const USERNAME_CAPTION = "Frozen Pitchkit handle.";
+
+export const PHOTO_CAPTION = "Avatar from the demo seed when present.";
+
+export const LAST_UPDATED_CAPTION =
+  "Seed media fetched_at. Not a live Graph timestamp.";
+
+export const CONTACT_CAPTION =
+  "Typed hole (email door). Hidden when blank. Do not invent an address.";
+
+export const PAST_BRANDS_CAPTION =
+  "Typed hole (proof). Hidden when blank. Not a highlights gallery.";
+
 /** Instagram follower_demographics age bands. Do not invent others. */
 export const AGE_BRACKETS = ["13-17", "18-24", "25-34", "35-44", "45-54", "55-64", "65+"] as const;
 
 /** What Meta typically returns. Do not add buckets. */
 export const GENDER_BUCKETS = ["female", "male", "unknown"] as const;
 
-export const INVENTORY_ITEM_IDS = [
+/** Identity / typed holes added for Design. Not extra Postgres columns. */
+export const IDENTITY_SLOT_IDS = [
+  "name",
+  "username",
+  "photo",
+  "last-updated",
+  "contact",
+  "past-brands",
+] as const;
+
+/** Original WHA-299 locked kit objects. Keep all 12. */
+export const LOCKED_KIT_OBJECT_IDS = [
   "engagement-rate",
   "followers",
   "typical-reach",
@@ -52,13 +78,17 @@ export const INVENTORY_ITEM_IDS = [
   "website",
 ] as const;
 
+export const INVENTORY_ITEM_IDS = [...IDENTITY_SLOT_IDS, ...LOCKED_KIT_OBJECT_IDS] as const;
+
+export type IdentitySlotId = (typeof IDENTITY_SLOT_IDS)[number];
+export type LockedKitObjectId = (typeof LOCKED_KIT_OBJECT_IDS)[number];
 export type InventoryItemId = (typeof INVENTORY_ITEM_IDS)[number];
 
 /**
  * First sentence only from GLOSSARY.md (PR 2 / cursor/v1-stats-lock-43e8).
  * Tooltip = first sentence. Do not invent if a term is missing.
  */
-export const GLOSSARY_FIRST_SENTENCE: Record<InventoryItemId, string> = {
+export const GLOSSARY_FIRST_SENTENCE: Partial<Record<InventoryItemId, string>> = {
   "engagement-rate": "Share of followers who interact with a typical post.",
   followers: "Accounts following this profile right now.",
   "typical-reach": "Unique accounts that usually see a post.",
@@ -125,6 +155,33 @@ export const INVENTORY_BIO: string | null = null;
 /** Demo profile has no website. Inventory shows the hide-when-blank pattern. */
 export const INVENTORY_WEBSITE: string | null = null;
 
+/** Typed hole — email door. Do not invent an address. Not a Postgres column. */
+export const INVENTORY_CONTACT: string | null = null;
+
+/** Typed hole — past brand proof. Not a highlights gallery. Not a Postgres column. */
+export const INVENTORY_PAST_BRANDS: readonly string[] = [];
+
 export function formatShare(row: RankedShare): string {
   return `${row.label} ${row.percent}%`;
+}
+
+export function sourcedText(value: string | null | undefined): string | null {
+  const trimmed = value?.trim() ?? "";
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+/**
+ * Last-updated from seed media fetched_at when present.
+ * Do not invent a live Graph timestamp or use Date.now().
+ */
+export function inventoryLastUpdated(
+  posts: { fetched_at: string | null }[],
+): string | null {
+  const stamps = posts
+    .map((row) => sourcedText(row.fetched_at))
+    .filter((value): value is string => value != null);
+  if (stamps.length === 0) {
+    return null;
+  }
+  return stamps.reduce((latest, stamp) => (stamp > latest ? stamp : latest));
 }

@@ -13,7 +13,7 @@ GitHub: [thewhatmatters/pitchkit](https://github.com/thewhatmatters/pitchkit).
 1. Creator opens pitchkit.app and reads the collection note.
 2. They tap **Continue with Instagram** (Professional accounts only — Business or Creator). That is login and sign-up. No email, no password.
 3. We pull public posts and Insights (not DMs, not who they follow).
-4. They land on **Insights** (private). **Media kit** is the shareable page.
+4. They land on **Insights** (private inventory). Copy / share the kit from there.
 5. Brands open `https://pitchkit.app/k/[handle]`. They do not sign in.
 
 Handle is taken from the Instagram username at signup and **does not change**. Local/demo kit: `/k/demo`.
@@ -36,7 +36,7 @@ On the connect screen, before they tap Instagram:
 | [GLOSSARY.md](./GLOSSARY.md) | What each kit number means (first sentence is the Insights inventory definition) |
 | [AGENTS.md](./AGENTS.md) | Short lock list for coding agents |
 | `app/` | Next.js App Router routes |
-| `components/` | Kit, stats, posts, owner chrome (WMDS composition) |
+| `components/` | Public kit card + owner chrome (inventory dump, copy/share/reconnect) |
 | `db/` | Postgres schema from [DATA.md](./DATA.md) (`users`, `media`, empty `detections` + `weekly_counts`) |
 | `lib/` | Schema types, in-repo seed, kit math (six-post rank + ER), Insights inventory examples (`inventory.ts`) |
 | `public/demo/` | Placeholder kit images (`r2_key` maps here until R2) |
@@ -45,7 +45,7 @@ Until Hyperdrive exists, `/k/demo` and `/insights` read the in-repo seed (`lib/s
 
 Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays public (no cookie) and does **not** dump the Insights inventory.
 
-`/insights` keeps the existing 2×2 stats + six posts, then stacks a **static inventory** of locked kit objects (engagement rate, followers, typical reach, saves, 30-day reach chart slot, six posts, country/city/age/gender mix, bio, website) so Design can see what to design. Each object shows the first sentence from [GLOSSARY.md](./GLOSSARY.md) next to the number. Invented samples are labeled example data, not live Instagram. No new Postgres columns.
+`/insights` is one **static inventory** (stacked Cards) so Design can see the objects: name, username, photo, last-updated, contact, past brands, then the original 12 (engagement rate, followers, typical reach, saves, 30-day reach chart slot, six posts, country/city/age/gender mix, bio, website). No Insights / Media kit tabs, no Followers/Posts/ER tiles, and no six-post grid or chart **above** that dump. Six posts stay **inside** the inventory (auto six, ranked saves → reach → likes). A page-level example-data banner marks sample numbers as not live Instagram. GLOSSARY first sentence only when the term exists. Contact and past brands are empty typed holes. No new Postgres columns.
 
 ---
 
@@ -85,7 +85,7 @@ cp .dev.vars.example .dev.vars
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=personal`, `/auth/instagram` (stub connect), `/auth/sign-out`, `/insights`, `/insights?tab=kit`, `/insights?grid=pulling`, `/k/demo`, `/k/nope` (404), `/privacy`, `/delete`.
+Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=personal`, `/auth/instagram` (stub connect), `/auth/sign-out`, `/insights`, `/insights?grid=pulling`, `/k/demo`, `/k/nope` (404), `/privacy`, `/delete`.
 
 ```bash
 npm test

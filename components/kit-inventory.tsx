@@ -2,12 +2,14 @@
 
 import type { ReactNode } from "react";
 import { Card, Chip, cardBodyTextClasses, cardTitleClasses } from "@/components/wmds";
+import { EmptyGrid } from "@/components/empty-grid";
 import { PostGrid } from "@/components/post-grid";
 import { formatCount, formatEngagementRate } from "@/lib/engagement";
 import {
   CHART_SLOT_CAPTION,
   CHART_SLOT_TITLE,
   CITY_MIX_CAPTION,
+  CONTACT_CAPTION,
   COUNTRY_MIX_CAPTION,
   ENGAGEMENT_FORMULA,
   EXAMPLE_AGE_MIX,
@@ -17,26 +19,36 @@ import {
   EXAMPLE_GENDER_MIX,
   EXAMPLE_TYPICAL_REACH,
   EXAMPLE_TYPICAL_SAVES,
-  GLOSSARY_DEFINITION_MISSING,
   GLOSSARY_FIRST_SENTENCE,
   HIDDEN_WHEN_BLANK,
   INVENTORY_BIO,
+  INVENTORY_CONTACT,
   INVENTORY_INTRO,
+  INVENTORY_PAST_BRANDS,
   INVENTORY_TITLE,
   INVENTORY_WEBSITE,
+  LAST_UPDATED_CAPTION,
+  NAME_CAPTION,
+  PAST_BRANDS_CAPTION,
+  PHOTO_CAPTION,
   SIX_POSTS_RANK,
   TYPICAL_REACH_CAPTION,
   TYPICAL_SAVES_CAPTION,
+  USERNAME_CAPTION,
   formatShare,
+  inventoryLastUpdated,
+  sourcedText,
   type InventoryItemId,
   type RankedShare,
 } from "@/lib/inventory";
+import { publicObjectUrl } from "@/lib/r2";
 import type { Media, User } from "@/lib/schema";
 
 type KitInventoryProps = {
   user: User;
   posts: Media[];
   engagementRate: number | null;
+  gridReady?: boolean;
 };
 
 function ExampleChip() {
@@ -48,7 +60,11 @@ function ExampleChip() {
 }
 
 function GlossaryDefinition({ id }: { id: InventoryItemId }) {
-  const sentence = GLOSSARY_FIRST_SENTENCE[id] ?? GLOSSARY_DEFINITION_MISSING;
+  const sentence = GLOSSARY_FIRST_SENTENCE[id];
+  if (!sentence) {
+    return null;
+  }
+
   return (
     <p className={cardBodyTextClasses} data-glossary-definition={id}>
       {sentence}
@@ -110,10 +126,45 @@ function HiddenWhenBlank({ value }: { value: string | null }) {
   return <p className={cardBodyTextClasses}>{HIDDEN_WHEN_BLANK}</p>;
 }
 
-export function KitInventory({ user, posts, engagementRate }: KitInventoryProps) {
+function PhotoValue({ avatarKey }: { avatarKey: string | null }) {
+  const src = publicObjectUrl(avatarKey);
+  if (!src) {
+    return <p className={cardBodyTextClasses}>{HIDDEN_WHEN_BLANK}</p>;
+  }
+
+  return <img src={src} alt="" width={56} height={56} data-inventory-avatar="" />;
+}
+
+function PastBrandsValue({ brands }: { brands: readonly string[] }) {
+  if (brands.length === 0) {
+    return <p className={cardBodyTextClasses}>{HIDDEN_WHEN_BLANK}</p>;
+  }
+
+  return (
+    <div className="flex flex-col gap-1">
+      {brands.map((brand) => (
+        <p key={brand} className={cardTitleClasses}>
+          {brand}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+export function KitInventory({
+  user,
+  posts,
+  engagementRate,
+  gridReady = true,
+}: KitInventoryProps) {
+  const name = sourcedText(user.name);
+  const username = sourcedText(user.handle);
+  const lastUpdated = inventoryLastUpdated(posts);
+  const avatarSrc = publicObjectUrl(user.avatar_r2_key);
+
   return (
     <section aria-label={INVENTORY_TITLE} className="flex flex-col gap-4" data-inventory="static">
-      <Card variant="outlined" shape="rounded" padding="none">
+      <Card variant="outlined" shape="rounded" padding="none" data-inventory-banner="example">
         <Card.Header>
           <p className={cardTitleClasses}>{INVENTORY_TITLE}</p>
         </Card.Header>
@@ -124,6 +175,54 @@ export function KitInventory({ user, posts, engagementRate }: KitInventoryProps)
           </div>
         </Card.Body>
       </Card>
+
+      <InventoryCard
+        id="name"
+        title="Name"
+        example={name != null}
+        value={<HiddenWhenBlank value={name} />}
+      >
+        <p className={cardBodyTextClasses}>{NAME_CAPTION}</p>
+      </InventoryCard>
+
+      <InventoryCard
+        id="username"
+        title="Username"
+        example={username != null}
+        value={<HiddenWhenBlank value={username ? `@${username}` : null} />}
+      >
+        <p className={cardBodyTextClasses}>{USERNAME_CAPTION}</p>
+      </InventoryCard>
+
+      <InventoryCard id="photo" title="Photo" example={Boolean(avatarSrc)}>
+        <PhotoValue avatarKey={user.avatar_r2_key} />
+        <p className={cardBodyTextClasses}>{PHOTO_CAPTION}</p>
+      </InventoryCard>
+
+      <InventoryCard
+        id="last-updated"
+        title="Last-updated"
+        example={lastUpdated != null}
+        value={<HiddenWhenBlank value={lastUpdated} />}
+      >
+        <p className={cardBodyTextClasses}>{LAST_UPDATED_CAPTION}</p>
+      </InventoryCard>
+
+      <InventoryCard
+        id="contact"
+        title="Contact"
+        value={<HiddenWhenBlank value={INVENTORY_CONTACT} />}
+      >
+        <p className={cardBodyTextClasses}>{CONTACT_CAPTION}</p>
+      </InventoryCard>
+
+      <InventoryCard
+        id="past-brands"
+        title="Past brands"
+        value={<PastBrandsValue brands={INVENTORY_PAST_BRANDS} />}
+      >
+        <p className={cardBodyTextClasses}>{PAST_BRANDS_CAPTION}</p>
+      </InventoryCard>
 
       <InventoryCard
         id="engagement-rate"
@@ -170,7 +269,7 @@ export function KitInventory({ user, posts, engagementRate }: KitInventoryProps)
 
       <InventoryCard id="six-posts" title="Six posts">
         <p className={cardBodyTextClasses}>{SIX_POSTS_RANK}</p>
-        <PostGrid posts={posts} hasInsights={false} />
+        {gridReady ? <PostGrid posts={posts} hasInsights={false} /> : <EmptyGrid />}
       </InventoryCard>
 
       <InventoryCard id="country-mix" title="Country mix" example>
