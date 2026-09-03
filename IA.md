@@ -84,12 +84,14 @@ IA grayscales sit on the WMDS app grid spine (main `64c995a` / Foundation → Gr
 
 ## Past brands (UR + Design 2026-09-03)
 
+> **ENTRY under review (Randy 2026-09-03):** Settings may be wrong for past brands; kit edit mode candidate. Waiting UR lock. Display (wrap chips) unchanged.
+
 Lock. Interviews unrun.
 
 - **Public `/k/`:** wrap row of typed **name chips**, display-only. Hide the section when empty. 1–4 one line; 5+ wrap. **No** auto-scroll marquee v1 (fights the 30s scan; names must stay screenshotable).
 - **Settings:** name + optional one **proof line** (campaign/year — not a quote, not a rate, not a logo URL). Hide the proof line if empty. Display order = Settings list order. Not a new URL.
 - **Never:** logo scrape, logo upload, marquee, testimonials-as-past-brands.
-- Peers (evidence 2026-09-03): Later Past Collaborations = typed; public render not surfaced. CollabKit / CreatorsJet show **uploaded logos** (carousel / logo card) — do **not** steal. Infinite marquee not seen. OwlScran auto-pulls logos from domain on case-study modal — scrape, skip. Beacons wants logos/testimonials — skip. Connoisseur not a creator-kit product. Interviews unrun. Wrap chips still win for the 30s scan (overflow-x can drop names off a screenshot).
+- Peers (evidence 2026-09-03): **Later** public kit = one metadata row, comma-separated **plain text** names (omit if empty; no logos/chips/links). CollabKit / CreatorsJet / Beacons use **uploaded logos** (carousel / logo card / View) — do **not** steal. Infinite marquee not seen. OwlScran domain-logo scrape on case-study modal — skip. Connoisseur not a creator-kit product. Interviews unrun. **Wrap chips** still win for the 30s scan vs Later’s comma line (overflow-x can drop names off a screenshot).
 
 ## Related
 
