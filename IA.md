@@ -18,7 +18,7 @@ Hide/swap lives on Insights (later, not this dump). Paid SKU is one rec (not a l
 ## Creator
 
 5. **Continue** — `/`. Disclosure + Professional note + support before the button.
-6. **Insights not connected** — owner cookie, no Insights yet. ER + Followers. Hide reach / saves / chart / mix.
+6. **Insights not connected** — `/insights`. Connect Instagram (Business/Creator). Do not show ER + Followers here — that is public-only kit #2. Don’t strand them on a fake thin kit.
 7. **Denied / token dead — reconnect** — public kit stays on last snapshot. Owner sees Reconnect Instagram.
 8. **Personal / no Insights — professional required** — Home with the Professional message.
 9. **Owner connected** — `/insights`. Same numbers as `/k/[handle]`, labeled. Auto six, ranked saves → reach → likes.
