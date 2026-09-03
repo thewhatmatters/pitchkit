@@ -10,6 +10,8 @@ Security: do not sell the list or rates. Ads never on kit fields. No pixel that 
 
 `/k/[handle]` stays free, including Insights objects when connected (typical reach, saves, 30-day chart, geo / age / gender, bio). Hide when missing. Dash, not zeros. Daily Insights on the live page stay free (Beacons already gives a daily kit at $0 — charging for sync would look worse).
 
+**Both URLs (Randy, P+E 2026-09-02):** `pitchkit.app/k/[handle]` stays the free share URL. `their.domain` `/` is the **same** public kit. No redirect either way. Insights stays on pitchkit.app (cookie never on their host). Custom domain does not paywall `/k/`.
+
 **Do not paywall:** the `/k/` link, reach, saves, chart, geo, age, gender, bio.
 
 **Breaks the promise**
@@ -25,7 +27,7 @@ Security: do not sell the list or rates. Ads never on kit fields. No pixel that 
 One SKU. Not three products.
 
 1. PDF export
-2. Custom domain on the same kit
+2. Custom domain on the same kit. **Both URLs:** `their.domain` `/` serves the same public kit as `pitchkit.app/k/[handle]`. No redirect either way. Insights stays on pitchkit.app (cookie never on their host). Not a second product and not a paywall of `/k/`. Not built this round. Cloudflare for SaaS later. Apex later. Subdomain CNAME first when we paint it. Diagram: [ARCHITECTURE.md](./ARCHITECTURE.md) / [WHA-302](https://linear.app/whatmatters/issue/WHA-302) — do not duplicate Backend’s diagram here.
 3. Strip the Pitchkit badge
 
 **Entry price: $9/mo or $90/yr.**
