@@ -44,10 +44,12 @@ Reach over the last 30 days so a brand (and the creator before they share) can s
 - Hide: until Insights. Empty > zeros.
 - Graph (live, Instagram Login): user insights `reach` `time_series` (`GET /{ig-user-id}/insights?metric=reach&period=day&metric_type=time_series`) — account unique reach (includes stories + ads). **Different number** from typical post media insights `reach`.
 
-**Six posts** — ranked saves → reach → likes.
+**Six posts** (proof posts) — ranked saves → reach → likes.
 Recent work a brand can match to the public grid. Likes-first would look like a vanity kit.
 - Brand ~30s: proof that matches the grid.
-- Hide: never if we have media.
+- Hide: when missing. No zeros. Empty kit if the creator has to pick from scratch is a fail.
+- Look (Design 2026-09-02, not a layout): kit media is **auto-selected** from recent media, ranked saves → reach → likes. Do not re-rank likes-first. Pin optional. Do not ship a separate uploaded highlights gallery in v1 (Later Featured Media) — past-brands is the typed proof slot.
+- Insights (later, not this dump): same sort so they can see why those six, plus hide/swap before share.
 - Graph (v25, Instagram Login): rank insights `saved` → insights `reach` → field `like_count`. `like_count` is public (not insights); `saved`/`reach` need Insights.
 
 Row length follows the data: 2 without Insights (ER + Followers), 4 + chart with Insights. Don’t pad to five. Lead pair is **Followers (context) + ER (hire)** as numbers, not Later’s prose sentence.

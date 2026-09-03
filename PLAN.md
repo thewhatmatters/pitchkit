@@ -74,7 +74,7 @@ No extra onboarding. No PDF in v1. No TikTok in v1. Steal vs skip: [GLOSSARY.md]
 
 **Row:** 2 without Insights (ER + Followers). 4 + chart with Insights. Don’t pad to five. Horizontal scroll is allowed later. Vocabulary: [GLOSSARY.md](./GLOSSARY.md).
 
-**Six posts:** among posts we fetched with `posted_at` in the **last 30 days**, rank insights `saved` → insights `reach` → field `like_count` (missing Insights sort last). Fill from older fetched posts only if we do not have six in-window.
+**Six posts:** among posts we fetched with `posted_at` in the **last 30 days**, rank insights `saved` → insights `reach` → field `like_count` (missing Insights sort last). Fill from older fetched posts only if we do not have six in-window. Auto-selected — empty kit if the creator has to pick from scratch is a fail. Do not re-rank likes-first. No uploaded highlights gallery in v1. Hide when missing. No zeros.
 
 **Insights-gated:** typical reach, saves, the 30-day chart, and country / city / age / gender mix **only when Insights exist**. Empty > zeros — do not paint missing Insights as 0. If Insights are missing, still show ER from public likes and comments; **hide typical reach, saves, the chart, and the mix objects**.
 
