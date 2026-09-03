@@ -2,9 +2,9 @@
 
 A hosted **media kit** for Instagram creators. They sign in with Instagram, see their numbers, and send brands a link. Live site: **pitchkit.app**. Public kit: `https://pitchkit.app/k/[handle]`.
 
-**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [AGENTS](./AGENTS.md)
+**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [glossary](./GLOSSARY.md) · [AGENTS](./AGENTS.md)
 
-The app is not built yet. This repo is the spec and the starting point. GitHub: [thewhatmatters/pitchkit](https://github.com/thewhatmatters/pitchkit).
+GitHub: [thewhatmatters/pitchkit](https://github.com/thewhatmatters/pitchkit).
 
 ---
 
@@ -13,7 +13,7 @@ The app is not built yet. This repo is the spec and the starting point. GitHub: 
 1. Creator opens pitchkit.app and reads the collection note.
 2. They tap **Continue with Instagram** (Professional accounts only — Business or Creator). That is login and sign-up. No email, no password.
 3. We pull public posts and Insights (not DMs, not who they follow).
-4. They land on **Insights** (private). **Media kit** is the shareable page.
+4. They land on **Insights** (private inventory). Copy / share the kit from there.
 5. Brands open `https://pitchkit.app/k/[handle]`. They do not sign in.
 
 Handle is taken from the Instagram username at signup and **does not change**. Local/demo kit: `/k/demo`.
@@ -33,9 +33,19 @@ On the connect screen, before they tap Instagram:
 | [PLAN.md](./PLAN.md) | Product and build brief |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | How the pieces connect (Workers, Graph, Neon, R2) |
 | [DATA.md](./DATA.md) | Database tables and column names |
+| [GLOSSARY.md](./GLOSSARY.md) | What each kit number means (first sentence is the Insights inventory definition) |
 | [AGENTS.md](./AGENTS.md) | Short lock list for coding agents |
+| `app/` | Next.js App Router routes |
+| `components/` | Public kit card + owner chrome (inventory dump, copy/share/reconnect) |
+| `db/` | Postgres schema from [DATA.md](./DATA.md) (`users`, `media`, empty `detections` + `weekly_counts`) |
+| `lib/` | Schema types, in-repo seed, kit math (six-post rank + ER), Insights inventory examples (`inventory.ts`) |
+| `public/demo/` | Placeholder kit images (`r2_key` maps here until R2) |
 
-No application source yet. When the app exists, this table will point at the folders.
+Until Hyperdrive exists, `/k/demo` and `/insights` read the in-repo seed (`lib/seed.ts`). Same `User` / `Media` types as live. `TOKEN_KEY` is not required for seed. Unknown handle (`/k/nope`) is 404. No Neon or Instagram token yet.
+
+Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays public (no cookie) and does **not** dump the Insights inventory.
+
+`/insights` is one **static inventory** (stacked Cards) so Design can see the objects: name, username, photo, last-updated, contact, past brands, then the original 12 (engagement rate, followers, typical reach, saves, 30-day reach chart slot, six posts, country/city/age/gender mix, bio, website). No Insights / Media kit tabs, no Followers/Posts/ER tiles, and no six-post grid or chart **above** that dump. Six posts stay **inside** the inventory (auto six, ranked saves → reach → likes). A page-level example-data banner marks sample numbers as not live Instagram. GLOSSARY first sentence only when the term exists. Contact and past brands are empty typed holes. No new Postgres columns.
 
 ---
 
@@ -53,27 +63,50 @@ Disconnect deletes the creator, their posts, and their files. Anonymous weekly t
 |---|---|
 | App | Next.js App Router, TypeScript, Tailwind v4 |
 | UI | WMDS (`@whatmatters/wmds`). No shadcn. Storybook stays in the WMDS repo. |
-| Compute | Cloudflare Workers, official OpenNext |
+| Compute | Cloudflare Workers, official OpenNext (`@opennextjs/cloudflare`) |
 | DB | Neon Postgres + Hyperdrive |
 | Files | R2 `pitchkit-media` |
 | Auth | Instagram Login + httpOnly cookie |
-| Charts | CSS |
+| Charts | Nivo via WMDS Chart (not CSS, not in this app yet) |
 
-Install WMDS from `../wmds` or GitHub until it is published; run `npm run build` there so `dist/` exists. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md).
+Install WMDS from `github:thewhatmatters/wmds` (CI cannot use `../wmds`). `prepare` builds `dist/`. Local `npm install ../wmds` still works. `postinstall` copies Geist font files into the WMDS `dist/files` path that `styles.css` expects. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md), WMDS [`CONSUMING.md`](https://github.com/thewhatmatters/wmds/blob/main/CONSUMING.md).
 
 Cloudflare and Support (for now): randy@whatmatters.so. Neon region is chosen when we create the database.
+
+Env **names** only (see `.env.example`): `IG_APP_ID`, `IG_APP_SECRET`, `TOKEN_KEY`, plus Hyperdrive notes. Never commit values.
 
 ---
 
 ## Run it
 
-Nothing to run until the app is scaffolded. After that, commands go here.
+```bash
+npm install
+cp .dev.vars.example .dev.vars
+npm run dev
+```
 
----
+Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=personal`, `/auth/instagram` (stub connect), `/auth/sign-out`, `/insights`, `/insights?grid=pulling`, `/k/demo`, `/k/nope` (404), `/privacy`, `/delete`.
 
-## If you are changing the product
+```bash
+npm test
+```
 
-1. Read [PLAN.md](./PLAN.md).
-2. If the picture of the stack changes, update [ARCHITECTURE.md](./ARCHITECTURE.md).
-3. If columns change, update [DATA.md](./DATA.md) in the same change.
-4. Keep [AGENTS.md](./AGENTS.md) in line with those.
+Tests cover six-post rank (saves → reach → likes), ER when Insights are missing, and set/clear of the Pitchkit session cookie plus the Insights gate.
+
+Production-shaped local Workers runtime (official OpenNext):
+
+```bash
+npm run preview
+```
+
+Build only:
+
+```bash
+npm run build
+```
+
+Deploy to Workers (needs Cloudflare auth and bindings):
+
+```bash
+npm run deploy
+```
