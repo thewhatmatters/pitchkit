@@ -42,7 +42,7 @@ People who bookmarked a typical post to come back. Intent, not applause. Stronge
 Reach over the last 30 days so a brand (and the creator before they share) can see typical vs a spike. Never paint an empty chart as zeros. This is **not** the same number as typical post reach.
 - Brand ~30s: typical vs a spike before they share.
 - Hide: until Insights. Empty > zeros.
-- Graph (live, Instagram Login): user insights `reach` `time_series` (`GET /{ig-user-id}/insights?metric=reach&period=day&metric_type=time_series`) — account unique reach (includes stories + ads). **Different number** from typical post media insights `reach`.
+- Graph (live, Instagram Login): user insights `reach` `time_series` (`GET /{ig-user-id}/insights?metric=reach&period=day&metric_type=time_series`). `since` / `until` are **required** for 30 days (omit = 24h only). Account unique reach (includes stories + ads). **Different number** from typical post media insights `reach`. See § Chart data contract.
 
 ## Chart types (UR + Design 2026-09-04)
 
@@ -58,6 +58,38 @@ Pitchkit only. Interviews unrun. Farmer Market: no charts this round.
 **Never chart (v1):** rates, stories, impressions, profile views, bio-link clicks, vanity likes-as-trend, map, donuts, pie, stacked composition, multi-series until sourced + reopen.
 
 **Later (optional, not v1):** second series only if Randy reopens (e.g. saves-over-time or dual reach/engagement) — still one Chart atom with optional series, not a new molecule. Shares as possible fifth Stat, not a chart.
+
+## Chart data contract (Backend live 2026-09-05)
+
+Instagram Login Insights for the **one** WMDS Chart (30-day account reach area). Stamp with Design. Interviews unrun.
+
+**Endpoint:** `GET https://graph.instagram.com/v25.0/{ig-user-id}/insights` (or pinned `GRAPH_API_VERSION`).
+Permissions: `instagram_business_basic` + `instagram_business_manage_insights`.
+
+**Params:** `metric=reach` · `period=day` · `metric_type=time_series` · `since` / `until` = Unix seconds (inclusive).
+- **Omit since/until → last 24h only** — Chart must set them for 30 days.
+- Do **not** pass `breakdown` with `time_series` (dropped). `timeframe` is demographics-only — ignore for Chart.
+- Example: `?metric=reach&period=day&metric_type=time_series&since={now-30d}&until={now}`
+
+**Point shape (Graph):** `data[0].values[]` → `{ "value": 12, "end_time": "2018-01-11T08:00:00+0000" }`
+- `value` = integer unique accounts that day (estimated)
+- `end_time` = ISO 8601 with offset (Meta day boundary, often `…T08:00:00+0000`) — treat as **day key**, not creator TZ
+
+**What reach is:** account-level unique accounts that saw any of posts / stories / reels / videos / live **including ads**. Not typical feed-post reach. Estimated.
+
+**Range:** User metrics retained ~**90 days**. We **lock Chart to 30 days** via `since`/`until` (Graph has no `last_30_days` for reach). Never rely on the 24h default.
+
+**Lag:** up to **48 hours**. Newest 1–2 day buckets may be missing or revise later.
+
+**Empty / omit:** unavailable → empty `data` / empty `values`, **not zeros**. Hide Chart. Do not paint a flat zero series.
+
+**Persist for FE:**
+```ts
+reach_series: Array<{ day: string; reach: number }> // day = YYYY-MM-DD from end_time UTC date
+```
+Omit field / empty array → hide Chart. One series only.
+
+**Gaps vs typical-vs-spike job:** We **can** show a daily account reach line for ~30 days (spike = high point). We **cannot** from this series alone: organic vs ads / stories vs feed; which post caused the spike; Graph-supplied “typical” percentile; creator-local midnight; impressions / `views` as this Chart.
 
 **Six posts** (proof posts) — ranked saves → reach → likes.
 Recent work a brand can match to the public grid. Likes-first would look like a vanity kit.

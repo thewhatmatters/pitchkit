@@ -71,7 +71,7 @@ Pitchkit only. Farmer Market: none this round.
 - **WMDS Chart atom (one):** Nivo `@nivo/line` 30-day **reach area**. Hide when Insights missing. No second series in v1.
 - **Not Chart atoms:** audience = ranked % list + horizontal bars; six posts = card grid; Followers/ER/Reach/Saves = Stat cards.
 - **Never (v1):** rates, stories, impressions, profile views, bio-link clicks, vanity likes-as-trend, map, donut/pie, stacked, multi-series.
-- Details: GLOSSARY.md § Chart types. WHA-294.
+- Details: GLOSSARY.md § Chart types. § Chart data contract (Backend 2026-09-05). WHA-294.
 
 ## Structure (WMDS grid)
 
