@@ -1,6 +1,6 @@
 # Pitchkit architecture
 
-**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [AGENTS](./AGENTS.md)
+**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [glossary](./GLOSSARY.md) · [AGENTS](./AGENTS.md)
 
 Living picture of v1. Product: [PLAN.md](./PLAN.md). Columns: [DATA.md](./DATA.md).
 
@@ -10,6 +10,8 @@ Two fixes so we do not build the wrong thing:
 
 1. **`pitchkit.app` is one Worker**, not a second app. `/`, `/insights`, `/privacy`, `/delete`, and `/k/[handle]` are routes on that Worker. The kit URL does not talk to Postgres by itself.
 2. **The public kit needs photos.** Postgres has rows and R2 keys. The browser loads images from **public R2** (or a Worker URL in front of R2). A diagram that only arrows the kit at Postgres is incomplete. The kit **does not** call Instagram.
+
+Custom domain: both URLs, same kit — `pitchkit.app/k/[handle]` stays free; `their.domain` `/` is the same public page, no redirect. Insights stays on pitchkit.app. Product lock: [LIGHTS-ON.md](./LIGHTS-ON.md). Diagram: [WHA-302](https://linear.app/whatmatters/issue/WHA-302). Do not duplicate Backend’s diagram here. Cloudflare for SaaS is **already ON** the `pitchkit.app` zone (zero custom hostnames, fallback origin empty). Painting hostnames is still later. Apex extra — skip at the $9 rec; subdomain CNAME first.
 
 ---
 
@@ -53,6 +55,7 @@ Brand  → /k/[handle] → same Worker → rows + public photos
 Same table as [PLAN.md](./PLAN.md#stack-locked). Short version:
 
 - **UI:** `@whatmatters/wmds` pattern-first + `styles.css`. App owns layout Tailwind only. No shadcn. No Storybook here (copy from WMDS Storybook).
+- **Charts:** stack table still says CSS; Randy overwrote that with Nivo in WMDS. Chart ships in WMDS first. Do not implement Nivo here.
 - **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers.
 - **Icons:** Lucide through WMDS props. **Motion:** `motion` peer when WMDS needs it.
 - **Install WMDS:** `../wmds` or `github:thewhatmatters/wmds`; `npm run build` in WMDS so `dist/` exists.

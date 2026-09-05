@@ -1,6 +1,6 @@
 # Pitchkit data
 
-**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [AGENTS](./AGENTS.md)
+**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [glossary](./GLOSSARY.md) · [AGENTS](./AGENTS.md)
 
 Canonical list of Postgres tables and columns. Product rules: [PLAN.md](./PLAN.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md).
 
@@ -97,9 +97,11 @@ No columns for:
 - `follows_count`
 - unfollowers
 - emails
-- industry / category
-- bio, website, rates, “contact for collab,” geo (not on the kit in v1)
-- location beyond the public profile
+- industry / category (unsourced; Later form)
+- creator location / hometown (unsourced; audience city ≠ hometown)
+- rates, “contact for collab”
+- lat/lng or geocoded maps (`follower_demographics` counts persist as objects when Insights lands — no extra Graph columns)
+- bio / website (sourced from IG `biography` / `website` if we show them — no column until we persist)
 - Stories (unless we add them to kit consent later)
 - other people’s accounts
 - scrape-derived panels

@@ -1,8 +1,8 @@
 # Pitchkit MVP plan
 
-**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [AGENTS](./AGENTS.md)
+**Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [glossary](./GLOSSARY.md) · [AGENTS](./AGENTS.md)
 
-Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md).
+Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md). Stats vocabulary: [GLOSSARY.md](./GLOSSARY.md). Kit-space SWOT SoT: [SWOT.md](./SWOT.md). Free-promise / lights-on SoT: [LIGHTS-ON.md](./LIGHTS-ON.md). IA SoT: [IA.md](./IA.md). Structure (WMDS grid): [IA.md](./IA.md#structure-wmds-grid). Past brands: [IA.md](./IA.md#past-brands-ur--design-2026-09-03).
 
 **Look:** WMDS (`@whatmatters/wmds`). Name on the site is Pitchkit.
 
@@ -22,6 +22,8 @@ Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCH
 | Files | R2 `pitchkit-media` |
 | Auth | Instagram Login + Pitchkit httpOnly cookie |
 | Charts | CSS |
+
+Randy overwrote **Charts: CSS** with **Nivo in WMDS**. Chart ships in the design system first. Do not implement Nivo in this repo.
 
 **Not used:** D1, Vercel, shadcn, Browser Run, Queues, Workers AI.
 
@@ -52,17 +54,45 @@ Seed: `/k/demo`.
 | Creator | Continue with Instagram (Professional). Land on Insights. Share the kit URL. Reconnect, sign out, disconnect. Phone works. |
 | Brand | Open the kit. No account. |
 
-No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “contact for collab,” or geo on the kit.
+No extra onboarding. No PDF in v1. No TikTok in v1. Steal vs skip: [GLOSSARY.md](./GLOSSARY.md). Lead pair is Followers + ER as numbers. Country / city / age / gender mix are own objects (Randy unlocked; Insights; ≥100 followers; empty copy not zeros). Not “no geo in v1.” Not “countries only.” Skip rates / From $100 / Contact Me, Stories as a kit section, profile views + bio-link clicks, average likes as a Stat, stats as prose, gallery/themes/colors, impressions, industry unless sourced. Bio / creator location only if sourced from IG; hide if empty.
 
 ---
 
 ## Kit math (locked)
 
-**Six posts:** among posts we fetched with `posted_at` in the **last 30 days**, rank **saves, then reach, then likes** (missing Insights sort last). Fill from older fetched posts only if we do not have six in-window.
+**Source:** User Research + Design, 2026-09-02. Meanings and copy: [GLOSSARY.md](./GLOSSARY.md). **Live Graph (Backend confirmed, Instagram Login):** media object `saved_count` / `shares_count` are Facebook Login only — do not use. Post kit: media insights `saved` / `shares` / `reach`. Account chart: user insights `reach` `time_series` (includes stories + ads) — different from typical post `reach`. If we ever label account-level saves: user insights `saves`, not `saved`. Empty dataset over zeros is correct. ER is locked: `(likes + comments) ÷ followers`, Insights or not. Tooltip: of followers, likes + comments only.
 
-**Engagement rate:** `(likes + comments) / followers` on those six, when followers > 0. If Insights are missing, still show that ER from public likes and comments; **hide reach, saves, and the chart**.
+**Headline:** name and handle. Lead pair on the card: **Followers (context) + ER (hire)** as numbers, not Later’s prose sentence. Followers are scale, not the headline.
+
+**Ordered Stat row (ER still primary).** Do not pad to five. Row length follows the data. Chart is a trend object, not a fifth Stat. Surface typical reach, saves, and the 30-day chart (Later buries these; we don’t). Analytics only after Insights connect. 30-day chart, not Later’s 3-month overview.
+
+1. **Engagement rate** — always, `primary`. Hire/no-hire. WMDS Stat (label + number). **Locked:** `(likes + comments) ÷ followers` on the six, when followers > 0. Insights or not. Tooltip: **of followers**, **likes + comments only**. Do not use ÷ reach. Do not add saves/shares to the numerator. Likes/comments are media `like_count` / `comments_count` — not insights.
+2. **Typical reach** — Insights only. Media insights `reach` (lifetime, unique). Median of recent posts, not a spike, not account 30-day unique, not `followers_count`. Hide until connected. **Different number** from the 30-day chart.
+3. **Followers** — always. Scale / sanity vs reach. User `followers_count` (store `followers`).
+4. **Saves** — Insights only. Media insights `saved`. Not user insights `saves`. Not media object `saved_count` (Facebook Login only). Hide until connected.
+5. Then the **30-day reach chart** (trend object, not a Stat). Insights only. User insights `reach` `time_series` (includes stories + ads). **Different number** from typical post media insights `reach`.
+
+**Row:** 2 without Insights (ER + Followers). 4 + chart with Insights. Don’t pad to five. Horizontal scroll is allowed later. Vocabulary: [GLOSSARY.md](./GLOSSARY.md).
+
+**Six posts:** among posts we fetched with `posted_at` in the **last 30 days**, rank insights `saved` → insights `reach` → field `like_count` (missing Insights sort last). Fill from older fetched posts only if we do not have six in-window. Auto-selected — empty kit if the creator has to pick from scratch is a fail. Do not re-rank likes-first. No uploaded highlights gallery in v1. Hide when missing. No zeros.
+
+**Insights-gated:** typical reach, saves, the 30-day chart, and country / city / age / gender mix **only when Insights exist**. Empty > zeros — do not paint missing Insights as 0. If Insights are missing, still show ER from public likes and comments; **hide typical reach, saves, the chart, and the mix objects**.
 
 **Carousel:** first child frame (cover) into R2. **Video:** poster only on the kit, never the file.
+
+**Own objects (Randy unlocked country, age, gender 2026-09-02):** not Stats. Meanings: [GLOSSARY.md](./GLOSSARY.md). `follower_demographics` breakdowns `country` / `city` / `age` / `gender` are live (v25/v26 Insights, Instagram Login). ≥100 followers or the metric is omitted — hide the object; don’t paint zeros. Empty dataset: hide the object. Top 45 only. Graph returns integer counts in `total_value.breakdowns.results.value`, not percents. Our math: % of located sample = `value / sum(results)`. **Never** % of `followers_count`. Backend persists those counts as objects when Insights lands; no extra Graph columns.
+
+- **Country mix** — own object. Insights only. Hide until connected / omitted / empty. Top 45. Ranked % of located sample. **Not a map.**
+- **City mix** — finer country job. Same Graph path / math. Audience city ≠ hometown.
+- **Age mix** + **gender mix** — still v1 own objects (Randy; not skipped). Same Graph family and math. Age = API brackets as bars. Gender = what Meta returns.
+- **Bio** — IG User `biography` (Public). Hide if empty. Not a typed Later blurb.
+- **Website** — IG User `website` (Public). Hide if empty.
+
+No IG User location field. No industry. Impressions stay off.
+
+**Later skip:** Rates / From $100 / Contact Me. Stories as a kit section. Profile views + bio-link clicks in the overview. Average likes as a Stat. Stats as a prose paragraph. Look: gallery, themes, colors. Impressions (deprecated). Industry unless sourced (Later form, not Graph). Creator location unless sourced from IG (none today). Shares: media insights `shares` (not media object `shares_count`, Facebook Login only) — fifth Stat only if the row has room.
+
+**Later vs us (note, not a lock flip):** Later public kit period is last 90 days; we locked a 30-day reach chart. Later IG kit ER is `(likes + comments + saves + shares) ÷ (reel reach + post reach)` — we do not use that; ours is ÷ followers. Later labels “Average” but docs say median (outliers removed) for post/story stats; our typical reach is already median. Later also lists profile views, avg impressions, stories, reels as separate sections — we skip those. If no posts in 90 days, Later omits (not zeros); same honesty: empty > zeros.
 
 ---
 
@@ -146,6 +176,13 @@ Landing (disclosure + Professional note + support)
 
 ## Product surface
 
+**Jobs (locked, User Research + Design, 2026-09-02):**
+
+| Who | Job |
+|---|---|
+| Brand on `/k/[handle]` | Spend or pass in ~30s — is the audience real, how many people actually see a post, is the content worth keeping. |
+| Creator on Insights | Same numbers as `/k/[handle]`, labeled — will this kit survive a brand checking the public grid before they share the link. |
+
 | Route | Who | What |
 |---|---|---|
 | `/` | anyone | Pitch, disclosure, Continue with Instagram, Professional note, support |
@@ -154,7 +191,7 @@ Landing (disclosure + Professional note + support)
 | `/k/[handle]` | public | Card only + support footer |
 | `/privacy`, `/delete` | public | Meta review |
 
-Responsive: 2×2 stats and 2×3 posts on a phone.
+Name/handle is the headline. Lead pair: Followers (context) + ER (hire) as numbers, not a prose sentence. ER is `(likes + comments) ÷ followers` (Insights or not); tooltip says of followers and likes + comments only (not Later’s ÷ reach). Vocabulary: [GLOSSARY.md](./GLOSSARY.md). Stat row: **2** without Insights (ER + Followers), **4 + chart** with Insights. Don’t pad to five. Surface typical reach, saves, 30-day chart after Insights (not Later’s 3-month overview). Country / city / age / gender mix are own objects (Insights; ≥100 followers; empty copy not zeros). Posts: **2×3**, ranked saves → reach → likes.
 
 Personal fail, OAuth cancel → landing with the Professional message or unchanged landing. Empty grid is OK. No blank Insights: “Pulling your grid…” until R2 catches up.
 
@@ -189,4 +226,4 @@ CV / filling `detections`. TikTok. PDF. Brand dashboard. Kit-view analytics for 
 
 ## Skip unless they are on the kit
 
-Bio, website, rates, “contact for collab,” geo. Easy to add columns later. Not why someone connects. No columns in [DATA.md](./DATA.md) until we show them.
+Later skip: Rates / From $100 / Contact Me, Stories as a kit section, profile views + bio-link clicks, average likes as a Stat, stats as a prose paragraph, gallery/themes/colors, impressions, industry unless sourced, creator location unless sourced. Country / city / age / gender mix persist as Insights objects (counts, not extra Graph columns). `biography` / `website` are Public; hide if empty. No IG User location. No industry. Impressions stay off.
