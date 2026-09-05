@@ -44,6 +44,21 @@ Reach over the last 30 days so a brand (and the creator before they share) can s
 - Hide: until Insights. Empty > zeros.
 - Graph (live, Instagram Login): user insights `reach` `time_series` (`GET /{ig-user-id}/insights?metric=reach&period=day&metric_type=time_series`) — account unique reach (includes stories + ads). **Different number** from typical post media insights `reach`.
 
+## Chart types (UR + Design 2026-09-04)
+
+Pitchkit only. Interviews unrun. Farmer Market: no charts this round.
+
+**v1 Chart atom (WMDS): one type.** `@nivo/line` **30-day reach area** (tokens only, no legend/grid). Series = account reach `time_series` day. Job: typical vs spike in ~30s. Surfaces: `/insights` + `/k/` when Insights exist; **hide when missing** (never zeros). No second time-series in v1 (no likes/comments/saves/ER over time, no multi-series overlay). Linear: [WHA-294](https://linear.app/whatmatters/issue/WHA-294/wmds-chart-30-day-nivo-area).
+
+**Not Chart atoms (layout / own objects):**
+- Audience country / city / age / gender = **ranked % list + horizontal bars**. Not stacked bars, not donut, not a second Chart molecule, not a map.
+- Six posts = **card grid**, not a chart.
+- Followers / ER / Reach / Saves = **Stat cards**, not charts.
+
+**Never chart (v1):** rates, stories, impressions, profile views, bio-link clicks, vanity likes-as-trend, map, donuts, pie, stacked composition, multi-series until sourced + reopen.
+
+**Later (optional, not v1):** second series only if Randy reopens (e.g. saves-over-time or dual reach/engagement) — still one Chart atom with optional series, not a new molecule. Shares as possible fifth Stat, not a chart.
+
 **Six posts** (proof posts) — ranked saves → reach → likes.
 Recent work a brand can match to the public grid. Likes-first would look like a vanity kit.
 - Brand ~30s: proof that matches the grid.

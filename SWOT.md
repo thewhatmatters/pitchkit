@@ -72,7 +72,7 @@ Hide when missing. Dash, not zero.
 | Engagement rate | (likes + comments) ÷ followers. Labeled. Same on Insights and `/k/`. |
 | Typical reach | Insights. Hide if missing. |
 | Saves | Insights. Hide if missing. |
-| 30-day chart | Insights. Nivo area in WMDS. Hide if missing. |
+| 30-day chart | Only WMDS Chart atom: Nivo `@nivo/line` 30-day reach area. No second series in v1. Hide if missing. [GLOSSARY Chart types](./GLOSSARY.md#chart-types-ur--design-2026-09-04). |
 | Six posts | Auto-selected from recent media, ranked saves → reach → likes. Empty kit if they pick from scratch is a fail. Hide when missing. No zeros. No uploaded highlights gallery in v1 — past-brands is the typed proof slot. |
 | Country / city mix | Ranked percent lists or bars. Not a map. |
 | Age mix | API brackets as bars. |

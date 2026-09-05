@@ -64,6 +64,15 @@ Lock. Interviews unrun. ENTRY = **kit view/edit** (Randy + UR re-lock 2026-09-03
 - **Never:** logo scrape, logo upload, marquee, testimonials-as-past-brands, past brands on Insights or in Settings.
 - Peers: **Later** = comma-separated plain text on the kit profile (not account settings). Beacons / CollabKit / CreatorsJet = uploaded logos — do **not** steal. OwlScran domain-logo scrape — skip. Connoisseur not a creator-kit product. Interviews unrun. **Wrap chips** still win for the 30s scan.
 
+## Chart types (UR + Design 2026-09-04)
+
+Pitchkit only. Farmer Market: none this round.
+
+- **WMDS Chart atom (one):** Nivo `@nivo/line` 30-day **reach area**. Hide when Insights missing. No second series in v1.
+- **Not Chart atoms:** audience = ranked % list + horizontal bars; six posts = card grid; Followers/ER/Reach/Saves = Stat cards.
+- **Never (v1):** rates, stories, impressions, profile views, bio-link clicks, vanity likes-as-trend, map, donut/pie, stacked, multi-series.
+- Details: GLOSSARY.md § Chart types. WHA-294.
+
 ## Structure (WMDS grid)
 
 IA grayscales sit on the WMDS **app** grid spine (`64c995a` / Foundation → Grid):
