@@ -48,7 +48,9 @@ Reach over the last 30 days so a brand (and the creator before they share) can s
 
 Pitchkit only. Interviews unrun. Farmer Market: no charts this round.
 
-**v1 Chart atom (WMDS): one type.** `@nivo/line` **30-day reach area** (tokens only, no legend/grid). Series = account reach `time_series` day. Job: typical vs spike in ~30s. Surfaces: `/insights` + `/k/` when Insights exist; **hide when missing** (never zeros). No second time-series in v1 (no likes/comments/saves/ER over time, no multi-series overlay). Linear: [WHA-294](https://linear.app/whatmatters/issue/WHA-294/wmds-chart-30-day-nivo-area).
+**Library (Randy 2026-09-06):** visx (`@visx/visx`) underneath WMDS’s exported **Chart** organism. WMDS owns the shell, tokens, tooltip, legend, animation, and chart patterns. Pitchkit consumes WMDS Chart only — do not invent chart atoms or swap libraries.
+
+**v1 Chart organism (WMDS): one type.** **30-day reach area** pattern. Series = account reach `time_series` day. Job: typical vs spike in ~30s. Surfaces: `/insights` + `/k/` when Insights exist; **hide when missing** (never zeros). No second time-series in v1 (no likes/comments/saves/ER over time, no multi-series overlay). Linear: [WHA-294](https://linear.app/whatmatters/issue/WHA-294/wmds-chart-30-day-nivo-area).
 
 **Not Chart atoms (layout / own objects):**
 - Audience country / city / age / gender = **ranked % list + horizontal bars**. Not stacked bars, not donut, not a second Chart molecule, not a map.

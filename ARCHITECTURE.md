@@ -55,7 +55,7 @@ Brand  → /k/[handle] → same Worker → rows + public photos
 Same table as [PLAN.md](./PLAN.md#stack-locked). Short version:
 
 - **UI:** `@whatmatters/wmds` pattern-first + `styles.css`. App owns layout Tailwind only. No shadcn. No Storybook here (copy from WMDS Storybook).
-- **Charts:** stack table still says CSS; Randy overwrote that with Nivo in WMDS. Chart ships in WMDS first. Do not implement Nivo here.
+- **Charts:** WMDS Chart organism, `@visx/visx` peer underneath. Pitchkit consumes WMDS Chart only — do not invent chart atoms or swap libraries.
 - **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers.
 - **Icons:** Lucide through WMDS props. **Motion:** `motion` peer when WMDS needs it.
 - **Install WMDS:** `../wmds` or `github:thewhatmatters/wmds`; `npm run build` in WMDS so `dist/` exists.

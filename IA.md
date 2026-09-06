@@ -68,7 +68,7 @@ Lock. Interviews unrun. ENTRY = **kit view/edit** (Randy + UR re-lock 2026-09-03
 
 Pitchkit only. Farmer Market: none this round.
 
-- **WMDS Chart atom (one):** Nivo `@nivo/line` 30-day **reach area**. Hide when Insights missing. No second series in v1.
+- **WMDS Chart organism (one):** visx (`@visx/visx`) under WMDS Chart, 30-day **reach area**. Hide when Insights missing. No second series in v1. Pitchkit consumes WMDS Chart only — do not invent chart atoms or swap libraries.
 - **Not Chart atoms:** audience = ranked % list + horizontal bars; six posts = card grid; Followers/ER/Reach/Saves = Stat cards.
 - **Never (v1):** rates, stories, impressions, profile views, bio-link clicks, vanity likes-as-trend, map, donut/pie, stacked, multi-series.
 - Details: GLOSSARY.md § Chart types. § Chart data contract (Backend 2026-09-05). WHA-294.

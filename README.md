@@ -58,7 +58,7 @@ Disconnect deletes the creator, their posts, and their files. Anonymous weekly t
 | DB | Neon Postgres + Hyperdrive |
 | Files | R2 `pitchkit-media` |
 | Auth | Instagram Login + httpOnly cookie |
-| Charts | CSS |
+| Charts | WMDS Chart (`@visx/visx`) |
 
 Install WMDS from `../wmds` or GitHub until it is published; run `npm run build` there so `dist/` exists. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md).
 

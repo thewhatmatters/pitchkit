@@ -21,9 +21,9 @@ Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCH
 | DB | Neon Postgres + Hyperdrive (`HYPERDRIVE` / `HYPERDRIVE_PREVIEW`) |
 | Files | R2 `pitchkit-media` |
 | Auth | Instagram Login + Pitchkit httpOnly cookie |
-| Charts | CSS |
+| Charts | WMDS Chart organism (`@visx/visx` peer) |
 
-Randy overwrote **Charts: CSS** with **Nivo in WMDS**. Chart ships in the design system first. Do not implement Nivo in this repo.
+Randy overwrote **Charts: CSS**. v1 uses visx (`@visx/visx`) underneath WMDS’s exported **Chart** organism. WMDS owns the shell, tokens, tooltip, legend, animation, and chart patterns. Pitchkit consumes WMDS Chart only — do not invent chart atoms or swap libraries.
 
 **Not used:** D1, Vercel, shadcn, Browser Run, Queues, Workers AI.
 

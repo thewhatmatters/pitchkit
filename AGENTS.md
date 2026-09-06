@@ -21,7 +21,7 @@ Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md)
 - `TOKEN_KEY` is a Workers secret. Never git.
 - Cloudflare and Support (for now): **randy@whatmatters.so**. Neon region: pick when we create the database.
 - **UI:** `@whatmatters/wmds` (pattern-first, import `styles.css`). Layout Tailwind only. Lucide via WMDS. No shadcn. No Storybook in this repo. Install from `../wmds` or `github:thewhatmatters/wmds`; build WMDS `dist/` first.
-- **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers. Charts: CSS — Randy overwrote this with Nivo in WMDS (Chart ships in WMDS first; do not implement Nivo here).
+- **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers. Charts: WMDS Chart organism (`@visx/visx` peer). Pitchkit consumes WMDS Chart only — do not invent chart atoms or swap libraries.
 
 ## Do not build
 
