@@ -1,7 +1,7 @@
 /**
  * Static Insights inventory of locked kit objects (WHA-299).
  * In-file examples only — not Postgres, not Graph, not live Instagram.
- * Seed Insights stay null; do not pretend they exist.
+ * Public seed Insights stay null. Owner `reach_series` is kit payload, not this dump.
  */
 
 export const INVENTORY_TITLE = "Static inventory";

@@ -128,6 +128,12 @@ Delete `users` + `media` + R2 `{user_id}/`.
 
 ---
 
+## Kit payload (not SQL)
+
+`reach_series` is assembled onto the kit payload from the Insights poll (`user insights` `reach` `time_series` — account day buckets, stories + ads). Shape: `{ day: string /* YYYY-MM-DD UTC */, reach: number }[]`. Empty or omit when Insights are missing — do not zero-fill 30 days just to paint. Seed/example series is fine until live poll exists. **Not a SQL table for v1.** Do not invent `weekly_counts` columns for this.
+
+Owner demo seed (`loadOwnerKit`) includes ~30 labeled example points. Public `/k/demo` (`loadPublicKit`) has no Insights and omits `reach_series`. Frontend: one WMDS Chart on `/insights` from `owner.reach_series` only; hide when omitted or `[]`. Never zero-fill. Public kit never paints the Chart.
+
 ## Graph hygiene (not extra columns)
 
 On poll: if Instagram no longer returns a post, delete that `media` row and its R2 object. Token revoke does not delete the kit; owner reconnects.

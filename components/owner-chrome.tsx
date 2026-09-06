@@ -20,7 +20,7 @@ type OwnerChromeProps = {
   engagementRate: number | null;
   typicalReach: number | null;
   typicalSaves: number | null;
-  reachSeries: ReachPoint[];
+  reachSeries?: ReachPoint[] | null;
   hasInsights: boolean;
   gridReady: boolean;
 };

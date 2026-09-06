@@ -1,6 +1,9 @@
 import { engagementRate, typicalFromPosts } from "./engagement";
-import { shouldShowReachChart, type ReachPoint } from "./reach-series";
+import { isUtcDay, type ReachPoint } from "./reach-series";
 import type { Media, User } from "./schema";
+
+export type { ReachPoint } from "./reach-series";
+export { isUtcDay };
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 
@@ -9,10 +12,18 @@ export type PublicKit = {
   posts: Media[];
   engagementRate: number | null;
   hasInsights: boolean;
-  /** Account 30-day reach. Empty / omit → hide Chart. Never invent points. */
-  reach_series: ReachPoint[];
+  /**
+   * One series: account reach (stories + ads). FE: hide Chart when omitted or [].
+   * Do not zero-fill a missing Insights window.
+   */
+  reach_series?: ReachPoint[];
   typicalReach: number | null;
   typicalSaves: number | null;
+};
+
+export type AssembleKitOptions = {
+  /** Seed/example or poll-derived. Ignored when Insights are missing. */
+  reach_series?: ReachPoint[];
 };
 
 export function kitPath(handle: string) {
@@ -88,7 +99,7 @@ export function assemblePublicKit(
   user: User,
   media: Media[],
   now: Date = new Date(),
-  reachSeries: ReachPoint[] = [],
+  options: AssembleKitOptions = {},
 ): PublicKit | null {
   if (user.disconnected_at) {
     return null;
@@ -96,15 +107,16 @@ export function assemblePublicKit(
 
   const posts = selectSixPosts(media, now);
   const typical = typicalFromPosts(posts);
-  const hasPostInsights = kitHasInsights(posts);
+  const hasInsights = kitHasInsights(posts);
 
   return {
     user,
     posts,
     engagementRate: engagementRate(posts, user.followers),
-    hasInsights: hasPostInsights || shouldShowReachChart(reachSeries),
-    reach_series: reachSeries,
+    hasInsights,
     typicalReach: typical.typicalReach,
     typicalSaves: typical.typicalSaves,
+    // Insights missing → omit (Chart hides). Do not invent 30 zeros.
+    ...(hasInsights ? { reach_series: options.reach_series ?? [] } : {}),
   };
 }

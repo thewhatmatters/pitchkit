@@ -56,8 +56,8 @@ Same table as [PLAN.md](./PLAN.md#stack-locked). Short version:
 - **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers.
 - **Icons:** Lucide through WMDS props. **Motion:** `motion` peer when WMDS needs it.
 - **Install WMDS:** pin `github:thewhatmatters/wmds#6d24c36a9f436a3922e32ea0a02a53b35df0b4b0` (CI cannot use `../wmds`). Local `../wmds` still works; `prepare` builds `dist/`. `@visx/visx` is the Chart peer.
-- **Charts:** WMDS `Chart` (visx peer). One 30-day account-reach area on `/insights` from `reach_series`. Empty/omit → hide the Chart. Never zero-fill. No Nivo in Pitchkit `package.json`.
-- **Seed:** In-repo rows match [DATA.md](./DATA.md). `TOKEN_KEY` not required (seed tokens are null). Disconnect columns exist; no live delete yet.
+- **Charts:** WMDS `Chart` (visx peer). One 30-day account-reach area on `/insights` from `owner.reach_series` only. Empty/omit → hide the Chart. Never zero-fill. Public kit never receives the series. No Nivo in Pitchkit `package.json`.
+- **Seed:** In-repo rows match [DATA.md](./DATA.md). `TOKEN_KEY` not required (seed tokens are null). Disconnect columns exist; no live delete yet. Public `/k/demo` has no Insights (`reach_series` omitted). Owner Insights seed includes example `reach_series` (not a SQL table, not live Graph).
 
 ---
 

@@ -1,11 +1,19 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { engagementRate } from "./engagement";
-import { assemblePublicKit, kitHasInsights, selectSixPosts } from "./kit";
+import { assemblePublicKit, isUtcDay, kitHasInsights, selectSixPosts } from "./kit";
 import type { Media, User } from "./schema";
 import { MEDIA_COLUMNS, USER_COLUMNS } from "./schema";
-import { DEMO_HANDLE, seedDetections, seedMedia, seedUser, seedWeeklyCounts } from "./seed";
-import { loadPublicKit } from "./store";
+import {
+  DEMO_HANDLE,
+  seedDetections,
+  seedMedia,
+  seedOwnerMedia,
+  seedReachSeries,
+  seedUser,
+  seedWeeklyCounts,
+} from "./seed";
+import { loadOwnerKit, loadPublicKit } from "./store";
 
 const NOW = new Date("2026-09-02T12:00:00.000Z");
 
@@ -116,7 +124,8 @@ describe("ER hide-insights", () => {
     assert.ok(kit);
     assert.equal(kit.hasInsights, false);
     assert.equal(kit.engagementRate, 0.099);
-    assert.deepEqual(kit.reach_series, []);
+    assert.equal("reach_series" in kit, false);
+    assert.equal(kit.reach_series, undefined);
     assert.equal(kit.typicalReach, null);
     assert.equal(kit.typicalSaves, null);
   });
@@ -132,6 +141,7 @@ describe("ER hide-insights", () => {
     assert.equal(kit.hasInsights, true);
     assert.equal(kit.typicalReach, 20);
     assert.equal(kit.typicalSaves, 4);
+    assert.deepEqual(kit.reach_series, []);
   });
 
   it("returns null ER when followers are 0", () => {
@@ -169,10 +179,56 @@ describe("seed schema", () => {
     assert.equal(demo.posts.length, 6);
     assert.equal(demo.hasInsights, false);
     assert.equal(demo.engagementRate, 0.099);
-    assert.deepEqual(demo.reach_series, []);
+    assert.equal("reach_series" in demo, false);
+    assert.equal(demo.reach_series, undefined);
     assert.equal(demo.typicalReach, null);
     assert.equal(demo.typicalSaves, null);
     assert.equal(loadPublicKit("nope", NOW), null);
     assert.equal(assemblePublicKit(user({ disconnected_at: NOW.toISOString() }), seedMedia, NOW), null);
+  });
+});
+
+describe("reach_series kit payload", () => {
+  it("returns non-empty {day,reach} series on the owner kit with Insights", () => {
+    const owner = loadOwnerKit(DEMO_HANDLE, NOW);
+    assert.ok(owner);
+    assert.equal(owner.hasInsights, true);
+    assert.ok(owner.reach_series);
+    assert.equal(owner.reach_series.length, 30);
+    assert.equal(owner.reach_series.length, seedReachSeries.length);
+
+    for (const point of owner.reach_series) {
+      assert.deepEqual(Object.keys(point).sort(), ["day", "reach"]);
+      assert.equal(isUtcDay(point.day), true);
+      assert.equal(typeof point.reach, "number");
+      assert.equal(Number.isFinite(point.reach), true);
+    }
+
+    assert.equal(owner.reach_series.every((point) => point.reach === 0), false);
+    assert.equal(new Set(owner.reach_series.map((point) => point.reach)).size > 1, true);
+    assert.equal(owner.typicalReach, 2175);
+    assert.equal(owner.typicalSaves, 42);
+    assert.deepEqual(
+      Object.keys(seedOwnerMedia[0]!).sort(),
+      [...MEDIA_COLUMNS].sort(),
+    );
+  });
+
+  it("omits reach_series on the public /k/ kit without Insights", () => {
+    const publicKit = loadPublicKit(DEMO_HANDLE, NOW);
+    assert.ok(publicKit);
+    assert.equal(publicKit.hasInsights, false);
+    assert.equal("reach_series" in publicKit, false);
+    assert.equal(publicKit.reach_series, undefined);
+
+    const emptyInsights = assemblePublicKit(
+      user({ followers: 10_000 }),
+      seedMedia,
+      NOW,
+      { reach_series: seedReachSeries },
+    );
+    assert.ok(emptyInsights);
+    assert.equal(emptyInsights.hasInsights, false);
+    assert.equal(emptyInsights.reach_series, undefined);
   });
 });

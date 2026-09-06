@@ -43,6 +43,7 @@ Reach over the last 30 days so a brand (and the creator before they share) can s
 - Brand ~30s: typical vs a spike before they share.
 - Hide: until Insights. Empty > zeros.
 - Graph (live, Instagram Login): user insights `reach` `time_series` (`GET /{ig-user-id}/insights?metric=reach&period=day&metric_type=time_series`) — account unique reach (includes stories + ads). **Different number** from typical post media insights `reach`.
+- Persist for FE (kit payload, not a SQL table): `reach_series: { day: string /* YYYY-MM-DD UTC */, reach: number }[]`. Empty or omit → hide Chart. Seed/example until live poll. Do not invent `weekly_counts` columns.
 
 **Six posts** — ranked saves → reach → likes.
 Recent work a brand can match to the public grid. Likes-first would look like a vanity kit.
