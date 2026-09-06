@@ -4,6 +4,8 @@
   "version": "0.1.0",
   "scripts": {
     "postinstall": "node scripts/copy-wmds-fonts.mjs",
+    "predev": "node scripts/copy-wmds-fonts.mjs",
+    "prebuild": "node scripts/copy-wmds-fonts.mjs",
     "dev": "next dev",
     "test": "tsx --test lib/**/*.test.ts",
     "build": "next build",

@@ -21,7 +21,7 @@ Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md)
 - Postgres: [DATA.md](./DATA.md). Empty `detections` and `weekly_counts`. Stub and live OAuth use the same schema. SQL in `db/`. Until Hyperdrive exists, `/k/demo` and `/insights` read `lib/seed.ts` (same types). Handle `demo` is frozen.
 - `TOKEN_KEY` is a Workers secret. Never git. Not required for the seed (tokens stay null). Disconnect columns exist; no live delete yet.
 - Cloudflare and Support (for now): **randy@whatmatters.so**. Neon region: pick when we create the database.
-- **UI:** `@whatmatters/wmds` (pattern-first, import `styles.css`). Layout Tailwind only (`grid-page` + `band` from CONSUMING). Lucide via WMDS. No shadcn. No Storybook in this repo. Pin `github:thewhatmatters/wmds#<sha>` (CI cannot use `../wmds`); `prepare` builds `dist/`. Current pin: `6d24c36a9f436a3922e32ea0a02a53b35df0b4b0` (2026-09-06 main).
+- **UI:** `@whatmatters/wmds` (pattern-first, import `styles.css`). Layout Tailwind only (`grid-page` + `band` from CONSUMING). Lucide via WMDS. No shadcn. No Storybook in this repo. Pin `github:thewhatmatters/wmds#<sha>` (CI cannot use `../wmds`); `prepare` builds `dist/`. Current pin: `6d24c36a9f436a3922e32ea0a02a53b35df0b4b0` (2026-09-06 main). After install, copy Geist into `node_modules/@whatmatters/wmds/dist/files` (`postinstall` / `predev` / `prebuild`).
 - **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers. Charts: WMDS `Chart` only (`@visx/visx` peer). No Nivo in this `package.json`.
 
 ## Do not build

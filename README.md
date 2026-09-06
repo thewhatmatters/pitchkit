@@ -75,7 +75,7 @@ Install WMDS pinned to a main SHA:
 npm install github:thewhatmatters/wmds#6d24c36a9f436a3922e32ea0a02a53b35df0b4b0
 ```
 
-`prepare` builds `dist/`. Local `npm install ../wmds` still works after `npm run build` there. `postinstall` copies Geist font files into the WMDS `dist/files` path that `styles.css` expects. Chart needs the `@visx/visx` peer. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md), WMDS [`CONSUMING.md`](https://github.com/thewhatmatters/wmds/blob/main/CONSUMING.md).
+`prepare` builds `dist/`. Local `npm install ../wmds` still works after `npm run build` there. `postinstall` / `predev` / `prebuild` copy Geist font files into the WMDS `dist/files` path that `styles.css` expects (otherwise Next 500s on the font URLs). Chart needs the `@visx/visx` peer. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md), WMDS [`CONSUMING.md`](https://github.com/thewhatmatters/wmds/blob/main/CONSUMING.md).
 
 Cloudflare and Support (for now): randy@whatmatters.so. Neon region is chosen when we create the database.
 
