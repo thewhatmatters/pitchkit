@@ -132,7 +132,7 @@ Delete `users` + `media` + R2 `{user_id}/`.
 
 `reach_series` is assembled onto the kit payload from the Insights poll (`user insights` `reach` `time_series` — account day buckets, stories + ads). Shape: `{ day: string /* YYYY-MM-DD UTC */, reach: number }[]`. Empty or omit when Insights are missing — do not zero-fill 30 days just to paint. Seed/example series is fine until live poll exists. **Not a SQL table for v1.** Do not invent `weekly_counts` columns for this.
 
-Owner demo seed (`loadOwnerKit`) includes ~30 labeled example points. Public `/k/demo` (`loadPublicKit`) has no Insights and omits `reach_series`. Frontend: one WMDS Chart on `/insights` from `owner.reach_series` only; hide the entire band when omitted, `[]`, or the plot has no ink. Never zero-fill. Public kit never paints the Chart.
+Owner demo seed (`loadOwnerKit`) includes ~30 labeled example points. Public `/k/demo` (`loadPublicKit`) has no Insights and omits `reach_series`. Frontend: one WMDS Chart on `/insights` from `owner.reach_series` only; hide the entire band when omitted, `[]`, or the plot has no ink. Date-tick budget uses WMDS `chartMaxTicksForWidth`. Never zero-fill. Public kit never paints the Chart. No period-over-period KPI deltas in the payload — do not invent Stat `trend`s.
 
 ## Graph hygiene (not extra columns)
 

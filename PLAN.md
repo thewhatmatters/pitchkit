@@ -52,13 +52,13 @@ Seed: `/k/demo`.
 | Creator | Continue with Instagram (Professional). Land on Insights. Share the kit URL. Reconnect, sign out, disconnect. Phone works. |
 | Brand | Open the kit. No account. |
 
-No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “contact for collab,” or geo on the **public kit**. `/insights` is the owner Graph layout (Stat + one Chart from `owner.reach_series` + six posts). Mixes as ranked % lists, not a map. No new Postgres columns for identity typed holes.
+No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “contact for collab,” or geo on the **public kit**. `/insights` is the owner Graph layout (headline Engagement rate + four-up Stat row + one Chart from `owner.reach_series` + Top-performing posts). AppShell primary nav is Insights / Media kit / Settings — no duplicate tabs on the page. Mixes as ranked % lists, not a map. No new Postgres columns for identity typed holes.
 
 ---
 
 ## Kit math (locked)
 
-**Six posts:** among posts we fetched with `posted_at` in the **last 30 days**, rank **saves, then reach, then likes** (missing Insights sort last). Fill from older fetched posts only if we do not have six in-window.
+**Six posts / Top-performing posts:** among posts we fetched with `posted_at` in the **last 30 days**, rank **saves, then reach, then likes** (missing Insights sort last). Fill from older fetched posts only if we do not have six in-window. Insights UI label is **Top-performing posts**, with a display sort (Reach / Engagement / Saves). Kit math stays the locked rank.
 
 **Engagement rate:** `(likes + comments) / followers` on those six, when followers > 0. If Insights are missing, still show that ER from public likes and comments; **hide reach, saves, and the chart**.
 
@@ -151,13 +151,12 @@ Landing (disclosure + Professional note + support)
 | Route | Who | What |
 |---|---|---|
 | `/` | anyone | Pitch, disclosure, Continue with Instagram, Professional note, support |
-| `/insights` | owner cookie | Graph-only Insights: WMDS Stat (Followers + ER; typical reach/saves when present), one 30-day account-reach Chart from `owner.reach_series` when that field is non-empty **and** the area can paint. Hide the whole Chart band when omitted, `[]`, or no ink. Never zero-fill. Media kit tab = public card + copy/share. No contact/past-brands holes. Reconnect / sign out / disconnect stay as buttons. |
-| `/insights` Media kit tab | owner | Same card as public + copy / share link |
+| `/insights` | owner cookie | Graph-only Insights: headline Engagement rate (hire), then a four-desktop-column Stat row (Followers, Engagement rate, typical reach/saves when present). No invented period-over-period trends. One 30-day account-reach Chart from `owner.reach_series` when that field is non-empty **and** the area can paint. Hide the whole Chart band when omitted, `[]`, or no ink. Date ticks use WMDS `chartMaxTicksForWidth` (~3 on a phone). Never zero-fill. **Top-performing posts** with Reach / Engagement / Saves sort; compact single-column rows. Quiet “Private to you” Badge. No Insights / Media kit tabs (AppShell nav). No contact/past-brands holes. Reconnect / sign out / disconnect stay as buttons. |
 | `/k/[handle]` | public | Kit card + support footer. Owner session on this handle can toggle Edit for contact + past brands. Share link stays view. |
 | `/settings` | owner cookie | Account only — reconnect / sign out / disconnect. No past-brands or contact slots. |
 | `/privacy`, `/delete` | public | Meta review |
 
-Responsive: 2×2 stats and 2×3 posts on a phone. Owner chrome is WMDS `AppShell` (desktop rail) and `AppShell.Mobile` (narrow dock) with `PageHeader` as an explicit child. Public kit spine stays `grid-page` + `band`.
+Responsive: Stat.Group stays WMDS 2-up on a phone / 4-up on desktop. Insights posts are compact single-column rows. Public kit stays a 2×3 card grid. Owner chrome is WMDS `AppShell` (desktop rail) and `AppShell.Mobile` (narrow dock) with `PageHeader` as an explicit child. Public kit spine stays `grid-page` + `band`.
 
 Personal fail, OAuth cancel → landing with the Professional message or unchanged landing. Empty grid is OK. No blank Insights: “Pulling your grid…” until R2 catches up.
 

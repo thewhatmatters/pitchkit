@@ -17,3 +17,6 @@ export const STUB_DISCONNECT =
 
 export const STUB_CONNECT =
   "Stub connect — no Instagram token. Sets a Pitchkit session for demo and continues to Insights.";
+
+/** Quiet Insights cue — AppShell is already private. Do not shout at brands. */
+export const INSIGHTS_PRIVATE = "Private to you";

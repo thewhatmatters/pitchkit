@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { OwnerChrome } from "@/components/owner-chrome";
 import { OwnerShell } from "@/components/owner-shell";
 import { SupportFooter } from "@/components/support-footer";
+import { Badge } from "@/components/wmds";
+import { INSIGHTS_PRIVATE } from "@/lib/copy";
 import { insightsGate, parseSessionValue, SESSION_COOKIE } from "@/lib/session";
 import { loadOwnerKit } from "@/lib/store";
 
@@ -25,8 +27,15 @@ export default async function InsightsPage({ searchParams }: InsightsProps) {
   }
 
   return (
-    <OwnerShell handle={kit.user.handle} title="Insights">
-      <p>Owner Insights. Brands never see this page.</p>
+    <OwnerShell
+      handle={kit.user.handle}
+      title="Insights"
+      end={
+        <Badge emphasis="muted" size="sm">
+          {INSIGHTS_PRIVATE}
+        </Badge>
+      }
+    >
       <OwnerChrome
         user={kit.user}
         posts={kit.posts}

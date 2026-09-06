@@ -58,3 +58,26 @@ export function reachSeriesToChartPoints(series: ReachPoint[] | null | undefined
     reach: point.reach,
   }));
 }
+
+/**
+ * Approximate painted width of a month/day/year date tick ("Aug 4, 2026") + gap.
+ * Pass to WMDS `chartMaxTicksForWidth` so narrow hosts get ~3 ticks.
+ */
+export const REACH_CHART_DATE_TICK = { width: 88, gap: 16 } as const;
+
+export type MaxTicksForWidth = (
+  containerWidth: number,
+  tickSpec: { width: number; gap: number },
+) => number;
+
+/** Date-axis tick budget from host width. Caller must pass WMDS `chartMaxTicksForWidth`. */
+export function reachChartDateTickCount(
+  hostWidth: number,
+  maxTicksForWidth: MaxTicksForWidth,
+): number {
+  if (!Number.isFinite(hostWidth) || hostWidth <= 0) {
+    return 0;
+  }
+
+  return maxTicksForWidth(hostWidth, REACH_CHART_DATE_TICK);
+}

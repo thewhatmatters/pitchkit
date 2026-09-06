@@ -10,6 +10,7 @@ export {
   Input,
   AppShell,
   PageHeader,
+  SegmentedControl,
   Skeleton,
   Stat,
   Status,
@@ -18,6 +19,7 @@ export {
   cardBodyTextClasses,
   cardSubtitleClasses,
   cardTitleClasses,
+  chartMaxTicksForWidth,
   chartSeriesConfigFromTone,
   Chart,
 } from "@whatmatters/wmds";

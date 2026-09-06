@@ -46,6 +46,45 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(shell, /secondaryNav/);
   });
 
+  it("Insights chrome has no duplicate tabs and spells Engagement rate", () => {
+    const page = read("app/insights/page.tsx");
+    const chrome = read("components/owner-chrome.tsx");
+    const stats = read("components/insights-stats.tsx");
+    const posts = read("components/post-grid.tsx");
+    const chart = read("components/reach-chart.tsx");
+    const copy = read("lib/copy.ts");
+
+    assert.doesNotMatch(chrome, /Tab\.Group|Owner views/);
+    assert.doesNotMatch(chrome, /<Tab[\s\S]*Insights/);
+    assert.doesNotMatch(chrome, /Media kit/);
+    assert.doesNotMatch(page, /Owner Insights\. Brands never see this page/);
+    assert.doesNotMatch(chrome, /Brands never see this page/);
+    assert.match(copy, /Private to you/);
+    assert.match(page, /INSIGHTS_PRIVATE/);
+    assert.match(page, /Badge/);
+    assert.match(stats, /label="Engagement rate"/);
+    assert.doesNotMatch(stats, /label="ER"/);
+    assert.match(stats, /size="md"/);
+    assert.match(stats, /columns=\{columns\}/);
+    assert.doesNotMatch(stats, /trend=/);
+    assert.match(chrome, /Top-performing posts/);
+    assert.doesNotMatch(chrome, /Six posts/);
+    assert.match(chrome, /SegmentedControl/);
+    assert.match(chrome, /value="reach"/);
+    assert.match(chrome, /value="engagement"/);
+    assert.match(chrome, /value="saves"/);
+    assert.match(chrome, /layout="rows"/);
+    assert.match(posts, /layout = "grid"/);
+    assert.match(posts, /layout === "rows"/);
+    assert.match(read("components/wmds.ts"), /SegmentedControl/);
+    assert.match(read("components/wmds.ts"), /chartMaxTicksForWidth/);
+    assert.match(chart, /chartMaxTicksForWidth/);
+    assert.match(chart, /reachChartDateTickCount/);
+    assert.match(chart, /shouldRenderReachChartBand/);
+    assert.match(chart, /animate="none"/);
+    assert.match(chart, /<Chart\.Cartesian[\s\S]*animate="none"/);
+  });
+
   it("settings is account only", () => {
     const page = read("app/settings/page.tsx");
     const settings = read("components/account-settings.tsx");

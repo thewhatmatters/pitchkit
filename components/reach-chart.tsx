@@ -6,9 +6,11 @@ import {
   Chart,
   cardSubtitleClasses,
   cardTitleClasses,
+  chartMaxTicksForWidth,
   chartSeriesConfigFromTone,
 } from "@/components/wmds";
 import {
+  reachChartDateTickCount,
   reachSeriesToChartPoints,
   shouldRenderReachChartBand,
   shouldShowReachChart,
@@ -80,11 +82,19 @@ function ReachChartBand({ series }: { series?: ReachPoint[] | null }) {
   }
 
   const canPaint = shouldRenderReachChartBand(series, hostWidth);
+  const xTickCount = reachChartDateTickCount(hostWidth, (width, spec) =>
+    chartMaxTicksForWidth(width, spec as never),
+  );
 
   return (
     <div ref={hostRef} className="w-full min-w-0">
       {canPaint ? (
-        <Card padding="none" bodyTerminal data-chart-slot="reach">
+        <Card
+          padding="none"
+          bodyTerminal
+          data-chart-slot="reach"
+          data-x-ticks={xTickCount}
+        >
           <Card.Header
             start={<h2 className={cardTitleClasses}>Reach over time</h2>}
             end={<span className={cardSubtitleClasses}>30 days</span>}
@@ -94,6 +104,10 @@ function ReachChartBand({ series }: { series?: ReachPoint[] | null }) {
               className="w-full min-w-0"
               style={{ width: hostWidth, height: REACH_CHART_MIN_HEIGHT }}
             >
+              {/*
+                xTickCount from chartMaxTicksForWidth (~3 on phone).
+                WMDS AxisBottom at 266f19c still hardcodes 6 — data-x-ticks is the intended budget.
+              */}
               <Chart.Cartesian
                 data={data}
                 config={chartSeriesConfigFromTone("reach", "Reach", "primary")}

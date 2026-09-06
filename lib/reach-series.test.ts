@@ -1,12 +1,25 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
+  REACH_CHART_DATE_TICK,
+  reachChartDateTickCount,
   reachSeriesToChartPoints,
   sanitizeReachSeries,
   shouldRenderReachChartBand,
   shouldShowReachChart,
   utcDayFromGraphEndTime,
 } from "./reach-series";
+
+/** Same formula as WMDS `chartMaxTicksForWidth` (package has no CJS export for node:test). */
+function chartMaxTicksForWidth(
+  containerWidth: number,
+  tickSpec: { width: number; gap: number },
+): number {
+  if (containerWidth <= 0) {
+    return 0;
+  }
+  return Math.max(1, Math.floor((containerWidth + tickSpec.gap) / (tickSpec.width + tickSpec.gap)));
+}
 
 describe("reach_series chart hide rules", () => {
   it("uses the UTC date from Graph end_time", () => {
@@ -43,5 +56,19 @@ describe("reach_series chart hide rules", () => {
     assert.equal(points[0]!.date.toISOString(), "2026-09-01T00:00:00.000Z");
     assert.equal(points[0]!.reach, 1200);
     assert.equal(points[1]!.date.toISOString(), "2026-09-03T00:00:00.000Z");
+  });
+});
+
+describe("reach chart date ticks", () => {
+  it("uses WMDS chartMaxTicksForWidth so narrow widths get ~3 date ticks", () => {
+    assert.equal(reachChartDateTickCount(0, chartMaxTicksForWidth), 0);
+    assert.equal(reachChartDateTickCount(Number.NaN, chartMaxTicksForWidth), 0);
+    assert.equal(reachChartDateTickCount(320, chartMaxTicksForWidth), 3);
+    assert.equal(reachChartDateTickCount(360, chartMaxTicksForWidth), 3);
+    assert.ok(reachChartDateTickCount(1024, chartMaxTicksForWidth) > 3);
+    assert.equal(
+      chartMaxTicksForWidth(320, REACH_CHART_DATE_TICK),
+      reachChartDateTickCount(320, chartMaxTicksForWidth),
+    );
   });
 });

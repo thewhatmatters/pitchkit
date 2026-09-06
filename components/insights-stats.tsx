@@ -11,6 +11,10 @@ type InsightsStatsProps = {
   loading?: boolean;
 };
 
+/**
+ * Headline hire number (Engagement rate) then a four-up Stat row.
+ * No period-over-period `trend` — seed/payload has no honest deltas.
+ */
 export function InsightsStats({
   followers,
   engagementRate,
@@ -18,26 +22,42 @@ export function InsightsStats({
   typicalSaves,
   loading = false,
 }: InsightsStatsProps) {
-  const columns = typicalReach != null || typicalSaves != null ? 4 : 2;
+  const showInsightsMetrics = typicalReach != null || typicalSaves != null || loading;
+  const columns = showInsightsMetrics ? 4 : 2;
 
   return (
-    <Stat.Group aria-label="Insights metrics" columns={columns} className="gap-2">
-      <Stat label="Followers" value={formatCount(followers)} loading={loading} />
-      <Stat label="ER" value={formatEngagementRate(engagementRate)} loading={loading} />
-      {typicalReach != null || loading ? (
+    <div className="flex flex-col gap-4">
+      <Stat
+        size="md"
+        label="Engagement rate"
+        value={formatEngagementRate(engagementRate)}
+        loading={loading}
+      />
+      <Stat.Group aria-label="Insights metrics" columns={columns}>
+        <Stat size="sm" label="Followers" value={formatCount(followers)} loading={loading} />
         <Stat
-          label="Typical reach"
-          value={typicalReach != null ? formatCount(typicalReach) : "—"}
+          size="sm"
+          label="Engagement rate"
+          value={formatEngagementRate(engagementRate)}
           loading={loading}
         />
-      ) : null}
-      {typicalSaves != null || loading ? (
-        <Stat
-          label="Saves"
-          value={typicalSaves != null ? formatCount(typicalSaves) : "—"}
-          loading={loading}
-        />
-      ) : null}
-    </Stat.Group>
+        {showInsightsMetrics ? (
+          <Stat
+            size="sm"
+            label="Typical reach"
+            value={typicalReach != null ? formatCount(typicalReach) : "—"}
+            loading={loading}
+          />
+        ) : null}
+        {showInsightsMetrics ? (
+          <Stat
+            size="sm"
+            label="Saves"
+            value={typicalSaves != null ? formatCount(typicalSaves) : "—"}
+            loading={loading}
+          />
+        ) : null}
+      </Stat.Group>
+    </div>
   );
 }
