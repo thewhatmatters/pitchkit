@@ -1,3 +1,4 @@
+import type { ReachPoint } from "./kit";
 import type { Detection, Media, User, WeeklyCount } from "./schema";
 
 /** Frozen Pitchkit handle for the in-repo seed. Live kits freeze at first connect. */
@@ -55,7 +56,7 @@ function post(
 }
 
 /**
- * One fetched page for the demo creator. Insights stay null (hide reach/saves/chart).
+ * One fetched page for the public `/k/demo` kit. Insights stay null (hide reach/saves/chart).
  * Carousel r2_key is the first frame; video r2_key is the poster. No R2 required —
  * keys map to /public/demo placeholders.
  */
@@ -109,6 +110,59 @@ export const seedMedia: Media[] = [
     comments_count: 10,
   }),
 ];
+
+/**
+ * Seed/example owner Insights overlay — not live Graph.
+ * Same six posts as `seedMedia` with reach/saves so `hasInsights` is true.
+ * Public `/k/demo` keeps `seedMedia` (Insights null).
+ */
+const OWNER_INSIGHTS: ReadonlyArray<{ reach: number; saves: number }> = [
+  { reach: 2_800, saves: 55 },
+  { reach: 2_450, saves: 48 },
+  { reach: 3_200, saves: 61 },
+  { reach: 1_900, saves: 36 },
+  { reach: 1_720, saves: 28 },
+  { reach: 1_510, saves: 22 },
+];
+
+export const seedOwnerMedia: Media[] = seedMedia.map((row, index) => {
+  const insights = OWNER_INSIGHTS[index] ?? { reach: 1_800, saves: 20 };
+  return {
+    ...row,
+    reach: insights.reach,
+    saves: insights.saves,
+    insights_fetched_at: FETCHED_AT,
+  };
+});
+
+/**
+ * Seed/example account reach day buckets (stories + ads). Not live Graph.
+ * ~30 UTC days ending the seed fetch day. Variation is intentional (not zeros).
+ */
+const SEED_REACH_VALUES = [
+  1_840, 1_920, 1_760, 2_100, 1_680, 1_540, 1_980, 2_200, 2_050, 1_890, 2_410,
+  1_780, 1_620, 2_300, 3_180, 1_950, 1_880, 2_010, 1_740, 1_590, 2_160, 2_480,
+  1_930, 1_810, 2_270, 1_690, 1_550, 2_080, 2_340, 1_970,
+] as const;
+
+function utcDaysEnding(endInclusive: string, count: number): string[] {
+  const end = new Date(`${endInclusive}T00:00:00.000Z`);
+  const days: string[] = [];
+  for (let i = count - 1; i >= 0; i -= 1) {
+    days.push(new Date(end.getTime() - i * 86_400_000).toISOString().slice(0, 10));
+  }
+  return days;
+}
+
+export const SEED_REACH_SERIES_NOTE = "seed/example — not live Graph";
+
+export const seedReachSeries: ReachPoint[] = utcDaysEnding(
+  FETCHED_AT.slice(0, 10),
+  SEED_REACH_VALUES.length,
+).map((day, index) => ({
+  day,
+  reach: SEED_REACH_VALUES[index]!,
+}));
 
 /** Empty until computer vision exists. */
 export const seedDetections: Detection[] = [];

@@ -43,6 +43,8 @@ On the connect screen, before they tap Instagram:
 
 Until Hyperdrive exists, `/k/demo` and `/insights` read the in-repo seed (`lib/seed.ts`). Same `User` / `Media` types as live. `TOKEN_KEY` is not required for seed. Unknown handle (`/k/nope`) is 404. No Neon or Instagram token yet.
 
+Owner Insights kit (`loadOwnerKit`) includes seed/example `reach_series: { day, reach }[]` (`day` = YYYY-MM-DD UTC). Frontend reads `kit.reach_series` for one WMDS Chart; hide when the field is omitted or empty. Public `/k/demo` (`loadPublicKit`) has no Insights and omits `reach_series`. Not a SQL table. No Graph poll in the seed.
+
 Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays public (no cookie) and does **not** dump the Insights inventory.
 
 `/insights` is one **static inventory** (stacked Cards) so Design can see the objects: name, username, photo, last-updated, contact, past brands, then the original 12 (engagement rate, followers, typical reach, saves, 30-day reach chart slot, six posts, country/city/age/gender mix, bio, website). No Insights / Media kit tabs, no Followers/Posts/ER tiles, and no six-post grid or chart **above** that dump. Six posts stay **inside** the inventory (auto six, ranked saves → reach → likes). A page-level example-data banner marks sample numbers as not live Instagram. GLOSSARY first sentence only when the term exists. Contact and past brands are empty typed holes. No new Postgres columns.
@@ -91,7 +93,7 @@ Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=perso
 npm test
 ```
 
-Tests cover six-post rank (saves → reach → likes), ER when Insights are missing, and set/clear of the Pitchkit session cookie plus the Insights gate.
+Tests cover six-post rank (saves → reach → likes), ER when Insights are missing, owner `reach_series` shape, public kit omitting the series, and set/clear of the Pitchkit session cookie plus the Insights gate.
 
 Production-shaped local Workers runtime (official OpenNext):
 

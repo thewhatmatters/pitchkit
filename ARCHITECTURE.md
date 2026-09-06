@@ -56,8 +56,8 @@ Same table as [PLAN.md](./PLAN.md#stack-locked). Short version:
 - **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers.
 - **Icons:** Lucide through WMDS props. **Motion:** `motion` peer when WMDS needs it.
 - **Install WMDS:** `github:thewhatmatters/wmds` (CI cannot use `../wmds`). Local `../wmds` still works; `prepare` builds `dist/`.
-- **Charts:** Nivo via WMDS Chart (not CSS, not in this app yet). Empty Insights slot; hide when Insights are missing. `/insights` shows a labeled empty “30-day reach chart” slot **inside** the Design inventory (WHA-299) so the object is visible even when seed Insights are null. Do not also paint ChartSlot / StatsGrid / a six-post grid above that dump.
-- **Seed:** In-repo rows match [DATA.md](./DATA.md). `TOKEN_KEY` not required (seed tokens are null). Disconnect columns exist; no live delete yet.
+- **Charts:** Nivo via WMDS Chart (not CSS, not invented in this app). Hide when Insights are missing. Kit payload `reach_series` (`{ day, reach }`, UTC day) is what FE reads — empty/omit, not zeros. `/insights` still shows the labeled empty “30-day reach chart” slot **inside** the Design inventory (WHA-299). Do not also paint ChartSlot / StatsGrid / a six-post grid above that dump.
+- **Seed:** In-repo rows match [DATA.md](./DATA.md). `TOKEN_KEY` not required (seed tokens are null). Disconnect columns exist; no live delete yet. Public `/k/demo` has no Insights (`reach_series` omitted). Owner Insights seed includes example `reach_series` (not a SQL table, not live Graph).
 
 ---
 

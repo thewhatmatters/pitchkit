@@ -3,11 +3,33 @@ import type { Media, User } from "./schema";
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 
+/** Account reach day bucket. `day` is YYYY-MM-DD UTC (Graph `end_time` date). */
+export type ReachPoint = {
+  day: string;
+  reach: number;
+};
+
+export const UTC_DAY = /^\d{4}-\d{2}-\d{2}$/;
+
+export function isUtcDay(value: string): boolean {
+  return UTC_DAY.test(value);
+}
+
 export type PublicKit = {
   user: User;
   posts: Media[];
   engagementRate: number | null;
   hasInsights: boolean;
+  /**
+   * One series: account reach (stories + ads). FE: hide Chart when omitted or [].
+   * Do not zero-fill a missing Insights window.
+   */
+  reach_series?: ReachPoint[];
+};
+
+export type AssembleKitOptions = {
+  /** Seed/example or poll-derived. Ignored when Insights are missing. */
+  reach_series?: ReachPoint[];
 };
 
 export function kitPath(handle: string) {
@@ -83,17 +105,21 @@ export function assemblePublicKit(
   user: User,
   media: Media[],
   now: Date = new Date(),
+  options: AssembleKitOptions = {},
 ): PublicKit | null {
   if (user.disconnected_at) {
     return null;
   }
 
   const posts = selectSixPosts(media, now);
+  const hasInsights = kitHasInsights(posts);
 
   return {
     user,
     posts,
     engagementRate: engagementRate(posts, user.followers),
-    hasInsights: kitHasInsights(posts),
+    hasInsights,
+    // Insights missing → omit (Chart hides). Do not invent 30 zeros.
+    ...(hasInsights ? { reach_series: options.reach_series ?? [] } : {}),
   };
 }

@@ -62,6 +62,8 @@ No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “c
 
 **Engagement rate:** `(likes + comments) / followers` on those six, when followers > 0. If Insights are missing, still show that ER from public likes and comments; **hide reach, saves, and the chart**.
 
+**Chart series:** Insights kit payload exposes one `reach_series` (`{ day, reach }`, `day` = YYYY-MM-DD UTC). Account reach day buckets (stories + ads). Empty or omit hides Chart — do not invent 30 zeros. Owner demo seed includes ~30 labeled example points. Public `/k/demo` omits (Insights missing). Seed only; no Graph poll in this path.
+
 **Carousel:** first child frame (cover) into R2. **Video:** poster only on the kit, never the file.
 
 ---
