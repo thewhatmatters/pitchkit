@@ -1,9 +1,9 @@
 "use client";
 
+import { useEffect, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import type { ReactNode } from "react";
 import { BarChart3, Settings, Share2 } from "lucide-react";
-import { Button, NavRail, PageHeader } from "@/components/wmds";
+import { AppShell, PageHeader } from "@/components/wmds";
 import { kitPath } from "@/lib/kit";
 
 type OwnerShellProps = {
@@ -13,9 +13,27 @@ type OwnerShellProps = {
   end?: ReactNode;
 };
 
+/** Tailwind `lg` — pick desktop AppShell vs AppShell.Mobile at the app breakpoint. */
+const DESKTOP_SHELL_QUERY = "(min-width: 1024px)";
+
+function useDesktopShell() {
+  const [desktop, setDesktop] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const media = window.matchMedia(DESKTOP_SHELL_QUERY);
+    const sync = () => setDesktop(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
+  }, []);
+
+  return desktop;
+}
+
 export function OwnerShell({ handle, title, children, end }: OwnerShellProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const desktop = useDesktopShell();
   const kitHref = kitPath(handle);
   const activeId = pathname.startsWith("/settings")
     ? "settings"
@@ -23,52 +41,54 @@ export function OwnerShell({ handle, title, children, end }: OwnerShellProps) {
       ? "kit"
       : "insights";
 
-  return (
-    <div className="flex min-h-dvh gap-4">
-      <div className="hidden shrink-0 lg:block">
-        <NavRail
+  const items = [
+    { id: "insights", label: "Insights", icon: <BarChart3 strokeWidth={2} /> },
+    { id: "kit", label: "Media kit", icon: <Share2 strokeWidth={2} /> },
+  ];
+  const footerItems = [{ id: "settings", label: "Settings", icon: <Settings strokeWidth={2} /> }];
+
+  function onSelect(id: string) {
+    if (id === "insights") router.push("/insights");
+    if (id === "kit") router.push(kitHref);
+    if (id === "settings") router.push("/settings");
+  }
+
+  const header = <PageHeader variant="app" title={title} end={end} />;
+
+  if (desktop === null) {
+    return <div className="min-h-dvh bg-body" />;
+  }
+
+  if (desktop) {
+    return (
+      <div className="flex h-dvh min-h-0">
+        <AppShell
           brandLabel="Pitchkit"
           aria-label="Owner"
-          items={[
-            { id: "insights", label: "Insights", icon: <BarChart3 strokeWidth={2} /> },
-            { id: "kit", label: "Media kit", icon: <Share2 strokeWidth={2} /> },
-          ]}
-          footerItems={[{ id: "settings", label: "Settings", icon: <Settings strokeWidth={2} /> }]}
+          items={items}
+          footerItems={footerItems}
           activeId={activeId}
-          onSelect={(id) => {
-            if (id === "insights") router.push("/insights");
-            if (id === "kit") router.push(kitHref);
-            if (id === "settings") router.push("/settings");
-          }}
-        />
+          onSelect={onSelect}
+        >
+          {header}
+          <AppShell.Body>{children}</AppShell.Body>
+        </AppShell>
       </div>
-      <div className="grid-page min-w-0 flex-1 py-6">
-        <div className="band">
-          <div className="col-span-full flex flex-col gap-6">
-            <PageHeader
-              variant="app"
-              title={title}
-              end={
-                <div className="flex flex-wrap items-center gap-2">
-                  {end}
-                  <div className="flex gap-2 lg:hidden">
-                    <Button role="ghost" size="sm" onClick={() => router.push("/insights")}>
-                      Insights
-                    </Button>
-                    <Button role="ghost" size="sm" onClick={() => router.push(kitHref)}>
-                      Media kit
-                    </Button>
-                    <Button role="ghost" size="sm" onClick={() => router.push("/settings")}>
-                      Settings
-                    </Button>
-                  </div>
-                </div>
-              }
-            />
-            {children}
-          </div>
-        </div>
-      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-dvh min-h-0 flex-col">
+      <AppShell.Mobile
+        aria-label="Owner"
+        items={items}
+        footerItems={footerItems}
+        activeId={activeId}
+        onSelect={onSelect}
+        header={header}
+      >
+        {children}
+      </AppShell.Mobile>
     </div>
   );
 }

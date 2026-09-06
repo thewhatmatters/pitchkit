@@ -55,7 +55,7 @@ Same table as [PLAN.md](./PLAN.md#stack-locked). Short version:
 - **UI:** `@whatmatters/wmds` pattern-first + `styles.css`. App owns layout Tailwind only. No shadcn. No Storybook here (copy from WMDS Storybook).
 - **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers.
 - **Icons:** Lucide through WMDS props. **Motion:** `motion` peer when WMDS needs it.
-- **Install WMDS:** pin `github:thewhatmatters/wmds#6d24c36a9f436a3922e32ea0a02a53b35df0b4b0` (CI cannot use `../wmds`). Local `../wmds` still works; `prepare` builds `dist/`. `@visx/visx` is the Chart peer.
+- **Install WMDS:** pin `github:thewhatmatters/wmds#266f19cd173216b31ac691ecd31063734f0265e0` (CI cannot use `../wmds`). Local `../wmds` still works; `prepare` builds `dist/`. `@visx/visx` is the Chart peer. Owner chrome consumes `AppShell` + `AppShell.Mobile`; `PageHeader` stays an explicit child.
 - **Charts:** WMDS `Chart` (visx peer). One 30-day account-reach area on `/insights` from `owner.reach_series` only. Empty/omit or no plot ink → hide the entire Chart band (not a header + empty 240px ParentSize host). `Chart.Cartesian` data is `{ date: Date, reach: number }[]`; `animate="none"` + `Chart.Cartesian.Area`. Never zero-fill. Public kit never receives the series. No Nivo in Pitchkit `package.json`.
 - **Seed:** In-repo rows match [DATA.md](./DATA.md). `TOKEN_KEY` not required (seed tokens are null). Disconnect columns exist; no live delete yet. Public `/k/demo` has no Insights (`reach_series` omitted). Owner Insights seed includes example `reach_series` (not a SQL table, not live Graph).
 

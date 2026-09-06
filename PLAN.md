@@ -16,7 +16,7 @@ Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCH
 | UI | **WMDS** (`@whatmatters/wmds`) — pattern-first. Import components and `@whatmatters/wmds/styles.css`. Layout (`grid`, `gap`, `max-w`) stays in the app. No shadcn. No ad-hoc `rounded-full bg-*` buttons. |
 | Icons | Lucide via WMDS props |
 | Motion | `motion` peer when a WMDS component needs it |
-| Install | Pin GitHub `github:thewhatmatters/wmds#<sha>` (CI cannot use `../wmds`). Local path still works. `prepare` builds `dist/`. Current pin: `6d24c36a9f436a3922e32ea0a02a53b35df0b4b0`. How to consume: WMDS `CONSUMING.md`. |
+| Install | Pin GitHub `github:thewhatmatters/wmds#<sha>` (CI cannot use `../wmds`). Local path still works. `prepare` builds `dist/`. Current pin: `266f19cd173216b31ac691ecd31063734f0265e0`. How to consume: WMDS `CONSUMING.md`. Owner chrome: `AppShell` / `AppShell.Body` / `AppShell.Mobile` with `PageHeader` as an explicit child (Organisms/AppShell Pattern). |
 | Compute | Cloudflare Workers via **OpenNext** (official adapter only) |
 | DB | Neon Postgres + Hyperdrive (`HYPERDRIVE` / `HYPERDRIVE_PREVIEW`) |
 | Files | R2 `pitchkit-media` |
@@ -157,7 +157,7 @@ Landing (disclosure + Professional note + support)
 | `/settings` | owner cookie | Account only — reconnect / sign out / disconnect. No past-brands or contact slots. |
 | `/privacy`, `/delete` | public | Meta review |
 
-Responsive: 2×2 stats and 2×3 posts on a phone. Page spine is WMDS `grid-page` + `band`.
+Responsive: 2×2 stats and 2×3 posts on a phone. Owner chrome is WMDS `AppShell` (desktop rail) and `AppShell.Mobile` (narrow dock) with `PageHeader` as an explicit child. Public kit spine stays `grid-page` + `band`.
 
 Personal fail, OAuth cancel → landing with the Professional message or unchanged landing. Empty grid is OK. No blank Insights: “Pulling your grid…” until R2 catches up.
 

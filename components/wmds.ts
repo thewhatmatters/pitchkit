@@ -8,7 +8,7 @@ export {
   Card,
   Chip,
   Input,
-  NavRail,
+  AppShell,
   PageHeader,
   Skeleton,
   Stat,

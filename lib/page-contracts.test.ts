@@ -34,6 +34,18 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(page, /KitInventory/);
   });
 
+  it("owner chrome consumes AppShell with an explicit PageHeader", () => {
+    const shell = read("components/owner-shell.tsx");
+    const barrel = read("components/wmds.ts");
+    assert.match(barrel, /AppShell/);
+    assert.match(shell, /<AppShell[\s\S]*items=/);
+    assert.match(shell, /<AppShell\.Body>/);
+    assert.match(shell, /<AppShell\.Mobile/);
+    assert.match(shell, /<PageHeader/);
+    assert.doesNotMatch(shell, /NavRail/);
+    assert.doesNotMatch(shell, /secondaryNav/);
+  });
+
   it("settings is account only", () => {
     const page = read("app/settings/page.tsx");
     const settings = read("components/account-settings.tsx");

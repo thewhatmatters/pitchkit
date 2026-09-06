@@ -36,7 +36,7 @@ On the connect screen, before they tap Instagram:
 | [GLOSSARY.md](./GLOSSARY.md) | What each kit number means (first sentence is the Insights inventory definition) |
 | [AGENTS.md](./AGENTS.md) | Short lock list for coding agents |
 | `app/` | Next.js App Router routes |
-| `components/` | WMDS composition: owner shell, Insights stats/chart/posts, public kit + owner Edit |
+| `components/` | WMDS composition: owner `AppShell`, Insights stats/chart/posts, public kit + owner Edit |
 | `db/` | Postgres schema from [DATA.md](./DATA.md) (`users`, `media`, empty `detections` + `weekly_counts`) |
 | `lib/` | Schema types, in-repo seed, kit math (six-post rank + ER), `reach_series` hide rules |
 | `public/demo/` | Placeholder kit images (`r2_key` maps here until R2) |
@@ -47,7 +47,7 @@ Owner Insights kit (`loadOwnerKit`) includes seed/example `reach_series: { day, 
 
 Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays public (no cookie). Owner Edit on `/k/demo` only when that session owns `demo`.
 
-`/insights` is the real owner layout (WMDS Stat, one Chart when `owner.reach_series` is present **and** the area can paint, six-post Card grid). Hide the entire Chart band if the series is omitted/`[]` or the plot has no ink — never a header-only empty slot. Public seed Insights stay null — ER still shows; reach, saves, and the Chart hide. Owner demo seed has post Insights plus the example series. Audience mixes hide until Graph data exists. Contact and past brands are typed holes on `/k/[handle]` only. No new Postgres columns.
+`/insights` is the real owner layout (WMDS `AppShell` chrome, Stat, one Chart when `owner.reach_series` is present **and** the area can paint, six-post Card grid). Hide the entire Chart band if the series is omitted/`[]` or the plot has no ink — never a header-only empty slot. Public seed Insights stay null — ER still shows; reach, saves, and the Chart hide. Owner demo seed has post Insights plus the example series. Audience mixes hide until Graph data exists. Contact and past brands are typed holes on `/k/[handle]` only. No new Postgres columns.
 
 ---
 
@@ -74,7 +74,7 @@ Disconnect deletes the creator, their posts, and their files. Anonymous weekly t
 Install WMDS pinned to a main SHA:
 
 ```bash
-npm install github:thewhatmatters/wmds#6d24c36a9f436a3922e32ea0a02a53b35df0b4b0
+npm install github:thewhatmatters/wmds#266f19cd173216b31ac691ecd31063734f0265e0
 ```
 
 `prepare` builds `dist/`. Local `npm install ../wmds` still works after `npm run build` there. `postinstall` / `predev` / `prebuild` copy Geist font files into the WMDS `dist/files` path that `styles.css` expects (otherwise Next 500s on the font URLs). Chart needs the `@visx/visx` peer. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md), WMDS [`CONSUMING.md`](https://github.com/thewhatmatters/wmds/blob/main/CONSUMING.md).
