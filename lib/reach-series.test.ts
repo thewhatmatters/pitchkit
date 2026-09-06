@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import {
   reachSeriesToChartPoints,
   sanitizeReachSeries,
+  shouldRenderReachChartBand,
   shouldShowReachChart,
   utcDayFromGraphEndTime,
 } from "./reach-series";
@@ -23,6 +24,8 @@ describe("reach_series chart hide rules", () => {
       false,
     );
     assert.deepEqual(sanitizeReachSeries([]), []);
+    assert.equal(shouldRenderReachChartBand([], 640), false);
+    assert.equal(shouldRenderReachChartBand(undefined, 640), false);
   });
 
   it("keeps honest points and does not invent missing days", () => {

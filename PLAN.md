@@ -62,7 +62,7 @@ No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “c
 
 **Engagement rate:** `(likes + comments) / followers` on those six, when followers > 0. If Insights are missing, still show that ER from public likes and comments; **hide reach, saves, and the chart**.
 
-**Chart series:** Insights kit payload exposes one `reach_series` (`{ day, reach }`, `day` = YYYY-MM-DD UTC). Account reach day buckets (stories + ads). Empty or omit hides Chart — do not invent 30 zeros. `/insights` reads `owner.reach_series` only. Owner demo seed includes ~30 labeled example points. Public `/k/demo` omits (Insights missing). Seed only; no Graph poll in this path.
+**Chart series:** Insights kit payload exposes one `reach_series` (`{ day, reach }`, `day` = YYYY-MM-DD UTC). Account reach day buckets (stories + ads). Empty, omit, or a plot that cannot paint ink hides the **entire Chart band** (title + slot) — never a header-only empty 240px box. Do not invent 30 zeros. `/insights` reads `owner.reach_series` only. WMDS `Chart.Cartesian` area: `{ date, reach }` points, `animate="none"`, explicit `Area`. Owner demo seed includes ~30 labeled example points. Public `/k/demo` omits (Insights missing). Seed only; no Graph poll in this path.
 
 **Carousel:** first child frame (cover) into R2. **Video:** poster only on the kit, never the file.
 
@@ -151,7 +151,7 @@ Landing (disclosure + Professional note + support)
 | Route | Who | What |
 |---|---|---|
 | `/` | anyone | Pitch, disclosure, Continue with Instagram, Professional note, support |
-| `/insights` | owner cookie | Graph-only Insights: WMDS Stat (Followers + ER; typical reach/saves when present), one 30-day account-reach Chart from `owner.reach_series` when that field is non-empty, six-post Card grid, audience ranked lists when Graph mix exists. Hide Chart when omitted or `[]`. Never zero-fill. Media kit tab = public card + copy/share. No contact/past-brands holes. Reconnect / sign out / disconnect stay as buttons. |
+| `/insights` | owner cookie | Graph-only Insights: WMDS Stat (Followers + ER; typical reach/saves when present), one 30-day account-reach Chart from `owner.reach_series` when that field is non-empty **and** the area can paint. Hide the whole Chart band when omitted, `[]`, or no ink. Never zero-fill. Media kit tab = public card + copy/share. No contact/past-brands holes. Reconnect / sign out / disconnect stay as buttons. |
 | `/insights` Media kit tab | owner | Same card as public + copy / share link |
 | `/k/[handle]` | public | Kit card + support footer. Owner session on this handle can toggle Edit for contact + past brands. Share link stays view. |
 | `/settings` | owner cookie | Account only — reconnect / sign out / disconnect. No past-brands or contact slots. |

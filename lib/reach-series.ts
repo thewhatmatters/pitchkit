@@ -41,6 +41,17 @@ export function shouldShowReachChart(series: ReachPoint[] | null | undefined): b
   return sanitizeReachSeries(series).length > 0;
 }
 
+/**
+ * Whole Insights Chart band (title + slot). Hide when series is empty/omit
+ * or the plot host has no width — never a header-only empty 240px box.
+ */
+export function shouldRenderReachChartBand(
+  series: ReachPoint[] | null | undefined,
+  hostWidth: number,
+): boolean {
+  return shouldShowReachChart(series) && Number.isFinite(hostWidth) && hostWidth > 0;
+}
+
 export function reachSeriesToChartPoints(series: ReachPoint[] | null | undefined) {
   return sanitizeReachSeries(series).map((point) => ({
     date: new Date(`${point.day}T00:00:00.000Z`),

@@ -47,7 +47,7 @@ Owner Insights kit (`loadOwnerKit`) includes seed/example `reach_series: { day, 
 
 Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays public (no cookie). Owner Edit on `/k/demo` only when that session owns `demo`.
 
-`/insights` is the real owner layout (WMDS Stat, one Chart when `owner.reach_series` is present, six-post Card grid). Public seed Insights stay null — ER still shows; reach, saves, and the Chart hide. Owner demo seed has post Insights plus the example series. Audience mixes hide until Graph data exists. Contact and past brands are typed holes on `/k/[handle]` only. No new Postgres columns.
+`/insights` is the real owner layout (WMDS Stat, one Chart when `owner.reach_series` is present **and** the area can paint, six-post Card grid). Hide the entire Chart band if the series is omitted/`[]` or the plot has no ink — never a header-only empty slot. Public seed Insights stay null — ER still shows; reach, saves, and the Chart hide. Owner demo seed has post Insights plus the example series. Audience mixes hide until Graph data exists. Contact and past brands are typed holes on `/k/[handle]` only. No new Postgres columns.
 
 ---
 
@@ -99,7 +99,7 @@ Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=perso
 npm test
 ```
 
-Tests cover six-post rank (saves → reach → likes), ER when Insights are missing, owner `reach_series` shape, public kit omitting the series, Chart hide rules, past-brand chip hide-empty, and set/clear of the Pitchkit session cookie plus the Insights gate.
+Tests cover six-post rank (saves → reach → likes), ER when Insights are missing, owner `reach_series` shape, public kit omitting the series, Chart hide rules (entire band — no header alone), past-brand chip hide-empty, and set/clear of the Pitchkit session cookie plus the Insights gate.
 
 Production-shaped local Workers runtime (official OpenNext):
 
