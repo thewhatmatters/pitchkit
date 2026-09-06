@@ -78,6 +78,11 @@ export function insightsGate(session: Session | null): session is Session {
   return session != null;
 }
 
+/** Owner Edit on `/k/[handle]` only when the session cookie owns that handle. */
+export function sessionOwnsHandle(session: Session | null, handle: string): boolean {
+  return session != null && session.handle === handle;
+}
+
 /** 303 so a POST connect/sign-out follows as GET. */
 export function sessionRedirect(request: Request, path: string, setCookie: string): Response {
   return new Response(null, {

@@ -116,6 +116,22 @@ describe("ER hide-insights", () => {
     assert.ok(kit);
     assert.equal(kit.hasInsights, false);
     assert.equal(kit.engagementRate, 0.099);
+    assert.deepEqual(kit.reach_series, []);
+    assert.equal(kit.typicalReach, null);
+    assert.equal(kit.typicalSaves, null);
+  });
+
+  it("computes typical reach/saves as the median of present Insights values", () => {
+    const posts = [
+      media({ id: "1", posted_at: "2026-08-20T00:00:00.000Z", like_count: 1, reach: 10, saves: 2 }),
+      media({ id: "2", posted_at: "2026-08-21T00:00:00.000Z", like_count: 1, reach: 30, saves: 4 }),
+      media({ id: "3", posted_at: "2026-08-22T00:00:00.000Z", like_count: 1, reach: 20, saves: 6 }),
+    ];
+    const kit = assemblePublicKit(user({ followers: 100 }), posts, NOW);
+    assert.ok(kit);
+    assert.equal(kit.hasInsights, true);
+    assert.equal(kit.typicalReach, 20);
+    assert.equal(kit.typicalSaves, 4);
   });
 
   it("returns null ER when followers are 0", () => {
@@ -153,6 +169,9 @@ describe("seed schema", () => {
     assert.equal(demo.posts.length, 6);
     assert.equal(demo.hasInsights, false);
     assert.equal(demo.engagementRate, 0.099);
+    assert.deepEqual(demo.reach_series, []);
+    assert.equal(demo.typicalReach, null);
+    assert.equal(demo.typicalSaves, null);
     assert.equal(loadPublicKit("nope", NOW), null);
     assert.equal(assemblePublicKit(user({ disconnected_at: NOW.toISOString() }), seedMedia, NOW), null);
   });

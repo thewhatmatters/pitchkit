@@ -1,11 +1,12 @@
 "use client";
 
+import { AppFrame } from "@/components/app-frame";
 import { PageButton, PageCard, PageCopy } from "@/components/page-card";
 import { SupportFooter } from "@/components/support-footer";
 
 export default function NotFound() {
   return (
-    <main className="max-w-lg mx-auto px-4 py-8 flex flex-col gap-6">
+    <AppFrame>
       <PageCard title="Not found">
         <PageCopy>This kit is missing or disconnected.</PageCopy>
         <form action="/">
@@ -13,6 +14,6 @@ export default function NotFound() {
         </form>
       </PageCard>
       <SupportFooter />
-    </main>
+    </AppFrame>
   );
 }

@@ -1,4 +1,5 @@
-import { engagementRate } from "./engagement";
+import { engagementRate, typicalFromPosts } from "./engagement";
+import { shouldShowReachChart, type ReachPoint } from "./reach-series";
 import type { Media, User } from "./schema";
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
@@ -8,6 +9,10 @@ export type PublicKit = {
   posts: Media[];
   engagementRate: number | null;
   hasInsights: boolean;
+  /** Account 30-day reach. Empty / omit → hide Chart. Never invent points. */
+  reach_series: ReachPoint[];
+  typicalReach: number | null;
+  typicalSaves: number | null;
 };
 
 export function kitPath(handle: string) {
@@ -83,17 +88,23 @@ export function assemblePublicKit(
   user: User,
   media: Media[],
   now: Date = new Date(),
+  reachSeries: ReachPoint[] = [],
 ): PublicKit | null {
   if (user.disconnected_at) {
     return null;
   }
 
   const posts = selectSixPosts(media, now);
+  const typical = typicalFromPosts(posts);
+  const hasPostInsights = kitHasInsights(posts);
 
   return {
     user,
     posts,
     engagementRate: engagementRate(posts, user.followers),
-    hasInsights: kitHasInsights(posts),
+    hasInsights: hasPostInsights || shouldShowReachChart(reachSeries),
+    reach_series: reachSeries,
+    typicalReach: typical.typicalReach,
+    typicalSaves: typical.typicalSaves,
   };
 }

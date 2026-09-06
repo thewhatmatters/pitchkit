@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { OwnerChrome } from "@/components/owner-chrome";
-import { PageTitle } from "@/components/page-card";
+import { OwnerShell } from "@/components/owner-shell";
 import { SupportFooter } from "@/components/support-footer";
 import { insightsGate, parseSessionValue, SESSION_COOKIE } from "@/lib/session";
 import { loadOwnerKit } from "@/lib/store";
@@ -25,16 +25,19 @@ export default async function InsightsPage({ searchParams }: InsightsProps) {
   }
 
   return (
-    <main className="max-w-lg mx-auto px-4 py-8 flex flex-col gap-6">
-      <PageTitle>Insights</PageTitle>
+    <OwnerShell handle={kit.user.handle} title="Insights">
       <p>Owner Insights. Brands never see this page.</p>
       <OwnerChrome
         user={kit.user}
         posts={kit.posts}
         engagementRate={kit.engagementRate}
+        typicalReach={kit.typicalReach}
+        typicalSaves={kit.typicalSaves}
+        reachSeries={kit.reach_series}
+        hasInsights={kit.hasInsights}
         gridReady={gridReady}
       />
       <SupportFooter />
-    </main>
+    </OwnerShell>
   );
 }

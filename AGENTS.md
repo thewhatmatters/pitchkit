@@ -12,7 +12,8 @@ Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md)
 
   > We only use your public posts and Instagram Insights to build your media kit. We don’t read DMs, who you follow, or unfollowers. Disconnect deletes your kit and the copies we stored.
 
-- After login: **Insights** inventory (no Insights / Media kit tabs). Copy / share stay as buttons. Brands never see Insights. `/insights` dumps locked kit objects (WHA-299) as stacked Cards — not a look lock, not on `/k/[handle]`. Do not also paint StatsGrid / ChartSlot / a six-post grid above that dump. GLOSSARY first sentence only when the term exists. Example geo/age/gender/reach/saves stay in-file (`lib/inventory.ts`). Identity reads seed `name` / handle / avatar / `fetched_at`. Contact and past brands are empty typed holes. Seed Insights stay null.
+- After login: **Insights**, then Media kit tab (same public card + copy/share). Brands never see Insights. `/insights` is Graph-only: WMDS Stat row (Followers + ER always; typical reach/saves only when present), one WMDS Chart when `reach_series` is non-empty, six-post Card grid, audience ranked lists when Graph mix exists. No contact/past-brands holes on Insights. Seed Insights and `reach_series` stay empty — hide reach/saves/chart, still show ER.
+- `/k/[handle]` (and `/k/demo`) is the public kit. Owner Edit is a toggle on that same URL when the session cookie owns the handle (contact + past brands). Share link stays view. Past brands = wrap WMDS `Chip` names; hide empty; no marquee. Settings (`/settings`) is account only.
 - Six posts: last 30 days, **saves then reach then likes**. ER: `(likes + comments) / followers` on those six; if Insights missing, still show ER, hide reach/saves/chart.
 - Carousel: first frame. Video: poster only. R2 public read for kit images.
 - Disconnect: delete SQL + R2 `{user_id}/` within 24 hours. `consent_index` default off.
@@ -20,14 +21,14 @@ Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md)
 - Postgres: [DATA.md](./DATA.md). Empty `detections` and `weekly_counts`. Stub and live OAuth use the same schema. SQL in `db/`. Until Hyperdrive exists, `/k/demo` and `/insights` read `lib/seed.ts` (same types). Handle `demo` is frozen.
 - `TOKEN_KEY` is a Workers secret. Never git. Not required for the seed (tokens stay null). Disconnect columns exist; no live delete yet.
 - Cloudflare and Support (for now): **randy@whatmatters.so**. Neon region: pick when we create the database.
-- **UI:** `@whatmatters/wmds` (pattern-first, import `styles.css`). Layout Tailwind only. Lucide via WMDS. No shadcn. No Storybook in this repo. Install from `github:thewhatmatters/wmds` (CI cannot use `../wmds`); `prepare` builds `dist/`.
-- **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers. Charts: Nivo via WMDS Chart (not CSS, not in this app yet).
+- **UI:** `@whatmatters/wmds` (pattern-first, import `styles.css`). Layout Tailwind only (`grid-page` + `band` from CONSUMING). Lucide via WMDS. No shadcn. No Storybook in this repo. Pin `github:thewhatmatters/wmds#<sha>` (CI cannot use `../wmds`); `prepare` builds `dist/`. Current pin: `6d24c36a9f436a3922e32ea0a02a53b35df0b4b0` (2026-09-06 main).
+- **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers. Charts: WMDS `Chart` only (`@visx/visx` peer). No Nivo in this `package.json`.
 
 ## Do not build
 
 CV, TikTok, PDF, brand dashboard, kit-view analytics for sale, Browser Run, D1, Vercel, shadcn, Storybook here, bio/website/rates/contact/geo on the kit.
 
-Do not add Graph columns we do not get from public posts + Insights. Do not invent rules that contradict [PLAN.md](./PLAN.md). The Insights inventory does not add bio/website/geo columns.
+Do not add Graph columns we do not get from public posts + Insights. Do not invent rules that contradict [PLAN.md](./PLAN.md). Do not invent WMDS atoms here.
 
 ## After each turn
 

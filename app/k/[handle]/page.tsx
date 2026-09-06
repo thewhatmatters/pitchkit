@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
-import { KitCard } from "@/components/kit-card";
+import { AppFrame } from "@/components/app-frame";
+import { KitEdit } from "@/components/kit-edit";
+import { OwnerShell } from "@/components/owner-shell";
 import { SupportFooter } from "@/components/support-footer";
 import { kitPath } from "@/lib/kit";
+import { parseSessionValue, SESSION_COOKIE, sessionOwnsHandle } from "@/lib/session";
 import { loadPublicKit } from "@/lib/store";
 
 type KitPageProps = {
@@ -33,15 +37,33 @@ export default async function KitPage({ params }: KitPageProps) {
     notFound();
   }
 
+  const cookieStore = await cookies();
+  const session = parseSessionValue(cookieStore.get(SESSION_COOKIE)?.value);
+  const canEdit = sessionOwnsHandle(session, kit.user.handle);
+
+  const card = (
+    <KitEdit
+      user={kit.user}
+      posts={kit.posts}
+      engagementRate={kit.engagementRate}
+      hasInsights={kit.hasInsights}
+      canEdit={canEdit}
+    />
+  );
+
+  if (canEdit) {
+    return (
+      <OwnerShell handle={kit.user.handle} title="Media kit">
+        {card}
+        <SupportFooter />
+      </OwnerShell>
+    );
+  }
+
   return (
-    <main className="max-w-lg mx-auto px-4 py-8 flex flex-col gap-6">
-      <KitCard
-        user={kit.user}
-        posts={kit.posts}
-        engagementRate={kit.engagementRate}
-        hasInsights={kit.hasInsights}
-      />
+    <AppFrame>
+      {card}
       <SupportFooter />
-    </main>
+    </AppFrame>
   );
 }

@@ -16,12 +16,12 @@ Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCH
 | UI | **WMDS** (`@whatmatters/wmds`) — pattern-first. Import components and `@whatmatters/wmds/styles.css`. Layout (`grid`, `gap`, `max-w`) stays in the app. No shadcn. No ad-hoc `rounded-full bg-*` buttons. |
 | Icons | Lucide via WMDS props |
 | Motion | `motion` peer when a WMDS component needs it |
-| Install | GitHub `github:thewhatmatters/wmds` (CI cannot use `../wmds`). Local path still works. `prepare` builds `dist/`. How to consume: WMDS `CONSUMING.md`. |
+| Install | Pin GitHub `github:thewhatmatters/wmds#<sha>` (CI cannot use `../wmds`). Local path still works. `prepare` builds `dist/`. Current pin: `6d24c36a9f436a3922e32ea0a02a53b35df0b4b0`. How to consume: WMDS `CONSUMING.md`. |
 | Compute | Cloudflare Workers via **OpenNext** (official adapter only) |
 | DB | Neon Postgres + Hyperdrive (`HYPERDRIVE` / `HYPERDRIVE_PREVIEW`) |
 | Files | R2 `pitchkit-media` |
 | Auth | Instagram Login + Pitchkit httpOnly cookie |
-| Charts | Nivo via WMDS Chart (not CSS, not in this app yet) |
+| Charts | WMDS `Chart` only (`@visx/visx` peer). No Nivo in Pitchkit `package.json`. |
 
 **Not used:** D1, Vercel, shadcn, Browser Run, Queues, Workers AI.
 
@@ -39,7 +39,7 @@ Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCH
 
 **Session:** Instagram proves who they are. Pitchkit still sets an **httpOnly cookie** for Insights, disconnect, and refresh. The cookie is our login, not the Instagram token. Until live OAuth, stub Continue (GET/POST `/auth/instagram`) sets that cookie for seed handle `demo`. Sign out clears it. `/insights` without the cookie goes `/`. `/k/[handle]` does not need it.
 
-Owner home: `/insights` — static inventory (stacked Cards) plus copy / share / reconnect / sign out / disconnect. No Insights / Media kit tabs. Brands only get `/k/[handle]`.
+Owner home: `/insights`. Media kit tab is owner chrome over the same card. Brands only get `/k/[handle]`.
 
 Seed: `/k/demo`.
 
@@ -149,11 +149,13 @@ Landing (disclosure + Professional note + support)
 | Route | Who | What |
 |---|---|---|
 | `/` | anyone | Pitch, disclosure, Continue with Instagram, Professional note, support |
-| `/insights` | owner cookie | One **static inventory** of locked kit objects (WHA-299 leftover): identity (name, username, photo, last-updated) + contact / past-brands typed holes + the original 12. Stacked Cards, not a look lock. No tabs, no Followers/Posts/ER tiles, no six-post grid or chart **above** the dump — those live inside the inventory. Copy / share / reconnect / sign out / disconnect stay as buttons. GLOSSARY first sentence next to a term only if it exists. Sample numbers are in-file examples, not live Instagram. |
-| `/k/[handle]` | public | Card only + support footer. No Insights inventory dump. |
+| `/insights` | owner cookie | Graph-only Insights: WMDS Stat (Followers + ER; typical reach/saves when present), one 30-day account-reach Chart when `reach_series` is non-empty, six-post Card grid, audience ranked lists when Graph mix exists. Media kit tab = public card + copy/share. No contact/past-brands holes. Reconnect / sign out / disconnect stay as buttons. |
+| `/insights` Media kit tab | owner | Same card as public + copy / share link |
+| `/k/[handle]` | public | Kit card + support footer. Owner session on this handle can toggle Edit for contact + past brands. Share link stays view. |
+| `/settings` | owner cookie | Account only — reconnect / sign out / disconnect. No past-brands or contact slots. |
 | `/privacy`, `/delete` | public | Meta review |
 
-Responsive: public kit card stays compact on a phone. `/insights` is a stacked Card inventory, not a 2×2 stats layout.
+Responsive: 2×2 stats and 2×3 posts on a phone. Page spine is WMDS `grid-page` + `band`.
 
 Personal fail, OAuth cancel → landing with the Professional message or unchanged landing. Empty grid is OK. No blank Insights: “Pulling your grid…” until R2 catches up.
 
@@ -170,7 +172,7 @@ Personal fail, OAuth cancel → landing with the Professional message or unchang
 
 ## Build order
 
-1. Next.js App Router + Tailwind v4 on OpenNext Workers. Install WMDS from `github:thewhatmatters/wmds` (local `../wmds` still fine). Neon + Hyperdrive + R2. Env names in README.  
+1. Next.js App Router + Tailwind v4 on OpenNext Workers. Install WMDS from `github:thewhatmatters/wmds#<sha>` (local `../wmds` still fine). Neon + Hyperdrive + R2. Env names in README.  
 2. Schema from [DATA.md](./DATA.md) including empty `detections` and `weekly_counts`. Seed `demo`. SQL in `db/`. Until Hyperdrive exists, `/k/demo` and `/insights` read the in-repo seed (`lib/seed.ts`) with the same types. `TOKEN_KEY` not required for seed.  
 3. Insights + public `/k/demo` (responsive, OG tags).  
 4. Cookie + stub Instagram → Insights.  

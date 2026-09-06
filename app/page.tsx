@@ -1,3 +1,4 @@
+import { AppFrame } from "@/components/app-frame";
 import { ConnectButton } from "@/components/connect-button";
 import { PageCard, PageCopy } from "@/components/page-card";
 import { SupportFooter } from "@/components/support-footer";
@@ -12,7 +13,7 @@ export default async function LandingPage({ searchParams }: LandingProps) {
   const personalFail = error === "personal";
 
   return (
-    <main className="max-w-lg mx-auto px-4 py-8 flex flex-col gap-6">
+    <AppFrame>
       <PageCard title="Pitchkit">
         <PageCopy>
           Sign in with Instagram, see your numbers, and send brands a link.
@@ -31,6 +32,6 @@ export default async function LandingPage({ searchParams }: LandingProps) {
         <PageCopy>{STUB_CONNECT}</PageCopy>
       </PageCard>
       <SupportFooter />
-    </main>
+    </AppFrame>
   );
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AppFrame } from "@/components/app-frame";
 import { PageCard, PageCopy } from "@/components/page-card";
 import { SupportFooter } from "@/components/support-footer";
 import { DISCLOSURE } from "@/lib/copy";
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <main className="max-w-lg mx-auto px-4 py-8 flex flex-col gap-6">
+    <AppFrame>
       <PageCard title="Privacy">
         <PageCopy>{DISCLOSURE}</PageCopy>
         <PageCopy>
@@ -19,6 +20,6 @@ export default function PrivacyPage() {
         </PageCopy>
       </PageCard>
       <SupportFooter />
-    </main>
+    </AppFrame>
   );
 }

@@ -13,7 +13,7 @@ GitHub: [thewhatmatters/pitchkit](https://github.com/thewhatmatters/pitchkit).
 1. Creator opens pitchkit.app and reads the collection note.
 2. They tap **Continue with Instagram** (Professional accounts only — Business or Creator). That is login and sign-up. No email, no password.
 3. We pull public posts and Insights (not DMs, not who they follow).
-4. They land on **Insights** (private inventory). Copy / share the kit from there.
+4. They land on **Insights** (private). **Media kit** is the shareable page.
 5. Brands open `https://pitchkit.app/k/[handle]`. They do not sign in.
 
 Handle is taken from the Instagram username at signup and **does not change**. Local/demo kit: `/k/demo`.
@@ -36,16 +36,16 @@ On the connect screen, before they tap Instagram:
 | [GLOSSARY.md](./GLOSSARY.md) | What each kit number means (first sentence is the Insights inventory definition) |
 | [AGENTS.md](./AGENTS.md) | Short lock list for coding agents |
 | `app/` | Next.js App Router routes |
-| `components/` | Public kit card + owner chrome (inventory dump, copy/share/reconnect) |
+| `components/` | WMDS composition: owner shell, Insights stats/chart/posts, public kit + owner Edit |
 | `db/` | Postgres schema from [DATA.md](./DATA.md) (`users`, `media`, empty `detections` + `weekly_counts`) |
-| `lib/` | Schema types, in-repo seed, kit math (six-post rank + ER), Insights inventory examples (`inventory.ts`) |
+| `lib/` | Schema types, in-repo seed, kit math (six-post rank + ER), `reach_series` hide rules |
 | `public/demo/` | Placeholder kit images (`r2_key` maps here until R2) |
 
 Until Hyperdrive exists, `/k/demo` and `/insights` read the in-repo seed (`lib/seed.ts`). Same `User` / `Media` types as live. `TOKEN_KEY` is not required for seed. Unknown handle (`/k/nope`) is 404. No Neon or Instagram token yet.
 
-Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays public (no cookie) and does **not** dump the Insights inventory.
+Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays public (no cookie). Owner Edit on `/k/demo` only when that session owns `demo`.
 
-`/insights` is one **static inventory** (stacked Cards) so Design can see the objects: name, username, photo, last-updated, contact, past brands, then the original 12 (engagement rate, followers, typical reach, saves, 30-day reach chart slot, six posts, country/city/age/gender mix, bio, website). No Insights / Media kit tabs, no Followers/Posts/ER tiles, and no six-post grid or chart **above** that dump. Six posts stay **inside** the inventory (auto six, ranked saves → reach → likes). A page-level example-data banner marks sample numbers as not live Instagram. GLOSSARY first sentence only when the term exists. Contact and past brands are empty typed holes. No new Postgres columns.
+`/insights` is the real owner layout (WMDS Stat, one Chart when `reach_series` is present, six-post Card grid). Seed Insights stay null — ER still shows; reach, saves, and the Chart hide. Audience mixes hide until Graph data exists. Contact and past brands are typed holes on `/k/[handle]` only. No new Postgres columns.
 
 ---
 
@@ -67,9 +67,15 @@ Disconnect deletes the creator, their posts, and their files. Anonymous weekly t
 | DB | Neon Postgres + Hyperdrive |
 | Files | R2 `pitchkit-media` |
 | Auth | Instagram Login + httpOnly cookie |
-| Charts | Nivo via WMDS Chart (not CSS, not in this app yet) |
+| Charts | WMDS `Chart` (`@visx/visx` peer). No Nivo in this app. |
 
-Install WMDS from `github:thewhatmatters/wmds` (CI cannot use `../wmds`). `prepare` builds `dist/`. Local `npm install ../wmds` still works. `postinstall` copies Geist font files into the WMDS `dist/files` path that `styles.css` expects. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md), WMDS [`CONSUMING.md`](https://github.com/thewhatmatters/wmds/blob/main/CONSUMING.md).
+Install WMDS pinned to a main SHA:
+
+```bash
+npm install github:thewhatmatters/wmds#6d24c36a9f436a3922e32ea0a02a53b35df0b4b0
+```
+
+`prepare` builds `dist/`. Local `npm install ../wmds` still works after `npm run build` there. `postinstall` copies Geist font files into the WMDS `dist/files` path that `styles.css` expects. Chart needs the `@visx/visx` peer. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md), WMDS [`CONSUMING.md`](https://github.com/thewhatmatters/wmds/blob/main/CONSUMING.md).
 
 Cloudflare and Support (for now): randy@whatmatters.so. Neon region is chosen when we create the database.
 
@@ -85,13 +91,13 @@ cp .dev.vars.example .dev.vars
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=personal`, `/auth/instagram` (stub connect), `/auth/sign-out`, `/insights`, `/insights?grid=pulling`, `/k/demo`, `/k/nope` (404), `/privacy`, `/delete`.
+Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=personal`, `/auth/instagram` (stub connect), `/auth/sign-out`, `/insights`, `/insights?grid=pulling`, `/settings`, `/k/demo`, `/k/nope` (404), `/privacy`, `/delete`.
 
 ```bash
 npm test
 ```
 
-Tests cover six-post rank (saves → reach → likes), ER when Insights are missing, and set/clear of the Pitchkit session cookie plus the Insights gate.
+Tests cover six-post rank (saves → reach → likes), ER when Insights are missing, `reach_series` Chart hide rules, past-brand chip hide-empty, and set/clear of the Pitchkit session cookie plus the Insights gate.
 
 Production-shaped local Workers runtime (official OpenNext):
 

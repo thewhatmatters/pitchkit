@@ -20,7 +20,7 @@ export const TYPICAL_SAVES_CAPTION = "Typical post.";
 export const CHART_SLOT_TITLE = "30-day reach chart";
 
 export const CHART_SLOT_CAPTION =
-  "Labeled empty slot. Not a 5th number. WMDS Chart is not in this app yet.";
+  "WMDS Chart.Cartesian area. Hide when reach_series is empty. Never zero-fill.";
 
 export const SIX_POSTS_RANK = "Ranked saves, then reach, then likes. Last 30 days.";
 

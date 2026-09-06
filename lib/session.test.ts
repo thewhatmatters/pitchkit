@@ -8,6 +8,7 @@ import {
   sessionClearCookieHeader,
   sessionCookieClearOptions,
   sessionCookieSetOptions,
+  sessionOwnsHandle,
   stubConnect,
   stubSignOut,
 } from "./session";
@@ -67,6 +68,13 @@ describe("insights gate", () => {
   it("sends /insights home without a cookie and allows a valid session", () => {
     assert.equal(insightsGate(null), false);
     assert.equal(insightsGate(parseSessionValue(DEMO_HANDLE)), true);
+  });
+
+  it("owner Edit only when the session handle matches the kit handle", () => {
+    const session = parseSessionValue(DEMO_HANDLE);
+    assert.equal(sessionOwnsHandle(session, DEMO_HANDLE), true);
+    assert.equal(sessionOwnsHandle(session, "someone-else"), false);
+    assert.equal(sessionOwnsHandle(null, DEMO_HANDLE), false);
   });
 
   it("POST/GET stub connect sets the cookie and 303s to /insights; sign-out 303s home", () => {
