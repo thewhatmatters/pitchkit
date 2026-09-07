@@ -55,6 +55,7 @@ describe("critical page contracts", () => {
     assert.match(frame, /OWNER_GRID_COLUMN_GAP = "8px"/);
     assert.match(frame, /\[--grid-max:960px\]/);
     assert.match(frame, /\[--grid-column-gap:8px\]/);
+    assert.match(frame, /\[--grid-gutter:8px\]/);
     assert.match(frame, /\[--grid-cols:12\]/);
     assert.doesNotMatch(frame, /style=\{/);
     assert.match(frame, /grid-page/);

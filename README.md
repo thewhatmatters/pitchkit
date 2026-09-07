@@ -36,7 +36,7 @@ On the connect screen, before they tap Instagram:
 | [GLOSSARY.md](./GLOSSARY.md) | What each kit number means (first sentence is the Insights inventory definition) |
 | [AGENTS.md](./AGENTS.md) | Short lock list for coding agents |
 | `app/` | Next.js App Router routes |
-| `components/` | WMDS composition: owner SegmentedControl + 960 grid (`[--grid-column-gap:8px]`), AppFrame GridOverlay, Insights headline + four-up Stat tiles in `col-span-*` wrappers on the band spine, chart/Top-performing posts, public kit + owner Edit |
+| `components/` | WMDS composition: owner SegmentedControl + 960 grid (`[--grid-column-gap:8px] [--grid-gutter:8px]`), AppFrame GridOverlay, Insights headline + four-up Stat tiles in `col-span-*` wrappers on the band spine, chart/Top-performing posts, public kit + owner Edit |
 | `db/` | Postgres schema from [DATA.md](./DATA.md) (`users`, `media`, empty `detections` + `weekly_counts`) |
 | `lib/` | Schema types, in-repo seed, kit math (six-post rank + ER), `reach_series` hide rules |
 | `public/demo/` | Placeholder kit images (`r2_key` maps here until R2) |
@@ -47,7 +47,7 @@ Owner Insights kit (`loadOwnerKit`) includes seed/example `reach_series: { day, 
 
 Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays public (no cookie). Owner Edit on `/k/demo` only when that session owns `demo`.
 
-`/insights` is the real owner layout (WMDS `SegmentedControl` Insights / Pitch, `grid-page` + `band` at 960px with Tailwind `[--grid-column-gap:8px] [--grid-cols:12]`, WMDS `GridOverlay` on by default — press **g** to toggle, headline Typical reach + four-up Stat tiles on the page spine — each in a `div` with `col-span-6` mobile / `md:col-span-3`, not nested `Stat.Group` — one Chart when `owner.reach_series` is present **and** the area can paint, Top-performing posts). Hide the entire Chart band if the series is omitted/`[]` or the plot has no ink — never a header-only empty slot. Public seed Insights stay null — Engagement rate still shows; reach, saves, and the Chart hide. Owner demo seed has post Insights plus the example series. Audience mixes hide until Graph data exists. Contact and past brands are typed holes on `/k/[handle]` only. No new Postgres columns.
+`/insights` is the real owner layout (WMDS `SegmentedControl` Insights / Pitch, `grid-page` + `band` at 960px with Tailwind `[--grid-column-gap:8px] [--grid-gutter:8px] [--grid-cols:12]`, WMDS `GridOverlay` on by default — press **g** to toggle, headline Typical reach + four-up Stat tiles on the page spine — each in a `div` with `col-span-6` mobile / `md:col-span-3`, not nested `Stat.Group` — one Chart when `owner.reach_series` is present **and** the area can paint, Top-performing posts). Hide the entire Chart band if the series is omitted/`[]` or the plot has no ink — never a header-only empty slot. Public seed Insights stay null — Engagement rate still shows; reach, saves, and the Chart hide. Owner demo seed has post Insights plus the example series. Audience mixes hide until Graph data exists. Contact and past brands are typed holes on `/k/[handle]` only. No new Postgres columns.
 
 ---
 
@@ -99,7 +99,7 @@ Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=perso
 npm test
 ```
 
-Tests cover six-post rank (saves → reach → likes), ER when Insights are missing, owner `reach_series` shape, public kit omitting the series, Chart hide rules (entire band — no header alone), date-tick helper usage, owner SegmentedControl Insights / Pitch + 960 grid (no AppShell), AppFrame mounting WMDS `GridOverlay` before `band` with band children as grid items (no `col-span-full flex` wrap; owner Tailwind `[--grid-column-gap:8px] [--grid-cols:12]`, not React `style`), Insights chrome (no duplicate tabs, Engagement rate label, four-up `div` wrappers with `col-span-6` / `md:col-span-3` not `Stat.Group`, Top-performing posts sort keys, private copy, Card + `Chart.Cartesian.Tooltip`), past-brand chip hide-empty, and set/clear of the Pitchkit session cookie plus the Insights gate.
+Tests cover six-post rank (saves → reach → likes), ER when Insights are missing, owner `reach_series` shape, public kit omitting the series, Chart hide rules (entire band — no header alone), date-tick helper usage, owner SegmentedControl Insights / Pitch + 960 grid (no AppShell), AppFrame mounting WMDS `GridOverlay` before `band` with band children as grid items (no `col-span-full flex` wrap; owner Tailwind `[--grid-column-gap:8px] [--grid-gutter:8px] [--grid-cols:12]`, not React `style`), Insights chrome (no duplicate tabs, Engagement rate label, four-up `div` wrappers with `col-span-6` / `md:col-span-3` not `Stat.Group`, Top-performing posts sort keys, private copy, Card + `Chart.Cartesian.Tooltip`), past-brand chip hide-empty, and set/clear of the Pitchkit session cookie plus the Insights gate.
 
 Production-shaped local Workers runtime (official OpenNext):
 
