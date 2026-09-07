@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
-import { AppFrame } from "@/components/app-frame";
+import { AppFrame, OWNER_GRID_MAX } from "@/components/app-frame";
 import { KitEdit } from "@/components/kit-edit";
-import { OwnerShell } from "@/components/owner-shell";
+import { OwnerNav } from "@/components/owner-nav";
 import { SupportFooter } from "@/components/support-footer";
 import { kitPath } from "@/lib/kit";
 import { parseSessionValue, SESSION_COOKIE, sessionOwnsHandle } from "@/lib/session";
@@ -53,10 +53,15 @@ export default async function KitPage({ params }: KitPageProps) {
 
   if (canEdit) {
     return (
-      <OwnerShell handle={kit.user.handle} title="Media kit">
+      <AppFrame gridMax={OWNER_GRID_MAX}>
+        <OwnerNav handle={kit.user.handle} />
         {card}
-        <SupportFooter />
-      </OwnerShell>
+        <SupportFooter>
+          <p>
+            <a href="/settings">Account</a>
+          </p>
+        </SupportFooter>
+      </AppFrame>
     );
   }
 

@@ -13,7 +13,7 @@ GitHub: [thewhatmatters/pitchkit](https://github.com/thewhatmatters/pitchkit).
 1. Creator opens pitchkit.app and reads the collection note.
 2. They tap **Continue with Instagram** (Professional accounts only — Business or Creator). That is login and sign-up. No email, no password.
 3. We pull public posts and Insights (not DMs, not who they follow).
-4. They land on **Insights** (private). AppShell nav is Insights / Media kit / Settings. **Media kit** is the shareable `/k/[handle]` page.
+4. They land on **Insights** (private). SegmentedControl nav is Insights / PitchKit. **PitchKit** is the shareable `/k/[handle]` page. Account is a quiet footer link.
 5. Brands open `https://pitchkit.app/k/[handle]`. They do not sign in.
 
 Handle is taken from the Instagram username at signup and **does not change**. Local/demo kit: `/k/demo`.
@@ -36,7 +36,7 @@ On the connect screen, before they tap Instagram:
 | [GLOSSARY.md](./GLOSSARY.md) | What each kit number means (first sentence is the Insights inventory definition) |
 | [AGENTS.md](./AGENTS.md) | Short lock list for coding agents |
 | `app/` | Next.js App Router routes |
-| `components/` | WMDS composition: owner `AppShell`, Insights headline + four-up stats/chart/Top-performing posts, public kit + owner Edit |
+| `components/` | WMDS composition: owner SegmentedControl + 960 grid, Insights headline + four-up stats/chart/Top-performing posts, public kit + owner Edit |
 | `db/` | Postgres schema from [DATA.md](./DATA.md) (`users`, `media`, empty `detections` + `weekly_counts`) |
 | `lib/` | Schema types, in-repo seed, kit math (six-post rank + ER), `reach_series` hide rules |
 | `public/demo/` | Placeholder kit images (`r2_key` maps here until R2) |
@@ -47,7 +47,7 @@ Owner Insights kit (`loadOwnerKit`) includes seed/example `reach_series: { day, 
 
 Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays public (no cookie). Owner Edit on `/k/demo` only when that session owns `demo`.
 
-`/insights` is the real owner layout (WMDS `AppShell` chrome, headline Typical reach + four-up Stat row, one Chart when `owner.reach_series` is present **and** the area can paint, Top-performing posts). Hide the entire Chart band if the series is omitted/`[]` or the plot has no ink — never a header-only empty slot. Public seed Insights stay null — Engagement rate still shows; reach, saves, and the Chart hide. Owner demo seed has post Insights plus the example series. Audience mixes hide until Graph data exists. Contact and past brands are typed holes on `/k/[handle]` only. No new Postgres columns.
+`/insights` is the real owner layout (WMDS `SegmentedControl` Insights / PitchKit, `grid-page` + `band` at 960px, headline Typical reach + four-up Stat row, one Chart when `owner.reach_series` is present **and** the area can paint, Top-performing posts). Hide the entire Chart band if the series is omitted/`[]` or the plot has no ink — never a header-only empty slot. Public seed Insights stay null — Engagement rate still shows; reach, saves, and the Chart hide. Owner demo seed has post Insights plus the example series. Audience mixes hide until Graph data exists. Contact and past brands are typed holes on `/k/[handle]` only. No new Postgres columns.
 
 ---
 
@@ -74,7 +74,7 @@ Disconnect deletes the creator, their posts, and their files. Anonymous weekly t
 Install WMDS pinned to a main SHA:
 
 ```bash
-npm install github:thewhatmatters/wmds#266f19cd173216b31ac691ecd31063734f0265e0
+npm install github:thewhatmatters/wmds#a80b2b99a7d2ca91bdc46c7fa6b860bf5e0ce42a
 ```
 
 `prepare` builds `dist/`. Local `npm install ../wmds` still works after `npm run build` there. `postinstall` / `predev` / `prebuild` copy Geist font files into the WMDS `dist/files` path that `styles.css` expects (otherwise Next 500s on the font URLs). Chart needs the `@visx/visx` peer. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md), WMDS [`CONSUMING.md`](https://github.com/thewhatmatters/wmds/blob/main/CONSUMING.md).
@@ -99,7 +99,7 @@ Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=perso
 npm test
 ```
 
-Tests cover six-post rank (saves → reach → likes), ER when Insights are missing, owner `reach_series` shape, public kit omitting the series, Chart hide rules (entire band — no header alone), date-tick helper usage, Insights chrome (no duplicate tabs, Engagement rate label, Top-performing posts sort keys, private copy), past-brand chip hide-empty, and set/clear of the Pitchkit session cookie plus the Insights gate.
+Tests cover six-post rank (saves → reach → likes), ER when Insights are missing, owner `reach_series` shape, public kit omitting the series, Chart hide rules (entire band — no header alone), date-tick helper usage, owner SegmentedControl + 960 grid (no AppShell), Insights chrome (no duplicate tabs, Engagement rate label, Top-performing posts sort keys, private copy), past-brand chip hide-empty, and set/clear of the Pitchkit session cookie plus the Insights gate.
 
 Production-shaped local Workers runtime (official OpenNext):
 

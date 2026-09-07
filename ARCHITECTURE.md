@@ -38,7 +38,7 @@ Creator → Workers (OpenNext)
             → Instagram Login + Graph   (connect, refresh, Insights poll)
             → Neon via Hyperdrive        = rows
             → R2                         = photos (public read)
-         → /insights                     (owner, cookie; Graph layout — AppShell nav, no page tabs)
+         → /insights                     (owner, cookie; Graph layout — SegmentedControl nav, 960 grid)
          → /k/[handle]                   (anyone; Postgres + R2; no Graph)
 
 Brand  → /k/[handle] → same Worker → rows + public photos
@@ -55,7 +55,7 @@ Same table as [PLAN.md](./PLAN.md#stack-locked). Short version:
 - **UI:** `@whatmatters/wmds` pattern-first + `styles.css`. App owns layout Tailwind only. No shadcn. No Storybook here (copy from WMDS Storybook).
 - **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers.
 - **Icons:** Lucide through WMDS props. **Motion:** `motion` peer when WMDS needs it.
-- **Install WMDS:** pin `github:thewhatmatters/wmds#266f19cd173216b31ac691ecd31063734f0265e0` (CI cannot use `../wmds`). Local `../wmds` still works; `prepare` builds `dist/`. `@visx/visx` is the Chart peer. Owner chrome consumes `AppShell` + `AppShell.Mobile`; `PageHeader` stays an explicit child.
+- **Install WMDS:** pin `github:thewhatmatters/wmds#a80b2b99a7d2ca91bdc46c7fa6b860bf5e0ce42a` (CI cannot use `../wmds`). Local `../wmds` still works; `prepare` builds `dist/`. `@visx/visx` is the Chart peer. Owner views: `grid-page` + `band` with `--grid-max: 960px` and WMDS `SegmentedControl` (Insights / PitchKit). No AppShell / NavRail.
 - **Charts:** WMDS `Chart` (visx peer). One 30-day account-reach area on `/insights` from `owner.reach_series` only. Empty/omit or no plot ink → hide the entire Chart band (not a header + empty 240px ParentSize host). `Chart.Cartesian` data is `{ date: Date, reach: number }[]`; `animate="none"` + `Chart.Cartesian.Area`. Date-tick budget uses WMDS `chartMaxTicksForWidth` (~3 on a phone). Never zero-fill. Public kit never receives the series. No Nivo in Pitchkit `package.json`.
 - **Seed:** In-repo rows match [DATA.md](./DATA.md). `TOKEN_KEY` not required (seed tokens are null). Disconnect columns exist; no live delete yet. Public `/k/demo` has no Insights (`reach_series` omitted). Owner Insights seed includes example `reach_series` (not a SQL table, not live Graph).
 

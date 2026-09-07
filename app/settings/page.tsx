@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AccountSettings } from "@/components/account-settings";
-import { OwnerShell } from "@/components/owner-shell";
+import { AppFrame, OWNER_GRID_MAX } from "@/components/app-frame";
 import { SupportFooter } from "@/components/support-footer";
 import { insightsGate, parseSessionValue, SESSION_COOKIE } from "@/lib/session";
 import { loadOwnerKit } from "@/lib/store";
@@ -19,9 +19,13 @@ export default async function SettingsPage() {
   }
 
   return (
-    <OwnerShell handle={kit.user.handle} title="Settings">
+    <AppFrame gridMax={OWNER_GRID_MAX}>
       <AccountSettings />
-      <SupportFooter />
-    </OwnerShell>
+      <SupportFooter>
+        <p>
+          <a href="/insights">Insights</a>
+        </p>
+      </SupportFooter>
+    </AppFrame>
   );
 }

@@ -1,7 +1,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { AppFrame, OWNER_GRID_MAX } from "@/components/app-frame";
 import { OwnerChrome } from "@/components/owner-chrome";
-import { OwnerShell } from "@/components/owner-shell";
+import { OwnerNav } from "@/components/owner-nav";
 import { SupportFooter } from "@/components/support-footer";
 import { Badge } from "@/components/wmds";
 import { INSIGHTS_PRIVATE } from "@/lib/copy";
@@ -27,15 +28,11 @@ export default async function InsightsPage({ searchParams }: InsightsProps) {
   }
 
   return (
-    <OwnerShell
-      handle={kit.user.handle}
-      title="Insights"
-      end={
-        <Badge emphasis="muted" size="sm">
-          {INSIGHTS_PRIVATE}
-        </Badge>
-      }
-    >
+    <AppFrame gridMax={OWNER_GRID_MAX}>
+      <OwnerNav handle={kit.user.handle} />
+      <Badge emphasis="muted" size="sm">
+        {INSIGHTS_PRIVATE}
+      </Badge>
       <OwnerChrome
         user={kit.user}
         posts={kit.posts}
@@ -46,7 +43,11 @@ export default async function InsightsPage({ searchParams }: InsightsProps) {
         hasInsights={kit.hasInsights}
         gridReady={gridReady}
       />
-      <SupportFooter />
-    </OwnerShell>
+      <SupportFooter>
+        <p>
+          <a href="/settings">Account</a>
+        </p>
+      </SupportFooter>
+    </AppFrame>
   );
 }

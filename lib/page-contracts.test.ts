@@ -34,16 +34,37 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(page, /KitInventory/);
   });
 
-  it("owner chrome consumes AppShell with an explicit PageHeader", () => {
-    const shell = read("components/owner-shell.tsx");
+  it("owner views use SegmentedControl on a 960 grid, not AppShell", () => {
+    const nav = read("components/owner-nav.tsx");
+    const frame = read("components/app-frame.tsx");
     const barrel = read("components/wmds.ts");
-    assert.match(barrel, /AppShell/);
-    assert.match(shell, /<AppShell[\s\S]*items=/);
-    assert.match(shell, /<AppShell\.Body>/);
-    assert.match(shell, /<AppShell\.Mobile/);
-    assert.match(shell, /<PageHeader/);
-    assert.doesNotMatch(shell, /NavRail/);
-    assert.doesNotMatch(shell, /secondaryNav/);
+    const insights = read("app/insights/page.tsx");
+    const kit = read("app/k/[handle]/page.tsx");
+    const settings = read("app/settings/page.tsx");
+
+    assert.doesNotMatch(barrel, /AppShell|NavRail|PageHeader/);
+    assert.match(barrel, /SegmentedControl/);
+    assert.match(nav, /SegmentedControl/);
+    assert.match(nav, />Insights</);
+    assert.match(nav, />PitchKit</);
+    assert.match(nav, /router\.push\("\/insights"\)/);
+    assert.match(nav, /kitPath/);
+    assert.match(frame, /OWNER_GRID_MAX = "960px"/);
+    assert.match(frame, /--grid-max/);
+    assert.match(frame, /grid-page/);
+    assert.match(frame, /band/);
+    assert.match(insights, /OWNER_GRID_MAX/);
+    assert.match(insights, /OwnerNav/);
+    assert.match(insights, /insightsGate/);
+    assert.match(kit, /OwnerNav/);
+    assert.match(kit, /OWNER_GRID_MAX/);
+    assert.match(kit, /sessionOwnsHandle/);
+    assert.match(settings, /OWNER_GRID_MAX/);
+    assert.doesNotMatch(settings, /OwnerNav/);
+    assert.doesNotMatch(insights, /OwnerShell|AppShell|AppShell\.Mobile|NavRail/);
+    assert.doesNotMatch(kit, /OwnerShell|AppShell|AppShell\.Mobile|NavRail/);
+    assert.doesNotMatch(settings, /OwnerShell|AppShell|AppShell\.Mobile|NavRail/);
+    assert.doesNotMatch(nav, /AppShell|NavRail|PageHeader/);
   });
 
   it("Insights chrome has no duplicate tabs and spells Engagement rate", () => {
