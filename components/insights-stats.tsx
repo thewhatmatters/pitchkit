@@ -11,12 +11,11 @@ type InsightsStatsProps = {
   loading?: boolean;
 };
 
-/** Four-up on the 12-col owner band: 6+6 mobile (2×2), 3×4 from md. */
-const KPI_TILE_SPAN = "col-span-6 md:col-span-3";
-
 /**
  * Headline hire number is Typical reach, then a four-up Stat row.
- * Tiles are band items on the page spine — not a nested Stat.Group grid.
+ * Band items are plain `div` wrappers so col-span lives on the grid item —
+ * Stat fills the cell. Full class strings in JSX (Tailwind v4 must see them).
+ * Not a nested Group grid — no four-column gap layout.
  * Do not lead with Engagement rate — it lives in the four-up only.
  * No period-over-period `trend` — seed/payload has no honest deltas.
  */
@@ -33,45 +32,55 @@ export function InsightsStats({
   return (
     <>
       {showHeadline ? (
-        <Stat
-          size="md"
-          className="col-span-full"
-          label="Typical reach"
-          value={typicalReach != null ? formatCount(typicalReach) : "—"}
-          loading={loading}
-        />
+        <div className="col-span-full">
+          <Stat
+            size="md"
+            className="w-full min-w-0"
+            label="Typical reach"
+            value={typicalReach != null ? formatCount(typicalReach) : "—"}
+            loading={loading}
+          />
+        </div>
       ) : null}
-      <Stat
-        size="sm"
-        className={KPI_TILE_SPAN}
-        label="Followers"
-        value={formatCount(followers)}
-        loading={loading}
-      />
-      <Stat
-        size="sm"
-        className={KPI_TILE_SPAN}
-        label="Engagement rate"
-        value={formatEngagementRate(engagementRate)}
-        loading={loading}
-      />
-      {showInsightsMetrics ? (
+      <div className="col-span-6 md:col-span-3">
         <Stat
           size="sm"
-          className={KPI_TILE_SPAN}
-          label="Typical reach"
-          value={typicalReach != null ? formatCount(typicalReach) : "—"}
+          className="w-full min-w-0"
+          label="Followers"
+          value={formatCount(followers)}
           loading={loading}
         />
-      ) : null}
-      {showInsightsMetrics ? (
+      </div>
+      <div className="col-span-6 md:col-span-3">
         <Stat
           size="sm"
-          className={KPI_TILE_SPAN}
-          label="Saves"
-          value={typicalSaves != null ? formatCount(typicalSaves) : "—"}
+          className="w-full min-w-0"
+          label="Engagement rate"
+          value={formatEngagementRate(engagementRate)}
           loading={loading}
         />
+      </div>
+      {showInsightsMetrics ? (
+        <div className="col-span-6 md:col-span-3">
+          <Stat
+            size="sm"
+            className="w-full min-w-0"
+            label="Typical reach"
+            value={typicalReach != null ? formatCount(typicalReach) : "—"}
+            loading={loading}
+          />
+        </div>
+      ) : null}
+      {showInsightsMetrics ? (
+        <div className="col-span-6 md:col-span-3">
+          <Stat
+            size="sm"
+            className="w-full min-w-0"
+            label="Saves"
+            value={typicalSaves != null ? formatCount(typicalSaves) : "—"}
+            loading={loading}
+          />
+        </div>
       ) : null}
     </>
   );
