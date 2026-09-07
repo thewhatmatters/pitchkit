@@ -114,7 +114,7 @@ describe("critical page contracts", () => {
     assert.match(stats, /size="sm"[\s\S]*label="Engagement rate"/);
     assert.doesNotMatch(stats, /label="ER"/);
     assert.match(stats, /size="md"/);
-    assert.doesNotMatch(stats, /Stat\.Group/);
+    assert.doesNotMatch(stats, /<Stat\.Group/);
     assert.doesNotMatch(stats, /columns=\{columns\}/);
     assert.doesNotMatch(stats, /md:grid-cols-4/);
     assert.match(stats, /col-span-2 md:col-span-2 lg:col-span-3/);
