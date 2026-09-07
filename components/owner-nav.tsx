@@ -28,7 +28,7 @@ export function OwnerNav({ handle }: OwnerNavProps) {
         }
       }}
       layout="stretch"
-      className="w-full min-w-0"
+      className="col-span-full w-full min-w-0"
     >
       <SegmentedControl.Item value="insights">Insights</SegmentedControl.Item>
       <SegmentedControl.Item value="kit">Pitch</SegmentedControl.Item>

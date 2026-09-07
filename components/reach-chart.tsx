@@ -35,7 +35,7 @@ type ReachChartProps = {
 export function ReachChart({ series, loading = false }: ReachChartProps) {
   if (loading) {
     return (
-      <Card padding="none" bodyTerminal data-chart-slot="loading">
+      <Card padding="none" bodyTerminal className="col-span-full" data-chart-slot="loading">
         <Card.Header start={<h2 className={cardTitleClasses}>Reach over time</h2>} />
         <Card.Body>
           <Chart.Loading label="Loading 30-day account reach" />
@@ -87,7 +87,7 @@ function ReachChartBand({ series }: { series?: ReachPoint[] | null }) {
   );
 
   return (
-    <div ref={hostRef} className="w-full min-w-0">
+    <div ref={hostRef} className="col-span-full w-full min-w-0">
       {canPaint ? (
         <Card
           padding="none"

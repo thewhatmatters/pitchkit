@@ -38,7 +38,7 @@ export function OwnerChrome({
   const rankedPosts = useMemo(() => sortPosts(posts, sortKey), [posts, sortKey]);
 
   return (
-    <div className="flex flex-col gap-6">
+    <>
       <InsightsStats
         followers={user.followers}
         engagementRate={engagementRate}
@@ -47,7 +47,7 @@ export function OwnerChrome({
         loading={!gridReady}
       />
       <ReachChart series={reachSeries} loading={!gridReady} />
-      <Card padding="none">
+      <Card padding="none" className="col-span-full">
         <Card.Header>
           <div className="flex w-full min-w-0 flex-col gap-3">
             <h2 className={cardTitleClasses}>Top-performing posts</h2>
@@ -85,7 +85,7 @@ export function OwnerChrome({
       <AudienceList title="Age mix" rows={SEED_AUDIENCE.age} />
       <AudienceList title="Gender mix" rows={SEED_AUDIENCE.gender} />
 
-      <div className="flex flex-wrap gap-2">
+      <div className="col-span-full flex flex-wrap gap-2">
         <form action="/auth/instagram" method="post">
           <Button type="submit" role="secondary">
             Reconnect Instagram
@@ -101,7 +101,7 @@ export function OwnerChrome({
         </Button>
       </div>
 
-      {notice ? <p>{notice}</p> : null}
-    </div>
+      {notice ? <p className="col-span-full">{notice}</p> : null}
+    </>
   );
 }

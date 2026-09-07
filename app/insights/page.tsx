@@ -30,7 +30,7 @@ export default async function InsightsPage({ searchParams }: InsightsProps) {
   return (
     <AppFrame gridMax={OWNER_GRID_MAX}>
       <OwnerNav handle={kit.user.handle} />
-      <div className="w-fit">
+      <div className="col-span-full w-fit">
         <Badge emphasis="muted" size="sm">
           {INSIGHTS_PRIVATE}
         </Badge>

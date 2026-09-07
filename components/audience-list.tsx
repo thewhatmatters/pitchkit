@@ -16,7 +16,7 @@ export function AudienceList({ title, caption, rows }: AudienceListProps) {
   }
 
   return (
-    <Card variant="outlined" shape="rounded" padding="none">
+    <Card variant="outlined" shape="rounded" padding="none" className="col-span-full">
       <Card.Header>
         <h2 className={cardTitleClasses}>{title}</h2>
       </Card.Header>

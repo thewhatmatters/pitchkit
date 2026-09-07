@@ -13,7 +13,7 @@ export function PageCard({
   footer?: ReactNode;
 }) {
   return (
-    <Card variant="outlined" shape="rounded" padding="none">
+    <Card variant="outlined" shape="rounded" padding="none" className="col-span-full">
       <Card.Header>
         <h1 className={cardTitleClasses}>{title}</h1>
       </Card.Header>

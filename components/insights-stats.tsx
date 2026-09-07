@@ -11,8 +11,12 @@ type InsightsStatsProps = {
   loading?: boolean;
 };
 
+/** Four-up on the WMDS band: 2 of 4 (mobile), 2 of 8 (md), 3 of 12 (lg). */
+const KPI_TILE_SPAN = "col-span-2 md:col-span-2 lg:col-span-3";
+
 /**
  * Headline hire number is Typical reach, then a four-up Stat row.
+ * Tiles are band items on the page spine — not a nested Stat.Group grid.
  * Do not lead with Engagement rate — it lives in the four-up only.
  * No period-over-period `trend` — seed/payload has no honest deltas.
  */
@@ -25,47 +29,50 @@ export function InsightsStats({
 }: InsightsStatsProps) {
   const showInsightsMetrics = typicalReach != null || typicalSaves != null || loading;
   const showHeadline = typicalReach != null || loading;
-  const columns = showInsightsMetrics ? 4 : 2;
 
   return (
-    <div className="flex flex-col gap-4">
+    <>
       {showHeadline ? (
         <Stat
           size="md"
+          className="col-span-full"
           label="Typical reach"
           value={typicalReach != null ? formatCount(typicalReach) : "—"}
           loading={loading}
         />
       ) : null}
-      <Stat.Group
-        aria-label="Insights metrics"
-        columns={columns}
-        className={showInsightsMetrics ? "md:grid-cols-4" : undefined}
-      >
-        <Stat size="sm" label="Followers" value={formatCount(followers)} loading={loading} />
+      <Stat
+        size="sm"
+        className={KPI_TILE_SPAN}
+        label="Followers"
+        value={formatCount(followers)}
+        loading={loading}
+      />
+      <Stat
+        size="sm"
+        className={KPI_TILE_SPAN}
+        label="Engagement rate"
+        value={formatEngagementRate(engagementRate)}
+        loading={loading}
+      />
+      {showInsightsMetrics ? (
         <Stat
           size="sm"
-          label="Engagement rate"
-          value={formatEngagementRate(engagementRate)}
+          className={KPI_TILE_SPAN}
+          label="Typical reach"
+          value={typicalReach != null ? formatCount(typicalReach) : "—"}
           loading={loading}
         />
-        {showInsightsMetrics ? (
-          <Stat
-            size="sm"
-            label="Typical reach"
-            value={typicalReach != null ? formatCount(typicalReach) : "—"}
-            loading={loading}
-          />
-        ) : null}
-        {showInsightsMetrics ? (
-          <Stat
-            size="sm"
-            label="Saves"
-            value={typicalSaves != null ? formatCount(typicalSaves) : "—"}
-            loading={loading}
-          />
-        ) : null}
-      </Stat.Group>
-    </div>
+      ) : null}
+      {showInsightsMetrics ? (
+        <Stat
+          size="sm"
+          className={KPI_TILE_SPAN}
+          label="Saves"
+          value={typicalSaves != null ? formatCount(typicalSaves) : "—"}
+          loading={loading}
+        />
+      ) : null}
+    </>
   );
 }

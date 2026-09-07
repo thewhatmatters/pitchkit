@@ -8,7 +8,7 @@ export function AccountSettings() {
   const [notice, setNotice] = useState<string | null>(null);
 
   return (
-    <Card variant="outlined" shape="rounded" padding="none">
+    <Card variant="outlined" shape="rounded" padding="none" className="col-span-full">
       <Card.Header>
         <h2 className={cardTitleClasses}>Account</h2>
       </Card.Header>

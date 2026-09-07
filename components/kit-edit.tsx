@@ -35,7 +35,7 @@ export function KitEdit({ user, posts, engagementRate, hasInsights, canEdit }: K
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="col-span-full flex flex-col gap-4">
       {canEdit ? (
         <Switch
           layout="settings"
