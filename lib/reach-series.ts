@@ -42,8 +42,8 @@ export function shouldShowReachChart(series: ReachPoint[] | null | undefined): b
 }
 
 /**
- * Whole Insights Chart band (title + slot). Hide when series is empty/omit
- * or the plot host has no width — never a header-only empty 240px box.
+ * Plot ink inside the occupant well. Empty/omit series still hides the
+ * whole band. Host width 0 keeps the Card + well chrome and skips Cartesian.
  */
 export function shouldRenderReachChartBand(
   series: ReachPoint[] | null | undefined,

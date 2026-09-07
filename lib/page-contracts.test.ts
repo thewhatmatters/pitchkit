@@ -146,6 +146,9 @@ describe("critical page contracts", () => {
     assert.match(posts, /layout === "rows"/);
     assert.match(read("components/wmds.ts"), /SegmentedControl/);
     assert.match(read("components/wmds.ts"), /chartMaxTicksForWidth/);
+    assert.match(read("components/wmds.ts"), /cardLayoutBodyOccupantPadYClasses/);
+    assert.match(read("components/wmds.ts"), /cardLayoutBodyOccupantWellClasses/);
+    assert.match(read("components/wmds.ts"), /cardLayoutBodyOccupantInsetXClasses/);
     assert.match(chart, /chartMaxTicksForWidth/);
     assert.match(chart, /reachChartDateTickCount/);
     assert.match(chart, /shouldRenderReachChartBand/);
@@ -153,6 +156,19 @@ describe("critical page contracts", () => {
     assert.match(chart, /<Chart\.Cartesian[\s\S]*animate="none"/);
     assert.match(chart, /<Card[\s\S]*<Chart\.Cartesian/);
     assert.match(chart, /<Chart\.Cartesian\.Tooltip \/>/);
+    assert.match(chart, /shape="rounded"/);
+    assert.match(chart, /bodyTerminal/);
+    assert.match(chart, /padding="none"/);
+    assert.match(
+      chart,
+      /flex flex-col gap-3 \$\{cardLayoutBodyOccupantPadYClasses\} \$\{cardLayoutBodyOccupantWellClasses\} \$\{cardLayoutBodyOccupantInsetXClasses\}/,
+    );
+    assert.match(chart, /<Card\.Body>[\s\S]*reachChartOccupantWellClasses/);
+    assert.match(chart, /<ReachChartCard slot="loading">[\s\S]*Chart\.Loading/);
+    assert.match(chart, /<ReachChartCard slot="reach"[\s\S]*hostRef/);
+    assert.doesNotMatch(chart, /max-w-lg/);
+    assert.doesNotMatch(chart, /Chart\.Legend/);
+    assert.doesNotMatch(chart, /<Select/);
   });
 
   it("settings is account only", () => {
