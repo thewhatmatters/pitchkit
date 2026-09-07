@@ -52,7 +52,10 @@ describe("critical page contracts", () => {
     assert.match(nav, /router\.push\("\/insights"\)/);
     assert.match(nav, /kitPath/);
     assert.match(frame, /OWNER_GRID_MAX = "960px"/);
+    assert.match(frame, /OWNER_GRID_COLUMN_GAP = "8px"/);
     assert.match(frame, /--grid-max/);
+    assert.match(frame, /--grid-column-gap/);
+    assert.match(frame, /--grid-cols/);
     assert.match(frame, /grid-page/);
     assert.match(frame, /band/);
     assert.match(frame, /<OwnerGridOverlay \/>/);
@@ -117,7 +120,9 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(stats, /<Stat\.Group/);
     assert.doesNotMatch(stats, /columns=\{columns\}/);
     assert.doesNotMatch(stats, /md:grid-cols-4/);
-    assert.match(stats, /col-span-2 md:col-span-2 lg:col-span-3/);
+    assert.match(stats, /col-span-6 md:col-span-3/);
+    assert.doesNotMatch(stats, /md:col-span-2/);
+    assert.match(read("package.json"), /wmds#975b649499da7b54cbc3acbac70dde5e2d9bb915/);
     assert.doesNotMatch(stats, /trend=/);
     assert.match(chrome, /className="col-span-full"/);
     assert.match(read("components/owner-nav.tsx"), /col-span-full/);

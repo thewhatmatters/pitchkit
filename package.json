@@ -19,7 +19,7 @@
     "@fontsource-variable/geist-mono": "^5.3.0",
     "@opennextjs/cloudflare": "^1.20.6",
     "@visx/visx": "^4.0.0",
-    "@whatmatters/wmds": "github:thewhatmatters/wmds#a80b2b99a7d2ca91bdc46c7fa6b860bf5e0ce42a",
+    "@whatmatters/wmds": "github:thewhatmatters/wmds#975b649499da7b54cbc3acbac70dde5e2d9bb915",
     "lucide-react": "^1.39.0",
     "motion": "^13.2.0",
     "next": "^16.3.4",

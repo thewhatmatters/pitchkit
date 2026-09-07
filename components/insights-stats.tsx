@@ -11,8 +11,8 @@ type InsightsStatsProps = {
   loading?: boolean;
 };
 
-/** Four-up on the WMDS band: 2 of 4 (mobile), 2 of 8 (md), 3 of 12 (lg). */
-const KPI_TILE_SPAN = "col-span-2 md:col-span-2 lg:col-span-3";
+/** Four-up on the 12-col owner band: 6+6 mobile (2×2), 3×4 from md. */
+const KPI_TILE_SPAN = "col-span-6 md:col-span-3";
 
 /**
  * Headline hire number is Typical reach, then a four-up Stat row.

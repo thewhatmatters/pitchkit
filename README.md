@@ -47,7 +47,7 @@ Owner Insights kit (`loadOwnerKit`) includes seed/example `reach_series: { day, 
 
 Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays public (no cookie). Owner Edit on `/k/demo` only when that session owns `demo`.
 
-`/insights` is the real owner layout (WMDS `SegmentedControl` Insights / Pitch, `grid-page` + `band` at 960px, WMDS `GridOverlay` on by default — press **g** to toggle, headline Typical reach + four-up Stat tiles on the page spine — `lg:col-span-3` each, not nested `Stat.Group` — one Chart when `owner.reach_series` is present **and** the area can paint, Top-performing posts). Hide the entire Chart band if the series is omitted/`[]` or the plot has no ink — never a header-only empty slot. Public seed Insights stay null — Engagement rate still shows; reach, saves, and the Chart hide. Owner demo seed has post Insights plus the example series. Audience mixes hide until Graph data exists. Contact and past brands are typed holes on `/k/[handle]` only. No new Postgres columns.
+`/insights` is the real owner layout (WMDS `SegmentedControl` Insights / Pitch, `grid-page` + `band` at 960px with `--grid-column-gap: 8px`, WMDS `GridOverlay` on by default — press **g** to toggle, headline Typical reach + four-up Stat tiles on the page spine — `col-span-6` mobile / `md:col-span-3`, not nested `Stat.Group` — one Chart when `owner.reach_series` is present **and** the area can paint, Top-performing posts). Hide the entire Chart band if the series is omitted/`[]` or the plot has no ink — never a header-only empty slot. Public seed Insights stay null — Engagement rate still shows; reach, saves, and the Chart hide. Owner demo seed has post Insights plus the example series. Audience mixes hide until Graph data exists. Contact and past brands are typed holes on `/k/[handle]` only. No new Postgres columns.
 
 ---
 
@@ -74,7 +74,7 @@ Disconnect deletes the creator, their posts, and their files. Anonymous weekly t
 Install WMDS pinned to a main SHA:
 
 ```bash
-npm install github:thewhatmatters/wmds#a80b2b99a7d2ca91bdc46c7fa6b860bf5e0ce42a
+npm install github:thewhatmatters/wmds#975b649499da7b54cbc3acbac70dde5e2d9bb915
 ```
 
 `prepare` builds `dist/`. Local `npm install ../wmds` still works after `npm run build` there. `postinstall` / `predev` / `prebuild` copy Geist font files into the WMDS `dist/files` path that `styles.css` expects (otherwise Next 500s on the font URLs). Chart needs the `@visx/visx` peer. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md), WMDS [`CONSUMING.md`](https://github.com/thewhatmatters/wmds/blob/main/CONSUMING.md).
@@ -99,7 +99,7 @@ Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=perso
 npm test
 ```
 
-Tests cover six-post rank (saves → reach → likes), ER when Insights are missing, owner `reach_series` shape, public kit omitting the series, Chart hide rules (entire band — no header alone), date-tick helper usage, owner SegmentedControl Insights / Pitch + 960 grid (no AppShell), AppFrame mounting WMDS `GridOverlay` before `band` with band children as grid items (no `col-span-full flex` wrap), Insights chrome (no duplicate tabs, Engagement rate label, four-up `lg:col-span-3` tiles not `Stat.Group`, Top-performing posts sort keys, private copy, Card + `Chart.Cartesian.Tooltip`), past-brand chip hide-empty, and set/clear of the Pitchkit session cookie plus the Insights gate.
+Tests cover six-post rank (saves → reach → likes), ER when Insights are missing, owner `reach_series` shape, public kit omitting the series, Chart hide rules (entire band — no header alone), date-tick helper usage, owner SegmentedControl Insights / Pitch + 960 grid (no AppShell), AppFrame mounting WMDS `GridOverlay` before `band` with band children as grid items (no `col-span-full flex` wrap; owner `--grid-column-gap: 8px`), Insights chrome (no duplicate tabs, Engagement rate label, four-up `col-span-6` / `md:col-span-3` tiles not `Stat.Group`, Top-performing posts sort keys, private copy, Card + `Chart.Cartesian.Tooltip`), past-brand chip hide-empty, and set/clear of the Pitchkit session cookie plus the Insights gate.
 
 Production-shaped local Workers runtime (official OpenNext):
 
