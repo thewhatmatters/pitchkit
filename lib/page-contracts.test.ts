@@ -66,6 +66,7 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(stats, /label="ER"/);
     assert.match(stats, /size="md"/);
     assert.match(stats, /columns=\{columns\}/);
+    assert.match(stats, /md:grid-cols-4/);
     assert.doesNotMatch(stats, /trend=/);
     assert.match(chrome, /Top-performing posts/);
     assert.doesNotMatch(chrome, /Six posts/);

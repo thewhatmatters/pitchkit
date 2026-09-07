@@ -33,7 +33,11 @@ export function InsightsStats({
         value={formatEngagementRate(engagementRate)}
         loading={loading}
       />
-      <Stat.Group aria-label="Insights metrics" columns={columns}>
+      <Stat.Group
+        aria-label="Insights metrics"
+        columns={columns}
+        className={showInsightsMetrics ? "md:grid-cols-4" : undefined}
+      >
         <Stat size="sm" label="Followers" value={formatCount(followers)} loading={loading} />
         <Stat
           size="sm"
