@@ -44,6 +44,7 @@ describe("critical page contracts", () => {
 
     assert.doesNotMatch(barrel, /AppShell|NavRail|PageHeader/);
     assert.match(barrel, /SegmentedControl/);
+    assert.match(barrel, /GridOverlay/);
     assert.match(nav, /SegmentedControl/);
     assert.match(nav, />Insights</);
     assert.match(nav, />PitchKit</);
@@ -53,6 +54,9 @@ describe("critical page contracts", () => {
     assert.match(frame, /--grid-max/);
     assert.match(frame, /grid-page/);
     assert.match(frame, /band/);
+    assert.match(frame, /<OwnerGridOverlay \/>/);
+    assert.match(frame, /grid-page[\s\S]*<OwnerGridOverlay \/>[\s\S]*className="band"/);
+    assert.doesNotMatch(frame, /["']use client["']/);
     assert.match(insights, /OWNER_GRID_MAX/);
     assert.match(insights, /OwnerNav/);
     assert.match(insights, /insightsGate/);
@@ -65,6 +69,21 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(kit, /OwnerShell|AppShell|AppShell\.Mobile|NavRail/);
     assert.doesNotMatch(settings, /OwnerShell|AppShell|AppShell\.Mobile|NavRail/);
     assert.doesNotMatch(nav, /AppShell|NavRail|PageHeader/);
+  });
+
+  it("AppFrame mounts WMDS GridOverlay before band", () => {
+    const frame = read("components/app-frame.tsx");
+    const overlay = read("components/owner-grid-overlay.tsx");
+    const barrel = read("components/wmds.ts");
+    const kit = read("app/k/[handle]/page.tsx");
+
+    assert.match(barrel, /GridOverlay/);
+    assert.match(overlay, /["']use client["']/);
+    assert.match(overlay, /<GridOverlay visibleByDefault/);
+    assert.match(frame, /<OwnerGridOverlay \/>/);
+    assert.match(frame, /grid-page[\s\S]*<OwnerGridOverlay \/>[\s\S]*className="band"/);
+    assert.doesNotMatch(frame, /["']use client["']/);
+    assert.doesNotMatch(kit, /OwnerGridOverlay|GridOverlay/);
   });
 
   it("Insights chrome has no duplicate tabs and spells Engagement rate", () => {

@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import { OwnerGridOverlay } from "@/components/owner-grid-overlay";
 
 /** Owner views only — WMDS `--grid-max` override from CONSUMING. */
 export const OWNER_GRID_MAX = "960px";
@@ -17,6 +18,7 @@ export function AppFrame({ children, gridMax }: AppFrameProps) {
 
   return (
     <div className="grid-page min-h-dvh py-6" style={style}>
+      <OwnerGridOverlay />
       <div className="band">
         <div className="col-span-full flex flex-col gap-6">{children}</div>
       </div>

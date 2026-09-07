@@ -16,7 +16,7 @@ Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCH
 | UI | **WMDS** (`@whatmatters/wmds`) — pattern-first. Import components and `@whatmatters/wmds/styles.css`. Layout (`grid`, `gap`, `max-w`) stays in the app. No shadcn. No ad-hoc `rounded-full bg-*` buttons. |
 | Icons | Lucide via WMDS props |
 | Motion | `motion` peer when a WMDS component needs it |
-| Install | Pin GitHub `github:thewhatmatters/wmds#<sha>` (CI cannot use `../wmds`). Local path still works. `prepare` builds `dist/`. Current pin: `a80b2b99a7d2ca91bdc46c7fa6b860bf5e0ce42a`. How to consume: WMDS `CONSUMING.md`. After login: WMDS `SegmentedControl` (Insights / PitchKit) on `grid-page` + `band` with `--grid-max: 960px`. No AppShell / NavRail / owner rail. |
+| Install | Pin GitHub `github:thewhatmatters/wmds#<sha>` (CI cannot use `../wmds`). Local path still works. `prepare` builds `dist/`. Current pin: `a80b2b99a7d2ca91bdc46c7fa6b860bf5e0ce42a`. How to consume: WMDS `CONSUMING.md`. After login: WMDS `SegmentedControl` (Insights / PitchKit) on `grid-page` + `band` with `--grid-max: 960px`. `AppFrame` mounts WMDS `GridOverlay` (`visibleByDefault`; press **g**) as the first child of `grid-page`. No AppShell / NavRail / owner rail. Do not invent a Pitchkit Grid atom. |
 | Compute | Cloudflare Workers via **OpenNext** (official adapter only) |
 | DB | Neon Postgres + Hyperdrive (`HYPERDRIVE` / `HYPERDRIVE_PREVIEW`) |
 | Files | R2 `pitchkit-media` |
@@ -156,7 +156,7 @@ Landing (disclosure + Professional note + support)
 | `/settings` | owner cookie | Account only — reconnect / sign out / disconnect. 960 grid, no SegmentedControl. Quiet Insights link in the footer. No past-brands or contact slots. |
 | `/privacy`, `/delete` | public | Meta review |
 
-Responsive: Stat.Group stays WMDS 2-up on a phone / 4-up on desktop. Insights posts are compact single-column rows. Public kit stays a 2×3 card grid. Owner views wrap `grid-page` + `band` with `--grid-max: 960px` and a top SegmentedControl (Insights / PitchKit). Public kit spine stays `grid-page` + `band` without that nav.
+Responsive: Stat.Group stays WMDS 2-up on a phone / 4-up on desktop. Insights posts are compact single-column rows. Public kit stays a 2×3 card grid. Owner views wrap `grid-page` + `band` with `--grid-max: 960px` and a top SegmentedControl (Insights / PitchKit). `AppFrame` paints WMDS `GridOverlay` inside `grid-page`. A public kit path that skips `AppFrame` has no overlay.
 
 Personal fail, OAuth cancel → landing with the Professional message or unchanged landing. Empty grid is OK. No blank Insights: “Pulling your grid…” until R2 catches up.
 

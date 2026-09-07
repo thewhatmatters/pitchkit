@@ -7,6 +7,7 @@ export {
   Button,
   Card,
   Chip,
+  GridOverlay,
   Input,
   SegmentedControl,
   Skeleton,
