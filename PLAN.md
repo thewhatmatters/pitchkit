@@ -52,7 +52,7 @@ Seed: `/k/demo`.
 | Creator | Continue with Instagram (Professional). Land on Insights. Share the kit URL. Reconnect, sign out, disconnect. Phone works. |
 | Brand | Open the kit. No account. |
 
-No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “contact for collab,” or geo on the **public kit**. `/insights` is the owner Graph layout (headline Engagement rate + four-up Stat row + one Chart from `owner.reach_series` + Top-performing posts). AppShell primary nav is Insights / Media kit / Settings — no duplicate tabs on the page. Mixes as ranked % lists, not a map. No new Postgres columns for identity typed holes.
+No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “contact for collab,” or geo on the **public kit**. `/insights` is the owner Graph layout (headline Typical reach + four-up Stat row + one Chart from `owner.reach_series` + Top-performing posts). AppShell primary nav is Insights / Media kit / Settings — no duplicate tabs on the page. Mixes as ranked % lists, not a map. No new Postgres columns for identity typed holes.
 
 ---
 
@@ -151,7 +151,7 @@ Landing (disclosure + Professional note + support)
 | Route | Who | What |
 |---|---|---|
 | `/` | anyone | Pitch, disclosure, Continue with Instagram, Professional note, support |
-| `/insights` | owner cookie | Graph-only Insights: headline Engagement rate (hire), then a four-desktop-column Stat row (Followers, Engagement rate, typical reach/saves when present). No invented period-over-period trends. One 30-day account-reach Chart from `owner.reach_series` when that field is non-empty **and** the area can paint. Hide the whole Chart band when omitted, `[]`, or no ink. Date ticks use WMDS `chartMaxTicksForWidth` (~3 on a phone). Never zero-fill. **Top-performing posts** with Reach / Engagement / Saves sort; compact single-column rows. Quiet “Private to you” Badge. No Insights / Media kit tabs (AppShell nav). No contact/past-brands holes. Reconnect / sign out / disconnect stay as buttons. |
+| `/insights` | owner cookie | Graph-only Insights: headline Typical reach (hire; hide if missing), then a four-desktop-column Stat row (Followers, Engagement rate, Typical reach, Saves when Insights are present). Do not lead with Engagement rate. Spell **Engagement rate** (never “ER”). No invented period-over-period trends. One 30-day account-reach Chart from `owner.reach_series` when that field is non-empty **and** the area can paint. Hide the whole Chart band when omitted, `[]`, or no ink. Date ticks use WMDS `chartMaxTicksForWidth` (~3 on a phone). Never zero-fill. **Top-performing posts** with Reach / Engagement / Saves sort; compact single-column rows. Quiet “Private to you” Badge. No Insights / Media kit tabs (AppShell nav). No contact/past-brands holes. Reconnect / sign out / disconnect stay as buttons. |
 | `/k/[handle]` | public | Kit card + support footer. Owner session on this handle can toggle Edit for contact + past brands. Share link stays view. |
 | `/settings` | owner cookie | Account only — reconnect / sign out / disconnect. No past-brands or contact slots. |
 | `/privacy`, `/delete` | public | Meta review |

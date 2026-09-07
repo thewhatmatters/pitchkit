@@ -47,7 +47,7 @@ Owner Insights kit (`loadOwnerKit`) includes seed/example `reach_series: { day, 
 
 Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays public (no cookie). Owner Edit on `/k/demo` only when that session owns `demo`.
 
-`/insights` is the real owner layout (WMDS `AppShell` chrome, headline Engagement rate + four-up Stat row, one Chart when `owner.reach_series` is present **and** the area can paint, Top-performing posts). Hide the entire Chart band if the series is omitted/`[]` or the plot has no ink — never a header-only empty slot. Public seed Insights stay null — Engagement rate still shows; reach, saves, and the Chart hide. Owner demo seed has post Insights plus the example series. Audience mixes hide until Graph data exists. Contact and past brands are typed holes on `/k/[handle]` only. No new Postgres columns.
+`/insights` is the real owner layout (WMDS `AppShell` chrome, headline Typical reach + four-up Stat row, one Chart when `owner.reach_series` is present **and** the area can paint, Top-performing posts). Hide the entire Chart band if the series is omitted/`[]` or the plot has no ink — never a header-only empty slot. Public seed Insights stay null — Engagement rate still shows; reach, saves, and the Chart hide. Owner demo seed has post Insights plus the example series. Audience mixes hide until Graph data exists. Contact and past brands are typed holes on `/k/[handle]` only. No new Postgres columns.
 
 ---
 

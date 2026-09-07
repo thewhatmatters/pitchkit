@@ -21,7 +21,7 @@ Share of followers who interact with a typical post. Brands use this first: is t
 - Graph (v25, Instagram Login): none; computed. Likes/comments are media `like_count` / `comments_count` — not insights. Followers denominator is user `followers_count` (store `followers`).
 
 **Typical reach** — Insights only; hide if missing.
-Unique accounts that usually see a post. This is what a brand is buying — not the follower total, not one viral. Median of recent posts, not a best-ever spike. If the public grid shows ~20k and the kit says 60k, the deal dies. Never paint 0.
+Unique accounts that usually see a post. This is what a brand is buying — not the follower total, not one viral. Median of recent posts, not a best-ever spike. If the public grid shows ~20k and the kit says 60k, the deal dies. Never paint 0. Insights UI headline (hire number); also in the four-up. Do not lead with Engagement rate.
 - Brand ~30s: how many unique accounts usually see a post (what they buy).
 - Hide: until Insights. Never paint 0.
 - Graph (live, Instagram Login): media insights `reach` (post kit). Typical = median of recent posts. Not account 30-day unique. Not `followers_count`. Different number from the account chart (user insights `reach` `time_series`).
@@ -51,7 +51,7 @@ Recent work a brand can match to the public grid. Likes-first would look like a 
 - Hide: never if we have media.
 - Graph (v25, Instagram Login): rank insights `saved` → insights `reach` → field `like_count`. `like_count` is public (not insights); `saved`/`reach` need Insights.
 
-Row length follows the data: 2 without Insights (ER + Followers), 4 + chart with Insights. Don’t pad to five. Lead pair is **Followers (context) + ER (hire)** as numbers, not Later’s prose sentence.
+Row length follows the data: 2 without Insights (ER + Followers), 4 + chart with Insights. Don’t pad to five. Insights chrome headline is **Typical reach** (hire; hide if missing), then four-up Followers / Engagement rate / Typical reach / Saves. Do not lead with Engagement rate. Public kit lead pair stays **Followers (context) + ER (hire)** as numbers, not Later’s prose sentence.
 
 ## Later steal vs skip (UR + Randy, 2026-09-02)
 

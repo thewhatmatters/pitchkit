@@ -62,7 +62,10 @@ describe("critical page contracts", () => {
     assert.match(copy, /Private to you/);
     assert.match(page, /INSIGHTS_PRIVATE/);
     assert.match(page, /Badge/);
-    assert.match(stats, /label="Engagement rate"/);
+    const headline = stats.match(/<Stat\s+size="md"[\s\S]*?\/>/)?.[0] ?? "";
+    assert.match(headline, /label="Typical reach"/);
+    assert.doesNotMatch(headline, /label="Engagement rate"/);
+    assert.match(stats, /size="sm"[\s\S]*label="Engagement rate"/);
     assert.doesNotMatch(stats, /label="ER"/);
     assert.match(stats, /size="md"/);
     assert.match(stats, /columns=\{columns\}/);
