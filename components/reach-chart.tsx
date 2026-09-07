@@ -128,6 +128,7 @@ function ReachChartBand({ series }: { series?: ReachPoint[] | null }) {
                 <Chart.Cartesian.AxisLeft />
                 <Chart.Cartesian.AxisBottom />
                 <Chart.Cartesian.Area />
+                <Chart.Cartesian.Tooltip />
               </Chart.Cartesian>
             </div>
           </Card.Body>

@@ -16,7 +16,7 @@ Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCH
 | UI | **WMDS** (`@whatmatters/wmds`) — pattern-first. Import components and `@whatmatters/wmds/styles.css`. Layout (`grid`, `gap`, `max-w`) stays in the app. No shadcn. No ad-hoc `rounded-full bg-*` buttons. |
 | Icons | Lucide via WMDS props |
 | Motion | `motion` peer when a WMDS component needs it |
-| Install | Pin GitHub `github:thewhatmatters/wmds#<sha>` (CI cannot use `../wmds`). Local path still works. `prepare` builds `dist/`. Current pin: `a80b2b99a7d2ca91bdc46c7fa6b860bf5e0ce42a`. How to consume: WMDS `CONSUMING.md`. After login: WMDS `SegmentedControl` (Insights / PitchKit) on `grid-page` + `band` with `--grid-max: 960px`. `AppFrame` mounts WMDS `GridOverlay` (`visibleByDefault`; press **g**) as the first child of `grid-page`. No AppShell / NavRail / owner rail. Do not invent a Pitchkit Grid atom. |
+| Install | Pin GitHub `github:thewhatmatters/wmds#<sha>` (CI cannot use `../wmds`). Local path still works. `prepare` builds `dist/`. Current pin: `a80b2b99a7d2ca91bdc46c7fa6b860bf5e0ce42a`. How to consume: WMDS `CONSUMING.md`. After login: WMDS `SegmentedControl` (Insights / Pitch) on `grid-page` + `band` with `--grid-max: 960px`. `AppFrame` mounts WMDS `GridOverlay` (`visibleByDefault`; press **g**) as the first child of `grid-page`. No AppShell / NavRail / owner rail. Do not invent a Pitchkit Grid atom. |
 | Compute | Cloudflare Workers via **OpenNext** (official adapter only) |
 | DB | Neon Postgres + Hyperdrive (`HYPERDRIVE` / `HYPERDRIVE_PREVIEW`) |
 | Files | R2 `pitchkit-media` |
@@ -39,7 +39,7 @@ Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCH
 
 **Session:** Instagram proves who they are. Pitchkit still sets an **httpOnly cookie** for Insights, disconnect, and refresh. The cookie is our login, not the Instagram token. Until live OAuth, stub Continue (GET/POST `/auth/instagram`) sets that cookie for seed handle `demo`. Sign out clears it. `/insights` without the cookie goes `/`. `/k/[handle]` does not need it.
 
-Owner home: `/insights`. SegmentedControl PitchKit is owner chrome over the same card at `/k/[handle]`. Brands only get `/k/[handle]` (no owner nav).
+Owner home: `/insights`. SegmentedControl Pitch is owner chrome over the same card at `/k/[handle]`. Brands only get `/k/[handle]` (no owner nav).
 
 Seed: `/k/demo`.
 
@@ -52,7 +52,7 @@ Seed: `/k/demo`.
 | Creator | Continue with Instagram (Professional). Land on Insights. Share the kit URL. Reconnect, sign out, disconnect. Phone works. |
 | Brand | Open the kit. No account. |
 
-No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “contact for collab,” or geo on the **public kit**. `/insights` is the owner Graph layout (headline Typical reach + four-up Stat row + one Chart from `owner.reach_series` + Top-performing posts). Primary nav is a WMDS `SegmentedControl` — Insights / PitchKit — no AppShell and no duplicate tabs on the page. Account is a quiet footer link. Mixes as ranked % lists, not a map. No new Postgres columns for identity typed holes.
+No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “contact for collab,” or geo on the **public kit**. `/insights` is the owner Graph layout (headline Typical reach + four-up Stat row + one Chart from `owner.reach_series` + Top-performing posts). Primary nav is a WMDS `SegmentedControl` — Insights / Pitch — no AppShell and no duplicate tabs on the page. Account is a quiet footer link. Mixes as ranked % lists, not a map. No new Postgres columns for identity typed holes.
 
 ---
 
@@ -62,7 +62,7 @@ No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “c
 
 **Engagement rate:** `(likes + comments) / followers` on those six, when followers > 0. If Insights are missing, still show that ER from public likes and comments; **hide reach, saves, and the chart**.
 
-**Chart series:** Insights kit payload exposes one `reach_series` (`{ day, reach }`, `day` = YYYY-MM-DD UTC). Account reach day buckets (stories + ads). Empty, omit, or a plot that cannot paint ink hides the **entire Chart band** (title + slot) — never a header-only empty 240px box. Do not invent 30 zeros. `/insights` reads `owner.reach_series` only. WMDS `Chart.Cartesian` area: `{ date, reach }` points, `animate="none"`, explicit `Area`. Owner demo seed includes ~30 labeled example points. Public `/k/demo` omits (Insights missing). Seed only; no Graph poll in this path.
+**Chart series:** Insights kit payload exposes one `reach_series` (`{ day, reach }`, `day` = YYYY-MM-DD UTC). Account reach day buckets (stories + ads). Empty, omit, or a plot that cannot paint ink hides the **entire Chart band** (title + slot) — never a header-only empty 240px box. Do not invent 30 zeros. `/insights` reads `owner.reach_series` only. WMDS `Chart.Cartesian` area: `{ date, reach }` points, `animate="none"`, explicit `Area` + `Tooltip` inside a WMDS `Card`. Owner demo seed includes ~30 labeled example points. Public `/k/demo` omits (Insights missing). Seed only; no Graph poll in this path.
 
 **Carousel:** first child frame (cover) into R2. **Video:** poster only on the kit, never the file.
 
@@ -151,12 +151,12 @@ Landing (disclosure + Professional note + support)
 | Route | Who | What |
 |---|---|---|
 | `/` | anyone | Pitch, disclosure, Continue with Instagram, Professional note, support |
-| `/insights` | owner cookie | Graph-only Insights: headline Typical reach (hire; hide if missing), then a four-desktop-column Stat row (Followers, Engagement rate, Typical reach, Saves when Insights are present). Do not lead with Engagement rate. Spell **Engagement rate** (never “ER”). No invented period-over-period trends. One 30-day account-reach Chart from `owner.reach_series` when that field is non-empty **and** the area can paint. Hide the whole Chart band when omitted, `[]`, or no ink. Date ticks use WMDS `chartMaxTicksForWidth` (~3 on a phone). Never zero-fill. **Top-performing posts** with Reach / Engagement / Saves sort; compact single-column rows. Quiet “Private to you” Badge. Top nav is SegmentedControl Insights / PitchKit (not AppShell). No contact/past-brands holes. Reconnect / sign out / disconnect stay as buttons. Account is a quiet footer link. |
+| `/insights` | owner cookie | Graph-only Insights: headline Typical reach (hire; hide if missing), then a four-desktop-column Stat row (Followers, Engagement rate, Typical reach, Saves when Insights are present). Do not lead with Engagement rate. Spell **Engagement rate** (never “ER”). No invented period-over-period trends. One 30-day account-reach Chart from `owner.reach_series` when that field is non-empty **and** the area can paint. Hide the whole Chart band when omitted, `[]`, or no ink. Date ticks use WMDS `chartMaxTicksForWidth` (~3 on a phone). Never zero-fill. **Top-performing posts** with Reach / Engagement / Saves sort; compact single-column rows. Quiet “Private to you” Badge. Top nav is SegmentedControl Insights / Pitch (not AppShell). No contact/past-brands holes. Reconnect / sign out / disconnect stay as buttons. Account is a quiet footer link. |
 | `/k/[handle]` | public | Kit card + support footer. No owner nav. Owner session on this handle gets SegmentedControl + 960 grid and can toggle Edit for contact + past brands. Share link stays view. |
 | `/settings` | owner cookie | Account only — reconnect / sign out / disconnect. 960 grid, no SegmentedControl. Quiet Insights link in the footer. No past-brands or contact slots. |
 | `/privacy`, `/delete` | public | Meta review |
 
-Responsive: Stat.Group stays WMDS 2-up on a phone / 4-up on desktop. Insights posts are compact single-column rows. Public kit stays a 2×3 card grid. Owner views wrap `grid-page` + `band` with `--grid-max: 960px` and a top SegmentedControl (Insights / PitchKit). `AppFrame` paints WMDS `GridOverlay` inside `grid-page`. A public kit path that skips `AppFrame` has no overlay.
+Responsive: Stat.Group stays WMDS 2-up on a phone / 4-up on desktop. Insights posts are compact single-column rows. Public kit stays a 2×3 card grid. Owner views wrap `grid-page` + `band` with `--grid-max: 960px` and a top SegmentedControl (Insights / Pitch). `AppFrame` paints WMDS `GridOverlay` inside `grid-page`. A public kit path that skips `AppFrame` has no overlay.
 
 Personal fail, OAuth cancel → landing with the Professional message or unchanged landing. Empty grid is OK. No blank Insights: “Pulling your grid…” until R2 catches up.
 

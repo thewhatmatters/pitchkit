@@ -47,7 +47,8 @@ describe("critical page contracts", () => {
     assert.match(barrel, /GridOverlay/);
     assert.match(nav, /SegmentedControl/);
     assert.match(nav, />Insights</);
-    assert.match(nav, />PitchKit</);
+    assert.match(nav, />Pitch</);
+    assert.doesNotMatch(nav, />PitchKit</);
     assert.match(nav, /router\.push\("\/insights"\)/);
     assert.match(nav, /kitPath/);
     assert.match(frame, /OWNER_GRID_MAX = "960px"/);
@@ -127,6 +128,8 @@ describe("critical page contracts", () => {
     assert.match(chart, /shouldRenderReachChartBand/);
     assert.match(chart, /animate="none"/);
     assert.match(chart, /<Chart\.Cartesian[\s\S]*animate="none"/);
+    assert.match(chart, /<Card[\s\S]*<Chart\.Cartesian/);
+    assert.match(chart, /<Chart\.Cartesian\.Tooltip \/>/);
   });
 
   it("settings is account only", () => {

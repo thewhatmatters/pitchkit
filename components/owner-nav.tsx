@@ -8,7 +8,7 @@ type OwnerNavProps = {
   handle: string;
 };
 
-/** Cookie-gated Insights / PitchKit switch. Not a shell. */
+/** Cookie-gated Insights / Pitch switch. Not a shell. */
 export function OwnerNav({ handle }: OwnerNavProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -31,7 +31,7 @@ export function OwnerNav({ handle }: OwnerNavProps) {
       className="w-full min-w-0"
     >
       <SegmentedControl.Item value="insights">Insights</SegmentedControl.Item>
-      <SegmentedControl.Item value="kit">PitchKit</SegmentedControl.Item>
+      <SegmentedControl.Item value="kit">Pitch</SegmentedControl.Item>
     </SegmentedControl>
   );
 }

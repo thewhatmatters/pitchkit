@@ -13,7 +13,7 @@ GitHub: [thewhatmatters/pitchkit](https://github.com/thewhatmatters/pitchkit).
 1. Creator opens pitchkit.app and reads the collection note.
 2. They tap **Continue with Instagram** (Professional accounts only — Business or Creator). That is login and sign-up. No email, no password.
 3. We pull public posts and Insights (not DMs, not who they follow).
-4. They land on **Insights** (private). SegmentedControl nav is Insights / PitchKit. **PitchKit** is the shareable `/k/[handle]` page. Account is a quiet footer link.
+4. They land on **Insights** (private). SegmentedControl nav is Insights / Pitch. **Pitch** is the shareable `/k/[handle]` page. Account is a quiet footer link.
 5. Brands open `https://pitchkit.app/k/[handle]`. They do not sign in.
 
 Handle is taken from the Instagram username at signup and **does not change**. Local/demo kit: `/k/demo`.
@@ -47,7 +47,7 @@ Owner Insights kit (`loadOwnerKit`) includes seed/example `reach_series: { day, 
 
 Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays public (no cookie). Owner Edit on `/k/demo` only when that session owns `demo`.
 
-`/insights` is the real owner layout (WMDS `SegmentedControl` Insights / PitchKit, `grid-page` + `band` at 960px, WMDS `GridOverlay` on by default — press **g** to toggle, headline Typical reach + four-up Stat row, one Chart when `owner.reach_series` is present **and** the area can paint, Top-performing posts). Hide the entire Chart band if the series is omitted/`[]` or the plot has no ink — never a header-only empty slot. Public seed Insights stay null — Engagement rate still shows; reach, saves, and the Chart hide. Owner demo seed has post Insights plus the example series. Audience mixes hide until Graph data exists. Contact and past brands are typed holes on `/k/[handle]` only. No new Postgres columns.
+`/insights` is the real owner layout (WMDS `SegmentedControl` Insights / Pitch, `grid-page` + `band` at 960px, WMDS `GridOverlay` on by default — press **g** to toggle, headline Typical reach + four-up Stat row, one Chart when `owner.reach_series` is present **and** the area can paint, Top-performing posts). Hide the entire Chart band if the series is omitted/`[]` or the plot has no ink — never a header-only empty slot. Public seed Insights stay null — Engagement rate still shows; reach, saves, and the Chart hide. Owner demo seed has post Insights plus the example series. Audience mixes hide until Graph data exists. Contact and past brands are typed holes on `/k/[handle]` only. No new Postgres columns.
 
 ---
 
@@ -99,7 +99,7 @@ Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=perso
 npm test
 ```
 
-Tests cover six-post rank (saves → reach → likes), ER when Insights are missing, owner `reach_series` shape, public kit omitting the series, Chart hide rules (entire band — no header alone), date-tick helper usage, owner SegmentedControl + 960 grid (no AppShell), AppFrame mounting WMDS `GridOverlay` before `band`, Insights chrome (no duplicate tabs, Engagement rate label, Top-performing posts sort keys, private copy), past-brand chip hide-empty, and set/clear of the Pitchkit session cookie plus the Insights gate.
+Tests cover six-post rank (saves → reach → likes), ER when Insights are missing, owner `reach_series` shape, public kit omitting the series, Chart hide rules (entire band — no header alone), date-tick helper usage, owner SegmentedControl Insights / Pitch + 960 grid (no AppShell), AppFrame mounting WMDS `GridOverlay` before `band`, Insights chrome (no duplicate tabs, Engagement rate label, Top-performing posts sort keys, private copy, Card + `Chart.Cartesian.Tooltip`), past-brand chip hide-empty, and set/clear of the Pitchkit session cookie plus the Insights gate.
 
 Production-shaped local Workers runtime (official OpenNext):
 
