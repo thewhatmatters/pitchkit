@@ -3,6 +3,8 @@
  *
  * Product code calls `hideFromKit(mediaId)` / `restoreToKit(mediaId)` only.
  * Do not persist hide state in React memory without going through this module.
+ * Owner Insights partitions `hidden_from_kit_at` (`partitionOwnerProofPosts`) so
+ * **"N shown"** excludes hidden rows; hidden rows stay for Restore.
  *
  * Routes:
  *   hideFromKit(mediaId)    → POST /api/media/hide    body { mediaId }
@@ -189,6 +191,45 @@ export function applyRestore<T extends { id: string }>(
     return [...posts];
   }
   return [...posts, hiddenPost];
+}
+
+export function isHiddenFromKit<T extends { hidden_from_kit_at?: string | null }>(row: T): boolean {
+  return row.hidden_from_kit_at != null;
+}
+
+/** Owner Insights: keep hidden rows for Restore; rank + "N shown" use `shown` only. */
+export function partitionOwnerProofPosts<T extends { hidden_from_kit_at?: string | null }>(
+  posts: readonly T[],
+): { shown: T[]; hidden: T[] } {
+  const shown: T[] = [];
+  const hidden: T[] = [];
+  for (const post of posts) {
+    if (isHiddenFromKit(post)) {
+      hidden.push(post);
+    } else {
+      shown.push(post);
+    }
+  }
+  return { shown, hidden };
+}
+
+export function stampHiddenFromKit<T extends { id: string; hidden_from_kit_at: string | null }>(
+  posts: readonly T[],
+  mediaId: string,
+  hiddenFromKitAt: string,
+): T[] {
+  return posts.map((post) =>
+    post.id === mediaId && post.hidden_from_kit_at == null
+      ? { ...post, hidden_from_kit_at: hiddenFromKitAt }
+      : post,
+  );
+}
+
+export function clearHiddenFromKit<T extends { id: string; hidden_from_kit_at: string | null }>(
+  posts: readonly T[],
+  mediaId: string,
+): T[] {
+  return posts.map((post) => (post.id === mediaId ? { ...post, hidden_from_kit_at: null } : post));
 }
 
 function parseSuccess(payload: unknown, mediaId: string): MediaVisibilitySuccess | null {

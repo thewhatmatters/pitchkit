@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { EyeOff, Repeat2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { EyeOff, Repeat2, Undo2 } from "lucide-react";
 import {
   AlertDialog,
   Badge,
@@ -13,7 +13,13 @@ import {
   cardTitleClasses,
   toast,
 } from "@/components/wmds";
-import { applyHide, applyRestore, hideFromKit, restoreToKit } from "@/lib/kit-visibility";
+import {
+  clearHiddenFromKit,
+  hideFromKit,
+  partitionOwnerProofPosts,
+  restoreToKit,
+  stampHiddenFromKit,
+} from "@/lib/kit-visibility";
 import { DEFAULT_POST_SORT, isPostSortKey, sortPosts, type PostSortKey } from "@/lib/post-sort";
 import { publicObjectUrl } from "@/lib/r2";
 import type { Media } from "@/lib/schema";
@@ -44,19 +50,28 @@ type ProofPostsProps = {
 };
 
 export function ProofPosts({ posts, hasInsights, loading = false }: ProofPostsProps) {
-  const [visiblePosts, setVisiblePosts] = useState(posts);
+  const [ownerPosts, setOwnerPosts] = useState(posts);
   const [proofMetric, setProofMetric] = useState<PostSortKey>(DEFAULT_POST_SORT);
   const [postNotice, setPostNotice] = useState<string | null>(null);
   const [pendingHidePostId, setPendingHidePostId] = useState<string | null>(null);
 
-  const rankedPosts = useMemo(
-    () => sortPosts(visiblePosts, proofMetric),
-    [proofMetric, visiblePosts],
-  );
+  useEffect(() => {
+    setOwnerPosts(posts);
+  }, [posts]);
+
+  const { shown, hidden } = useMemo(() => partitionOwnerProofPosts(ownerPosts), [ownerPosts]);
+  const rankedPosts = useMemo(() => sortPosts(shown, proofMetric), [proofMetric, shown]);
 
   function handlePostAction(postId: string, actionId: string) {
     if (actionId === "hide") {
       setPendingHidePostId(postId);
+      return;
+    }
+    if (actionId === "restore") {
+      const hiddenPost = ownerPosts.find((post) => post.id === postId);
+      if (hiddenPost != null) {
+        void restoreHiddenPost(hiddenPost);
+      }
       return;
     }
     setPostNotice("Swap is not wired. Backend will own replacement selection.");
@@ -66,21 +81,30 @@ export function ProofPosts({ posts, hasInsights, loading = false }: ProofPostsPr
     if (pendingHidePostId == null) {
       return;
     }
-    const hiddenPost = visiblePosts.find((post) => post.id === pendingHidePostId);
+    const hiddenPost = shown.find((post) => post.id === pendingHidePostId);
     if (hiddenPost == null) {
       setPendingHidePostId(null);
       return;
     }
 
-    setVisiblePosts((current) => applyHide(current, hiddenPost.id));
+    const optimisticHiddenAt = new Date().toISOString();
+    setOwnerPosts((current) => stampHiddenFromKit(current, hiddenPost.id, optimisticHiddenAt));
     setPostNotice("Post hidden from the shareable kit preview.");
     setPendingHidePostId(null);
 
     const result = await hideFromKit(hiddenPost.id);
     if (!result.ok) {
-      setVisiblePosts((current) => applyRestore(current, hiddenPost));
+      setOwnerPosts((current) => clearHiddenFromKit(current, hiddenPost.id));
       setPostNotice(result.error);
       return;
+    }
+
+    if (result.hiddenFromKitAt != null) {
+      setOwnerPosts((current) =>
+        current.map((post) =>
+          post.id === hiddenPost.id ? { ...post, hidden_from_kit_at: result.hiddenFromKitAt } : post,
+        ),
+      );
     }
 
     toast.add({
@@ -90,18 +114,21 @@ export function ProofPosts({ posts, hasInsights, loading = false }: ProofPostsPr
       action: {
         label: "Undo",
         onClick: () => {
-          void restoreHiddenPost(hiddenPost);
+          void restoreHiddenPost({ ...hiddenPost, hidden_from_kit_at: result.hiddenFromKitAt });
         },
       },
     });
   }
 
   async function restoreHiddenPost(hiddenPost: Media) {
-    setVisiblePosts((current) => applyRestore(current, hiddenPost));
+    const previousHiddenAt = hiddenPost.hidden_from_kit_at;
+    setOwnerPosts((current) => clearHiddenFromKit(current, hiddenPost.id));
     setPostNotice("Post restored to the shareable kit preview.");
     const result = await restoreToKit(hiddenPost.id);
     if (!result.ok) {
-      setVisiblePosts((current) => applyHide(current, hiddenPost.id));
+      if (previousHiddenAt != null) {
+        setOwnerPosts((current) => stampHiddenFromKit(current, hiddenPost.id, previousHiddenAt));
+      }
       setPostNotice(result.error);
     }
   }
@@ -122,7 +149,7 @@ export function ProofPosts({ posts, hasInsights, loading = false }: ProofPostsPr
           <p className="text-muted">{postNotice ?? proofMetricNotices[proofMetric]}</p>
         </div>
         <Badge variant="neutral" emphasis="muted" size="sm">
-          {visiblePosts.length} shown
+          {shown.length} shown
         </Badge>
       </div>
       <Tab.Group
@@ -152,6 +179,17 @@ export function ProofPosts({ posts, hasInsights, loading = false }: ProofPostsPr
             key={post.id}
             post={post}
             displayRank={index + 1}
+            hidden={false}
+            hasInsights={hasInsights}
+            onAction={handlePostAction}
+          />
+        ))}
+        {hidden.map((post) => (
+          <ProofPostCard
+            key={post.id}
+            post={post}
+            displayRank={null}
+            hidden
             hasInsights={hasInsights}
             onAction={handlePostAction}
           />
@@ -179,11 +217,13 @@ export function ProofPosts({ posts, hasInsights, loading = false }: ProofPostsPr
 function ProofPostCard({
   post,
   displayRank,
+  hidden,
   hasInsights,
   onAction,
 }: {
   post: Media;
-  displayRank: number;
+  displayRank: number | null;
+  hidden: boolean;
   hasInsights: boolean;
   onAction: (postId: string, actionId: string) => void;
 }) {
@@ -199,30 +239,50 @@ function ProofPostCard({
       ];
 
   return (
-    <Card variant="outlined" shape="rounded" className="col-span-full min-w-0 md:col-span-4 lg:col-span-4">
+    <Card
+      variant="outlined"
+      shape="rounded"
+      className={`col-span-full min-w-0 md:col-span-4 lg:col-span-4${hidden ? " text-muted" : ""}`}
+    >
       <Card.Header
         start={
           <span className="flex items-center gap-2">
-            <Badge size="sm">#{displayRank}</Badge>
+            {hidden ? (
+              <Badge variant="neutral" emphasis="muted" size="sm">
+                Hidden
+              </Badge>
+            ) : (
+              <Badge size="sm">#{displayRank}</Badge>
+            )}
             <span className={cardSubtitleClasses}>{formatPostedAt(post.posted_at)}</span>
           </span>
         }
         end={
           <MoreMenu
-            aria-label={`Manage ranked post ${displayRank}`}
+            aria-label={hidden ? "Manage hidden post" : `Manage ranked post ${displayRank}`}
             size="xs"
-            items={[
-              {
-                id: "swap",
-                label: "Swap post",
-                start: <Repeat2 />,
-              },
-              {
-                id: "hide",
-                label: "Hide from kit",
-                start: <EyeOff />,
-              },
-            ]}
+            items={
+              hidden
+                ? [
+                    {
+                      id: "restore",
+                      label: "Restore to kit",
+                      start: <Undo2 />,
+                    },
+                  ]
+                : [
+                    {
+                      id: "swap",
+                      label: "Swap post",
+                      start: <Repeat2 />,
+                    },
+                    {
+                      id: "hide",
+                      label: "Hide from kit",
+                      start: <EyeOff />,
+                    },
+                  ]
+            }
             onAction={(actionId) => onAction(post.id, actionId)}
           />
         }

@@ -140,6 +140,13 @@ describe("critical page contracts", () => {
     assert.match(proof, /label: "Undo"/);
     assert.match(proof, /hideFromKit\(hiddenPost\.id\)/);
     assert.match(proof, /restoreToKit\(hiddenPost\.id\)/);
+    assert.match(proof, /partitionOwnerProofPosts/);
+    assert.match(proof, /setOwnerPosts\(posts\)/);
+    assert.match(proof, /shown\.length\} shown/);
+    assert.match(proof, /Restore to kit/);
+    assert.match(proof, /Hidden/);
+    assert.match(proof, /stampHiddenFromKit/);
+    assert.match(proof, /clearHiddenFromKit/);
     assert.match(proof, /result\.error/);
     assert.match(read("lib/kit-visibility.ts"), /POST \/api\/media\/hide/);
     assert.match(read("lib/kit-visibility.ts"), /POST \/api\/media\/restore/);
@@ -152,6 +159,7 @@ describe("critical page contracts", () => {
     assert.match(read("lib/schema.ts"), /hidden_from_kit_at/);
     assert.match(read("lib/store.ts"), /hiddenOverlayForHandle/);
     assert.match(read("lib/store.ts"), /Includes every owner row/);
+    assert.match(read("lib/kit-visibility.ts"), /partitionOwnerProofPosts/);
     assert.doesNotMatch(read("app/insights/page.tsx"), /mediaVisibleOnKit/);
     assert.match(audience, /Chart\.RankedBars/);
     assert.match(chart, /Chart\.Cartesian/);

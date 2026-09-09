@@ -4,6 +4,7 @@ import {
   applyHide,
   applyOverlayToMedia,
   applyRestore,
+  clearHiddenFromKit,
   hiddenIdsFromOverlay,
   hideFromKit,
   hideInOverlay,
@@ -14,9 +15,11 @@ import {
   mediaVisibilityStatus,
   parseHiddenCookie,
   parseMediaIdBody,
+  partitionOwnerProofPosts,
   restoreInOverlay,
   restoreToKit,
   serializeHiddenCookie,
+  stampHiddenFromKit,
 } from "./kit-visibility";
 
 describe("kit visibility overlay", () => {
@@ -69,6 +72,49 @@ describe("kit visibility overlay", () => {
     assert.equal(stamped.length, 2);
     assert.equal(stamped[1]?.hidden_from_kit_at, "2026-09-02T12:00:00.000Z");
     assert.equal(stamped[0]?.hidden_from_kit_at, null);
+  });
+
+  it("partitions owner proof so init with hidden_from_kit_at set excludes from shown", () => {
+    const posts = [
+      { id: "keep", hidden_from_kit_at: null },
+      { id: "drop", hidden_from_kit_at: "2026-09-09T01:30:00.000Z" },
+      { id: "also-keep", hidden_from_kit_at: null },
+    ];
+    const { shown, hidden } = partitionOwnerProofPosts(posts);
+    assert.deepEqual(
+      shown.map((post) => post.id),
+      ["keep", "also-keep"],
+    );
+    assert.deepEqual(
+      hidden.map((post) => post.id),
+      ["drop"],
+    );
+    assert.equal(shown.length, 2);
+    assert.equal(hidden[0]?.hidden_from_kit_at, "2026-09-09T01:30:00.000Z");
+  });
+
+  it("restore path clears hidden_from_kit_at so the row returns to shown", () => {
+    const hiddenAt = "2026-09-09T01:30:00.000Z";
+    const posts = [
+      { id: "keep", hidden_from_kit_at: null as string | null },
+      { id: "drop", hidden_from_kit_at: hiddenAt },
+    ];
+    const afterHide = stampHiddenFromKit(
+      posts.map((post) => ({ ...post, hidden_from_kit_at: null })),
+      "drop",
+      hiddenAt,
+    );
+    assert.equal(afterHide[1]?.hidden_from_kit_at, hiddenAt);
+    assert.equal(partitionOwnerProofPosts(afterHide).shown.length, 1);
+
+    const restored = clearHiddenFromKit(afterHide, "drop");
+    const { shown, hidden } = partitionOwnerProofPosts(restored);
+    assert.equal(restored[1]?.hidden_from_kit_at, null);
+    assert.deepEqual(
+      shown.map((post) => post.id),
+      ["keep", "drop"],
+    );
+    assert.deepEqual(hidden, []);
   });
 
   it("confirm hide then undo restores the same record", () => {
