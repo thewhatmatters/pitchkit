@@ -150,7 +150,7 @@ Stamped contract. Not a Graph column.
 | Public kit | filter `hidden_from_kit_at != null` **before** `selectSixPosts` |
 | Owner Insights | keep the row so toast Undo can `restoreToKit` the same `media.id` |
 
-**Seed path:** until Hyperdrive, the routes may persist an httpOnly overlay (`pitchkit_hidden` = `{ [mediaId]: ISO }`) that stamps `hidden_from_kit_at` onto seed rows. FE just calls the routes. LocalStorage is fallback only when the API is unreachable — not the primary store. Do not invent Graph columns.
+**Seed path:** until Hyperdrive, the routes may persist an httpOnly overlay (`pitchkit_hidden` = `{ [mediaId]: ISO }`) that stamps `hidden_from_kit_at` onto seed rows. FE just calls the routes. Product SoT is `POST /api/media/hide|restore` — not `window.localStorage`. API failure returns a stamped error only; do not persist hide state in the browser. Do not invent Graph columns.
 
 ## Graph hygiene (not extra columns)
 

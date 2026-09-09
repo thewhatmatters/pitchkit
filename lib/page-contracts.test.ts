@@ -146,6 +146,9 @@ describe("critical page contracts", () => {
     assert.match(read("app/api/media/hide/route.ts"), /mediaVisibilityPost\(request, "hide"\)/);
     assert.match(read("app/api/media/restore/route.ts"), /mediaVisibilityPost\(request, "restore"\)/);
     assert.doesNotMatch(read("lib/kit-visibility.ts"), /\/api\/kit\/visibility/);
+    assert.doesNotMatch(read("lib/kit-visibility.ts"), /localStorage\.(get|set)Item/);
+    assert.doesNotMatch(read("lib/kit-visibility.ts"), /persistLocalStub/);
+    assert.doesNotMatch(read("components/proof-posts.tsx"), /localStorage/);
     assert.match(read("lib/schema.ts"), /hidden_from_kit_at/);
     assert.match(read("lib/store.ts"), /mediaVisibleOnKit/);
     assert.match(read("lib/store.ts"), /Hidden rows stay in the payload/);
