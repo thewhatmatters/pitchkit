@@ -34,7 +34,7 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(page, /KitInventory/);
   });
 
-  it("owner views use SegmentedControl on a 960 grid, not AppShell", () => {
+  it("owner views use SegmentedControl Insights | PitchKit on a 1140 grid", () => {
     const nav = read("components/owner-nav.tsx");
     const frame = read("components/app-frame.tsx");
     const barrel = read("components/wmds.ts");
@@ -42,26 +42,23 @@ describe("critical page contracts", () => {
     const kit = read("app/k/[handle]/page.tsx");
     const settings = read("app/settings/page.tsx");
 
-    assert.doesNotMatch(barrel, /AppShell|NavRail|PageHeader/);
     assert.match(barrel, /SegmentedControl/);
-    assert.match(barrel, /GridOverlay/);
+    assert.match(barrel, /PageHeader/);
     assert.match(nav, /SegmentedControl/);
     assert.match(nav, />Insights</);
-    assert.match(nav, />Pitch</);
-    assert.doesNotMatch(nav, />PitchKit</);
+    assert.match(nav, />PitchKit</);
+    assert.match(nav, /aria-label="PitchKit primary navigation"/);
     assert.match(nav, /router\.push\("\/insights"\)/);
     assert.match(nav, /kitPath/);
-    assert.match(frame, /OWNER_GRID_MAX = "960px"/);
+    assert.match(frame, /OWNER_GRID_MAX = "1140px"/);
     assert.match(frame, /OWNER_GRID_COLUMN_GAP = "8px"/);
-    assert.match(frame, /\[--grid-max:960px\]/);
+    assert.match(frame, /\[--grid-max:1140px\]/);
     assert.match(frame, /\[--grid-column-gap:8px\]/);
     assert.match(frame, /\[--grid-gutter:8px\]/);
-    assert.match(frame, /\[--grid-cols:12\]/);
     assert.doesNotMatch(frame, /style=\{/);
     assert.match(frame, /grid-page/);
     assert.match(frame, /band/);
-    assert.match(frame, /<OwnerGridOverlay \/>/);
-    assert.match(frame, /grid-page[\s\S]*<OwnerGridOverlay \/>[\s\S]*className="band"/);
+    assert.doesNotMatch(frame, /<OwnerGridOverlay|<GridOverlay|ExampleGridControls/);
     assert.doesNotMatch(frame, /col-span-full flex flex-col/);
     assert.match(frame, /<div className="band">\{children\}<\/div>/);
     assert.doesNotMatch(frame, /["']use client["']/);
@@ -76,99 +73,83 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(insights, /OwnerShell|AppShell|AppShell\.Mobile|NavRail/);
     assert.doesNotMatch(kit, /OwnerShell|AppShell|AppShell\.Mobile|NavRail/);
     assert.doesNotMatch(settings, /OwnerShell|AppShell|AppShell\.Mobile|NavRail/);
-    assert.doesNotMatch(nav, /AppShell|NavRail|PageHeader/);
+    assert.doesNotMatch(nav, /AppShell|NavRail/);
   });
 
-  it("AppFrame mounts WMDS GridOverlay before band", () => {
+  it("does not ship GridOverlay as product chrome", () => {
     const frame = read("components/app-frame.tsx");
-    const overlay = read("components/owner-grid-overlay.tsx");
-    const barrel = read("components/wmds.ts");
+    const chrome = read("components/owner-chrome.tsx");
+    const insights = read("app/insights/page.tsx");
     const kit = read("app/k/[handle]/page.tsx");
+    const layout = read("app/layout.tsx");
 
-    assert.match(barrel, /GridOverlay/);
-    assert.match(overlay, /["']use client["']/);
-    assert.match(overlay, /<GridOverlay visibleByDefault/);
-    assert.match(frame, /<OwnerGridOverlay \/>/);
-    assert.match(frame, /grid-page[\s\S]*<OwnerGridOverlay \/>[\s\S]*className="band"/);
-    assert.doesNotMatch(frame, /col-span-full flex flex-col/);
-    assert.match(frame, /<div className="band">\{children\}<\/div>/);
-    assert.doesNotMatch(frame, /["']use client["']/);
-    assert.doesNotMatch(kit, /OwnerGridOverlay|GridOverlay/);
+    assert.doesNotMatch(frame, /<OwnerGridOverlay|<GridOverlay|ExampleGridControls/);
+    assert.doesNotMatch(chrome, /<GridOverlay|ExampleGridControls/);
+    assert.doesNotMatch(insights, /<GridOverlay|ExampleGridControls/);
+    assert.doesNotMatch(kit, /<OwnerGridOverlay|<GridOverlay|ExampleGridControls/);
+    assert.doesNotMatch(layout, /<GridOverlay|ExampleGridControls/);
   });
 
-  it("Insights chrome has no duplicate tabs and spells Engagement rate", () => {
+  it("mounts one Toaster at the app root", () => {
+    const layout = read("app/layout.tsx");
+    const toaster = read("components/app-toaster.tsx");
+    const barrel = read("components/wmds.ts");
+
+    assert.match(barrel, /Toaster/);
+    assert.match(barrel, /toast,/);
+    assert.match(toaster, /<Toaster position="bottom-right" \/>/);
+    assert.match(layout, /<AppToaster \/>/);
+    assert.doesNotMatch(read("components/owner-chrome.tsx"), /<Toaster/);
+    assert.doesNotMatch(read("components/proof-posts.tsx"), /<Toaster/);
+  });
+
+  it("Insights chrome matches creator Insights pattern", () => {
     const page = read("app/insights/page.tsx");
     const chrome = read("components/owner-chrome.tsx");
     const stats = read("components/insights-stats.tsx");
-    const posts = read("components/post-grid.tsx");
+    const proof = read("components/proof-posts.tsx");
     const chart = read("components/reach-chart.tsx");
+    const audience = read("components/audience-fit.tsx");
     const copy = read("lib/copy.ts");
+    const card = read("components/kit-card.tsx");
 
-    assert.doesNotMatch(chrome, /Tab\.Group|Owner views/);
-    assert.doesNotMatch(chrome, /<Tab[\s\S]*Insights/);
-    assert.doesNotMatch(chrome, /Media kit/);
-    assert.doesNotMatch(page, /Owner Insights\. Brands never see this page/);
-    assert.doesNotMatch(chrome, /Brands never see this page/);
+    assert.match(chrome, /PageHeader/);
+    assert.match(chrome, /title="Insights"/);
+    assert.match(chrome, /Share kit/);
     assert.match(copy, /Private to you/);
-    assert.match(page, /INSIGHTS_PRIVATE/);
-    assert.match(page, /Badge/);
-    const headline =
-      stats.match(/<div className="col-span-full">[\s\S]*?<Stat\s+size="md"[\s\S]*?\/>/)?.[0] ?? "";
-    assert.match(headline, /label="Typical reach"/);
-    assert.doesNotMatch(headline, /label="Engagement rate"/);
-    assert.match(stats, /size="sm"[\s\S]*label="Engagement rate"/);
+    assert.match(chrome, /INSIGHTS_PRIVATE/);
+    assert.match(stats, /label="Engagement rate"/);
     assert.doesNotMatch(stats, /label="ER"/);
-    assert.match(stats, /size="md"/);
+    assert.doesNotMatch(card, />ER</);
+    assert.match(card, /Engagement rate/);
     assert.doesNotMatch(stats, /<Stat\.Group/);
-    assert.doesNotMatch(stats, /statGroupGridClasses/);
-    assert.doesNotMatch(stats, /className="[^"]*gap-4/);
-    assert.doesNotMatch(stats, /grid-cols-4/);
-    assert.doesNotMatch(stats, /columns=\{columns\}/);
-    assert.doesNotMatch(stats, /md:grid-cols-4/);
-    assert.doesNotMatch(stats, /KPI_TILE_SPAN/);
-    const tileWraps = stats.match(/<div className="col-span-6 md:col-span-3">/g) ?? [];
-    assert.equal(tileWraps.length, 4);
-    assert.doesNotMatch(stats, /md:col-span-2/);
-    assert.match(read("package.json"), /wmds#975b649499da7b54cbc3acbac70dde5e2d9bb915/);
     assert.doesNotMatch(stats, /trend=/);
-    assert.match(chrome, /className="col-span-full"/);
-    assert.match(read("components/owner-nav.tsx"), /col-span-full/);
-    assert.match(read("components/support-footer.tsx"), /col-span-full/);
-    assert.match(read("components/reach-chart.tsx"), /col-span-full/);
-    assert.match(chrome, /Top-performing posts/);
-    assert.doesNotMatch(chrome, /Six posts/);
-    assert.match(chrome, /SegmentedControl/);
-    assert.match(chrome, /value="reach"/);
-    assert.match(chrome, /value="engagement"/);
-    assert.match(chrome, /value="saves"/);
-    assert.match(chrome, /layout="rows"/);
-    assert.match(posts, /layout = "grid"/);
-    assert.match(posts, /layout === "rows"/);
-    assert.match(read("components/wmds.ts"), /SegmentedControl/);
-    assert.match(read("components/wmds.ts"), /chartMaxTicksForWidth/);
-    assert.match(read("components/wmds.ts"), /cardLayoutBodyOccupantPadYClasses/);
-    assert.match(read("components/wmds.ts"), /cardLayoutBodyOccupantWellClasses/);
-    assert.match(read("components/wmds.ts"), /cardLayoutBodyOccupantInsetXClasses/);
-    assert.match(chart, /chartMaxTicksForWidth/);
-    assert.match(chart, /reachChartDateTickCount/);
+    assert.match(stats, /col-span-2 w-full min-w-0 md:col-span-4 lg:col-span-3/);
+    assert.match(proof, /Recent proof/);
+    assert.doesNotMatch(chrome, /Six posts|Top-performing posts/);
+    assert.doesNotMatch(proof, /Six posts|Top-performing posts/);
+    assert.match(proof, /Tab\.Group/);
+    assert.match(proof, /value="reach"/);
+    assert.match(proof, /value="engagement"/);
+    assert.match(proof, /value="saves"/);
+    assert.match(proof, /MoreMenu/);
+    assert.match(proof, /Hide from kit/);
+    assert.match(proof, /AlertDialog/);
+    assert.match(proof, /confirmLabel="Hide from kit"/);
+    assert.match(proof, /toast\.add\(/);
+    assert.match(proof, /label: "Undo"/);
+    assert.match(proof, /hideFromKit/);
+    assert.match(proof, /restoreToKit/);
+    assert.match(audience, /Chart\.RankedBars/);
+    assert.match(chart, /Chart\.Cartesian/);
+    assert.match(chart, /variant="outlined"/);
+    assert.match(chart, /Reach over 30 days/);
     assert.match(chart, /shouldRenderReachChartBand/);
     assert.match(chart, /animate="none"/);
-    assert.match(chart, /<Chart\.Cartesian[\s\S]*animate="none"/);
-    assert.match(chart, /<Card[\s\S]*<Chart\.Cartesian/);
-    assert.match(chart, /<Chart\.Cartesian\.Tooltip \/>/);
-    assert.match(chart, /shape="rounded"/);
-    assert.match(chart, /bodyTerminal/);
-    assert.match(chart, /padding="none"/);
-    assert.match(
-      chart,
-      /flex flex-col gap-3 \$\{cardLayoutBodyOccupantPadYClasses\} \$\{cardLayoutBodyOccupantWellClasses\} \$\{cardLayoutBodyOccupantInsetXClasses\}/,
-    );
-    assert.match(chart, /<Card\.Body>[\s\S]*reachChartOccupantWellClasses/);
-    assert.match(chart, /<ReachChartCard slot="loading">[\s\S]*Chart\.Loading/);
-    assert.match(chart, /<ReachChartCard slot="reach"[\s\S]*hostRef/);
-    assert.doesNotMatch(chart, /max-w-lg/);
     assert.doesNotMatch(chart, /Chart\.Legend/);
-    assert.doesNotMatch(chart, /<Select/);
+    assert.match(read("components/wmds.ts"), /chartMaxTicksForWidth/);
+    assert.match(read("package.json"), /wmds#2f3d828374e02566af5419f21e937c02b958135f/);
+    assert.doesNotMatch(page, /Owner Insights\. Brands never see this page/);
   });
 
   it("settings is account only", () => {

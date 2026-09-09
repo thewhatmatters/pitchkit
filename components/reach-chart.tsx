@@ -69,15 +69,16 @@ function ReachChartCard({
 }) {
   return (
     <Card
+      variant="outlined"
       shape="rounded"
       padding="none"
       bodyTerminal
-      className="col-span-full"
+      className="col-span-full min-w-0 lg:col-span-6"
       data-chart-slot={slot}
       data-x-ticks={xTickCount}
     >
       <Card.Header
-        start={<h2 className={cardTitleClasses}>Reach over time</h2>}
+        start={<h2 className={cardTitleClasses}>Reach over 30 days</h2>}
         end={<span className={cardSubtitleClasses}>30 days</span>}
       />
       <Card.Body>

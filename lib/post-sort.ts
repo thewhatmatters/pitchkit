@@ -5,7 +5,7 @@ export const POST_SORT_KEYS = ["reach", "engagement", "saves"] as const;
 
 export type PostSortKey = (typeof POST_SORT_KEYS)[number];
 
-export const DEFAULT_POST_SORT: PostSortKey = "saves";
+export const DEFAULT_POST_SORT: PostSortKey = "reach";
 
 export function isPostSortKey(value: string): value is PostSortKey {
   return (POST_SORT_KEYS as readonly string[]).includes(value);

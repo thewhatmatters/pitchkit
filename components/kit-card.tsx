@@ -48,7 +48,7 @@ export function KitCard({
             <p className={cardTitleClasses}>{formatCount(user.followers)}</p>
           </div>
           <div>
-            <p className={cardBodyTextClasses}>ER</p>
+            <p className={cardBodyTextClasses}>Engagement rate</p>
             <p className={cardTitleClasses}>{formatEngagementRate(engagementRate)}</p>
           </div>
         </div>

@@ -13,7 +13,7 @@ GitHub: [thewhatmatters/pitchkit](https://github.com/thewhatmatters/pitchkit).
 1. Creator opens pitchkit.app and reads the collection note.
 2. They tap **Continue with Instagram** (Professional accounts only — Business or Creator). That is login and sign-up. No email, no password.
 3. We pull public posts and Insights (not DMs, not who they follow).
-4. They land on **Insights** (private). SegmentedControl nav is Insights / Pitch. **Pitch** is the shareable `/k/[handle]` page. Account is a quiet footer link.
+4. They land on **Insights** (private). SegmentedControl nav is Insights / PitchKit. **PitchKit** is the shareable `/k/[handle]` page. Account is a quiet footer link.
 5. Brands open `https://pitchkit.app/k/[handle]`. They do not sign in.
 
 Handle is taken from the Instagram username at signup and **does not change**. Local/demo kit: `/k/demo`.
@@ -36,7 +36,7 @@ On the connect screen, before they tap Instagram:
 | [GLOSSARY.md](./GLOSSARY.md) | What each kit number means (first sentence is the Insights inventory definition) |
 | [AGENTS.md](./AGENTS.md) | Short lock list for coding agents |
 | `app/` | Next.js App Router routes |
-| `components/` | WMDS composition: owner SegmentedControl + 960 grid (`[--grid-column-gap:8px] [--grid-gutter:8px]`), AppFrame GridOverlay, Insights headline + four-up Stat tiles in `col-span-*` wrappers on the band spine, chart/Top-performing posts, public kit + owner Edit |
+| `components/` | WMDS composition: owner SegmentedControl + 1140 grid, Insights creator pattern (`PageHeader`, Stat, Chart, Recent proof), public kit + owner Edit |
 | `db/` | Postgres schema from [DATA.md](./DATA.md) (`users`, `media`, empty `detections` + `weekly_counts`) |
 | `lib/` | Schema types, in-repo seed, kit math (six-post rank + ER), `reach_series` hide rules |
 | `public/demo/` | Placeholder kit images (`r2_key` maps here until R2) |
@@ -47,7 +47,7 @@ Owner Insights kit (`loadOwnerKit`) includes seed/example `reach_series: { day, 
 
 Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays public (no cookie). Owner Edit on `/k/demo` only when that session owns `demo`.
 
-`/insights` is the real owner layout (WMDS `SegmentedControl` Insights / Pitch, `grid-page` + `band` at 960px with Tailwind `[--grid-column-gap:8px] [--grid-gutter:8px] [--grid-cols:12]`, WMDS `GridOverlay` on by default — press **g** to toggle, headline Typical reach + four-up Stat tiles on the page spine — each in a `div` with `col-span-6` mobile / `md:col-span-3`, not nested `Stat.Group` — one Chart when `owner.reach_series` is present, Top-performing posts). The Chart Card matches WMDS Occupancy history: occupant well in `Card.Body`, static “30 days” header end, no Select, no Legend. Hide the entire Chart band if the series is omitted/`[]`. Public seed Insights stay null — Engagement rate still shows; reach, saves, and the Chart hide. Owner demo seed has post Insights plus the example series. Audience mixes hide until Graph data exists. Contact and past brands are typed holes on `/k/[handle]` only. No new Postgres columns.
+`/insights` is the real owner layout (WMDS Pattern — creator Insights: `SegmentedControl` Insights / PitchKit, `grid-page` + `band` at 1140px with `[--grid-column-gap:8px] [--grid-gutter:8px]`, `PageHeader`, four-up Stat, `Chart.Cartesian` + `Chart.RankedBars`, Recent proof with `Tab.Group`). `GridOverlay` is Storybook-only. One `<Toaster position="bottom-right" />` at the app root. Hide-from-kit goes through `hideFromKit` / `restoreToKit` (`AlertDialog` + toast Undo). Hide the entire Chart band if `reach_series` is omitted/`[]`. Public seed Insights stay null — Engagement rate still shows; reach, saves, and the Chart hide. Owner demo seed has post Insights plus the example series. Contact and past brands are typed holes on `/k/[handle]` only. Kit Stat label is **Engagement rate**, never “ER”.
 
 ---
 
@@ -74,7 +74,7 @@ Disconnect deletes the creator, their posts, and their files. Anonymous weekly t
 Install WMDS pinned to a main SHA:
 
 ```bash
-npm install github:thewhatmatters/wmds#975b649499da7b54cbc3acbac70dde5e2d9bb915
+npm install github:thewhatmatters/wmds#2f3d828374e02566af5419f21e937c02b958135f
 ```
 
 `prepare` builds `dist/`. Local `npm install ../wmds` still works after `npm run build` there. `postinstall` / `predev` / `prebuild` copy Geist font files into the WMDS `dist/files` path that `styles.css` expects (otherwise Next 500s on the font URLs). Chart needs the `@visx/visx` peer. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md), WMDS [`CONSUMING.md`](https://github.com/thewhatmatters/wmds/blob/main/CONSUMING.md).

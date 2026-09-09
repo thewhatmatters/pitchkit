@@ -6,6 +6,7 @@ import { KitEdit } from "@/components/kit-edit";
 import { OwnerNav } from "@/components/owner-nav";
 import { SupportFooter } from "@/components/support-footer";
 import { kitPath } from "@/lib/kit";
+import { HIDDEN_COOKIE, hiddenIdsForHandle, parseHiddenCookie } from "@/lib/kit-visibility";
 import { parseSessionValue, SESSION_COOKIE, sessionOwnsHandle } from "@/lib/session";
 import { loadPublicKit } from "@/lib/store";
 
@@ -32,12 +33,16 @@ export async function generateMetadata({ params }: KitPageProps): Promise<Metada
 
 export default async function KitPage({ params }: KitPageProps) {
   const { handle } = await params;
-  const kit = loadPublicKit(handle);
+  const cookieStore = await cookies();
+  const hiddenIds = hiddenIdsForHandle(
+    parseHiddenCookie(cookieStore.get(HIDDEN_COOKIE)?.value),
+    handle,
+  );
+  const kit = loadPublicKit(handle, new Date(), hiddenIds);
   if (!kit) {
     notFound();
   }
 
-  const cookieStore = await cookies();
   const session = parseSessionValue(cookieStore.get(SESSION_COOKIE)?.value);
   const canEdit = sessionOwnsHandle(session, kit.user.handle);
 

@@ -214,6 +214,14 @@ describe("reach_series kit payload", () => {
     );
   });
 
+  it("excludes hidden media ids before selecting the six", () => {
+    const first = seedOwnerMedia[0]!;
+    const owner = loadOwnerKit(DEMO_HANDLE, NOW, [first.id]);
+    assert.ok(owner);
+    assert.equal(owner.posts.some((post) => post.id === first.id), false);
+    assert.equal(owner.posts.length, seedOwnerMedia.length - 1);
+  });
+
   it("omits reach_series on the public /k/ kit without Insights", () => {
     const publicKit = loadPublicKit(DEMO_HANDLE, NOW);
     assert.ok(publicKit);

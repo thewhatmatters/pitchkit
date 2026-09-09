@@ -4,8 +4,11 @@ import { AppFrame, OWNER_GRID_MAX } from "@/components/app-frame";
 import { OwnerChrome } from "@/components/owner-chrome";
 import { OwnerNav } from "@/components/owner-nav";
 import { SupportFooter } from "@/components/support-footer";
-import { Badge } from "@/components/wmds";
-import { INSIGHTS_PRIVATE } from "@/lib/copy";
+import {
+  HIDDEN_COOKIE,
+  hiddenIdsForHandle,
+  parseHiddenCookie,
+} from "@/lib/kit-visibility";
 import { insightsGate, parseSessionValue, SESSION_COOKIE } from "@/lib/session";
 import { loadOwnerKit } from "@/lib/store";
 
@@ -22,7 +25,11 @@ export default async function InsightsPage({ searchParams }: InsightsProps) {
   }
 
   const gridReady = grid !== "pulling";
-  const kit = loadOwnerKit(session.handle);
+  const hiddenIds = hiddenIdsForHandle(
+    parseHiddenCookie(cookieStore.get(HIDDEN_COOKIE)?.value),
+    session.handle,
+  );
+  const kit = loadOwnerKit(session.handle, new Date(), hiddenIds);
   if (!kit) {
     redirect("/");
   }
@@ -30,11 +37,6 @@ export default async function InsightsPage({ searchParams }: InsightsProps) {
   return (
     <AppFrame gridMax={OWNER_GRID_MAX}>
       <OwnerNav handle={kit.user.handle} />
-      <div className="col-span-full w-fit">
-        <Badge emphasis="muted" size="sm">
-          {INSIGHTS_PRIVATE}
-        </Badge>
-      </div>
       <OwnerChrome
         user={kit.user}
         posts={kit.posts}

@@ -38,7 +38,7 @@ Creator → Workers (OpenNext)
             → Instagram Login + Graph   (connect, refresh, Insights poll)
             → Neon via Hyperdrive        = rows
             → R2                         = photos (public read)
-         → /insights                     (owner, cookie; Graph layout — SegmentedControl nav, 960 grid)
+         → /insights                     (owner, cookie; Graph layout — SegmentedControl nav, 1140 grid)
          → /k/[handle]                   (anyone; Postgres + R2; no Graph)
 
 Brand  → /k/[handle] → same Worker → rows + public photos
@@ -55,8 +55,8 @@ Same table as [PLAN.md](./PLAN.md#stack-locked). Short version:
 - **UI:** `@whatmatters/wmds` pattern-first + `styles.css`. App owns layout Tailwind only. No shadcn. No Storybook here (copy from WMDS Storybook).
 - **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers.
 - **Icons:** Lucide through WMDS props. **Motion:** `motion` peer when WMDS needs it.
-- **Install WMDS:** pin `github:thewhatmatters/wmds#975b649499da7b54cbc3acbac70dde5e2d9bb915` (CI cannot use `../wmds`). Local `../wmds` still works; `prepare` builds `dist/`. `@visx/visx` is the Chart peer. Owner views: `grid-page` + `band` with Tailwind arbitrary props `[--grid-max:960px] [--grid-column-gap:8px] [--grid-gutter:8px] [--grid-cols:12]` (not React `style` vs `@theme`; both gap tokens until WMDS column-gap reads `--grid-column-gap`), and WMDS `SegmentedControl` (Insights / Pitch). `AppFrame` mounts WMDS `GridOverlay` (`visibleByDefault`; press **g**) as a direct child of `grid-page`. Band children are grid items — Insights four-up wraps each Stat in a `div` with `col-span-6` (mobile 2×2) and `md:col-span-3` (4×3=12; full class strings in JSX). Owner nav, private badge, Chart, posts, and footer use `col-span-full`. No AppShell / NavRail. Do not invent a Pitchkit Grid atom.
-- **Charts:** WMDS `Chart` (visx peer). One 30-day account-reach area on `/insights` from `owner.reach_series` only. Empty/omit → hide the entire Chart band. `Chart.Cartesian` data is `{ date: Date, reach: number }[]`; `animate="none"` + `Chart.Cartesian.Area` + `Chart.Cartesian.Tooltip` inside a WMDS `Card` matching Organisms/Chart **Occupancy history** (`shape="rounded"` `bodyTerminal` `padding="none"` `col-span-full`; occupant well in `Card.Body`). Header end is static “30 days”; no Select; no `Chart.Legend`. Width paint gate nests inside the well. Date-tick budget uses WMDS `chartMaxTicksForWidth` (~3 on a phone). Never zero-fill. Public kit never receives the series. No Nivo in Pitchkit `package.json`.
+- **Install WMDS:** pin `github:thewhatmatters/wmds#2f3d828374e02566af5419f21e937c02b958135f` (CI cannot use `../wmds`). Local `../wmds` still works; `prepare` builds `dist/`. `@visx/visx` is the Chart peer. Owner views: `grid-page` + `band` with Tailwind `[--grid-max:1140px] [--grid-column-gap:8px] [--grid-gutter:8px]`, and WMDS `SegmentedControl` (Insights / PitchKit). `GridOverlay` is Storybook-only. One root `Toaster`. Insights consumes Examples/PitchKit creator Insights (`PageHeader`, `Stat`, `Chart.Cartesian`, `Chart.RankedBars`, `Tab.Group`, `MoreMenu`, `AlertDialog`, `toast`). No AppShell / NavRail. Do not invent a Pitchkit Grid atom.
+- **Charts:** WMDS `Chart` (visx peer). One 30-day account-reach area on `/insights` from `owner.reach_series` only. Empty/omit → hide the entire Chart band. Single series — no invented typical line. Audience uses `Chart.RankedBars` and hides when empty. Never zero-fill. Public kit never receives the series. No Nivo in Pitchkit `package.json`.
 - **Seed:** In-repo rows match [DATA.md](./DATA.md). `TOKEN_KEY` not required (seed tokens are null). Disconnect columns exist; no live delete yet. Public `/k/demo` has no Insights (`reach_series` omitted). Owner Insights seed includes example `reach_series` (not a SQL table, not live Graph).
 
 ---

@@ -1,4 +1,5 @@
 import { assemblePublicKit, type PublicKit } from "./kit";
+import { mediaVisibleOnKit } from "./kit-visibility";
 import type { Detection, WeeklyCount } from "./schema";
 import {
   seedDetections,
@@ -18,13 +19,20 @@ export function hasHyperdrive(): boolean {
   return false;
 }
 
-export function loadPublicKit(handle: string, now: Date = new Date()): PublicKit | null {
+export function loadPublicKit(
+  handle: string,
+  now: Date = new Date(),
+  hiddenIds: readonly string[] = [],
+): PublicKit | null {
   const user = seedUsers.find((row) => row.handle === handle);
   if (!user) {
     return null;
   }
 
-  const media = seedMedia.filter((row) => row.user_id === user.id);
+  const media = mediaVisibleOnKit(
+    seedMedia.filter((row) => row.user_id === user.id),
+    hiddenIds,
+  );
   return assemblePublicKit(user, media, now);
 }
 
@@ -32,13 +40,20 @@ export function loadPublicKit(handle: string, now: Date = new Date()): PublicKit
  * Owner Insights for the session handle.
  * Demo seed includes example Insights + `reach_series` (not live Graph).
  */
-export function loadOwnerKit(handle: string, now: Date = new Date()): PublicKit | null {
+export function loadOwnerKit(
+  handle: string,
+  now: Date = new Date(),
+  hiddenIds: readonly string[] = [],
+): PublicKit | null {
   const user = seedUsers.find((row) => row.handle === handle);
   if (!user) {
     return null;
   }
 
-  const media = seedOwnerMedia.filter((row) => row.user_id === user.id);
+  const media = mediaVisibleOnKit(
+    seedOwnerMedia.filter((row) => row.user_id === user.id),
+    hiddenIds,
+  );
   return assemblePublicKit(user, media, now, { reach_series: seedReachSeries });
 }
 

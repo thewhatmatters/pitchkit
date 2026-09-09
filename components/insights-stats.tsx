@@ -12,11 +12,9 @@ type InsightsStatsProps = {
 };
 
 /**
- * Headline hire number is Typical reach, then a four-up Stat row.
- * Band items are plain `div` wrappers so col-span lives on the grid item —
- * Stat fills the cell. Full class strings in JSX (Tailwind v4 must see them).
- * Not a nested Group grid — no four-column gap layout.
- * Do not lead with Engagement rate — it lives in the four-up only.
+ * WMDS PitchKit creator Insights four-up on the page subgrid.
+ * Spans match Examples/PitchKit: `col-span-2 md:col-span-4 lg:col-span-3`.
+ * Do not lead with Engagement rate. Spell **Engagement rate** — never “ER”.
  * No period-over-period `trend` — seed/payload has no honest deltas.
  */
 export function InsightsStats({
@@ -27,61 +25,41 @@ export function InsightsStats({
   loading = false,
 }: InsightsStatsProps) {
   const showInsightsMetrics = typicalReach != null || typicalSaves != null || loading;
-  const showHeadline = typicalReach != null || loading;
 
   return (
-    <>
-      {showHeadline ? (
-        <div className="col-span-full">
-          <Stat
-            size="md"
-            className="w-full min-w-0"
-            label="Typical reach"
-            value={typicalReach != null ? formatCount(typicalReach) : "—"}
-            loading={loading}
-          />
-        </div>
-      ) : null}
-      <div className="col-span-6 md:col-span-3">
+    <div
+      role="group"
+      aria-label="Instagram performance summary"
+      className="band col-span-full gap-y-4"
+    >
+      <Stat
+        className="col-span-2 w-full min-w-0 md:col-span-4 lg:col-span-3"
+        label="Followers"
+        value={formatCount(followers)}
+        loading={loading}
+      />
+      <Stat
+        className="col-span-2 w-full min-w-0 md:col-span-4 lg:col-span-3"
+        label="Engagement rate"
+        value={formatEngagementRate(engagementRate)}
+        loading={loading}
+      />
+      {showInsightsMetrics ? (
         <Stat
-          size="sm"
-          className="w-full min-w-0"
-          label="Followers"
-          value={formatCount(followers)}
+          className="col-span-2 w-full min-w-0 md:col-span-4 lg:col-span-3"
+          label="Typical reach"
+          value={typicalReach != null ? formatCount(typicalReach) : "—"}
           loading={loading}
         />
-      </div>
-      <div className="col-span-6 md:col-span-3">
+      ) : null}
+      {showInsightsMetrics ? (
         <Stat
-          size="sm"
-          className="w-full min-w-0"
-          label="Engagement rate"
-          value={formatEngagementRate(engagementRate)}
+          className="col-span-2 w-full min-w-0 md:col-span-4 lg:col-span-3"
+          label="Saves"
+          value={typicalSaves != null ? formatCount(typicalSaves) : "—"}
           loading={loading}
         />
-      </div>
-      {showInsightsMetrics ? (
-        <div className="col-span-6 md:col-span-3">
-          <Stat
-            size="sm"
-            className="w-full min-w-0"
-            label="Typical reach"
-            value={typicalReach != null ? formatCount(typicalReach) : "—"}
-            loading={loading}
-          />
-        </div>
       ) : null}
-      {showInsightsMetrics ? (
-        <div className="col-span-6 md:col-span-3">
-          <Stat
-            size="sm"
-            className="w-full min-w-0"
-            label="Saves"
-            value={typicalSaves != null ? formatCount(typicalSaves) : "—"}
-            loading={loading}
-          />
-        </div>
-      ) : null}
-    </>
+    </div>
   );
 }

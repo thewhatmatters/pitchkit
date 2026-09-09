@@ -32,9 +32,9 @@ function media(
 }
 
 describe("post sort keys", () => {
-  it("exposes Reach / Engagement / Saves and defaults to saves", () => {
+  it("exposes Reach / Engagement / Saves and defaults to reach", () => {
     assert.deepEqual([...POST_SORT_KEYS], ["reach", "engagement", "saves"]);
-    assert.equal(DEFAULT_POST_SORT, "saves");
+    assert.equal(DEFAULT_POST_SORT, "reach");
     assert.equal(isPostSortKey("reach"), true);
     assert.equal(isPostSortKey("engagement"), true);
     assert.equal(isPostSortKey("saves"), true);
