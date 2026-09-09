@@ -3,6 +3,9 @@ import { DEMO_HANDLE, seedUsers } from "./seed";
 /** Pitchkit session cookie — our login, not an Instagram token. */
 export const SESSION_COOKIE = "pitchkit_session";
 
+/** httpOnly hide overlay until Hyperdrive writes `media.hidden_from_kit_at`. */
+export const HIDDEN_COOKIE = "pitchkit_hidden";
+
 /** Stub and future live Instagram Login share this path. FE posts here; cookie write stays here. */
 export const AUTH_CONNECT_PATH = "/auth/instagram";
 
@@ -37,9 +40,9 @@ export function sessionCookieClearOptions(secure: boolean) {
   };
 }
 
-function serializeCookie(value: string, secure: boolean, maxAge: number): string {
+function serializeCookie(name: string, value: string, secure: boolean, maxAge: number): string {
   const parts = [
-    `${SESSION_COOKIE}=${value}`,
+    `${name}=${value}`,
     "Path=/",
     "HttpOnly",
     "SameSite=Lax",
@@ -53,11 +56,15 @@ function serializeCookie(value: string, secure: boolean, maxAge: number): string
 
 /** Sets the session for seed handle `demo`. Value is the handle, not a token. */
 export function sessionSetCookieHeader(secure: boolean): string {
-  return serializeCookie(DEMO_HANDLE, secure, SESSION_MAX_AGE);
+  return serializeCookie(SESSION_COOKIE, DEMO_HANDLE, secure, SESSION_MAX_AGE);
 }
 
 export function sessionClearCookieHeader(secure: boolean): string {
-  return serializeCookie("", secure, 0);
+  return serializeCookie(SESSION_COOKIE, "", secure, 0);
+}
+
+export function hiddenCookieClearHeader(secure: boolean): string {
+  return serializeCookie(HIDDEN_COOKIE, "", secure, 0);
 }
 
 export function parseSessionValue(value: string | undefined | null): Session | null {
@@ -100,5 +107,12 @@ export function stubConnect(request: Request): Response {
 }
 
 export function stubSignOut(request: Request): Response {
-  return sessionRedirect(request, "/", sessionClearCookieHeader(isHttpsRequest(request)));
+  const secure = isHttpsRequest(request);
+  const headers = new Headers({
+    Location: new URL("/", request.url).toString(),
+    "Cache-Control": "no-store",
+  });
+  headers.append("Set-Cookie", sessionClearCookieHeader(secure));
+  headers.append("Set-Cookie", hiddenCookieClearHeader(secure));
+  return new Response(null, { status: 303, headers });
 }

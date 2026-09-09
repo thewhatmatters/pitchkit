@@ -46,9 +46,9 @@ Reach over the last 30 days so a brand (and the creator before they share) can s
 - Persist for FE (kit payload, not a SQL table): `reach_series: { day: string /* YYYY-MM-DD UTC */, reach: number }[]`. Empty or omit → hide Chart. Seed/example until live poll. Do not invent `weekly_counts` columns.
 
 **Six posts** — ranked saves → reach → likes.
-Recent work a brand can match to the public grid. Likes-first would look like a vanity kit. Insights UI label: **Top-performing posts** (display sort Reach / Engagement / Saves; kit math stays this rank).
+Recent work a brand can match to the public grid. Likes-first would look like a vanity kit. Insights UI label: **Top-performing posts** (display sort Reach / Engagement / Saves; kit math stays this rank). Owner can hide a post from the public kit (`hidden_from_kit_at`); Insights still lists it.
 - Brand ~30s: proof that matches the grid.
-- Hide: never if we have media.
+- Hide: never if we have media. Hidden-from-kit posts drop out of the public six only (not Insights).
 - Graph (v25, Instagram Login): rank insights `saved` → insights `reach` → field `like_count`. `like_count` is public (not insights); `saved`/`reach` need Insights.
 
 Row length follows the data: 2 without Insights (ER + Followers), 4 + chart with Insights. Don’t pad to five. Insights chrome headline is **Typical reach** (hire; hide if missing), then four-up Followers / Engagement rate / Typical reach / Saves. Do not lead with Engagement rate. Public kit lead pair stays **Followers (context) + ER (hire)** as numbers, not Later’s prose sentence.

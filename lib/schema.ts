@@ -39,6 +39,7 @@ export const MEDIA_COLUMNS = [
   "impressions",
   "fetched_at",
   "insights_fetched_at",
+  "hidden_from_kit_at",
 ] as const;
 
 export const DETECTION_COLUMNS = [
@@ -87,6 +88,8 @@ export type Media = {
   impressions: number | null;
   fetched_at: string;
   insights_fetched_at: string | null;
+  /** NULL = on the public kit. ISO timestamptz = hidden from /k/[handle]. */
+  hidden_from_kit_at: string | null;
 };
 
 export type Detection = {

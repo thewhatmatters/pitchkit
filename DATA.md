@@ -4,7 +4,7 @@
 
 Canonical list of Postgres tables and columns. Product rules: [PLAN.md](./PLAN.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md).
 
-SQL: `db/001_users.sql`, `db/002_media.sql`, `db/003_detections.sql`, `db/004_weekly_counts.sql`. Types: `lib/schema.ts`. In-repo seed (same columns, not Graph): `lib/seed.ts`. Handle `demo` is frozen. Until Hyperdrive exists the Worker reads that seed. `TOKEN_KEY` is not required for seed rows (tokens stay null). The Pitchkit session is an httpOnly cookie (`pitchkit_session` = handle), not a Graph column and not the Instagram token.
+SQL: `db/001_users.sql`, `db/002_media.sql`, `db/003_detections.sql`, `db/004_weekly_counts.sql`, `db/005_media_hidden_from_kit.sql`. Types: `lib/schema.ts`. In-repo seed (same columns, not Graph): `lib/seed.ts`. Handle `demo` is frozen. Until Hyperdrive exists the Worker reads that seed. `TOKEN_KEY` is not required for seed rows (tokens stay null). The Pitchkit session is an httpOnly cookie (`pitchkit_session` = handle), not a Graph column and not the Instagram token. Hide/restore until Hyperdrive: httpOnly `pitchkit_hidden` overlay keyed to the session user (not localStorage).
 
 Photos live in object storage (R2), **publicly readable** for kit objects (already public posts). Do not use expiring signed URLs for the kit. SQL stores keys, not image bytes.
 
@@ -59,6 +59,7 @@ One row per post we actually fetched. First kit: **one page**, not the archive.
 | `impressions` | or `views` / `plays` — use the name Graph sends; nullable | Insights | when Insights fetch succeeds |
 | `fetched_at` | last media pull | us | each media pull |
 | `insights_fetched_at` | last Insights pull | us | each Insights pull |
+| `hidden_from_kit_at` | timestamptz NULL. NULL = eligible for the public six-post pick. Set = hidden from `/k/[handle]`. Row and R2 stay. Owner Insights still lists the post. Seed default null. | us (owner hide/restore) | hide / restore |
 
 ---
 
@@ -133,6 +134,8 @@ Delete `users` + `media` + R2 `{user_id}/`.
 `reach_series` is assembled onto the kit payload from the Insights poll (`user insights` `reach` `time_series` — account day buckets, stories + ads). Shape: `{ day: string /* YYYY-MM-DD UTC */, reach: number }[]`. Empty or omit when Insights are missing — do not zero-fill 30 days just to paint. Seed/example series is fine until live poll exists. **Not a SQL table for v1.** Do not invent `weekly_counts` columns for this.
 
 Owner demo seed (`loadOwnerKit`) includes ~30 labeled example points. Public `/k/demo` (`loadPublicKit`) has no Insights and omits `reach_series`. Frontend: one WMDS Chart on `/insights` from `owner.reach_series` only; hide the entire band when omitted or `[]`. Card.Body uses the Occupancy history occupant well; host-width paint gate is inside that well. Date-tick budget uses WMDS `chartMaxTicksForWidth`. Never zero-fill. Public kit never paints the Chart. No period-over-period KPI deltas in the payload — do not invent Stat `trend`s.
+
+**Hide from kit (WHA-312):** public `loadPublicKit` drops `hidden_from_kit_at != null` **before** `selectSixPosts`. Owner `loadOwnerKit` includes every owner row with `hidden_from_kit_at`. Seams: `hideFromKit` / `restoreToKit` → `POST /api/media/hide` and `POST /api/media/restore` `{ mediaId }`. 200 `{ mediaId, hiddenFromKitAt }` (`null` on restore). Errors: `unauthenticated` / `invalid_body` / `not_found` / `forbidden` / `persist_failed`. Idempotent. Seed path writes `pitchkit_hidden` (httpOnly, session-user keyed) until `hasHyperdrive()` is true.
 
 ## Graph hygiene (not extra columns)
 

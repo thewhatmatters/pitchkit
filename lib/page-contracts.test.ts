@@ -171,6 +171,40 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(chart, /<Select/);
   });
 
+  it("hide/restore persist through owner APIs and an httpOnly overlay, not localStorage", () => {
+    const hide = read("app/api/media/hide/route.ts");
+    const restore = read("app/api/media/restore/route.ts");
+    const hidden = read("lib/hidden-kit.ts");
+    const store = read("lib/store.ts");
+    const data = read("DATA.md");
+    const migration = read("db/005_media_hidden_from_kit.sql");
+    const schema = read("lib/schema.ts");
+    const kit = read("lib/kit.ts");
+    const insights = read("app/insights/page.tsx");
+    const publicKit = read("app/k/[handle]/page.tsx");
+
+    assert.match(hide, /mediaVisibilityResponse/);
+    assert.match(hide, /"hide"/);
+    assert.match(restore, /mediaVisibilityResponse/);
+    assert.match(restore, /"restore"/);
+    assert.match(hidden, /export function hideFromKit/);
+    assert.match(hidden, /export function restoreToKit/);
+    assert.match(hidden, /pitchkit_hidden|HIDDEN_COOKIE/);
+    assert.match(hidden, /HttpOnly/);
+    assert.match(store, /excludeHiddenFromPublicKit/);
+    assert.match(store, /export \{ hideFromKit, restoreToKit/);
+    assert.match(kit, /excludeHiddenFromPublicKit/);
+    assert.match(schema, /hidden_from_kit_at/);
+    assert.match(data, /hidden_from_kit_at/);
+    assert.match(migration, /hidden_from_kit_at timestamptz/);
+    assert.match(insights, /HIDDEN_COOKIE/);
+    assert.match(publicKit, /HIDDEN_COOKIE/);
+    assert.doesNotMatch(hidden, /localStorage/);
+    assert.doesNotMatch(store, /localStorage/);
+    assert.doesNotMatch(hide, /localStorage/);
+    assert.doesNotMatch(restore, /localStorage/);
+  });
+
   it("settings is account only", () => {
     const page = read("app/settings/page.tsx");
     const settings = read("components/account-settings.tsx");

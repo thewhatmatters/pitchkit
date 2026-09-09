@@ -58,6 +58,11 @@ function compareNullableDesc(a: number | null, b: number | null): number {
   return b - a;
 }
 
+/** Public kit only: drop hidden rows before `selectSixPosts`. */
+export function excludeHiddenFromPublicKit(media: Media[]): Media[] {
+  return media.filter((row) => row.hidden_from_kit_at == null);
+}
+
 /**
  * Six posts: last 30 days, ranked saves then reach then likes.
  * Fill from older fetched posts only if we do not have six in-window.
