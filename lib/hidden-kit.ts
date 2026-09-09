@@ -1,3 +1,8 @@
+import {
+  resolveHiddenKitStore,
+  type HiddenKitAccess,
+  type HiddenKitStore,
+} from "./hidden-kit-kv";
 import type { Media } from "./schema";
 import { seedMedia } from "./seed";
 import {
@@ -9,33 +14,11 @@ import {
 } from "./session";
 
 export { HIDDEN_COOKIE };
-
-/** Process-global seed SoT. Cookie is a cold-start / owner-reload mirror. */
-const HIDDEN_STORE_KEY = "__pitchkitHiddenFromKit";
-
-type HiddenByUser = Map<string, Record<string, string>>;
-
-function hiddenFromKitStore(): HiddenByUser {
-  const g = globalThis as typeof globalThis & { [HIDDEN_STORE_KEY]?: HiddenByUser };
-  if (!g[HIDDEN_STORE_KEY]) {
-    g[HIDDEN_STORE_KEY] = new Map();
-  }
-  return g[HIDDEN_STORE_KEY];
-}
-
-export function readHiddenFromKitStore(userId: string): Record<string, string> | undefined {
-  const hidden = hiddenFromKitStore().get(userId);
-  return hidden ? { ...hidden } : undefined;
-}
-
-export function writeHiddenFromKitStore(userId: string, hidden: Record<string, string>): void {
-  hiddenFromKitStore().set(userId, { ...hidden });
-}
-
-/** Test helper — isolate tests from leftover hide/restore writes. */
-export function resetHiddenFromKitStore(): void {
-  hiddenFromKitStore().clear();
-}
+export {
+  createMemoryHiddenKit,
+  hiddenKitKey,
+  setHiddenKitNamespaceForTests,
+} from "./hidden-kit-kv";
 
 export type HiddenOverlay = {
   userId: string;
@@ -197,27 +180,29 @@ export function overlayForUser(
 }
 
 /**
- * Seed overlay for a user. Map is SoT in this isolate (wins conflicts).
- * Cookie fills only when this isolate has no Map row yet (cold start).
+ * Seed overlay for a user. KV `HIDDEN_KIT` is SoT (`hidden:<userId>`).
+ * Cookie fills only when that key is missing (owner reload mirror).
  */
-export function mergeHiddenOverlay(
+export async function mergeHiddenOverlay(
   userId: string,
   cookie: HiddenOverlay | null = null,
-): HiddenOverlay {
-  const stored = readHiddenFromKitStore(userId);
+  store?: HiddenKitStore | null,
+  access: HiddenKitAccess = "page",
+): Promise<HiddenOverlay> {
+  const resolved = store === undefined ? await resolveHiddenKitStore(access) : store;
+  const stored = resolved ? await resolved.get(userId) : undefined;
   if (stored !== undefined) {
-    // Map is SoT in this isolate. Cookie-only keys are ignored so restore wins
-    // over a stale overlay. Cookie fills when this user has no Map row (cold start).
     return { userId, hidden: { ...stored } };
   }
   return overlayForUser(cookie, userId);
 }
 
-function overlayBaseForWrite(
+async function overlayBaseForWrite(
   userId: string,
   cookie: HiddenOverlay | null,
-): Record<string, string> {
-  const stored = readHiddenFromKitStore(userId);
+  store: HiddenKitStore,
+): Promise<Record<string, string>> {
+  const stored = await store.get(userId);
   if (stored !== undefined) {
     return { ...stored };
   }
@@ -270,21 +255,31 @@ function authorize(
   return { ok: true, session, mediaId: id, row };
 }
 
-export function hideFromKit(input: {
+export async function hideFromKit(input: {
   session: Session | null;
   mediaId: unknown;
   overlay: HiddenOverlay | null;
   now?: Date;
   catalog?: readonly Media[];
   persist?: HiddenPersist;
-}): HideRestoreOutcome {
+  store?: HiddenKitStore | null;
+  access?: HiddenKitAccess;
+}): Promise<HideRestoreOutcome> {
   const authorized = authorize(input.session, input.mediaId, input.catalog ?? seedMedia);
   if (!authorized.ok) {
     return authorized;
   }
 
+  const store =
+    input.store === undefined
+      ? await resolveHiddenKitStore(input.access ?? "route")
+      : input.store;
+  if (!store) {
+    return failure("persist_failed");
+  }
+
   const persist = input.persist ?? defaultHiddenPersist;
-  const hidden = overlayBaseForWrite(authorized.session.userId, input.overlay);
+  const hidden = await overlayBaseForWrite(authorized.session.userId, input.overlay, store);
   const hiddenFromKitAt =
     hidden[authorized.mediaId] ?? (input.now ?? new Date()).toISOString();
 
@@ -293,7 +288,9 @@ export function hideFromKit(input: {
   }
 
   hidden[authorized.mediaId] = hiddenFromKitAt;
-  writeHiddenFromKitStore(authorized.session.userId, hidden);
+  if (!(await store.put(authorized.session.userId, hidden))) {
+    return failure("persist_failed");
+  }
 
   return {
     ok: true,
@@ -303,16 +300,26 @@ export function hideFromKit(input: {
   };
 }
 
-export function restoreToKit(input: {
+export async function restoreToKit(input: {
   session: Session | null;
   mediaId: unknown;
   overlay: HiddenOverlay | null;
   catalog?: readonly Media[];
   persist?: HiddenPersist;
-}): HideRestoreOutcome {
+  store?: HiddenKitStore | null;
+  access?: HiddenKitAccess;
+}): Promise<HideRestoreOutcome> {
   const authorized = authorize(input.session, input.mediaId, input.catalog ?? seedMedia);
   if (!authorized.ok) {
     return authorized;
+  }
+
+  const store =
+    input.store === undefined
+      ? await resolveHiddenKitStore(input.access ?? "route")
+      : input.store;
+  if (!store) {
+    return failure("persist_failed");
   }
 
   const persist = input.persist ?? defaultHiddenPersist;
@@ -320,9 +327,11 @@ export function restoreToKit(input: {
     return failure("persist_failed");
   }
 
-  const hidden = overlayBaseForWrite(authorized.session.userId, input.overlay);
+  const hidden = await overlayBaseForWrite(authorized.session.userId, input.overlay, store);
   delete hidden[authorized.mediaId];
-  writeHiddenFromKitStore(authorized.session.userId, hidden);
+  if (!(await store.put(authorized.session.userId, hidden))) {
+    return failure("persist_failed");
+  }
 
   return {
     ok: true,
@@ -349,8 +358,8 @@ export async function mediaVisibilityResponse(
   const mediaId = parseMediaId(await readJsonBody(request));
   const outcome =
     action === "hide"
-      ? hideFromKit({ session, mediaId, overlay })
-      : restoreToKit({ session, mediaId, overlay });
+      ? await hideFromKit({ session, mediaId, overlay, access: "route" })
+      : await restoreToKit({ session, mediaId, overlay, access: "route" });
 
   if (!outcome.ok) {
     return Response.json(

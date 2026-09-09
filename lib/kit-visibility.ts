@@ -15,7 +15,7 @@
  * Idempotent. Schema field: media.hidden_from_kit_at
  *
  * Product SoT is the POST routes — not window.localStorage.
- * Seed path: Backend may use an httpOnly overlay until Hyperdrive.
+ * Seed SoT is KV `HIDDEN_KIT` until Neon; owner cookie is a reload mirror.
  * FE just calls the routes. API failure returns a stamped error only.
  */
 

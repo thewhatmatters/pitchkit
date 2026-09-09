@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { beforeEach, describe, it } from "node:test";
+import { afterEach, beforeEach, describe, it } from "node:test";
 import { engagementRate } from "./engagement";
 import {
   assemblePublicKit,
@@ -19,13 +19,17 @@ import {
   seedUser,
   seedWeeklyCounts,
 } from "./seed";
-import { resetHiddenFromKitStore } from "./hidden-kit";
+import { createMemoryHiddenKit, setHiddenKitNamespaceForTests } from "./hidden-kit";
 import { loadOwnerKit, loadPublicKit } from "./store";
 
 const NOW = new Date("2026-09-02T12:00:00.000Z");
 
 beforeEach(() => {
-  resetHiddenFromKitStore();
+  setHiddenKitNamespaceForTests(createMemoryHiddenKit());
+});
+
+afterEach(() => {
+  setHiddenKitNamespaceForTests(undefined);
 });
 
 function media(partial: Partial<Media> & Pick<Media, "id" | "posted_at" | "like_count">): Media {
@@ -204,8 +208,8 @@ describe("seed schema", () => {
     );
   });
 
-  it("loads /k/demo from seed and 404s unknown or disconnected handles", () => {
-    const demo = loadPublicKit(DEMO_HANDLE, NOW);
+  it("loads /k/demo from seed and 404s unknown or disconnected handles", async () => {
+    const demo = await loadPublicKit(DEMO_HANDLE, NOW);
     assert.ok(demo);
     assert.equal(demo.user.handle, DEMO_HANDLE);
     assert.equal(demo.posts.length, 6);
@@ -215,14 +219,14 @@ describe("seed schema", () => {
     assert.equal(demo.reach_series, undefined);
     assert.equal(demo.typicalReach, null);
     assert.equal(demo.typicalSaves, null);
-    assert.equal(loadPublicKit("nope", NOW), null);
+    assert.equal(await loadPublicKit("nope", NOW), null);
     assert.equal(assemblePublicKit(user({ disconnected_at: NOW.toISOString() }), seedMedia, NOW), null);
   });
 });
 
 describe("reach_series kit payload", () => {
-  it("returns non-empty {day,reach} series on the owner kit with Insights", () => {
-    const owner = loadOwnerKit(DEMO_HANDLE, NOW);
+  it("returns non-empty {day,reach} series on the owner kit with Insights", async () => {
+    const owner = await loadOwnerKit(DEMO_HANDLE, NOW);
     assert.ok(owner);
     assert.equal(owner.hasInsights, true);
     assert.ok(owner.reach_series);
@@ -246,25 +250,25 @@ describe("reach_series kit payload", () => {
     );
   });
 
-  it("public kit filters hidden media before selecting the six; owner Insights keeps the row", () => {
+  it("public kit filters hidden media before selecting the six; owner Insights keeps the row", async () => {
     const first = seedOwnerMedia[0]!;
     const hiddenAt = "2026-09-02T12:00:00.000Z";
     const overlay = { userId: seedUser.id, hidden: { [first.id]: hiddenAt } };
 
-    const owner = loadOwnerKit(DEMO_HANDLE, NOW, overlay);
+    const owner = await loadOwnerKit(DEMO_HANDLE, NOW, overlay);
     assert.ok(owner);
     const ownerHidden = owner.posts.find((post) => post.id === first.id);
     assert.ok(ownerHidden);
     assert.equal(ownerHidden.hidden_from_kit_at, hiddenAt);
     assert.equal(owner.posts.length, seedOwnerMedia.length);
 
-    const publicKit = loadPublicKit(DEMO_HANDLE, NOW, overlay);
+    const publicKit = await loadPublicKit(DEMO_HANDLE, NOW, overlay);
     assert.ok(publicKit);
     assert.equal(publicKit.posts.some((post) => post.id === first.id), false);
   });
 
-  it("omits reach_series on the public /k/ kit without Insights", () => {
-    const publicKit = loadPublicKit(DEMO_HANDLE, NOW);
+  it("omits reach_series on the public /k/ kit without Insights", async () => {
+    const publicKit = await loadPublicKit(DEMO_HANDLE, NOW);
     assert.ok(publicKit);
     assert.equal(publicKit.hasInsights, false);
     assert.equal("reach_series" in publicKit, false);

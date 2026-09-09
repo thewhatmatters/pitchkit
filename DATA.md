@@ -150,7 +150,7 @@ Stamped contract. Not a Graph column.
 | Public kit | filter `hidden_from_kit_at != null` **before** `selectSixPosts` |
 | Owner Insights | keep the row (`hidden_from_kit_at` set). FE partitions: **"N shown"** + rank = `null` only; Hidden rows stay for MoreMenu **Restore to kit** / toast Undo |
 
-**Seed path:** until Hyperdrive, seed SoT is an in-memory Map (`userId` → mediaId → ISO) on `globalThis` plus httpOnly `pitchkit_hidden` cookie mirror (`{ userId, hidden }`) so anon `/k/[handle]` sees hides. Cold start may clear the Map until Neon. FE calls the routes only — no localStorage. Do not invent Graph columns.
+**Seed path:** until Hyperdrive, seed SoT is KV `HIDDEN_KIT` (`hidden:<userId>` → JSON `Record<mediaId, ISO>`). httpOnly `pitchkit_hidden` (`{ userId, hidden }`) is the owner reload mirror. Public `/k/[handle]` reads KV for the kit owner, not the visitor cookie. FE calls the routes only — no localStorage. Do not invent Graph columns.
 
 ## Graph hygiene (not extra columns)
 
