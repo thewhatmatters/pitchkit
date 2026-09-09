@@ -17,7 +17,6 @@
       "service": "pitchkit",
     },
   ],
-
   "kv_namespaces": [
     {
       "binding": "HIDDEN_KIT",
@@ -34,7 +33,4 @@
   // "r2_buckets": [
   //   { "binding": "MEDIA", "bucket_name": "pitchkit-media" },
   // ],
-  "kv_namespaces": [
-    { "binding": "HIDDEN_KIT", "id": "8a50f78eca5e4bf7bbabc96d9f9df63c" }
-  ],
 }
