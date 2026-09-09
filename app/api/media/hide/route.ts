@@ -1,6 +1,7 @@
-import { mediaVisibilityPost } from "@/lib/media-visibility-route";
+import { mediaVisibilityResponse } from "@/lib/hidden-kit";
 
-/** WHA-312: hideFromKit(mediaId) → POST /api/media/hide { mediaId } */
-export async function POST(request: Request) {
-  return mediaVisibilityPost(request, "hide");
+export const dynamic = "force-dynamic";
+
+export function POST(request: Request) {
+  return mediaVisibilityResponse(request, "hide");
 }

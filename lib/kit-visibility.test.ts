@@ -5,13 +5,17 @@ import {
   applyOverlayToMedia,
   applyRestore,
   hiddenIdsFromOverlay,
+  hideFromKit,
   hideInOverlay,
+  MEDIA_HIDE_PATH,
+  MEDIA_RESTORE_PATH,
   mediaVisibleOnKit,
   mediaVisibilityErrorMessage,
   mediaVisibilityStatus,
   parseHiddenCookie,
   parseMediaIdBody,
   restoreInOverlay,
+  restoreToKit,
   serializeHiddenCookie,
 } from "./kit-visibility";
 
@@ -104,5 +108,91 @@ describe("kit visibility overlay", () => {
     assert.equal(parseMediaIdBody({ mediaId: 1 }), null);
     assert.equal(parseMediaIdBody({}), null);
     assert.equal(parseMediaIdBody(null), null);
+  });
+});
+
+describe("hideFromKit / restoreToKit", () => {
+  const originalFetch = globalThis.fetch;
+
+  function mockFetch(handler: typeof fetch) {
+    globalThis.fetch = handler;
+  }
+
+  function restoreFetch() {
+    globalThis.fetch = originalFetch;
+  }
+
+  it("posts { mediaId } to the stamped hide and restore routes", async () => {
+    const calls: Array<{ path: string; body: unknown }> = [];
+    mockFetch(async (input, init) => {
+      calls.push({
+        path: String(input),
+        body: JSON.parse(String(init?.body)),
+      });
+      const mediaId = (calls.at(-1)?.body as { mediaId: string }).mediaId;
+      const hiddenFromKitAt = String(input) === MEDIA_HIDE_PATH ? "2026-09-02T12:00:00.000Z" : null;
+      return new Response(JSON.stringify({ mediaId, hiddenFromKitAt }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
+    });
+    try {
+      assert.deepEqual(await hideFromKit("media-1"), {
+        ok: true,
+        mediaId: "media-1",
+        hiddenFromKitAt: "2026-09-02T12:00:00.000Z",
+      });
+      assert.deepEqual(await restoreToKit("media-1"), {
+        ok: true,
+        mediaId: "media-1",
+        hiddenFromKitAt: null,
+      });
+      assert.deepEqual(calls, [
+        { path: MEDIA_HIDE_PATH, body: { mediaId: "media-1" } },
+        { path: MEDIA_RESTORE_PATH, body: { mediaId: "media-1" } },
+      ]);
+    } finally {
+      restoreFetch();
+    }
+  });
+
+  it("returns stamped persist_failed when the API is unreachable", async () => {
+    mockFetch(async () => {
+      throw new TypeError("Failed to fetch");
+    });
+    try {
+      const hide = await hideFromKit("media-1");
+      const restore = await restoreToKit("media-1");
+      assert.deepEqual(hide, {
+        ok: false,
+        code: "persist_failed",
+        error: "Hide could not be saved.",
+      });
+      assert.deepEqual(restore, {
+        ok: false,
+        code: "persist_failed",
+        error: "Restore could not be saved.",
+      });
+    } finally {
+      restoreFetch();
+    }
+  });
+
+  it("returns stamped HTTP errors without a local persist", async () => {
+    mockFetch(async () => {
+      return new Response(JSON.stringify({ error: "unauthenticated" }), {
+        status: 401,
+        headers: { "content-type": "application/json" },
+      });
+    });
+    try {
+      assert.deepEqual(await hideFromKit("media-1"), {
+        ok: false,
+        code: "unauthenticated",
+        error: "Sign in to change kit posts.",
+      });
+    } finally {
+      restoreFetch();
+    }
   });
 });

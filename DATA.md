@@ -4,7 +4,7 @@
 
 Canonical list of Postgres tables and columns. Product rules: [PLAN.md](./PLAN.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md).
 
-SQL: `db/001_users.sql`, `db/002_media.sql`, `db/003_detections.sql`, `db/004_weekly_counts.sql`, `db/005_media_hidden_from_kit_at.sql`. Types: `lib/schema.ts`. In-repo seed (same columns, not Graph): `lib/seed.ts`. Handle `demo` is frozen. Until Hyperdrive exists the Worker reads that seed. `TOKEN_KEY` is not required for seed rows (tokens stay null). The Pitchkit session is an httpOnly cookie (`pitchkit_session` = handle), not a Graph column and not the Instagram token.
+SQL: `db/001_users.sql`, `db/002_media.sql`, `db/003_detections.sql`, `db/004_weekly_counts.sql`, `db/005_media_hidden_from_kit.sql`. Types: `lib/schema.ts`. In-repo seed (same columns, not Graph): `lib/seed.ts`. Handle `demo` is frozen. Until Hyperdrive exists the Worker reads that seed. `TOKEN_KEY` is not required for seed rows (tokens stay null). The Pitchkit session is an httpOnly cookie (`pitchkit_session` = handle), not a Graph column and not the Instagram token.
 
 Photos live in object storage (R2), **publicly readable** for kit objects (already public posts). Do not use expiring signed URLs for the kit. SQL stores keys, not image bytes.
 
@@ -150,7 +150,7 @@ Stamped contract. Not a Graph column.
 | Public kit | filter `hidden_from_kit_at != null` **before** `selectSixPosts` |
 | Owner Insights | keep the row so toast Undo can `restoreToKit` the same `media.id` |
 
-**Seed path:** until Hyperdrive, the routes may persist an httpOnly overlay (`pitchkit_hidden` = `{ [mediaId]: ISO }`) that stamps `hidden_from_kit_at` onto seed rows. FE just calls the routes. LocalStorage is fallback only when the API is unreachable — not the primary store. Do not invent Graph columns.
+**Seed path:** until Hyperdrive, seed SoT is an in-memory Map (`userId` → mediaId → ISO) on `globalThis` plus httpOnly `pitchkit_hidden` cookie mirror (`{ userId, hidden }`) so anon `/k/[handle]` sees hides. Cold start may clear the Map until Neon. FE calls the routes only — no localStorage. Do not invent Graph columns.
 
 ## Graph hygiene (not extra columns)
 

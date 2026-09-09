@@ -1,6 +1,7 @@
-import { mediaVisibilityPost } from "@/lib/media-visibility-route";
+import { mediaVisibilityResponse } from "@/lib/hidden-kit";
 
-/** WHA-312: restoreToKit(mediaId) → POST /api/media/restore { mediaId } */
-export async function POST(request: Request) {
-  return mediaVisibilityPost(request, "restore");
+export const dynamic = "force-dynamic";
+
+export function POST(request: Request) {
+  return mediaVisibilityResponse(request, "restore");
 }

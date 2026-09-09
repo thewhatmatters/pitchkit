@@ -65,7 +65,7 @@ Same table as [PLAN.md](./PLAN.md#stack-locked). Short version:
 
 | Piece | Role |
 |---|---|
-| Workers / OpenNext | All HTML and APIs. Sets the httpOnly session cookie. Encrypts tokens with `TOKEN_KEY` before SQL. Until live OAuth, stub `/auth/instagram` sets `pitchkit_session` for seed `demo` (not a token). `/auth/sign-out` clears it. Hide/restore: `POST /api/media/hide` and `POST /api/media/restore` (`{ mediaId }` → `{ mediaId, hiddenFromKitAt }`). Until Hyperdrive, seed persist is an httpOnly overlay; FE just calls the routes. |
+| Workers / OpenNext | All HTML and APIs. Sets the httpOnly session cookie. Encrypts tokens with `TOKEN_KEY` before SQL. Until live OAuth, stub `/auth/instagram` sets `pitchkit_session` for seed `demo` (not a token). `/auth/sign-out` clears it and `pitchkit_hidden`. Hide/restore: `POST /api/media/hide` and `POST /api/media/restore` (`{ mediaId }` → `{ mediaId, hiddenFromKitAt }`). Seed SoT: in-memory Map + httpOnly `pitchkit_hidden` mirror so anon `/k/[handle]` sees hides; cold start may clear the Map until Neon. FE calls the routes only (no localStorage). |
 | Instagram | Login and Graph **only while the creator is connecting or we are polling**. Pin `GRAPH_API_VERSION`. No webhooks in v1. Stub connect does not call Graph. |
 | Hyperdrive → Neon | `users`, `media`, empty `detections` and `weekly_counts`. Bindings: `HYPERDRIVE` / `HYPERDRIVE_PREVIEW`. Until Hyperdrive exists, `/k/demo` and `/insights` read `lib/seed.ts` — same types as live. Schema SQL: `db/*.sql`. |
 | R2 `pitchkit-media` | Bytes. Public read for kit objects. Keys on `avatar_r2_key` / `r2_key`. Prefix `{user_id}/`. |

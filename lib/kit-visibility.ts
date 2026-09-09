@@ -12,9 +12,9 @@
  *           403 forbidden, 500 persist_failed
  * Idempotent. Schema field: media.hidden_from_kit_at
  *
+ * Product SoT is the POST routes — not window.localStorage.
  * Seed path: Backend may use an httpOnly overlay until Hyperdrive.
- * FE just calls the routes. Local durable stub is fallback only when
- * the API is unreachable — not the primary store.
+ * FE just calls the routes. API failure returns a stamped error only.
  */
 
 export const HIDDEN_COOKIE = "pitchkit_hidden";
@@ -241,30 +241,12 @@ async function postMediaVisibility(
     const code = errorFromResponse(response.status, payload);
     return { ok: false, code, error: mediaVisibilityErrorMessage(code, action) };
   } catch {
-    return persistLocalStub(action, mediaId);
-  }
-}
-
-function persistLocalStub(action: MediaVisibilityAction, mediaId: string): MediaVisibilityResult {
-  if (typeof window === "undefined") {
     return {
       ok: false,
       code: "persist_failed",
       error: mediaVisibilityErrorMessage("persist_failed", action),
     };
   }
-
-  const overlay = parseHiddenCookie(window.localStorage.getItem(HIDDEN_COOKIE));
-  if (action === "hide") {
-    const hiddenFromKitAt = overlay[mediaId] ?? new Date().toISOString();
-    const next = hideInOverlay(overlay, mediaId, hiddenFromKitAt);
-    window.localStorage.setItem(HIDDEN_COOKIE, serializeHiddenCookie(next));
-    return { ok: true, mediaId, hiddenFromKitAt: next[mediaId] ?? hiddenFromKitAt };
-  }
-
-  const next = restoreInOverlay(overlay, mediaId);
-  window.localStorage.setItem(HIDDEN_COOKIE, serializeHiddenCookie(next));
-  return { ok: true, mediaId, hiddenFromKitAt: null };
 }
 
 /** Owner Insights MoreMenu → AlertDialog confirm. */

@@ -143,12 +143,15 @@ describe("critical page contracts", () => {
     assert.match(proof, /result\.error/);
     assert.match(read("lib/kit-visibility.ts"), /POST \/api\/media\/hide/);
     assert.match(read("lib/kit-visibility.ts"), /POST \/api\/media\/restore/);
-    assert.match(read("app/api/media/hide/route.ts"), /mediaVisibilityPost\(request, "hide"\)/);
-    assert.match(read("app/api/media/restore/route.ts"), /mediaVisibilityPost\(request, "restore"\)/);
+    assert.match(read("app/api/media/hide/route.ts"), /mediaVisibilityResponse\(request, "hide"\)/);
+    assert.match(read("app/api/media/restore/route.ts"), /mediaVisibilityResponse\(request, "restore"\)/);
     assert.doesNotMatch(read("lib/kit-visibility.ts"), /\/api\/kit\/visibility/);
+    assert.doesNotMatch(read("lib/kit-visibility.ts"), /localStorage\.(get|set)Item/);
+    assert.doesNotMatch(read("lib/kit-visibility.ts"), /persistLocalStub/);
+    assert.doesNotMatch(read("components/proof-posts.tsx"), /localStorage/);
     assert.match(read("lib/schema.ts"), /hidden_from_kit_at/);
-    assert.match(read("lib/store.ts"), /mediaVisibleOnKit/);
-    assert.match(read("lib/store.ts"), /Hidden rows stay in the payload/);
+    assert.match(read("lib/store.ts"), /hiddenOverlayForHandle/);
+    assert.match(read("lib/store.ts"), /Includes every owner row/);
     assert.doesNotMatch(read("app/insights/page.tsx"), /mediaVisibleOnKit/);
     assert.match(audience, /Chart\.RankedBars/);
     assert.match(chart, /Chart\.Cartesian/);
@@ -160,6 +163,45 @@ describe("critical page contracts", () => {
     assert.match(read("components/wmds.ts"), /chartMaxTicksForWidth/);
     assert.match(read("package.json"), /wmds#2f3d828374e02566af5419f21e937c02b958135f/);
     assert.doesNotMatch(page, /Owner Insights\. Brands never see this page/);
+  });
+
+  it("hide/restore persist through owner APIs and an httpOnly overlay, not localStorage", () => {
+    const hide = read("app/api/media/hide/route.ts");
+    const restore = read("app/api/media/restore/route.ts");
+    const hidden = read("lib/hidden-kit.ts");
+    const store = read("lib/store.ts");
+    const data = read("DATA.md");
+    const migration = read("db/005_media_hidden_from_kit.sql");
+    const schema = read("lib/schema.ts");
+    const kit = read("lib/kit.ts");
+    const insights = read("app/insights/page.tsx");
+    const publicKit = read("app/k/[handle]/page.tsx");
+
+    assert.match(hide, /mediaVisibilityResponse/);
+    assert.match(hide, /"hide"/);
+    assert.match(restore, /mediaVisibilityResponse/);
+    assert.match(restore, /"restore"/);
+    assert.match(hidden, /export function hideFromKit/);
+    assert.match(hidden, /export function restoreToKit/);
+    assert.match(hidden, /pitchkit_hidden|HIDDEN_COOKIE/);
+    assert.match(hidden, /HttpOnly/);
+    assert.match(store, /excludeHiddenFromPublicKit/);
+    assert.match(store, /export \{ hideFromKit, restoreToKit/);
+    assert.match(store, /hiddenOverlayForHandle/);
+    assert.match(hidden, /globalThis/);
+    assert.match(hidden, /mergeHiddenOverlay/);
+    assert.match(hidden, /__pitchkitHiddenFromKit/);
+    assert.match(kit, /excludeHiddenFromPublicKit/);
+    assert.match(publicKit, /hiddenOverlayForHandle/);
+    assert.match(schema, /hidden_from_kit_at/);
+    assert.match(data, /hidden_from_kit_at/);
+    assert.match(migration, /hidden_from_kit_at timestamptz/);
+    assert.match(insights, /hiddenOverlayForHandle/);
+    assert.match(publicKit, /HIDDEN_COOKIE/);
+    assert.doesNotMatch(hidden, /localStorage/);
+    assert.doesNotMatch(store, /localStorage/);
+    assert.doesNotMatch(hide, /localStorage/);
+    assert.doesNotMatch(restore, /localStorage/);
   });
 
   it("settings is account only", () => {

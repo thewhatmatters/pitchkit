@@ -88,7 +88,7 @@ export type Media = {
   impressions: number | null;
   fetched_at: string;
   insights_fetched_at: string | null;
-  /** ISO timestamp when hidden from the public kit; null = visible. Not Graph. */
+  /** NULL = on the public kit. ISO timestamptz = hidden from /k/[handle]. */
   hidden_from_kit_at: string | null;
 };
 

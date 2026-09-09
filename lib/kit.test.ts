@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { beforeEach, describe, it } from "node:test";
 import { engagementRate } from "./engagement";
-import { assemblePublicKit, isUtcDay, kitHasInsights, selectSixPosts } from "./kit";
+import {
+  assemblePublicKit,
+  excludeHiddenFromPublicKit,
+  isUtcDay,
+  kitHasInsights,
+  selectSixPosts,
+} from "./kit";
 import type { Media, User } from "./schema";
 import { MEDIA_COLUMNS, USER_COLUMNS } from "./schema";
 import {
@@ -13,9 +19,14 @@ import {
   seedUser,
   seedWeeklyCounts,
 } from "./seed";
+import { resetHiddenFromKitStore } from "./hidden-kit";
 import { loadOwnerKit, loadPublicKit } from "./store";
 
 const NOW = new Date("2026-09-02T12:00:00.000Z");
+
+beforeEach(() => {
+  resetHiddenFromKitStore();
+});
 
 function media(partial: Partial<Media> & Pick<Media, "id" | "posted_at" | "like_count">): Media {
   return {
@@ -88,6 +99,26 @@ describe("selectSixPosts", () => {
     assert.deepEqual(
       selectSixPosts(rows, NOW).map((row) => row.id),
       ["b", "c", "d", "a", "f", "g"],
+    );
+  });
+
+  it("fills from older fetched posts after hidden rows are dropped", () => {
+    const rows = [
+      media({
+        id: "hidden-top",
+        posted_at: "2026-08-20T00:00:00.000Z",
+        saves: 99,
+        like_count: 1,
+        hidden_from_kit_at: "2026-09-09T01:30:00.000Z",
+      }),
+      media({ id: "w1", posted_at: "2026-08-21T00:00:00.000Z", saves: 2, like_count: 1 }),
+      media({ id: "w2", posted_at: "2026-08-22T00:00:00.000Z", saves: 1, like_count: 1 }),
+      media({ id: "o1", posted_at: "2026-07-01T00:00:00.000Z", saves: 8, like_count: 1 }),
+    ];
+
+    assert.deepEqual(
+      selectSixPosts(excludeHiddenFromPublicKit(rows), NOW).map((row) => row.id),
+      ["w1", "w2", "o1"],
     );
   });
 
@@ -218,7 +249,7 @@ describe("reach_series kit payload", () => {
   it("public kit filters hidden media before selecting the six; owner Insights keeps the row", () => {
     const first = seedOwnerMedia[0]!;
     const hiddenAt = "2026-09-02T12:00:00.000Z";
-    const overlay = { [first.id]: hiddenAt };
+    const overlay = { userId: seedUser.id, hidden: { [first.id]: hiddenAt } };
 
     const owner = loadOwnerKit(DEMO_HANDLE, NOW, overlay);
     assert.ok(owner);
