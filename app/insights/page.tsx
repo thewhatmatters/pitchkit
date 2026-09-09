@@ -4,11 +4,7 @@ import { AppFrame, OWNER_GRID_MAX } from "@/components/app-frame";
 import { OwnerChrome } from "@/components/owner-chrome";
 import { OwnerNav } from "@/components/owner-nav";
 import { SupportFooter } from "@/components/support-footer";
-import {
-  HIDDEN_COOKIE,
-  hiddenIdsForHandle,
-  parseHiddenCookie,
-} from "@/lib/kit-visibility";
+import { HIDDEN_COOKIE, parseHiddenCookie } from "@/lib/kit-visibility";
 import { insightsGate, parseSessionValue, SESSION_COOKIE } from "@/lib/session";
 import { loadOwnerKit } from "@/lib/store";
 
@@ -25,11 +21,8 @@ export default async function InsightsPage({ searchParams }: InsightsProps) {
   }
 
   const gridReady = grid !== "pulling";
-  const hiddenIds = hiddenIdsForHandle(
-    parseHiddenCookie(cookieStore.get(HIDDEN_COOKIE)?.value),
-    session.handle,
-  );
-  const kit = loadOwnerKit(session.handle, new Date(), hiddenIds);
+  const overlay = parseHiddenCookie(cookieStore.get(HIDDEN_COOKIE)?.value);
+  const kit = loadOwnerKit(session.handle, new Date(), overlay);
   if (!kit) {
     redirect("/");
   }

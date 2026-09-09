@@ -1,29 +1,109 @@
 /**
- * Hide-from-kit / restore seam (WHA-311 FE, WHA-312 Backend).
+ * Hide-from-kit / restore seam (WHA-311 FE, WHA-312 contract).
  *
- * Product code calls `hideFromKit` / `restoreToKit` only. Do not persist
- * hide state in React memory without going through this module.
+ * Product code calls `hideFromKit(mediaId)` / `restoreToKit(mediaId)` only.
+ * Do not persist hide state in React memory without going through this module.
  *
- * Stub: durable cookie `pitchkit_hidden` keyed by frozen handle → media ids.
- * Backend replaces the cookie store with SQL (proposed `media.hidden_from_kit`
- * or `media.kit_hidden_at`) and the same route shapes.
+ * Routes:
+ *   hideFromKit(mediaId)    → POST /api/media/hide    body { mediaId }
+ *   restoreToKit(mediaId)   → POST /api/media/restore body { mediaId }
+ * Success 200: { mediaId, hiddenFromKitAt }  // ISO string or null
+ * Failures: 401 unauthenticated, 400 invalid_body, 404 not_found,
+ *           403 forbidden, 500 persist_failed
+ * Idempotent. Schema field: media.hidden_from_kit_at
+ *
+ * Seed path: Backend may use an httpOnly overlay until Hyperdrive.
+ * FE just calls the routes. Local durable stub is fallback only when
+ * the API is unreachable — not the primary store.
  */
 
 export const HIDDEN_COOKIE = "pitchkit_hidden";
 
-export const KIT_VISIBILITY_PATH = "/api/kit/visibility";
+export const MEDIA_HIDE_PATH = "/api/media/hide";
+export const MEDIA_RESTORE_PATH = "/api/media/restore";
 
-export type HiddenByHandle = Record<string, string[]>;
+export type MediaVisibilityAction = "hide" | "restore";
 
-export type KitVisibilityAction = "hide" | "restore";
+export type MediaVisibilityError =
+  | "unauthenticated"
+  | "invalid_body"
+  | "not_found"
+  | "forbidden"
+  | "persist_failed";
 
-export type KitVisibilityResult = {
-  ok: boolean;
-  hiddenIds: string[];
-  error?: string;
+/** mediaId → ISO timestamp. Absent key = visible on the public kit. */
+export type HiddenOverlay = Record<string, string>;
+
+export type MediaVisibilitySuccess = {
+  mediaId: string;
+  hiddenFromKitAt: string | null;
 };
 
-export function parseHiddenCookie(value: string | undefined | null): HiddenByHandle {
+export type MediaVisibilityResult =
+  | ({ ok: true } & MediaVisibilitySuccess)
+  | { ok: false; error: string; code: MediaVisibilityError };
+
+const ERROR_STATUS: Record<MediaVisibilityError, number> = {
+  unauthenticated: 401,
+  invalid_body: 400,
+  not_found: 404,
+  forbidden: 403,
+  persist_failed: 500,
+};
+
+const STATUS_ERROR: Record<number, MediaVisibilityError> = {
+  401: "unauthenticated",
+  400: "invalid_body",
+  404: "not_found",
+  403: "forbidden",
+  500: "persist_failed",
+};
+
+export function isMediaVisibilityError(value: unknown): value is MediaVisibilityError {
+  return (
+    value === "unauthenticated" ||
+    value === "invalid_body" ||
+    value === "not_found" ||
+    value === "forbidden" ||
+    value === "persist_failed"
+  );
+}
+
+export function mediaVisibilityStatus(code: MediaVisibilityError): number {
+  return ERROR_STATUS[code];
+}
+
+/** Honest copy for the failure codes. */
+export function mediaVisibilityErrorMessage(
+  code: MediaVisibilityError,
+  action: MediaVisibilityAction = "hide",
+): string {
+  switch (code) {
+    case "unauthenticated":
+      return "Sign in to change kit posts.";
+    case "invalid_body":
+      return action === "restore" ? "That restore request was invalid." : "That hide request was invalid.";
+    case "not_found":
+      return "That post was not found.";
+    case "forbidden":
+      return "You cannot change this post.";
+    case "persist_failed":
+      return action === "restore" ? "Restore could not be saved." : "Hide could not be saved.";
+  }
+}
+
+export function parseMediaIdBody(body: unknown): string | null {
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return null;
+  }
+  const mediaId = (body as { mediaId?: unknown }).mediaId;
+  if (typeof mediaId !== "string" || mediaId.length === 0) {
+    return null;
+  }
+  return mediaId;
+}
+
+export function parseHiddenCookie(value: string | undefined | null): HiddenOverlay {
   if (!value) {
     return {};
   }
@@ -34,15 +114,15 @@ export function parseHiddenCookie(value: string | undefined | null): HiddenByHan
       return {};
     }
 
-    const next: HiddenByHandle = {};
-    for (const [handle, ids] of Object.entries(parsed as Record<string, unknown>)) {
-      if (typeof handle !== "string" || handle.length === 0) {
+    const next: HiddenOverlay = {};
+    for (const [mediaId, hiddenAt] of Object.entries(parsed as Record<string, unknown>)) {
+      if (typeof mediaId !== "string" || mediaId.length === 0) {
         continue;
       }
-      if (!Array.isArray(ids)) {
+      if (typeof hiddenAt !== "string" || hiddenAt.length === 0) {
         continue;
       }
-      next[handle] = ids.filter((id): id is string => typeof id === "string" && id.length > 0);
+      next[mediaId] = hiddenAt;
     }
     return next;
   } catch {
@@ -50,45 +130,50 @@ export function parseHiddenCookie(value: string | undefined | null): HiddenByHan
   }
 }
 
-export function serializeHiddenCookie(map: HiddenByHandle): string {
-  return JSON.stringify(map);
+export function serializeHiddenCookie(overlay: HiddenOverlay): string {
+  return JSON.stringify(overlay);
 }
 
-export function hiddenIdsForHandle(map: HiddenByHandle, handle: string): string[] {
-  return [...(map[handle] ?? [])];
+export function hiddenIdsFromOverlay(overlay: HiddenOverlay): string[] {
+  return Object.keys(overlay);
 }
 
-export function hideFromKitStore(
-  map: HiddenByHandle,
-  handle: string,
+export function hideInOverlay(
+  overlay: HiddenOverlay,
   mediaId: string,
-): HiddenByHandle {
-  const current = new Set(hiddenIdsForHandle(map, handle));
-  current.add(mediaId);
-  return { ...map, [handle]: [...current] };
-}
-
-export function restoreToKitStore(
-  map: HiddenByHandle,
-  handle: string,
-  mediaId: string,
-): HiddenByHandle {
-  const current = hiddenIdsForHandle(map, handle).filter((id) => id !== mediaId);
-  const next = { ...map };
-  if (current.length === 0) {
-    delete next[handle];
-  } else {
-    next[handle] = current;
+  hiddenFromKitAt: string,
+): HiddenOverlay {
+  if (overlay[mediaId]) {
+    return overlay;
   }
+  return { ...overlay, [mediaId]: hiddenFromKitAt };
+}
+
+export function restoreInOverlay(overlay: HiddenOverlay, mediaId: string): HiddenOverlay {
+  if (!(mediaId in overlay)) {
+    return overlay;
+  }
+  const next = { ...overlay };
+  delete next[mediaId];
   return next;
 }
 
-export function mediaVisibleOnKit<T extends { id: string }>(
+export function applyOverlayToMedia<T extends { id: string; hidden_from_kit_at: string | null }>(
   media: readonly T[],
-  hiddenIds: readonly string[],
+  overlay: HiddenOverlay,
 ): T[] {
-  const hidden = new Set(hiddenIds);
-  return media.filter((row) => !hidden.has(row.id));
+  return media.map((row) => ({
+    ...row,
+    hidden_from_kit_at: overlay[row.id] ?? row.hidden_from_kit_at,
+  }));
+}
+
+/** Public kit: drop hidden rows before selectSixPosts. */
+export function mediaVisibleOnKit<T extends { id: string; hidden_from_kit_at?: string | null }>(
+  media: readonly T[],
+  overlay: HiddenOverlay = {},
+): T[] {
+  return media.filter((row) => row.hidden_from_kit_at == null && overlay[row.id] == null);
 }
 
 /** Confirm-hide then Undo — same record identity. */
@@ -106,52 +191,88 @@ export function applyRestore<T extends { id: string }>(
   return [...posts, hiddenPost];
 }
 
-async function postVisibility(
-  action: KitVisibilityAction,
-  handle: string,
+function parseSuccess(payload: unknown, mediaId: string): MediaVisibilitySuccess | null {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return null;
+  }
+  const body = payload as { mediaId?: unknown; hiddenFromKitAt?: unknown };
+  if (body.mediaId !== mediaId) {
+    return null;
+  }
+  if (body.hiddenFromKitAt !== null && typeof body.hiddenFromKitAt !== "string") {
+    return null;
+  }
+  return { mediaId, hiddenFromKitAt: body.hiddenFromKitAt };
+}
+
+function errorFromResponse(status: number, payload: unknown): MediaVisibilityError {
+  if (payload && typeof payload === "object" && !Array.isArray(payload)) {
+    const code = (payload as { error?: unknown }).error;
+    if (isMediaVisibilityError(code)) {
+      return code;
+    }
+  }
+  return STATUS_ERROR[status] ?? "persist_failed";
+}
+
+async function postMediaVisibility(
+  action: MediaVisibilityAction,
   mediaId: string,
-): Promise<KitVisibilityResult> {
+): Promise<MediaVisibilityResult> {
+  const path = action === "hide" ? MEDIA_HIDE_PATH : MEDIA_RESTORE_PATH;
   try {
-    const response = await fetch(KIT_VISIBILITY_PATH, {
+    const response = await fetch(path, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ action, handle, mediaId }),
+      body: JSON.stringify({ mediaId }),
     });
-    const payload = (await response.json()) as Partial<KitVisibilityResult>;
-    if (!response.ok || payload.ok !== true || !Array.isArray(payload.hiddenIds)) {
-      return {
-        ok: false,
-        hiddenIds: Array.isArray(payload.hiddenIds) ? payload.hiddenIds : [],
-        error: payload.error ?? "Hide could not be saved.",
-      };
+    const payload: unknown = await response.json().catch(() => null);
+    if (response.ok) {
+      const success = parseSuccess(payload, mediaId);
+      if (!success) {
+        return {
+          ok: false,
+          code: "persist_failed",
+          error: mediaVisibilityErrorMessage("persist_failed", action),
+        };
+      }
+      return { ok: true, ...success };
     }
-    return { ok: true, hiddenIds: payload.hiddenIds };
+    const code = errorFromResponse(response.status, payload);
+    return { ok: false, code, error: mediaVisibilityErrorMessage(code, action) };
   } catch {
-    return persistLocalStub(action, handle, mediaId);
+    return persistLocalStub(action, mediaId);
   }
 }
 
-function persistLocalStub(
-  action: KitVisibilityAction,
-  handle: string,
-  mediaId: string,
-): KitVisibilityResult {
+function persistLocalStub(action: MediaVisibilityAction, mediaId: string): MediaVisibilityResult {
   if (typeof window === "undefined") {
-    return { ok: false, hiddenIds: [], error: "Hide could not be saved." };
+    return {
+      ok: false,
+      code: "persist_failed",
+      error: mediaVisibilityErrorMessage("persist_failed", action),
+    };
   }
 
-  const map = parseHiddenCookie(window.localStorage.getItem(HIDDEN_COOKIE));
-  const next = action === "hide" ? hideFromKitStore(map, handle, mediaId) : restoreToKitStore(map, handle, mediaId);
+  const overlay = parseHiddenCookie(window.localStorage.getItem(HIDDEN_COOKIE));
+  if (action === "hide") {
+    const hiddenFromKitAt = overlay[mediaId] ?? new Date().toISOString();
+    const next = hideInOverlay(overlay, mediaId, hiddenFromKitAt);
+    window.localStorage.setItem(HIDDEN_COOKIE, serializeHiddenCookie(next));
+    return { ok: true, mediaId, hiddenFromKitAt: next[mediaId] ?? hiddenFromKitAt };
+  }
+
+  const next = restoreInOverlay(overlay, mediaId);
   window.localStorage.setItem(HIDDEN_COOKIE, serializeHiddenCookie(next));
-  return { ok: true, hiddenIds: hiddenIdsForHandle(next, handle) };
+  return { ok: true, mediaId, hiddenFromKitAt: null };
 }
 
-/** Owner Insights MoreMenu → AlertDialog confirm. Backend plugs this. */
-export function hideFromKit(handle: string, mediaId: string): Promise<KitVisibilityResult> {
-  return postVisibility("hide", handle, mediaId);
+/** Owner Insights MoreMenu → AlertDialog confirm. */
+export function hideFromKit(mediaId: string): Promise<MediaVisibilityResult> {
+  return postMediaVisibility("hide", mediaId);
 }
 
 /** Toast Undo. Restores the same media id. */
-export function restoreToKit(handle: string, mediaId: string): Promise<KitVisibilityResult> {
-  return postVisibility("restore", handle, mediaId);
+export function restoreToKit(mediaId: string): Promise<MediaVisibilityResult> {
+  return postMediaVisibility("restore", mediaId);
 }

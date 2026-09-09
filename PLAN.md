@@ -52,7 +52,7 @@ Seed: `/k/demo`.
 | Creator | Continue with Instagram (Professional). Land on Insights. Share the kit URL. Reconnect, sign out, disconnect. Phone works. |
 | Brand | Open the kit. No account. |
 
-No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “contact for collab,” or geo on the **public kit**. `/insights` is the owner Graph layout (WMDS PitchKit creator Insights: `PageHeader`, four-up Stat, `Chart.Cartesian` + `Chart.RankedBars`, Recent proof). Primary nav is a WMDS `SegmentedControl` — Insights / PitchKit — no AppShell and no duplicate tabs on the page. Account is a quiet footer link. Mixes as `Chart.RankedBars`, not a map. Hide/restore posts through `hideFromKit` / `restoreToKit` (WHA-312). No new Postgres columns for identity typed holes.
+No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “contact for collab,” or geo on the **public kit**. `/insights` is the owner Graph layout (WMDS PitchKit creator Insights: `PageHeader`, four-up Stat, `Chart.Cartesian` + `Chart.RankedBars`, Recent proof). Primary nav is a WMDS `SegmentedControl` — Insights / PitchKit — no AppShell and no duplicate tabs on the page. Account is a quiet footer link. Mixes as `Chart.RankedBars`, not a map. Hide/restore posts through `hideFromKit(mediaId)` → `POST /api/media/hide` and `restoreToKit(mediaId)` → `POST /api/media/restore` (WHA-312). Success `{ mediaId, hiddenFromKitAt }`. Schema `media.hidden_from_kit_at`. Public kit filters before `selectSixPosts`; owner Insights keeps the row. No new Postgres columns for identity typed holes.
 
 ---
 

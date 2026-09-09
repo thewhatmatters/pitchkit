@@ -33,6 +33,7 @@ function media(partial: Partial<Media> & Pick<Media, "id" | "posted_at" | "like_
     impressions: null,
     fetched_at: NOW.toISOString(),
     insights_fetched_at: null,
+    hidden_from_kit_at: null,
     ...partial,
   };
 }
@@ -214,12 +215,21 @@ describe("reach_series kit payload", () => {
     );
   });
 
-  it("excludes hidden media ids before selecting the six", () => {
+  it("public kit filters hidden media before selecting the six; owner Insights keeps the row", () => {
     const first = seedOwnerMedia[0]!;
-    const owner = loadOwnerKit(DEMO_HANDLE, NOW, [first.id]);
+    const hiddenAt = "2026-09-02T12:00:00.000Z";
+    const overlay = { [first.id]: hiddenAt };
+
+    const owner = loadOwnerKit(DEMO_HANDLE, NOW, overlay);
     assert.ok(owner);
-    assert.equal(owner.posts.some((post) => post.id === first.id), false);
-    assert.equal(owner.posts.length, seedOwnerMedia.length - 1);
+    const ownerHidden = owner.posts.find((post) => post.id === first.id);
+    assert.ok(ownerHidden);
+    assert.equal(ownerHidden.hidden_from_kit_at, hiddenAt);
+    assert.equal(owner.posts.length, seedOwnerMedia.length);
+
+    const publicKit = loadPublicKit(DEMO_HANDLE, NOW, overlay);
+    assert.ok(publicKit);
+    assert.equal(publicKit.posts.some((post) => post.id === first.id), false);
   });
 
   it("omits reach_series on the public /k/ kit without Insights", () => {

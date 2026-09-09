@@ -121,7 +121,7 @@ export function OwnerChrome({
         </div>
       </div>
 
-      <ProofPosts handle={user.handle} posts={posts} hasInsights={hasInsights} loading={!gridReady} />
+      <ProofPosts posts={posts} hasInsights={hasInsights} loading={!gridReady} />
 
       <div className="col-span-full flex flex-wrap gap-2">
         <form action="/auth/instagram" method="post">

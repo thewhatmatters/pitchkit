@@ -38,13 +38,12 @@ function formatPostedAt(iso: string): string {
 }
 
 type ProofPostsProps = {
-  handle: string;
   posts: Media[];
   hasInsights: boolean;
   loading?: boolean;
 };
 
-export function ProofPosts({ handle, posts, hasInsights, loading = false }: ProofPostsProps) {
+export function ProofPosts({ posts, hasInsights, loading = false }: ProofPostsProps) {
   const [visiblePosts, setVisiblePosts] = useState(posts);
   const [proofMetric, setProofMetric] = useState<PostSortKey>(DEFAULT_POST_SORT);
   const [postNotice, setPostNotice] = useState<string | null>(null);
@@ -77,10 +76,10 @@ export function ProofPosts({ handle, posts, hasInsights, loading = false }: Proo
     setPostNotice("Post hidden from the shareable kit preview.");
     setPendingHidePostId(null);
 
-    const result = await hideFromKit(handle, hiddenPost.id);
+    const result = await hideFromKit(hiddenPost.id);
     if (!result.ok) {
       setVisiblePosts((current) => applyRestore(current, hiddenPost));
-      setPostNotice(result.error ?? "Hide could not be saved.");
+      setPostNotice(result.error);
       return;
     }
 
@@ -100,10 +99,10 @@ export function ProofPosts({ handle, posts, hasInsights, loading = false }: Proo
   async function restoreHiddenPost(hiddenPost: Media) {
     setVisiblePosts((current) => applyRestore(current, hiddenPost));
     setPostNotice("Post restored to the shareable kit preview.");
-    const result = await restoreToKit(handle, hiddenPost.id);
+    const result = await restoreToKit(hiddenPost.id);
     if (!result.ok) {
       setVisiblePosts((current) => applyHide(current, hiddenPost.id));
-      setPostNotice(result.error ?? "Restore could not be saved.");
+      setPostNotice(result.error);
     }
   }
 

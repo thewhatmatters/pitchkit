@@ -19,7 +19,8 @@ CREATE TABLE media (
   shares integer,
   impressions integer,
   fetched_at timestamptz NOT NULL,
-  insights_fetched_at timestamptz
+  insights_fetched_at timestamptz,
+  hidden_from_kit_at timestamptz
 );
 
 CREATE INDEX media_user_posted_at_idx ON media (user_id, posted_at DESC);

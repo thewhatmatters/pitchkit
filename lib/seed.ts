@@ -51,6 +51,7 @@ function post(
     impressions: null,
     fetched_at: FETCHED_AT,
     insights_fetched_at: null,
+    hidden_from_kit_at: null,
     ...fields,
   };
 }

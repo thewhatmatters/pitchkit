@@ -27,6 +27,7 @@ function media(
     impressions: null,
     fetched_at: "2026-09-02T12:00:00.000Z",
     insights_fetched_at: null,
+    hidden_from_kit_at: null,
     ...partial,
   };
 }
