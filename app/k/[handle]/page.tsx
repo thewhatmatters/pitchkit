@@ -5,7 +5,6 @@ import { AppFrame, OWNER_GRID_MAX } from "@/components/app-frame";
 import { KitEdit } from "@/components/kit-edit";
 import { OwnerNav } from "@/components/owner-nav";
 import { SupportFooter } from "@/components/support-footer";
-import { HIDDEN_COOKIE, parseHiddenOverlay } from "@/lib/hidden-kit";
 import { kitPath } from "@/lib/kit";
 import { parseSessionValue, SESSION_COOKIE, sessionOwnsHandle } from "@/lib/session";
 import { hiddenOverlayForHandle, loadPublicKit } from "@/lib/store";
@@ -16,12 +15,8 @@ type KitPageProps = {
 
 export async function generateMetadata({ params }: KitPageProps): Promise<Metadata> {
   const { handle } = await params;
-  const cookieStore = await cookies();
-  const overlay = hiddenOverlayForHandle(
-    handle,
-    parseHiddenOverlay(cookieStore.get(HIDDEN_COOKIE)?.value),
-  );
-  const kit = loadPublicKit(handle, new Date(), overlay);
+  const overlay = await hiddenOverlayForHandle(handle);
+  const kit = await loadPublicKit(handle, new Date(), overlay);
   if (!kit) {
     return { title: "Not found" };
   }
@@ -39,11 +34,8 @@ export async function generateMetadata({ params }: KitPageProps): Promise<Metada
 export default async function KitPage({ params }: KitPageProps) {
   const { handle } = await params;
   const cookieStore = await cookies();
-  const overlay = hiddenOverlayForHandle(
-    handle,
-    parseHiddenOverlay(cookieStore.get(HIDDEN_COOKIE)?.value),
-  );
-  const kit = loadPublicKit(handle, new Date(), overlay);
+  const overlay = await hiddenOverlayForHandle(handle);
+  const kit = await loadPublicKit(handle, new Date(), overlay);
   if (!kit) {
     notFound();
   }

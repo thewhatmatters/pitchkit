@@ -21,11 +21,11 @@ export default async function InsightsPage({ searchParams }: InsightsProps) {
   }
 
   const gridReady = grid !== "pulling";
-  const overlay = hiddenOverlayForHandle(
+  const overlay = await hiddenOverlayForHandle(
     session.handle,
     parseHiddenOverlay(cookieStore.get(HIDDEN_COOKIE)?.value),
   );
-  const kit = loadOwnerKit(session.handle, new Date(), overlay);
+  const kit = await loadOwnerKit(session.handle, new Date(), overlay);
   if (!kit) {
     redirect("/");
   }

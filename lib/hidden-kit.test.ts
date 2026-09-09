@@ -3,18 +3,20 @@ import { afterEach, beforeEach, describe, it } from "node:test";
 import {
   applyHiddenOverlay,
   cookieValue,
+  createMemoryHiddenKit,
   HIDDEN_COOKIE,
   hideFromKit,
   hiddenCookieSetHeader,
+  hiddenKitKey,
   mediaVisibilityResponse,
   mergeHiddenOverlay,
-  readHiddenFromKitStore,
-  resetHiddenFromKitStore,
   parseHiddenOverlay,
   parseMediaId,
   restoreToKit,
   serializeHiddenOverlay,
+  setHiddenKitNamespaceForTests,
 } from "./hidden-kit";
+import { hiddenKitStoreFromNamespace } from "./hidden-kit-kv";
 import { excludeHiddenFromPublicKit } from "./kit";
 import type { Media } from "./schema";
 import { DEMO_HANDLE, DEMO_USER_ID, seedMedia } from "./seed";
@@ -76,11 +78,11 @@ function postVisibility(
 }
 
 beforeEach(() => {
-  resetHiddenFromKitStore();
+  setHiddenKitNamespaceForTests(createMemoryHiddenKit());
 });
 
 afterEach(() => {
-  resetHiddenFromKitStore();
+  setHiddenKitNamespaceForTests(undefined);
 });
 
 describe("hide/restore helpers", () => {
@@ -89,9 +91,9 @@ describe("hide/restore helpers", () => {
     assert.equal(storeRestore, restoreToKit);
   });
 
-  it("hides and restores a seed post; hide is idempotent on the first timestamp", () => {
+  it("hides and restores a seed post; hide is idempotent on the first timestamp", async () => {
     assert.ok(session);
-    const hidden = hideFromKit({
+    const hidden = await hideFromKit({
       session,
       mediaId: TOP_ID,
       overlay: null,
@@ -107,7 +109,7 @@ describe("hide/restore helpers", () => {
     );
     assert.equal(hidden.overlay.hidden[TOP_ID], HIDDEN_AT);
 
-    const again = hideFromKit({
+    const again = await hideFromKit({
       session,
       mediaId: TOP_ID,
       overlay: hidden.overlay,
@@ -119,7 +121,7 @@ describe("hide/restore helpers", () => {
     }
     assert.equal(again.hiddenFromKitAt, HIDDEN_AT);
 
-    const restored = restoreToKit({
+    const restored = await restoreToKit({
       session,
       mediaId: TOP_ID,
       overlay: again.overlay,
@@ -131,7 +133,7 @@ describe("hide/restore helpers", () => {
     assert.equal(restored.hiddenFromKitAt, null);
     assert.equal(restored.overlay.hidden[TOP_ID], undefined);
 
-    const alreadyVisible = restoreToKit({
+    const alreadyVisible = await restoreToKit({
       session,
       mediaId: TOP_ID,
       overlay: restored.overlay,
@@ -143,25 +145,25 @@ describe("hide/restore helpers", () => {
     assert.equal(alreadyVisible.hiddenFromKitAt, null);
   });
 
-  it("returns the stamped failure codes", () => {
+  it("returns the stamped failure codes", async () => {
     assert.deepEqual(
-      hideFromKit({ session: null, mediaId: TOP_ID, overlay: null }),
+      await hideFromKit({ session: null, mediaId: TOP_ID, overlay: null }),
       { ok: false, status: 401, error: "unauthenticated" },
     );
     assert.deepEqual(
-      hideFromKit({ session, mediaId: 12, overlay: null }),
+      await hideFromKit({ session, mediaId: 12, overlay: null }),
       { ok: false, status: 400, error: "invalid_body" },
     );
     assert.deepEqual(
-      hideFromKit({ session, mediaId: "", overlay: null }),
+      await hideFromKit({ session, mediaId: "", overlay: null }),
       { ok: false, status: 400, error: "invalid_body" },
     );
     assert.deepEqual(
-      hideFromKit({ session, mediaId: "missing-media", overlay: null }),
+      await hideFromKit({ session, mediaId: "missing-media", overlay: null }),
       { ok: false, status: 404, error: "not_found" },
     );
     assert.deepEqual(
-      hideFromKit({
+      await hideFromKit({
         session,
         mediaId: "foreign",
         overlay: null,
@@ -170,7 +172,7 @@ describe("hide/restore helpers", () => {
       { ok: false, status: 403, error: "forbidden" },
     );
     assert.deepEqual(
-      hideFromKit({
+      await hideFromKit({
         session,
         mediaId: TOP_ID,
         overlay: null,
@@ -178,14 +180,18 @@ describe("hide/restore helpers", () => {
       }),
       { ok: false, status: 500, error: "persist_failed" },
     );
-    assert.equal(readHiddenFromKitStore(DEMO_USER_ID), undefined);
+    setHiddenKitNamespaceForTests(null);
+    assert.deepEqual(
+      await hideFromKit({ session, mediaId: TOP_ID, overlay: null }),
+      { ok: false, status: 500, error: "persist_failed" },
+    );
     assert.equal(parseMediaId(null), null);
     assert.equal(parseMediaId({ mediaId: TOP_ID }), TOP_ID);
   });
 });
 
 describe("public vs owner kit visibility", () => {
-  it("excludes hidden rows before selectSixPosts on the public kit only", () => {
+  it("excludes hidden rows before selectSixPosts on the public kit only", async () => {
     const rows = [
       media({ id: "top", posted_at: "2026-08-20T00:00:00.000Z", saves: 90, like_count: 1 }),
       media({ id: "mid", posted_at: "2026-08-21T00:00:00.000Z", saves: 40, like_count: 1 }),
@@ -208,7 +214,7 @@ describe("public vs owner kit visibility", () => {
       ["mid", "low", "old"],
     );
 
-    const publicKit = loadPublicKit(DEMO_HANDLE, NOW, {
+    const publicKit = await loadPublicKit(DEMO_HANDLE, NOW, {
       userId: DEMO_USER_ID,
       hidden: { [TOP_ID]: HIDDEN_AT },
     });
@@ -217,7 +223,7 @@ describe("public vs owner kit visibility", () => {
     assert.equal(publicKit.posts.length, 5);
     assert.equal(publicKit.posts.every((row) => row.hidden_from_kit_at == null), true);
 
-    const owner = loadOwnerKit(DEMO_HANDLE, NOW, {
+    const owner = await loadOwnerKit(DEMO_HANDLE, NOW, {
       userId: DEMO_USER_ID,
       hidden: { [TOP_ID]: HIDDEN_AT },
     });
@@ -229,8 +235,8 @@ describe("public vs owner kit visibility", () => {
     assert.equal(owner.reach_series?.length, 30);
   });
 
-  it("ignores another user's overlay cookie", () => {
-    const publicKit = loadPublicKit(DEMO_HANDLE, NOW, {
+  it("ignores another user's overlay cookie", async () => {
+    const publicKit = await loadPublicKit(DEMO_HANDLE, NOW, {
       userId: "someone-else",
       hidden: { [TOP_ID]: HIDDEN_AT },
     });
@@ -239,31 +245,58 @@ describe("public vs owner kit visibility", () => {
     assert.equal(publicKit.posts.length, 6);
   });
 
-  it("excludes a hidden post from the public kit without the hidden cookie (Map SoT)", () => {
+  it("excludes a hidden post from the public kit without the hidden cookie when KV has the entry", async () => {
+    const kv = createMemoryHiddenKit({ [DEMO_USER_ID]: { [TOP_ID]: HIDDEN_AT } });
+    setHiddenKitNamespaceForTests(kv);
+    assert.equal(await kv.get(hiddenKitKey(DEMO_USER_ID)), JSON.stringify({ [TOP_ID]: HIDDEN_AT }));
+
+    const brandKit = await loadPublicKit(DEMO_HANDLE, NOW, null);
+    assert.ok(brandKit);
+    assert.equal(brandKit.posts.some((row) => row.id === TOP_ID), false);
+    assert.equal(brandKit.posts.length, 5);
+
+    const merged = await mergeHiddenOverlay(DEMO_USER_ID, null);
+    assert.equal(merged.hidden[TOP_ID], HIDDEN_AT);
+  });
+
+  it("writes hide/restore through KV so anon kit visitors see the change", async () => {
     assert.ok(session);
-    const hidden = hideFromKit({
+    const kv = createMemoryHiddenKit();
+    setHiddenKitNamespaceForTests(kv);
+
+    const hidden = await hideFromKit({
       session,
       mediaId: TOP_ID,
       overlay: null,
       now: new Date(HIDDEN_AT),
     });
     assert.equal(hidden.ok, true);
-    assert.deepEqual(readHiddenFromKitStore(DEMO_USER_ID), { [TOP_ID]: HIDDEN_AT });
+    assert.equal(await kv.get(hiddenKitKey(DEMO_USER_ID)), JSON.stringify({ [TOP_ID]: HIDDEN_AT }));
 
-    const brandKit = loadPublicKit(DEMO_HANDLE, NOW, null);
+    const brandKit = await loadPublicKit(DEMO_HANDLE, NOW, null);
     assert.ok(brandKit);
     assert.equal(brandKit.posts.some((row) => row.id === TOP_ID), false);
     assert.equal(brandKit.posts.length, 5);
 
-    const merged = mergeHiddenOverlay(DEMO_USER_ID, null);
-    assert.equal(merged.hidden[TOP_ID], HIDDEN_AT);
-
-    const restored = restoreToKit({ session, mediaId: TOP_ID, overlay: null });
+    const restored = await restoreToKit({ session, mediaId: TOP_ID, overlay: null });
     assert.equal(restored.ok, true);
-    const after = loadPublicKit(DEMO_HANDLE, NOW, null);
+    assert.equal(await kv.get(hiddenKitKey(DEMO_USER_ID)), JSON.stringify({}));
+    const after = await loadPublicKit(DEMO_HANDLE, NOW, null);
     assert.ok(after);
     assert.equal(after.posts.some((row) => row.id === TOP_ID), true);
     assert.equal(after.posts.length, 6);
+  });
+
+  it("owner cookie fills only when the KV key is missing", async () => {
+    const cookie = { userId: DEMO_USER_ID, hidden: { [TOP_ID]: HIDDEN_AT } };
+
+    const fromCookie = await loadOwnerKit(DEMO_HANDLE, NOW, cookie);
+    assert.equal(fromCookie?.posts.find((row) => row.id === TOP_ID)?.hidden_from_kit_at, HIDDEN_AT);
+
+    const kv = createMemoryHiddenKit({ [DEMO_USER_ID]: {} });
+    setHiddenKitNamespaceForTests(kv);
+    const afterRestore = await loadOwnerKit(DEMO_HANDLE, NOW, cookie);
+    assert.equal(afterRestore?.posts.find((row) => row.id === TOP_ID)?.hidden_from_kit_at, null);
   });
 });
 
@@ -361,5 +394,16 @@ describe("POST /api/media/hide and /restore", () => {
     );
     assert.equal(response.status, 200);
     assert.doesNotMatch(await response.text(), /localStorage/);
+  });
+});
+
+describe("fake KV namespace", () => {
+  it("round-trips hidden:<userId> JSON through the store adapter", async () => {
+    const ns = createMemoryHiddenKit();
+    const store = hiddenKitStoreFromNamespace(ns);
+    assert.equal(await store.get(DEMO_USER_ID), undefined);
+    assert.equal(await store.put(DEMO_USER_ID, { [TOP_ID]: HIDDEN_AT }), true);
+    assert.deepEqual(await store.get(DEMO_USER_ID), { [TOP_ID]: HIDDEN_AT });
+    assert.equal(await ns.get(hiddenKitKey(DEMO_USER_ID)), JSON.stringify({ [TOP_ID]: HIDDEN_AT }));
   });
 });
