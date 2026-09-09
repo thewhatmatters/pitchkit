@@ -10,6 +10,33 @@ import {
 
 export { HIDDEN_COOKIE };
 
+/** Process-global seed SoT. Cookie is a cold-start / owner-reload mirror. */
+const HIDDEN_STORE_KEY = "__pitchkitHiddenFromKit";
+
+type HiddenByUser = Map<string, Record<string, string>>;
+
+function hiddenFromKitStore(): HiddenByUser {
+  const g = globalThis as typeof globalThis & { [HIDDEN_STORE_KEY]?: HiddenByUser };
+  if (!g[HIDDEN_STORE_KEY]) {
+    g[HIDDEN_STORE_KEY] = new Map();
+  }
+  return g[HIDDEN_STORE_KEY];
+}
+
+export function readHiddenFromKitStore(userId: string): Record<string, string> | undefined {
+  const hidden = hiddenFromKitStore().get(userId);
+  return hidden ? { ...hidden } : undefined;
+}
+
+export function writeHiddenFromKitStore(userId: string, hidden: Record<string, string>): void {
+  hiddenFromKitStore().set(userId, { ...hidden });
+}
+
+/** Test helper — isolate tests from leftover hide/restore writes. */
+export function resetHiddenFromKitStore(): void {
+  hiddenFromKitStore().clear();
+}
+
 export type HiddenOverlay = {
   userId: string;
   hidden: Record<string, string>;
@@ -169,6 +196,34 @@ export function overlayForUser(
   return { userId, hidden: {} };
 }
 
+/**
+ * Seed overlay for a user. Map is SoT in this isolate (wins conflicts).
+ * Cookie fills only when this isolate has no Map row yet (cold start).
+ */
+export function mergeHiddenOverlay(
+  userId: string,
+  cookie: HiddenOverlay | null = null,
+): HiddenOverlay {
+  const stored = readHiddenFromKitStore(userId);
+  if (stored !== undefined) {
+    // Map is SoT in this isolate. Cookie-only keys are ignored so restore wins
+    // over a stale overlay. Cookie fills when this user has no Map row (cold start).
+    return { userId, hidden: { ...stored } };
+  }
+  return overlayForUser(cookie, userId);
+}
+
+function overlayBaseForWrite(
+  userId: string,
+  cookie: HiddenOverlay | null,
+): Record<string, string> {
+  const stored = readHiddenFromKitStore(userId);
+  if (stored !== undefined) {
+    return { ...stored };
+  }
+  return overlayForUser(cookie, userId).hidden;
+}
+
 /** Stamp overlay timestamps onto copies. Caller skips this when Hyperdrive owns the column. */
 export function applyHiddenOverlay(
   media: Media[],
@@ -229,22 +284,22 @@ export function hideFromKit(input: {
   }
 
   const persist = input.persist ?? defaultHiddenPersist;
-  const overlay = overlayForUser(input.overlay, authorized.session.userId);
+  const hidden = overlayBaseForWrite(authorized.session.userId, input.overlay);
   const hiddenFromKitAt =
-    overlay.hidden[authorized.mediaId] ?? (input.now ?? new Date()).toISOString();
+    hidden[authorized.mediaId] ?? (input.now ?? new Date()).toISOString();
 
   if (!persist.write(authorized.session.userId, authorized.mediaId, hiddenFromKitAt)) {
     return failure("persist_failed");
   }
 
+  hidden[authorized.mediaId] = hiddenFromKitAt;
+  writeHiddenFromKitStore(authorized.session.userId, hidden);
+
   return {
     ok: true,
     mediaId: authorized.mediaId,
     hiddenFromKitAt,
-    overlay: {
-      userId: authorized.session.userId,
-      hidden: { ...overlay.hidden, [authorized.mediaId]: hiddenFromKitAt },
-    },
+    overlay: { userId: authorized.session.userId, hidden },
   };
 }
 
@@ -265,9 +320,9 @@ export function restoreToKit(input: {
     return failure("persist_failed");
   }
 
-  const overlay = overlayForUser(input.overlay, authorized.session.userId);
-  const hidden = { ...overlay.hidden };
+  const hidden = overlayBaseForWrite(authorized.session.userId, input.overlay);
   delete hidden[authorized.mediaId];
+  writeHiddenFromKitStore(authorized.session.userId, hidden);
 
   return {
     ok: true,

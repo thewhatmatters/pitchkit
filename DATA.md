@@ -4,7 +4,7 @@
 
 Canonical list of Postgres tables and columns. Product rules: [PLAN.md](./PLAN.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md).
 
-SQL: `db/001_users.sql`, `db/002_media.sql`, `db/003_detections.sql`, `db/004_weekly_counts.sql`, `db/005_media_hidden_from_kit.sql`. Types: `lib/schema.ts`. In-repo seed (same columns, not Graph): `lib/seed.ts`. Handle `demo` is frozen. Until Hyperdrive exists the Worker reads that seed. `TOKEN_KEY` is not required for seed rows (tokens stay null). The Pitchkit session is an httpOnly cookie (`pitchkit_session` = handle), not a Graph column and not the Instagram token. Hide/restore until Hyperdrive: httpOnly `pitchkit_hidden` overlay keyed to the session user (not localStorage).
+SQL: `db/001_users.sql`, `db/002_media.sql`, `db/003_detections.sql`, `db/004_weekly_counts.sql`, `db/005_media_hidden_from_kit.sql`. Types: `lib/schema.ts`. In-repo seed (same columns, not Graph): `lib/seed.ts`. Handle `demo` is frozen. Until Hyperdrive exists the Worker reads that seed. `TOKEN_KEY` is not required for seed rows (tokens stay null). The Pitchkit session is an httpOnly cookie (`pitchkit_session` = handle), not a Graph column and not the Instagram token. Hide/restore until Hyperdrive: in-memory Map keyed by `userId` (isolate SoT) plus an httpOnly `pitchkit_hidden` cookie mirror for owner reload after cold start (not localStorage). Cold start may clear the Map until Neon.
 
 Photos live in object storage (R2), **publicly readable** for kit objects (already public posts). Do not use expiring signed URLs for the kit. SQL stores keys, not image bytes.
 
@@ -135,7 +135,7 @@ Delete `users` + `media` + R2 `{user_id}/`.
 
 Owner demo seed (`loadOwnerKit`) includes ~30 labeled example points. Public `/k/demo` (`loadPublicKit`) has no Insights and omits `reach_series`. Frontend: one WMDS Chart on `/insights` from `owner.reach_series` only; hide the entire band when omitted or `[]`. Card.Body uses the Occupancy history occupant well; host-width paint gate is inside that well. Date-tick budget uses WMDS `chartMaxTicksForWidth`. Never zero-fill. Public kit never paints the Chart. No period-over-period KPI deltas in the payload — do not invent Stat `trend`s.
 
-**Hide from kit (WHA-312):** public `loadPublicKit` drops `hidden_from_kit_at != null` **before** `selectSixPosts`. Owner `loadOwnerKit` includes every owner row with `hidden_from_kit_at`. Seams: `hideFromKit` / `restoreToKit` → `POST /api/media/hide` and `POST /api/media/restore` `{ mediaId }`. 200 `{ mediaId, hiddenFromKitAt }` (`null` on restore). Errors: `unauthenticated` / `invalid_body` / `not_found` / `forbidden` / `persist_failed`. Idempotent. Seed path writes `pitchkit_hidden` (httpOnly, session-user keyed) until `hasHyperdrive()` is true.
+**Hide from kit (WHA-312):** public `loadPublicKit` drops `hidden_from_kit_at != null` **before** `selectSixPosts`. Owner `loadOwnerKit` includes every owner row with `hidden_from_kit_at`. Seams: `hideFromKit` / `restoreToKit` → `POST /api/media/hide` and `POST /api/media/restore` `{ mediaId }`. 200 `{ mediaId, hiddenFromKitAt }` (`null` on restore). Errors: `unauthenticated` / `invalid_body` / `not_found` / `forbidden` / `persist_failed`. Idempotent. Seed SoT is an in-memory `globalThis` Map (`userId` → mediaId → ISO) plus an httpOnly `pitchkit_hidden` cookie mirror. Public `/k/[handle]` merges that Map even when the visitor has no session cookie. Cold start may clear the Map until Neon. When `hasHyperdrive()` is true, write `media.hidden_from_kit_at` instead.
 
 ## Graph hygiene (not extra columns)
 

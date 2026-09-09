@@ -7,7 +7,7 @@
     "predev": "node scripts/copy-wmds-fonts.mjs",
     "prebuild": "node scripts/copy-wmds-fonts.mjs",
     "dev": "next dev",
-    "test": "tsx --test lib/**/*.test.ts",
+    "test": "tsx --test --test-concurrency=1 lib/**/*.test.ts",
     "build": "next build",
     "start": "next start",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",

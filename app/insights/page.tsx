@@ -8,7 +8,7 @@ import { Badge } from "@/components/wmds";
 import { INSIGHTS_PRIVATE } from "@/lib/copy";
 import { HIDDEN_COOKIE, parseHiddenOverlay } from "@/lib/hidden-kit";
 import { insightsGate, parseSessionValue, SESSION_COOKIE } from "@/lib/session";
-import { loadOwnerKit } from "@/lib/store";
+import { hiddenOverlayForHandle, loadOwnerKit } from "@/lib/store";
 
 type InsightsProps = {
   searchParams: Promise<{ grid?: string }>;
@@ -23,7 +23,10 @@ export default async function InsightsPage({ searchParams }: InsightsProps) {
   }
 
   const gridReady = grid !== "pulling";
-  const overlay = parseHiddenOverlay(cookieStore.get(HIDDEN_COOKIE)?.value);
+  const overlay = hiddenOverlayForHandle(
+    session.handle,
+    parseHiddenOverlay(cookieStore.get(HIDDEN_COOKIE)?.value),
+  );
   const kit = loadOwnerKit(session.handle, new Date(), overlay);
   if (!kit) {
     redirect("/");

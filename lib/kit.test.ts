@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { beforeEach, describe, it } from "node:test";
 import { engagementRate } from "./engagement";
 import {
   assemblePublicKit,
@@ -19,9 +19,14 @@ import {
   seedUser,
   seedWeeklyCounts,
 } from "./seed";
+import { resetHiddenFromKitStore } from "./hidden-kit";
 import { loadOwnerKit, loadPublicKit } from "./store";
 
 const NOW = new Date("2026-09-02T12:00:00.000Z");
+
+beforeEach(() => {
+  resetHiddenFromKitStore();
+});
 
 function media(partial: Partial<Media> & Pick<Media, "id" | "posted_at" | "like_count">): Media {
   return {

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { afterEach, beforeEach, describe, it } from "node:test";
 import {
   applyHiddenOverlay,
   cookieValue,
@@ -7,6 +7,9 @@ import {
   hideFromKit,
   hiddenCookieSetHeader,
   mediaVisibilityResponse,
+  mergeHiddenOverlay,
+  readHiddenFromKitStore,
+  resetHiddenFromKitStore,
   parseHiddenOverlay,
   parseMediaId,
   restoreToKit,
@@ -71,6 +74,14 @@ function postVisibility(
     path.endsWith("hide") ? "hide" : "restore",
   );
 }
+
+beforeEach(() => {
+  resetHiddenFromKitStore();
+});
+
+afterEach(() => {
+  resetHiddenFromKitStore();
+});
 
 describe("hide/restore helpers", () => {
   it("exports hideFromKit and restoreToKit from the store seam", () => {
@@ -167,6 +178,7 @@ describe("hide/restore helpers", () => {
       }),
       { ok: false, status: 500, error: "persist_failed" },
     );
+    assert.equal(readHiddenFromKitStore(DEMO_USER_ID), undefined);
     assert.equal(parseMediaId(null), null);
     assert.equal(parseMediaId({ mediaId: TOP_ID }), TOP_ID);
   });
@@ -225,6 +237,33 @@ describe("public vs owner kit visibility", () => {
     assert.ok(publicKit);
     assert.equal(publicKit.posts.some((row) => row.id === TOP_ID), true);
     assert.equal(publicKit.posts.length, 6);
+  });
+
+  it("excludes a hidden post from the public kit without the hidden cookie (Map SoT)", () => {
+    assert.ok(session);
+    const hidden = hideFromKit({
+      session,
+      mediaId: TOP_ID,
+      overlay: null,
+      now: new Date(HIDDEN_AT),
+    });
+    assert.equal(hidden.ok, true);
+    assert.deepEqual(readHiddenFromKitStore(DEMO_USER_ID), { [TOP_ID]: HIDDEN_AT });
+
+    const brandKit = loadPublicKit(DEMO_HANDLE, NOW, null);
+    assert.ok(brandKit);
+    assert.equal(brandKit.posts.some((row) => row.id === TOP_ID), false);
+    assert.equal(brandKit.posts.length, 5);
+
+    const merged = mergeHiddenOverlay(DEMO_USER_ID, null);
+    assert.equal(merged.hidden[TOP_ID], HIDDEN_AT);
+
+    const restored = restoreToKit({ session, mediaId: TOP_ID, overlay: null });
+    assert.equal(restored.ok, true);
+    const after = loadPublicKit(DEMO_HANDLE, NOW, null);
+    assert.ok(after);
+    assert.equal(after.posts.some((row) => row.id === TOP_ID), true);
+    assert.equal(after.posts.length, 6);
   });
 });
 

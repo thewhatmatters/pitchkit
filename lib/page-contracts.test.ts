@@ -193,11 +193,16 @@ describe("critical page contracts", () => {
     assert.match(hidden, /HttpOnly/);
     assert.match(store, /excludeHiddenFromPublicKit/);
     assert.match(store, /export \{ hideFromKit, restoreToKit/);
+    assert.match(store, /hiddenOverlayForHandle/);
+    assert.match(hidden, /globalThis/);
+    assert.match(hidden, /mergeHiddenOverlay/);
+    assert.match(hidden, /__pitchkitHiddenFromKit/);
     assert.match(kit, /excludeHiddenFromPublicKit/);
+    assert.match(publicKit, /hiddenOverlayForHandle/);
     assert.match(schema, /hidden_from_kit_at/);
     assert.match(data, /hidden_from_kit_at/);
     assert.match(migration, /hidden_from_kit_at timestamptz/);
-    assert.match(insights, /HIDDEN_COOKIE/);
+    assert.match(insights, /hiddenOverlayForHandle/);
     assert.match(publicKit, /HIDDEN_COOKIE/);
     assert.doesNotMatch(hidden, /localStorage/);
     assert.doesNotMatch(store, /localStorage/);
