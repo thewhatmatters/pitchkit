@@ -17,6 +17,13 @@
       "service": "pitchkit",
     },
   ],
+
+  "kv_namespaces": [
+    {
+      "binding": "HIDDEN_KIT",
+      "id": "8a50f78eca5e4bf7bbabc96d9f9df63c",
+    },
+  ],
   // Neon via Hyperdrive — add binding ids when the database exists.
   // Prod: HYPERDRIVE. Preview: HYPERDRIVE_PREVIEW.
   // "hyperdrive": [
