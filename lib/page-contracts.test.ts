@@ -52,6 +52,7 @@ describe("critical page contracts", () => {
     assert.match(nav, /kitPath/);
     assert.match(frame, /OWNER_GRID_MAX = "1140px"/);
     assert.match(frame, /OWNER_GRID_COLUMN_GAP = "8px"/);
+    assert.match(frame, /OWNER_GRID_CLASS/);
     assert.match(frame, /\[--grid-max:1140px\]/);
     assert.match(frame, /\[--grid-column-gap:8px\]/);
     assert.match(frame, /\[--grid-gutter:8px\]/);

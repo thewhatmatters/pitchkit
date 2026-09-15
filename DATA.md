@@ -148,7 +148,7 @@ Stamped contract. Not a Graph column.
 | Idempotent | hide-already-hidden keeps the first timestamp; restore-already-visible returns `null` |
 | Schema | `media.hidden_from_kit_at` |
 | Public kit | filter `hidden_from_kit_at != null` **before** `selectSixPosts` |
-| Owner Insights | keep the row (`hidden_from_kit_at` set). FE partitions: **"N shown"** + rank = `null` only; Hidden rows stay for MoreMenu **Restore to kit** / toast Undo |
+| Owner Insights | keep the row (`hidden_from_kit_at` set). FE partitions: **"N shown"** + rank = `null` only; Hidden rows stay for MoreMenu **Restore to kit** / toast Undo. `npm test` fail-closes this partition. |
 
 **Seed path:** until Hyperdrive, seed SoT is KV `HIDDEN_KIT` (`hidden:<userId>` → JSON `Record<mediaId, ISO>`). httpOnly `pitchkit_hidden` (`{ userId, hidden }`) is the owner reload mirror. Public `/k/[handle]` reads KV for the kit owner, not the visitor cookie. FE calls the routes only — no localStorage. Do not invent Graph columns.
 
