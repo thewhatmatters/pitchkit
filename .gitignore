@@ -9,3 +9,10 @@ node_modules/
 .dev.vars
 *.pem
 tsconfig.tsbuildinfo
+
+# verify-pitchkit: keep evidence on disk, never commit captures or the disposable profile
+.cursor/skills/verify-pitchkit/artifacts/**
+!.cursor/skills/verify-pitchkit/artifacts/**/
+!.cursor/skills/verify-pitchkit/artifacts/**/.gitkeep
+.cursor/skills/verify-pitchkit/.run/
+.cursor/skills/verify-pitchkit/helpers/node_modules/

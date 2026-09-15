@@ -24,6 +24,7 @@ Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md)
 - Cloudflare and Support (for now): **randy@whatmatters.so**. Neon region: pick when we create the database.
 - **UI:** `@whatmatters/wmds` (pattern-first, import `styles.css`). Layout Tailwind only (`grid-page` + `band` from CONSUMING). Owner views: `SegmentedControl` + Tailwind `[--grid-max:1140px] [--grid-column-gap:8px] [--grid-gutter:8px]`. Do not mount `GridOverlay` in product chrome. Do not invent a Pitchkit Grid atom. Do not compose AppShell. Lucide via WMDS. No shadcn. No Storybook in this repo. Pin `github:thewhatmatters/wmds#2f3d828374e02566af5419f21e937c02b958135f`. After install, copy Geist into `node_modules/@whatmatters/wmds/dist/files`.
 - **App:** Next.js App Router, TypeScript, Tailwind v4, official OpenNext on Workers. Charts: WMDS `Chart` only (`@visx/visx` peer). No Nivo in this `package.json`.
+- **Verify:** project-local skill [`.cursor/skills/verify-pitchkit/`](./.cursor/skills/verify-pitchkit/SKILL.md). Feature map in `features/`. Prefer live https://pitchkit.app. Dry-run: `control-pitchkit doctor` → drive `insights-overview` → evidence under `artifacts/insights-overview/`.
 
 ## Do not build
 
