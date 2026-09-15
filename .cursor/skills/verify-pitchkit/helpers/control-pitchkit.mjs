@@ -105,6 +105,8 @@ Usage:
   control-pitchkit goto <path-or-url> [--fresh]
   control-pitchkit click --name <name> [--role <role>] [--exact]
   control-pitchkit fill --name <name> --value <value> [--role <role>]
+  control-pitchkit wait --name <name> [--role <role>]
+  control-pitchkit wait --selector <css>
   control-pitchkit screenshot --path <path> [--fresh] [--goto <path>]
   control-pitchkit snapshot --aria [--path <path>] [--fresh] [--goto <path>]
   control-pitchkit eval --js <expression> [--fresh] [--goto <path>]
@@ -233,6 +235,28 @@ async function ensureOnPage(page, target, { fresh = false } = {}) {
     return response;
   }
   return null;
+}
+
+/** Owner Insights Reach plot waits for host width (WHA-310). Wait inside the same process as the capture. */
+async function settlePage(page, flags = {}) {
+  if (flags["wait-selector"]) {
+    await page.waitForSelector(String(flags["wait-selector"]), { timeout: 15_000, state: "visible" });
+  }
+  if (flags["wait-name"]) {
+    const locator = locatorFor(page, {
+      role: flags.role,
+      name: flags["wait-name"],
+      exact: Boolean(flags.exact),
+    });
+    await locator.first().waitFor({ state: "visible", timeout: 15_000 });
+  }
+  const reachSlot = page.locator('[data-chart-slot="reach"]');
+  if ((await reachSlot.count()) > 0) {
+    await page.waitForSelector(
+      '[aria-label="30-day account reach"], [data-chart-slot="reach"]:not([data-x-ticks="0"])',
+      { timeout: 15_000 },
+    );
+  }
 }
 
 function locatorFor(page, { role, name, exact }) {
@@ -365,6 +389,7 @@ async function cmdClick(flags) {
   }
   const result = await withPage(async (page) => {
     await ensureOnPage(page, flags.goto);
+    await settlePage(page, flags);
     await clickNamed(page, {
       role: flags.role,
       name,
@@ -376,6 +401,29 @@ async function cmdClick(flags) {
   printJson(result);
 }
 
+async function cmdWait(flags) {
+  const timeout = Number(flags.timeout) || 15_000;
+  const result = await withPage(async (page) => {
+    await ensureOnPage(page, flags.goto, { fresh: Boolean(flags.fresh) });
+    await settlePage(page, flags);
+    if (flags.selector) {
+      await page.waitForSelector(String(flags.selector), { timeout, state: "visible" });
+      return { ok: true, url: page.url(), selector: String(flags.selector) };
+    }
+    if (!flags.name) {
+      throw new Error('wait requires --name "<accessible name>" or --selector "<css>"');
+    }
+    const locator = locatorFor(page, {
+      role: flags.role,
+      name: flags.name,
+      exact: Boolean(flags.exact),
+    });
+    await locator.first().waitFor({ state: "visible", timeout });
+    return { ok: true, url: page.url(), name: flags.name, role: flags.role ?? "auto" };
+  }, { fresh: Boolean(flags.fresh) });
+  printJson(result);
+}
+
 async function cmdFill(flags) {
   const name = flags.name;
   const value = flags.value;
@@ -384,6 +432,7 @@ async function cmdFill(flags) {
   }
   const result = await withPage(async (page) => {
     await ensureOnPage(page, flags.goto);
+    await settlePage(page, flags);
     const role = flags.role || "textbox";
     await page.getByRole(role, { name: String(name) }).fill(String(value));
     return { ok: true, url: page.url(), name, role };
@@ -399,6 +448,7 @@ async function cmdScreenshot(flags) {
   fs.mkdirSync(path.dirname(dest), { recursive: true });
   const result = await withPage(async (page) => {
     await ensureOnPage(page, flags.goto, { fresh: Boolean(flags.fresh) });
+    await settlePage(page, flags);
     await page.screenshot({ path: dest, fullPage: true });
     return { ok: true, url: page.url(), path: dest };
   }, { fresh: Boolean(flags.fresh) });
@@ -409,6 +459,7 @@ async function cmdSnapshot(flags) {
   const dest = resolveArtifactPath(flags.path);
   const result = await withPage(async (page) => {
     await ensureOnPage(page, flags.goto, { fresh: Boolean(flags.fresh) });
+    await settlePage(page, flags);
     const aria = await dumpAria(page);
     if (dest) {
       fs.mkdirSync(path.dirname(dest), { recursive: true });
@@ -430,6 +481,7 @@ async function cmdEval(flags) {
   }
   const result = await withPage(async (page) => {
     await ensureOnPage(page, flags.goto, { fresh: Boolean(flags.fresh) });
+    await settlePage(page, flags);
     const value = await page.evaluate((js) => {
       // eslint-disable-next-line no-eval
       return eval(js);
@@ -520,6 +572,9 @@ async function main() {
       return;
     case "click":
       await cmdClick(flags);
+      return;
+    case "wait":
+      await cmdWait(flags);
       return;
     case "fill":
       await cmdFill(flags);

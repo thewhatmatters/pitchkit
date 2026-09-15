@@ -83,15 +83,17 @@ $H goto /insights
 $H goto /k/demo
 $H goto /k/demo --fresh
 $H click --role button --name "Continue with Instagram"
-$H click --name "PitchKit"
-$H click --name "Insights"
+$H click --role radio --name "PitchKit"
+$H click --role radio --name "Insights"
+$H wait --selector '[aria-label="30-day account reach"]'
+$H wait --name "Instagram performance summary"
 $H click --name "Manage ranked post 1"
 $H click --role menuitem --name "Hide from kit"
 $H click --role button --name "Hide from kit"
 $H click --name "Undo"
 $H click --name "Restore to kit"
 $H fill --role textbox --name "Contact" --value "brand@example.com"
-$H screenshot --path artifacts/insights-overview/overview.png
+$H screenshot --path artifacts/insights-overview/overview.png --wait-selector '[aria-label="30-day account reach"]'
 $H screenshot --path artifacts/public-kit/demo.png --fresh --goto /k/demo
 $H snapshot --aria --path artifacts/insights-overview/overview.aria.txt
 $H snapshot --aria --path artifacts/public-kit/demo.aria.txt --fresh --goto /k/demo
@@ -104,13 +106,15 @@ $H cleanup --restore-hidden
 
 `--fresh` is a one-shot context with **no** cookies (anon / incognito). Use it for brand `/k/demo`. It does not overwrite the owner session.
 
+Each command relaunches the disposable browser (cookies persist in `.run/chrome`; the painted page does not). `screenshot` / `snapshot` / `eval` settle the Reach plot when `[data-chart-slot="reach"]` is on the page. A standalone `wait` cannot keep that paint for the next command.
+
 `click --name` without `--role` tries button / tab / radio / link / menuitem. Prefer an explicit `--role` when the map names one.
 
 Stable handles already in product:
 
 | Surface | Handle |
 |---|---|
-| Owner nav | `aria-label="PitchKit primary navigation"` · items **Insights** \| **PitchKit** |
+| Owner nav | `aria-label="PitchKit primary navigation"` · **radio** Insights \| PitchKit (radiogroup) |
 | Stats | `aria-label="Instagram performance summary"` · Followers / **Engagement rate** / Typical reach / Saves |
 | Reach chart | `aria-label="30-day account reach"` · Card title **Reach over 30 days** |
 | Proof tabs | `aria-label="Rank recent proof posts by"` · Reach / Engagement / Saves |
@@ -166,7 +170,9 @@ H=node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs
 $H doctor
 $H connect
 $H doctor --require-session
-# then features/insights-overview.md
+$H goto /insights
+$H screenshot --path artifacts/insights-overview/overview.png
+$H snapshot --aria --path artifacts/insights-overview/overview.aria.txt
 # evidence: .cursor/skills/verify-pitchkit/artifacts/insights-overview/
 $H cleanup
 ```

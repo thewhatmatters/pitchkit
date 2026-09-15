@@ -24,15 +24,15 @@ Preconditions:
 - Start on `/insights`.
 
 - **See nav.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /insights`. A control named **PitchKit primary navigation** contains **Insights** and **PitchKit**. Insights is the current view. Footer has a quiet **Account** link, not a third segment.
-- **Open PitchKit.** Choose PitchKit. Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs click --name "PitchKit"`. Path is `/k/demo`. Title is `Demo Creator (@demo) · Pitchkit`. The kit card shows **Demo Creator**, `@demo`, Followers, and Engagement rate. Owner **Edit** switch may be present; Insights PageHeader / Recent proof / Share kit are absent on this page.
+- **Open PitchKit.** Choose PitchKit. Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs click --role radio --name "PitchKit"`. Path is `/k/demo`. Title is `Demo Creator (@demo) · Pitchkit`. The kit card shows **Demo Creator**, `@demo`, Followers, and Engagement rate. Owner **Edit** switch may be present; Insights PageHeader / Recent proof / Share kit are absent on this page.
 - **Owner grid on kit.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs eval --js "getComputedStyle(document.querySelector('.grid-page')).getPropertyValue('--grid-max').trim()"`. `value` is `1140px`. `--grid-column-gap` and `--grid-gutter` are `8px`.
-- **Return to Insights.** Choose Insights. Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs click --name "Insights"`. Path is `/insights`. PageHeader **Insights** returns.
+- **Return to Insights.** Choose Insights. Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs click --role radio --name "Insights"`. Path is `/insights`. PageHeader **Insights** returns.
 - **Anon has no nav.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /k/demo --fresh`. There is no **PitchKit primary navigation** and no **Edit** switch.
 - **Proof.** Capture both owner views. Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /insights` then `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs screenshot --path artifacts/owner-nav-pitchkit/insights.png` and `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs snapshot --aria --path artifacts/owner-nav-pitchkit/insights.aria.txt`. Repeat after `click --name "PitchKit"` into `artifacts/owner-nav-pitchkit/pitchkit.png` and `pitchkit.aria.txt`.
 
 ## Gotchas
 
-- SegmentedControl items may expose as tab, radio, or button. If an explicit `--role` misses, retry `--name "PitchKit"` (auto roles).
+- SegmentedControl items expose as **radio** in radiogroup **PitchKit primary navigation** (observed on live). If `--role radio` misses after a WMDS change, retry `--name "PitchKit"` (auto roles).
 - Share link / a brand opening `/k/demo` must stay view — do not treat owner Edit as the public kit.
 - Settings is account only. Do not expect Insights / PitchKit on `/settings`.
 - Public (non-owner) `AppFrame` does not set `--grid-max:1140px`. Assert 1140 only on owner views.
