@@ -1,0 +1,12 @@
+{
+  "name": "control-pitchkit",
+  "private": true,
+  "type": "module",
+  "description": "Disposable-browser harness for the verify-pitchkit skill. Not a product dependency.",
+  "bin": {
+    "control-pitchkit": "./control-pitchkit.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.55.1"
+  }
+}
