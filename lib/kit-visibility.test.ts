@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import {
   applyHide,
   applyOverlayToMedia,
@@ -21,6 +23,8 @@ import {
   serializeHiddenCookie,
   stampHiddenFromKit,
 } from "./kit-visibility";
+import { sortPosts } from "./post-sort";
+import type { Media } from "./schema";
 
 describe("kit visibility overlay", () => {
   it("parses and serializes mediaId → ISO timestamps", () => {
@@ -91,6 +95,62 @@ describe("kit visibility overlay", () => {
     );
     assert.equal(shown.length, 2);
     assert.equal(hidden[0]?.hidden_from_kit_at, "2026-09-09T01:30:00.000Z");
+  });
+
+  it("N shown and rank count only hidden_from_kit_at == null; hidden stay for Restore", () => {
+    const posts: Array<Pick<Media, "id" | "hidden_from_kit_at" | "like_count" | "comments_count" | "reach" | "saves">> = [
+      {
+        id: "shown-low",
+        hidden_from_kit_at: null,
+        like_count: 2,
+        comments_count: 0,
+        reach: 10,
+        saves: 1,
+      },
+      {
+        id: "hidden-restore",
+        hidden_from_kit_at: "2026-09-09T01:30:00.000Z",
+        like_count: 99,
+        comments_count: 9,
+        reach: 999,
+        saves: 50,
+      },
+      {
+        id: "shown-high",
+        hidden_from_kit_at: null,
+        like_count: 4,
+        comments_count: 1,
+        reach: 80,
+        saves: 3,
+      },
+    ];
+    const { shown, hidden } = partitionOwnerProofPosts(posts);
+    const shownLabel = `${shown.length} shown`;
+    const ranked = sortPosts(shown as Media[], "reach");
+
+    assert.equal(shownLabel, "2 shown");
+    assert.ok(shown.every((post) => post.hidden_from_kit_at == null));
+    assert.ok(hidden.every((post) => post.hidden_from_kit_at != null));
+    assert.deepEqual(
+      shown.map((post) => post.id),
+      ["shown-low", "shown-high"],
+    );
+    assert.deepEqual(
+      hidden.map((post) => post.id),
+      ["hidden-restore"],
+    );
+    assert.deepEqual(
+      ranked.map((post) => post.id),
+      ["shown-high", "shown-low"],
+    );
+    assert.ok(!ranked.some((post) => post.id === "hidden-restore"));
+    assert.equal(hidden[0]?.hidden_from_kit_at, "2026-09-09T01:30:00.000Z");
+
+    const proof = readFileSync(join(process.cwd(), "components/proof-posts.tsx"), "utf8");
+    assert.match(proof, /partitionOwnerProofPosts\(ownerPosts\)/);
+    assert.match(proof, /sortPosts\(shown,/);
+    assert.match(proof, /shown\.length\} shown/);
+    assert.match(proof, /Restore to kit/);
   });
 
   it("restore path clears hidden_from_kit_at so the row returns to shown", () => {

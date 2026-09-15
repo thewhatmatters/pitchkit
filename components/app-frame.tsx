@@ -6,6 +6,14 @@ export const OWNER_GRID_MAX = "1140px";
 /** Owner views only — WMDS gutter override. Band inherits. */
 export const OWNER_GRID_COLUMN_GAP = "8px";
 
+/**
+ * Owner `grid-page` className SoT. Force both gap tokens (WHA-309: live WMDS
+ * `.grid-page` still reads `column-gap: var(--grid-gutter)`).
+ * Keep these Tailwind arbitrary props as literals so the scanner sees them.
+ */
+export const OWNER_GRID_CLASS =
+  "grid-page min-h-dvh bg-body py-6 [--grid-max:1140px] [--grid-column-gap:8px] [--grid-gutter:8px]";
+
 type AppFrameProps = {
   children: ReactNode;
   /** Centered WMDS page max. Owner views pass `OWNER_GRID_MAX`. */
@@ -27,9 +35,7 @@ export function AppFrame({ children, gridMax }: AppFrameProps) {
   return (
     <div
       className={
-        gridMax
-          ? "grid-page min-h-dvh bg-body py-6 [--grid-max:1140px] [--grid-column-gap:8px] [--grid-gutter:8px]"
-          : "grid-page min-h-dvh py-6"
+        gridMax ? OWNER_GRID_CLASS : "grid-page min-h-dvh py-6"
       }
     >
       <div className="band">{children}</div>
