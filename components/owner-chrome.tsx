@@ -117,7 +117,11 @@ export function OwnerChrome({
         />
 
         <div className="band min-w-0 gap-y-6 [align-items:stretch]">
-          <ReachChart series={reachSeries} loading={!gridReady} />
+          <ReachChart
+            series={reachSeries}
+            typicalReach={typicalReach}
+            loading={!gridReady}
+          />
           <AudienceFit
             country={audience.country}
             city={audience.city}

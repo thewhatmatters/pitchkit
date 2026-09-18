@@ -39,8 +39,9 @@ function AudienceSection({ title, items }: { title: string; items: { label: stri
 }
 
 /**
- * Owner Insights audience Card. Hide the whole Card when every mix is empty.
- * Never paint zeros. Chart.RankedBars only — no invented bars.
+ * Canvas AudienceCard chrome: outlined + bodyTerminal, title + subtitle,
+ * four-block well (`pitchKitAudienceWellClasses`). Hide the Card when every
+ * mix is empty. Never paint zeros. Chart.RankedBars only — no invented bars.
  */
 export function AudienceFit({ country, city, age, gender }: AudienceFitProps) {
   const countries = toBars(country);

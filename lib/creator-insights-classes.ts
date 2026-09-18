@@ -1,7 +1,7 @@
 /**
  * WMDS Examples/PitchKit live Storybook canvas (`pitchKitStyles.ts`).
  * `typographyClass` is not a package export — use the pin's `type-*` utilities.
- * Show code on the Pattern story is stale; these tokens win when they differ.
+ * Pattern Show code matches the live canvas after WMDS #10 (`3f136308`).
  */
 
 export const CREATOR_INSIGHTS_PAGE_CLASS =
