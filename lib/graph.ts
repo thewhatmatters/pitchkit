@@ -4,7 +4,7 @@
  */
 
 import { DEFAULT_GRAPH_API_VERSION } from "./env";
-import { utcDayFromGraphEndTime, type ReachPoint } from "./reach-series";
+import { isUtcDay, utcDayFromGraphEndTime, type ReachPoint } from "./reach-series";
 import type { MediaType } from "./schema";
 
 export const GRAPH_HOST = "https://graph.instagram.com";
@@ -255,13 +255,21 @@ export function parseReachTimeSeries(payload: GraphInsightsPayload | null | unde
   const values = payload?.data?.find((row) => row.name === "reach")?.values ?? [];
   const points: ReachPoint[] = [];
   for (const row of values) {
-    if (typeof row.end_time !== "string" || typeof row.value !== "number" || !Number.isFinite(row.value)) {
+    if (typeof row.end_time !== "string") {
       continue;
     }
-    points.push({
-      day: utcDayFromGraphEndTime(row.end_time),
-      reach: row.value,
-    });
+    const day = utcDayFromGraphEndTime(row.end_time);
+    if (!isUtcDay(day)) {
+      continue;
+    }
+    if (row.value === null || row.value === undefined) {
+      points.push({ day, reach: null });
+      continue;
+    }
+    if (typeof row.value !== "number" || !Number.isFinite(row.value)) {
+      continue;
+    }
+    points.push({ day, reach: row.value });
   }
   return points;
 }

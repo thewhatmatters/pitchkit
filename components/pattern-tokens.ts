@@ -1,6 +1,6 @@
 /**
  * Interpolated Show code class strings from WMDS Examples/PitchKit at
- * `70da6a4c50d8efc1e687b20f231c6e4f1f6190c6`.
+ * `cd18e7a29afd0c0d774552c1a3d665f480f51bd4`.
  *
  * Stories:
  * - `examples-pitchkit--creator-insights` (Pattern — creator Insights)
@@ -10,6 +10,7 @@
  * - `examples-pitchkit--insufficient-reach-and-audience-data` (State — insufficient reach and audience data)
  * - `examples-pitchkit--graph-data-unavailable` (State — Graph data unavailable; omit optional regions)
  * - `examples-pitchkit--shareable-pitchkit` (Pattern — shareable PitchKit)
+ * - `components-data-display-chart--cartesian-no-data-gaps` (in-series Reach hatch)
  *
  * Copy these literals. Do not import Storybook-only `pitchKitStyles`.
  */

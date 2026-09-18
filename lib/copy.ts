@@ -39,6 +39,9 @@ export const REACH_INSUFFICIENT_TITLE = "No reach data yet";
 export const REACH_INSUFFICIENT_BODY =
   "Connect more Instagram activity to plot the last 30 days.";
 
+/** Pattern — Cartesian no-data gaps (`components-data-display-chart--cartesian-no-data-gaps`). */
+export const REACH_NO_DATA_LABEL = "No data";
+
 /** State — insufficient audience data (`examples-pitchkit--insufficient-audience-data`). */
 export const AUDIENCE_INSUFFICIENT_TITLE = "No audience data yet";
 export const AUDIENCE_INSUFFICIENT_BODY =
