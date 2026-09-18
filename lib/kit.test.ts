@@ -143,7 +143,7 @@ describe("selectSixPosts", () => {
 });
 
 describe("ER hide-insights", () => {
-  it("still computes ER from likes+comments when Insights are missing, and hides Insights", () => {
+  it("hides Engagement rate when Insights reach is missing — no ÷ followers", () => {
     const posts = [
       media({ id: "1", posted_at: "2026-08-20T00:00:00.000Z", like_count: 200, comments_count: 20 }),
       media({ id: "2", posted_at: "2026-08-21T00:00:00.000Z", like_count: 180, comments_count: 18 }),
@@ -154,12 +154,12 @@ describe("ER hide-insights", () => {
     ];
 
     assert.equal(kitHasInsights(posts), false);
-    assert.equal(engagementRate(posts, 10_000), 0.099);
+    assert.equal(engagementRate(posts), null);
 
     const kit = assemblePublicKit(user({ followers: 10_000 }), posts, NOW);
     assert.ok(kit);
     assert.equal(kit.hasInsights, false);
-    assert.equal(kit.engagementRate, 0.099);
+    assert.equal(kit.engagementRate, null);
     assert.equal("reach_series" in kit, false);
     assert.equal(kit.reach_series, undefined);
     assert.equal(kit.typicalReach, null);
@@ -180,11 +180,38 @@ describe("ER hide-insights", () => {
     assert.deepEqual(kit.reach_series, []);
   });
 
-  it("returns null ER when followers are 0", () => {
+  it("returns null Engagement rate when no post has Insights reach > 0", () => {
     const posts = [
       media({ id: "1", posted_at: "2026-08-20T00:00:00.000Z", like_count: 10, comments_count: 1 }),
     ];
-    assert.equal(engagementRate(posts, 0), null);
+    assert.equal(engagementRate(posts), null);
+  });
+
+  it("computes kit Engagement rate as sum÷sum of reach, including saves and shares", () => {
+    const posts = [
+      media({
+        id: "1",
+        posted_at: "2026-08-20T00:00:00.000Z",
+        like_count: 10,
+        comments_count: 2,
+        saves: 3,
+        shares: 1,
+        reach: 100,
+      }),
+      media({
+        id: "2",
+        posted_at: "2026-08-21T00:00:00.000Z",
+        like_count: 8,
+        comments_count: 0,
+        saves: 1,
+        shares: 1,
+        reach: 50,
+      }),
+    ];
+    const kit = assemblePublicKit(user({ followers: 10_000 }), posts, NOW);
+    assert.ok(kit);
+    assert.equal(kit.engagementRate, 26 / 150);
+    assert.notEqual(kit.engagementRate, 20 / 10_000);
   });
 });
 
@@ -214,7 +241,7 @@ describe("seed schema", () => {
     assert.equal(demo.user.handle, DEMO_HANDLE);
     assert.equal(demo.posts.length, 6);
     assert.equal(demo.hasInsights, false);
-    assert.equal(demo.engagementRate, 0.099);
+    assert.equal(demo.engagementRate, null);
     assert.equal("reach_series" in demo, false);
     assert.equal(demo.reach_series, undefined);
     assert.equal(demo.typicalReach, null);
@@ -244,6 +271,8 @@ describe("reach_series kit payload", () => {
     assert.equal(new Set(owner.reach_series.map((point) => point.reach)).size > 1, true);
     assert.equal(owner.typicalReach, 2175);
     assert.equal(owner.typicalSaves, 42);
+    assert.equal(owner.engagementRate, engagementRate(seedOwnerMedia));
+    assert.notEqual(owner.engagementRate, null);
     assert.deepEqual(
       Object.keys(seedOwnerMedia[0]!).sort(),
       [...MEDIA_COLUMNS].sort(),

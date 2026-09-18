@@ -57,7 +57,8 @@ function post(
 }
 
 /**
- * One fetched page for the public `/k/demo` kit. Insights stay null (hide reach/saves/chart).
+ * One fetched page for the public `/k/demo` kit. Insights stay null
+ * (hide Engagement rate, reach, saves, chart — no ÷ followers fallback).
  * Carousel r2_key is the first frame; video r2_key is the poster. No R2 required —
  * keys map to /public/demo placeholders.
  */
@@ -114,24 +115,30 @@ export const seedMedia: Media[] = [
 
 /**
  * Seed/example owner Insights overlay — not live Graph.
- * Same six posts as `seedMedia` with reach/saves so `hasInsights` is true.
- * Public `/k/demo` keeps `seedMedia` (Insights null).
+ * Same six posts as `seedMedia` with reach/saves/shares so Engagement rate
+ * can use (likes + comments + saves + shares) ÷ reach. Public `/k/demo`
+ * keeps `seedMedia` (Insights null → hide Engagement rate).
  */
-const OWNER_INSIGHTS: ReadonlyArray<{ reach: number; saves: number }> = [
-  { reach: 2_800, saves: 55 },
-  { reach: 2_450, saves: 48 },
-  { reach: 3_200, saves: 61 },
-  { reach: 1_900, saves: 36 },
-  { reach: 1_720, saves: 28 },
-  { reach: 1_510, saves: 22 },
+const OWNER_INSIGHTS: ReadonlyArray<{
+  reach: number;
+  saves: number;
+  shares: number;
+}> = [
+  { reach: 2_800, saves: 55, shares: 12 },
+  { reach: 2_450, saves: 48, shares: 10 },
+  { reach: 3_200, saves: 61, shares: 16 },
+  { reach: 1_900, saves: 36, shares: 8 },
+  { reach: 1_720, saves: 28, shares: 6 },
+  { reach: 1_510, saves: 22, shares: 4 },
 ];
 
 export const seedOwnerMedia: Media[] = seedMedia.map((row, index) => {
-  const insights = OWNER_INSIGHTS[index] ?? { reach: 1_800, saves: 20 };
+  const insights = OWNER_INSIGHTS[index] ?? { reach: 1_800, saves: 20, shares: 4 };
   return {
     ...row,
     reach: insights.reach,
     saves: insights.saves,
+    shares: insights.shares,
     insights_fetched_at: FETCHED_AT,
   };
 });

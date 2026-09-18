@@ -9,16 +9,16 @@ Desk research, interviews unrun. Locked with Design 2026-09-02. User Research ow
 - If we ever label account-level saves: user insights `saves`, not `saved`.
 - `follower_demographics` breakdowns `country` / `city` / `age` / `gender` are live (v25/v26 Insights, Instagram Login). ≥100 followers or the metric is omitted — hide the object; don’t paint zeros. Top 45 only. Graph returns integer counts in `total_value.breakdowns.results.value`, not percents. Our math: % of located sample = `value / sum(results)`. **Never** % of `followers_count` (sums can be less than followers because Meta only counts people with demo data). Empty dataset: hide the object. Backend persists those counts as objects when Insights lands; no extra Graph columns.
 - IG User `biography` and `website` are Public. Hide if empty. No IG User location field. No industry. Impressions stay off.
-- ER is locked: `(likes + comments) ÷ followers`, Insights or not. Tooltip: of followers, likes + comments only.
+- Engagement rate unlocked 2026-09-18: `(likes + comments + saves + shares) ÷ reach`. Account = **sum÷sum** on posts with Insights `reach` > 0. Hide (or —) when reach is missing. Tooltip: **of reach**, likes + comments + saves + shares in the numerator. Do not fall back to ÷ followers (that was the 2026-09-02 lock; removed). Public kit and Insights use the same formula.
 
 ## v1 Stat row (ordered)
 
-**Engagement rate (ER)** — always, `primary`.
-Share of followers who interact with a typical post. Brands use this first: is the audience real, or a quiet list? Average recent posts: (likes + comments) ÷ followers. A smaller account with a high ER often beats a big one that nobody talks to.
+**Engagement rate** — Insights `reach` required. Spell the words; never “ER” in UI.
+Share of reach who interact with a typical post (likes + comments + saves + shares). Brands use this first: is the audience real, or a quiet list? Account rate is sum of those interactions ÷ sum of reach on the six posts that have Insights `reach` > 0 — not an average of per-post rates, which overweight small posts. Unlocked 2026-09-18. Same formula on the public kit and Insights. A smaller account with a high Engagement rate often beats a big one that nobody talks to.
 - Brand ~30s: hire or pass — is the audience real?
-- Hide: never (public kit still has it).
-- Formula (locked): `(likes + comments) ÷ followers` on the six, when followers > 0. Same formula with or without Insights. Tooltip: **of followers**, **likes + comments only**. Do not use ÷ reach. Do not add saves/shares to the numerator.
-- Graph (v25, Instagram Login): none; computed. Likes/comments are media `like_count` / `comments_count` — not insights. Followers denominator is user `followers_count` (store `followers`).
+- Hide: when no post on the six has Insights `reach` > 0 (missing, null, or 0). Show — rather than 0. Public kit hides Engagement rate when Insights reach is unavailable. Do not fall back to ÷ followers. Do not invent zeros.
+- Formula (locked 2026-09-18): `(likes + comments + saves + shares) ÷ reach`. Per-post when that media has Insights `reach` > 0. Account/typical = **sum(interactions) ÷ sum(reach)** on those posts. Tooltip: **of reach**, likes + comments + saves + shares in the numerator. The 2026-09-02 lock was `(likes + comments) ÷ followers` — removed; do not teach it.
+- Graph (v25, Instagram Login): computed. Likes/comments are media `like_count` / `comments_count`. Saves/shares are media insights `saved` / `shares` — not Facebook-only object fields `saved_count` / `shares_count`. Reach denominator is media insights `reach`.
 
 **Typical reach** — Insights only; hide if missing.
 Unique accounts that usually see a post. This is what a brand is buying — not the follower total, not one viral. Median of recent posts, not a best-ever spike. If the public grid shows ~20k and the kit says 60k, the deal dies. Never paint 0. Insights UI headline (hire number); also in the four-up. Do not lead with Engagement rate.
@@ -51,12 +51,12 @@ Recent work a brand can match to the public grid. Likes-first would look like a 
 - Hide: never if we have media.
 - Graph (v25, Instagram Login): rank insights `saved` → insights `reach` → field `like_count`. `like_count` is public (not insights); `saved`/`reach` need Insights.
 
-Row length follows the data: 2 without Insights (Engagement rate + Followers), 4 + chart with Insights. Don’t pad to five. Insights four-up is Followers / Engagement rate / Typical reach / Saves on the WMDS subgrid. Do not lead with Engagement rate. Spell **Engagement rate** on the public kit too — never “ER”.
+Row length follows the data: Followers always; Engagement rate when reach exists (otherwise hide or —). 4 + chart with Insights. Don’t pad to five. Insights four-up is Followers / Engagement rate / Typical reach / Saves on the WMDS subgrid. Do not lead with Engagement rate. Spell **Engagement rate** on the public kit too — never “ER”.
 
 ## Later steal vs skip (UR + Randy, 2026-09-02)
 
 **Steal**
-- Followers (context) + ER (hire) as the lead pair. Numbers, not Later’s prose sentence. ER locked: `(likes + comments) ÷ followers` (Insights or not). Tooltip: of followers, likes + comments only — not Later’s ÷ reach.
+- Followers (context) + Engagement rate (hire) as the lead pair. Numbers, not Later’s prose sentence. Engagement rate unlocked 2026-09-18: `(likes + comments + saves + shares) ÷ reach`. Tooltip: of reach, likes + comments + saves + shares. Hide when reach is missing.
 - Country mix, age mix, gender mix: own objects, not Stats. Randy unlocked all three. Insights only. Hide until Insights. Later/IG: need ≥100 followers to see audience data; empty copy, not zeros. Country = top countries + %. Age/gender same Graph family (`follower_demographics`). City mix is the finer country job — not “countries only,” not “no geo in v1.”
 - Six posts ranked saves → reach → likes. Surface typical reach, saves, and the 30-day chart (Later buries these; we don’t).
 - Analytics only after Insights connect. 30-day chart, not Later’s 3-month overview.
@@ -76,7 +76,7 @@ Row length follows the data: 2 without Insights (Engagement rate + Followers), 4
 ## Later vs us (note, not a lock flip)
 
 - Later public kit reporting period is last 90 days; we locked a **30-day** reach chart.
-- Later Instagram kit ER is `(likes + comments + saves + shares) ÷ (reel reach + post reach)`. We do not use that. Ours is `(likes + comments) ÷ followers`.
+- Later Instagram kit Engagement rate is `(likes + comments + saves + shares) ÷ (reel reach + post reach)`. Ours is the same family as of 2026-09-18: `(likes + comments + saves + shares) ÷ reach`. Account rate is **sum÷sum** on the six (posts with reach > 0), not an average of per-post rates. Hide when reach is unavailable — no ÷ followers fallback (that was the 2026-09-02 lock; removed). Public kit and Insights use the same formula.
 - Later labels “Average” but their docs say they use a median that removes outliers for post/story stats. Typical reach for us is already median.
 - Later kit also lists profile views, avg impressions, stories, reels as separate sections. We skip those.
 - If no posts in 90 days, Later pulls no data for that profile (omit, not zeros). Same honesty: empty > zeros.
@@ -143,6 +143,6 @@ Does the split match the customer?
 
 **Audience mix (followers vs non)** — later. Graph: `reach` breakdown `follow_type`.
 
-**Insights** — Instagram account analytics the creator connected. Typical reach, saves, the chart, and country / city / age / gender mix require this. Public-only kits still show ER + Followers.
+**Insights** — Instagram account analytics the creator connected. Typical reach, saves, the chart, Engagement rate, and country / city / age / gender mix require this. Public-only kits show Followers; Engagement rate hides (or —) until Insights reach exists.
 
-Country / city / age / gender mix are v1 objects (not Stats): % of located sample (`value / sum(results)`), never % of `followers_count`. Hide if omitted, <100 followers, or empty. No IG User location field. No industry. Impressions stay off. `biography` / `website` are Public; hide if empty. Backend persists demo counts as objects when Insights lands; no extra Graph columns. ER is `(likes + comments) ÷ followers` (Insights or not).
+Country / city / age / gender mix are v1 objects (not Stats): % of located sample (`value / sum(results)`), never % of `followers_count`. Hide if omitted, <100 followers, or empty. No IG User location field. No industry. Impressions stay off. `biography` / `website` are Public; hide if empty. Backend persists demo counts as objects when Insights lands; no extra Graph columns. Engagement rate is `(likes + comments + saves + shares) ÷ reach` (sum÷sum; hide when reach is missing).

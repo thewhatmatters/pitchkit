@@ -97,11 +97,11 @@ Professional Instagram account required for all Insights rows. Instagram Login t
 
 | | |
 |---|---|
-| Reads | six posts’ `media.like_count` + `media.comments_count`, denominator `users.followers` |
-| Formula | `(Σ likes + Σ comments) / followers` when followers &gt; 0 (`lib/engagement.ts`) |
-| Graph-ready | yes — public media fields + `followers_count`; **not** an Insights metric |
-| Today | seed `0.099` → `9.9%` |
-| Missing | `followers <= 0` → `null` → `—`. Still shown without Insights |
+| Reads | six posts’ `like_count` + `comments_count` + `saves` + `shares`, denominator media `reach` |
+| Formula | `(Σ likes + Σ comments + Σ saves + Σ shares) / Σ reach` on posts with Insights `reach` &gt; 0 (`lib/engagement.ts`). Not an average of per-post rates. |
+| Graph-ready | yes — public likes/comments + media insights `saved` / `shares` / `reach`. Not Facebook `saved_count` / `shares_count`. Not `followers_count`. |
+| Today | owner seed → `9.5%`; public `/k/demo` has no reach → `null` → `—` |
+| Missing | no post with `reach` &gt; 0 → `null` → `—`. Do not fall back to ÷ followers. |
 
 ### Typical reach
 
@@ -170,7 +170,7 @@ Poll on Insights load, `GET /me`, one media page, Insights, token encrypt, Profe
 |---|---|
 | User `followers_count`, `media_count`, `name`, photo, `account_type` | seed columns only |
 | Media page + `like_count` / `comments_count` | seed |
-| Media insights `reach` / `saved` / `shares` | owner seed overlays; `shares` unused in UI |
+| Media insights `reach` / `saved` / `shares` | owner seed overlays; feeds Engagement rate numerator + typical reach/saves |
 | User insights `reach` `time_series` | `seedReachSeries` on owner kit payload |
 | `follower_demographics` ×4 | **invented percents** on owner Insights |
 | 6h poll / Refresh / deleted-post drop | none |
@@ -178,7 +178,7 @@ Poll on Insights load, `GET /me`, one media page, Insights, token encrypt, Profe
 
 ### UI that shows numbers Graph cannot supply *yet* (and some Graph will never supply as painted)
 
-- Owner four-up Typical reach **2175**, Saves **42**, 30-day chart, Followers **10k**, ER **9.9%** — invented seed
+- Owner four-up Typical reach **2175**, Saves **42**, 30-day chart, Followers **10k**, Engagement rate **9.5%** — invented seed
 - Audience RankedBars — invented `%` that are not even stored as Graph counts (GLOSSARY: Graph returns integers, we must compute %)
 - Reach Card **“Graph data”** badge on seed
 - `ig_account_type: "BUSINESS"` vs Graph `Business` / `Media_Creator`

@@ -53,9 +53,9 @@ One row per post we actually fetched. First kit: **one page**, not the archive.
 | `r2_key` | canonical image or poster; never bytes in SQL | Graph media URL → R2 | if we re-download |
 | `like_count` | public | Graph | login / refresh |
 | `comments_count` | public | Graph | login / refresh |
-| `reach` | nullable until Insights | Insights | when Insights fetch succeeds |
-| `saves` | nullable until Insights | Insights | when Insights fetch succeeds |
-| `shares` | nullable until Insights | Insights | when Insights fetch succeeds |
+| `reach` | nullable until Insights; Engagement rate denominator (hide ER when missing/0) | media insights `reach` | when Insights fetch succeeds |
+| `saves` | nullable until Insights; Instagram Login media insights `saved` (not Facebook `saved_count`) | Insights | when Insights fetch succeeds |
+| `shares` | nullable until Insights; Instagram Login media insights `shares` (not Facebook `shares_count`) | Insights | when Insights fetch succeeds |
 | `impressions` | or `views` / `plays` — use the name Graph sends; nullable | Insights | when Insights fetch succeeds |
 | `fetched_at` | last media pull | us | each media pull |
 | `insights_fetched_at` | last Insights pull | us | each Insights pull |
