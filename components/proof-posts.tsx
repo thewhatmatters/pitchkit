@@ -27,6 +27,14 @@ import {
   toast,
 } from "@/components/wmds";
 import {
+  TOAST_HIDE_FAILED_TITLE,
+  TOAST_POST_HIDDEN_DESCRIPTION,
+  TOAST_POST_HIDDEN_TITLE,
+  TOAST_POST_RESTORED_DESCRIPTION,
+  TOAST_POST_RESTORED_TITLE,
+  TOAST_RESTORE_FAILED_TITLE,
+} from "@/lib/copy";
+import {
   clearHiddenFromKit,
   hideFromKit,
   partitionOwnerProofPosts,
@@ -102,13 +110,15 @@ export function ProofPosts({ posts, hasInsights, loading = false }: ProofPostsPr
 
     const optimisticHiddenAt = new Date().toISOString();
     setOwnerPosts((current) => stampHiddenFromKit(current, hiddenPost.id, optimisticHiddenAt));
-    setPostNotice("Post hidden from the shareable kit preview.");
     setPendingHidePostId(null);
 
     const result = await hideFromKit(hiddenPost.id);
     if (!result.ok) {
       setOwnerPosts((current) => clearHiddenFromKit(current, hiddenPost.id));
-      setPostNotice(result.error);
+      toast.add({
+        title: TOAST_HIDE_FAILED_TITLE,
+        description: result.error,
+      });
       return;
     }
 
@@ -121,8 +131,8 @@ export function ProofPosts({ posts, hasInsights, loading = false }: ProofPostsPr
     }
 
     toast.add({
-      title: "Post hidden from kit",
-      description: "It no longer appears in the shareable PitchKit.",
+      title: TOAST_POST_HIDDEN_TITLE,
+      description: TOAST_POST_HIDDEN_DESCRIPTION,
       duration: 6000,
       action: {
         label: "Undo",
@@ -136,14 +146,22 @@ export function ProofPosts({ posts, hasInsights, loading = false }: ProofPostsPr
   async function restoreHiddenPost(hiddenPost: Media) {
     const previousHiddenAt = hiddenPost.hidden_from_kit_at;
     setOwnerPosts((current) => clearHiddenFromKit(current, hiddenPost.id));
-    setPostNotice("Post restored to the shareable kit preview.");
     const result = await restoreToKit(hiddenPost.id);
     if (!result.ok) {
       if (previousHiddenAt != null) {
         setOwnerPosts((current) => stampHiddenFromKit(current, hiddenPost.id, previousHiddenAt));
       }
-      setPostNotice(result.error);
+      toast.add({
+        title: TOAST_RESTORE_FAILED_TITLE,
+        description: result.error,
+      });
+      return;
     }
+
+    toast.add({
+      title: TOAST_POST_RESTORED_TITLE,
+      description: TOAST_POST_RESTORED_DESCRIPTION,
+    });
   }
 
   if (loading) {

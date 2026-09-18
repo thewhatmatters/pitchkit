@@ -8,6 +8,31 @@ function read(rel: string) {
   return readFileSync(join(process.cwd(), rel), "utf8");
 }
 
+function toastAddBlocks(source: string): string[] {
+  const blocks: string[] = [];
+  const startRe = /toast\.add\(/g;
+  let match: RegExpExecArray | null;
+  while ((match = startRe.exec(source))) {
+    const open = source.indexOf("{", match.index);
+    if (open < 0) {
+      continue;
+    }
+    let depth = 0;
+    for (let i = open; i < source.length; i++) {
+      if (source[i] === "{") {
+        depth += 1;
+      } else if (source[i] === "}") {
+        depth -= 1;
+        if (depth === 0) {
+          blocks.push(source.slice(open, i + 1));
+          break;
+        }
+      }
+    }
+  }
+  return blocks;
+}
+
 describe("critical page contracts", () => {
   it("landing Continue posts Instagram auth (live when secrets exist, else stub)", () => {
     const page = read("app/page.tsx");
@@ -163,6 +188,39 @@ describe("critical page contracts", () => {
     assert.match(layout, /<AppToaster \/>/);
     assert.doesNotMatch(read("components/owner-chrome.tsx"), /<Toaster/);
     assert.doesNotMatch(read("components/proof-posts.tsx"), /<Toaster/);
+  });
+
+  it("Insights product toasts pass title and description", () => {
+    const chrome = read("components/owner-chrome.tsx");
+    const proof = read("components/proof-posts.tsx");
+    const copy = read("lib/copy.ts");
+    const layout = read("app/layout.tsx");
+    const sources = [chrome, proof];
+    const blocks = sources.flatMap(toastAddBlocks);
+
+    assert.equal(blocks.length, 6);
+    for (const block of blocks) {
+      assert.match(block, /\btitle:/);
+      assert.match(block, /\bdescription:/);
+    }
+
+    assert.match(copy, /TOAST_KIT_COPIED_TITLE = "Kit link copied"/);
+    assert.match(copy, /TOAST_KIT_COPIED_DESCRIPTION = "The public kit URL is ready to paste."/);
+    assert.match(copy, /TOAST_KIT_COPY_FAILED_TITLE/);
+    assert.match(copy, /TOAST_POST_HIDDEN_TITLE = "Post hidden from kit"/);
+    assert.match(copy, /TOAST_POST_HIDDEN_DESCRIPTION = "It no longer appears in the shareable PitchKit."/);
+    assert.match(copy, /TOAST_POST_RESTORED_TITLE = "Post restored to kit"/);
+    assert.match(copy, /TOAST_POST_RESTORED_DESCRIPTION = "It appears in the shareable PitchKit again."/);
+    assert.match(copy, /TOAST_HIDE_FAILED_TITLE/);
+    assert.match(copy, /TOAST_RESTORE_FAILED_TITLE/);
+    assert.match(chrome, /TOAST_KIT_COPIED_TITLE/);
+    assert.match(chrome, /TOAST_KIT_COPIED_DESCRIPTION/);
+    assert.match(proof, /TOAST_POST_HIDDEN_TITLE/);
+    assert.match(proof, /TOAST_POST_HIDDEN_DESCRIPTION/);
+    assert.match(proof, /TOAST_POST_RESTORED_TITLE/);
+    assert.match(proof, /TOAST_POST_RESTORED_DESCRIPTION/);
+    assert.match(layout, /@whatmatters\/wmds\/styles\.css/);
+    assert.doesNotMatch(proof, /setPostNotice\("Post (hidden|restored)/);
   });
 
   it("Insights chrome matches creator Insights pattern", () => {

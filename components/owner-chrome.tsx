@@ -16,7 +16,14 @@ import { InsightsStats } from "@/components/insights-stats";
 import { ProofPosts } from "@/components/proof-posts";
 import { ReachChart } from "@/components/reach-chart";
 import { SEED_AUDIENCE } from "@/lib/audience";
-import { INSIGHTS_PRIVATE, STUB_DISCONNECT } from "@/lib/copy";
+import {
+  INSIGHTS_PRIVATE,
+  STUB_DISCONNECT,
+  TOAST_KIT_COPIED_DESCRIPTION,
+  TOAST_KIT_COPIED_TITLE,
+  TOAST_KIT_COPY_FAILED_DESCRIPTION,
+  TOAST_KIT_COPY_FAILED_TITLE,
+} from "@/lib/copy";
 import { ENGAGEMENT_FORMULA, inventoryLastUpdated } from "@/lib/inventory";
 import { kitPath, type KitAudience } from "@/lib/kit";
 import type { ReachPoint } from "@/lib/reach-series";
@@ -70,8 +77,15 @@ export function OwnerChrome({
     const url = `${window.location.origin}${kitPath(user.handle)}`;
     try {
       await navigator.clipboard.writeText(url);
-      toast.add({ title: "Kit link copied" });
+      toast.add({
+        title: TOAST_KIT_COPIED_TITLE,
+        description: TOAST_KIT_COPIED_DESCRIPTION,
+      });
     } catch {
+      toast.add({
+        title: TOAST_KIT_COPY_FAILED_TITLE,
+        description: TOAST_KIT_COPY_FAILED_DESCRIPTION,
+      });
       setNotice(url);
     }
   }
