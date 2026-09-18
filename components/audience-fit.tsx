@@ -30,15 +30,18 @@ function AudienceSection({ title, items }: { title: string; items: { label: stri
 
   return (
     <section className="flex min-w-0 flex-col gap-3">
-      <h3 className="text-xs uppercase tracking-wide text-muted">{title}</h3>
+      <h3 className="type-supporting font-medium uppercase tracking-wider text-muted">
+        {title}
+      </h3>
       <Chart.RankedBars aria-label={`Audience by ${title.toLowerCase()}`} items={items} animate="none" />
     </section>
   );
 }
 
 /**
- * Owner Insights audience Card. Hide the whole Card when every mix is empty.
- * Never paint zeros. Chart.RankedBars only — no invented bars.
+ * Canvas AudienceCard chrome: outlined + bodyTerminal, title + subtitle,
+ * four-block well (`pitchKitAudienceWellClasses`). Hide the Card when every
+ * mix is empty. Never paint zeros. Chart.RankedBars only — no invented bars.
  */
 export function AudienceFit({ country, city, age, gender }: AudienceFitProps) {
   const countries = toBars(country);

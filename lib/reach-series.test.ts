@@ -55,7 +55,20 @@ describe("reach_series chart hide rules", () => {
     assert.equal(points.length, 2);
     assert.equal(points[0]!.date.toISOString(), "2026-09-01T00:00:00.000Z");
     assert.equal(points[0]!.reach, 1200);
+    assert.equal("typical" in points[0]!, false);
     assert.equal(points[1]!.date.toISOString(), "2026-09-03T00:00:00.000Z");
+  });
+
+  it("adds a constant Typical reach reference from the existing median, not extra days", () => {
+    const series = [
+      { day: "2026-09-01", reach: 1200 },
+      { day: "2026-09-03", reach: 1400 },
+    ];
+    const points = reachSeriesToChartPoints(series, 2175);
+    assert.equal(points.length, 2);
+    assert.equal(points[0]!.typical, 2175);
+    assert.equal(points[1]!.typical, 2175);
+    assert.equal(reachSeriesToChartPoints(series, null)[0]!.typical, undefined);
   });
 });
 

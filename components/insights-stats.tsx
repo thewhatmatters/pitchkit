@@ -1,5 +1,6 @@
 "use client";
 
+import { CREATOR_INSIGHTS_STAT_CLASS } from "@/lib/creator-insights-classes";
 import { Stat } from "@/components/wmds";
 import { formatCount, formatEngagementRate } from "@/lib/engagement";
 
@@ -13,7 +14,7 @@ type InsightsStatsProps = {
 
 /**
  * WMDS PitchKit creator Insights four-up on the page subgrid.
- * Spans match Examples/PitchKit: `col-span-2 md:col-span-4 lg:col-span-3`.
+ * Spans match canvas `pitchKitStatClasses` only. Do not add full-width extras.
  * Do not lead with Engagement rate. Spell **Engagement rate** — never “ER”.
  * No period-over-period `trend` — seed/payload has no honest deltas.
  */
@@ -30,23 +31,23 @@ export function InsightsStats({
     <div
       role="group"
       aria-label="Instagram performance summary"
-      className="band col-span-full gap-y-4"
+      className="band gap-y-4"
     >
       <Stat
-        className="col-span-2 w-full min-w-0 md:col-span-4 lg:col-span-3"
+        className={CREATOR_INSIGHTS_STAT_CLASS}
         label="Followers"
         value={formatCount(followers)}
         loading={loading}
       />
       <Stat
-        className="col-span-2 w-full min-w-0 md:col-span-4 lg:col-span-3"
+        className={CREATOR_INSIGHTS_STAT_CLASS}
         label="Engagement rate"
         value={formatEngagementRate(engagementRate)}
         loading={loading}
       />
       {showInsightsMetrics ? (
         <Stat
-          className="col-span-2 w-full min-w-0 md:col-span-4 lg:col-span-3"
+          className={CREATOR_INSIGHTS_STAT_CLASS}
           label="Typical reach"
           value={typicalReach != null ? formatCount(typicalReach) : "—"}
           loading={loading}
@@ -54,7 +55,7 @@ export function InsightsStats({
       ) : null}
       {showInsightsMetrics ? (
         <Stat
-          className="col-span-2 w-full min-w-0 md:col-span-4 lg:col-span-3"
+          className={CREATOR_INSIGHTS_STAT_CLASS}
           label="Saves"
           value={typicalSaves != null ? formatCount(typicalSaves) : "—"}
           loading={loading}

@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { Share2 } from "lucide-react";
 import { AudienceFit } from "@/components/audience-fit";
+import {
+  CREATOR_INSIGHTS_FORMULA_CLASS,
+  CREATOR_INSIGHTS_SUPPORTING_CLASS,
+} from "@/lib/creator-insights-classes";
 import { Button, PageHeader, toast } from "@/components/wmds";
 import { InsightsStats } from "@/components/insights-stats";
 import { ProofPosts } from "@/components/proof-posts";
@@ -92,16 +96,18 @@ export function OwnerChrome({
           }
         />
         <div className="flex max-w-2xl flex-col gap-1">
-          <p className="text-muted">
+          <p className={CREATOR_INSIGHTS_SUPPORTING_CLASS}>
             {refreshed
               ? `Verified Instagram performance, refreshed ${refreshed}. ${INSIGHTS_PRIVATE}.`
               : `${INSIGHTS_PRIVATE}.`}
           </p>
-          <p className="text-muted">Engagement rate = (likes + comments) ÷ followers.</p>
+          <p className={CREATOR_INSIGHTS_FORMULA_CLASS}>
+            Engagement rate = (likes + comments) ÷ followers.
+          </p>
         </div>
       </section>
 
-      <div className="band col-span-full min-w-0 gap-y-2">
+      <div className="band gap-y-2">
         <InsightsStats
           followers={user.followers}
           engagementRate={engagementRate}
@@ -110,8 +116,12 @@ export function OwnerChrome({
           loading={!gridReady}
         />
 
-        <div className="band col-span-full min-w-0 gap-y-6 [align-items:stretch]">
-          <ReachChart series={reachSeries} loading={!gridReady} />
+        <div className="band min-w-0 gap-y-6 [align-items:stretch]">
+          <ReachChart
+            series={reachSeries}
+            typicalReach={typicalReach}
+            loading={!gridReady}
+          />
           <AudienceFit
             country={audience.country}
             city={audience.city}

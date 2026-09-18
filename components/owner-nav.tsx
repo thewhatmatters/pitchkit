@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
+import { CREATOR_INSIGHTS_TOPBAR_END_CLASS } from "@/lib/creator-insights-classes";
 import { Avatar, SegmentedControl } from "@/components/wmds";
 import { kitPath } from "@/lib/kit";
 
@@ -18,7 +19,7 @@ export function OwnerNav({ handle, name }: OwnerNavProps) {
 
   return (
     <header className="col-span-full grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-      <span className="type-ui-label text-fg">PitchKit</span>
+      <span className="type-label text-fg">PitchKit</span>
       <SegmentedControl
         aria-label="PitchKit primary navigation"
         size="sm"
@@ -35,7 +36,9 @@ export function OwnerNav({ handle, name }: OwnerNavProps) {
         <SegmentedControl.Item value="insights">Insights</SegmentedControl.Item>
         <SegmentedControl.Item value="pitchkit">PitchKit</SegmentedControl.Item>
       </SegmentedControl>
-      <Avatar name={name} size="sm" className="justify-self-end" />
+      <span className={CREATOR_INSIGHTS_TOPBAR_END_CLASS}>
+        <Avatar name={name} size="sm" />
+      </span>
     </header>
   );
 }

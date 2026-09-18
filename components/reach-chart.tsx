@@ -1,45 +1,40 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import {
+  Badge,
   Card,
   Chart,
-  cardLayoutBodyOccupantInsetXClasses,
-  cardLayoutBodyOccupantPadYClasses,
-  cardLayoutBodyOccupantWellClasses,
+  cardLayoutBodyOccupantRadiusClasses,
   cardSubtitleClasses,
   cardTitleClasses,
-  chartMaxTicksForWidth,
-  chartSeriesConfigFromTone,
+  chartSeriesConfigFromKeys,
 } from "@/components/wmds";
 import {
-  reachChartDateTickCount,
+  hasTypicalReachReference,
   reachSeriesToChartPoints,
-  shouldRenderReachChartBand,
   shouldShowReachChart,
   type ReachPoint,
 } from "@/lib/reach-series";
 
-/** Matches WMDS Chart.Cartesian default host height. */
-const REACH_CHART_MIN_HEIGHT = 240;
+/** Canvas ReachCard `minHeight` — fills the stretched dashboard well. */
+const REACH_CHART_MIN_HEIGHT = 344;
 
-/** WMDS Occupancy history Card occupant well — Organisms/Chart story (975b649). */
-const reachChartOccupantWellClasses = `flex flex-col gap-3 ${cardLayoutBodyOccupantPadYClasses} ${cardLayoutBodyOccupantWellClasses} ${cardLayoutBodyOccupantInsetXClasses}`;
+/** Canvas `pitchKitCardWellClasses`. */
+const reachChartOccupantWellClasses = `flex min-w-0 flex-col gap-4 bg-body px-3.5 py-4 ${cardLayoutBodyOccupantRadiusClasses}`;
 
 type ReachChartProps = {
   series?: ReachPoint[] | null;
+  typicalReach?: number | null;
   loading?: boolean;
 };
 
 /**
- * One Insights Chart. Hide the whole band (title + slot) when series is
- * omitted/empty — never a header-only box. Plot ink still waits for a real
- * host width inside the occupant well so the well chrome stays visible.
- * WMDS Chart.Cartesian uses visx ParentSize (0×0 until laid out) and
- * `animate="initial"` starts the area at opacity 0 / pathLength 0. We wait for
- * a real width and pass `animate="none"` so the area stroke/fill paint.
+ * Canvas ReachCard: outlined Card, dual Cartesian (daily + typical reference),
+ * Legend in the well. Hide the whole band when `reach_series` is empty.
+ * Typical is the existing typicalReach median — not invented Graph days.
  */
-export function ReachChart({ series, loading = false }: ReachChartProps) {
+export function ReachChart({ series, typicalReach = null, loading = false }: ReachChartProps) {
   if (loading) {
     return (
       <ReachChartCard slot="loading">
@@ -55,31 +50,38 @@ export function ReachChart({ series, loading = false }: ReachChartProps) {
     return null;
   }
 
-  return <ReachChartBand series={series} />;
+  return <ReachChartBand series={series} typicalReach={typicalReach} />;
 }
 
 function ReachChartCard({
   slot,
-  xTickCount,
   children,
 }: {
   slot: "loading" | "reach";
-  xTickCount?: number;
   children: ReactNode;
 }) {
   return (
     <Card
       variant="outlined"
       shape="rounded"
-      padding="none"
       bodyTerminal
       className="col-span-full min-w-0 lg:col-span-6"
       data-chart-slot={slot}
-      data-x-ticks={xTickCount}
     >
       <Card.Header
-        start={<h2 className={cardTitleClasses}>Reach over 30 days</h2>}
-        end={<span className={cardSubtitleClasses}>30 days</span>}
+        start={
+          <>
+            <h2 className={cardTitleClasses}>Reach over 30 days</h2>
+            <p className={cardSubtitleClasses}>
+              Typical performance with unusual spikes left visible.
+            </p>
+          </>
+        }
+        end={
+          <Badge variant="neutral" emphasis="muted" size="sm">
+            Graph data
+          </Badge>
+        }
       />
       <Card.Body>
         <div className={reachChartOccupantWellClasses}>{children}</div>
@@ -88,78 +90,39 @@ function ReachChartCard({
   );
 }
 
-function ReachChartBand({ series }: { series?: ReachPoint[] | null }) {
-  const hostRef = useRef<HTMLDivElement>(null);
-  const [hostWidth, setHostWidth] = useState(0);
-  const data = reachSeriesToChartPoints(series);
-
-  useLayoutEffect(() => {
-    const node = hostRef.current;
-    if (!node || data.length === 0) {
-      setHostWidth(0);
-      return;
-    }
-
-    const sync = () => {
-      setHostWidth(node.clientWidth);
-    };
-
-    sync();
-    if (typeof ResizeObserver === "undefined") {
-      return;
-    }
-
-    const observer = new ResizeObserver(sync);
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [data.length]);
+function ReachChartBand({
+  series,
+  typicalReach,
+}: {
+  series?: ReachPoint[] | null;
+  typicalReach?: number | null;
+}) {
+  const showTypical = hasTypicalReachReference(typicalReach);
+  const data = reachSeriesToChartPoints(series, typicalReach);
+  const config = chartSeriesConfigFromKeys(
+    showTypical
+      ? [
+          { key: "typical", label: "Typical reach" },
+          { key: "reach", label: "Daily reach" },
+        ]
+      : [{ key: "reach", label: "Daily reach" }],
+  );
 
   if (data.length === 0) {
     return null;
   }
 
-  const canPaint = shouldRenderReachChartBand(series, hostWidth);
-  const xTickCount = reachChartDateTickCount(hostWidth, (width, spec) =>
-    chartMaxTicksForWidth(width, spec as never),
-  );
-
   return (
-    <ReachChartCard slot="reach" xTickCount={xTickCount}>
-      <div ref={hostRef} className="w-full min-w-0">
-        {canPaint ? (
-          <div
-            className="w-full min-w-0"
-            style={{ width: hostWidth, height: REACH_CHART_MIN_HEIGHT }}
-          >
-            {/*
-              xTickCount from chartMaxTicksForWidth (~3 on phone).
-              WMDS AxisBottom at 266f19c still hardcodes 6 — data-x-ticks is the intended budget.
-            */}
-            <Chart.Cartesian
-              data={data}
-              config={chartSeriesConfigFromTone("reach", "Reach", "primary")}
-              seriesKeys={["reach"]}
-              variant="hero"
-              minHeight={REACH_CHART_MIN_HEIGHT}
-              periodKind="month"
-              animate="none"
-              verticalGrid={false}
-              xAccessor={(point) => point.date}
-              yAccessor={(point, key) => {
-                const value = point[key];
-                return typeof value === "number" && Number.isFinite(value) ? value : 0;
-              }}
-              aria-label="30-day account reach"
-            >
-              <Chart.Cartesian.Grid />
-              <Chart.Cartesian.AxisLeft />
-              <Chart.Cartesian.AxisBottom />
-              <Chart.Cartesian.Area />
-              <Chart.Cartesian.Tooltip />
-            </Chart.Cartesian>
-          </div>
-        ) : null}
-      </div>
+    <ReachChartCard slot="reach">
+      <Chart.Cartesian
+        data={data}
+        config={config}
+        periodKind="month"
+        minHeight={REACH_CHART_MIN_HEIGHT}
+        animate="none"
+        aria-label="30-day account reach"
+      />
+      <Chart.Legend config={config} />
     </ReachChartCard>
   );
 }

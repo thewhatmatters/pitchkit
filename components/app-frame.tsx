@@ -1,27 +1,21 @@
 import type { ReactNode } from "react";
 
+export {
+  CREATOR_INSIGHTS_BODY_BAND_CLASS,
+  CREATOR_INSIGHTS_BODY_INNER_CLASS,
+  CREATOR_INSIGHTS_FORMULA_CLASS,
+  CREATOR_INSIGHTS_HEADER_BAND_CLASS,
+  CREATOR_INSIGHTS_PAGE_CLASS,
+  CREATOR_INSIGHTS_STAT_CLASS,
+  CREATOR_INSIGHTS_SUPPORTING_CLASS,
+  CREATOR_INSIGHTS_TOPBAR_END_CLASS,
+} from "@/lib/creator-insights-classes";
+
 /** Owner views only — WMDS `--grid-max` override from CONSUMING / PitchKit pattern. */
 export const OWNER_GRID_MAX = "1140px";
 
 /** Owner views only — WMDS gutter override. Band inherits. */
 export const OWNER_GRID_COLUMN_GAP = "8px";
-
-/**
- * WMDS Pattern — creator Insights Show code `<main>` class. Copy verbatim.
- * Cookie-gated Insights + owner `/k/[handle]` only. Do not add `min-h-dvh`,
- * `py-6`, `layout="stretch"`, or `--grid-gutter` here.
- */
-export const CREATOR_INSIGHTS_PAGE_CLASS =
-  "grid-page min-h-screen bg-body [--grid-column-gap:8px] [--grid-max:1140px] [padding-bottom:44px]";
-
-/** Pattern header band. */
-export const CREATOR_INSIGHTS_HEADER_BAND_CLASS = "band pb-4";
-
-/** Pattern body band. */
-export const CREATOR_INSIGHTS_BODY_BAND_CLASS = "band pt-8";
-
-/** Pattern inner content band. */
-export const CREATOR_INSIGHTS_BODY_INNER_CLASS = "band min-w-0 gap-y-8";
 
 /**
  * AppFrame `grid-page` className SoT (settings / landing / public / legal).
@@ -41,9 +35,9 @@ type AppFrameProps = {
  * Copy of WMDS `grid-page` + `band` from CONSUMING. Layout only — not a new atom.
  * Band children are grid items: place with `col-span-*`.
  *
- * Insights and cookie-gated owner kit compose Pattern `<main>` + bands
- * (`CREATOR_INSIGHTS_*`) instead of this frame. AppFrame stays for landing,
- * settings, public kit, and legal pages.
+ * Insights and cookie-gated owner kit compose the live Storybook canvas
+ * `<main>` + bands (`CREATOR_INSIGHTS_*`) instead of this frame. AppFrame
+ * stays for landing, settings, public kit, and legal pages.
  *
  * AppFrame owner tokens are Tailwind arbitrary props in JSX (Randy SoT). Force
  * both `--grid-column-gap` and `--grid-gutter` on this surface until leftover

@@ -52,11 +52,27 @@ export function shouldRenderReachChartBand(
   return shouldShowReachChart(series) && Number.isFinite(hostWidth) && hostWidth > 0;
 }
 
-export function reachSeriesToChartPoints(series: ReachPoint[] | null | undefined) {
+/**
+ * Daily account reach plus an optional Typical reach reference.
+ * Typical is the existing post-median Stat (`typicalReach`), drawn as a
+ * constant like the canvas — not a second Graph time series.
+ */
+export function reachSeriesToChartPoints(
+  series: ReachPoint[] | null | undefined,
+  typicalReach?: number | null,
+) {
+  const typical =
+    typeof typicalReach === "number" && Number.isFinite(typicalReach) ? typicalReach : null;
+
   return sanitizeReachSeries(series).map((point) => ({
     date: new Date(`${point.day}T00:00:00.000Z`),
     reach: point.reach,
+    ...(typical != null ? { typical } : {}),
   }));
+}
+
+export function hasTypicalReachReference(typicalReach?: number | null): boolean {
+  return typeof typicalReach === "number" && Number.isFinite(typicalReach);
 }
 
 /**
