@@ -76,7 +76,7 @@ Disconnect deletes the creator, their posts, and their files. Anonymous weekly t
 Install WMDS pinned to a main SHA:
 
 ```bash
-npm install github:thewhatmatters/wmds#55944edfc8039b6682882c65d1a956b1e51fba21
+npm install github:thewhatmatters/wmds#dc813326028c0fe1cc5f3719466a32607bab4504
 ```
 
 `prepare` builds `dist/`. Local `npm install ../wmds` still works after `npm run build` there. `postinstall` / `predev` / `prebuild` copy Geist font files into the WMDS `dist/files` path that `styles.css` expects (otherwise Next 500s on the font URLs). Chart needs the `@visx/visx` peer. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md), WMDS [`CONSUMING.md`](https://github.com/thewhatmatters/wmds/blob/main/CONSUMING.md).

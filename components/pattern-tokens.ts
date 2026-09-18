@@ -1,6 +1,6 @@
 /**
  * Interpolated Show code class strings from WMDS Examples/PitchKit at
- * `55944edfc8039b6682882c65d1a956b1e51fba21`.
+ * `dc813326028c0fe1cc5f3719466a32607bab4504`.
  *
  * Stories:
  * - `examples-pitchkit--creator-insights` (Pattern — creator Insights)
@@ -54,9 +54,14 @@ export const PATTERN_CARD_WELL_CLASS =
 /** Matches Chart.Cartesian `minHeight` on the Reach well — keep empty/skeleton bands the same. */
 export const PATTERN_REACH_CHART_MIN_HEIGHT = 344;
 
-export const PATTERN_REACH_EMPTY_WELL_CLASS = `${PATTERN_CARD_WELL_CLASS} justify-center`;
+export const PATTERN_REACH_EMPTY_WELL_CLASS =
+  `${PATTERN_CARD_WELL_CLASS} items-center justify-center text-center`;
 
 export const PATTERN_EMPTY_COPY_CLASS = "flex max-w-lg flex-col gap-2";
+
+/** Centered title/body stack for the Reach empty well — unavailable empty copy stays left-aligned. */
+export const PATTERN_REACH_EMPTY_COPY_CLASS =
+  `${PATTERN_EMPTY_COPY_CLASS} items-center text-center`;
 
 export const PATTERN_EMPTY_TITLE_CLASS = "type-heading-2 text-fg";
 
