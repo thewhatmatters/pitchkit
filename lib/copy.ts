@@ -20,3 +20,9 @@ export const DEMO_SESSION_NOTE = "Opens the demo Insights session.";
 
 /** Quiet Insights cue — cookie-gated page. Do not shout at brands. */
 export const INSIGHTS_PRIVATE = "Private to you";
+
+/** Owner PitchKit segment — Coming soon (WMDS PitchKitPlaceholder copy). */
+export const PITCHKIT_COMING_SOON_BADGE = "Coming soon";
+export const PITCHKIT_COMING_SOON_TITLE = "Shareable PitchKit";
+export const PITCHKIT_COMING_SOON_BODY =
+  "The public creator profile will bring verified insights, selected posts, contact details, and past-brand proof into one brand-ready view.";

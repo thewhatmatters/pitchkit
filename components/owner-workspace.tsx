@@ -7,9 +7,9 @@ import {
   CREATOR_INSIGHTS_HEADER_BAND_CLASS,
   CREATOR_INSIGHTS_PAGE_CLASS,
 } from "@/components/pattern-tokens";
-import { KitEdit } from "@/components/kit-edit";
 import { OwnerChrome } from "@/components/owner-chrome";
 import { OwnerNav, type OwnerView } from "@/components/owner-nav";
+import { PitchKitComingSoon } from "@/components/pitchkit-coming-soon";
 import { SupportFooter } from "@/components/support-footer";
 import type { ReachPoint } from "@/lib/reach-series";
 import type { Media, User } from "@/lib/schema";
@@ -17,7 +17,6 @@ import type { Media, User } from "@/lib/schema";
 type OwnerWorkspaceProps = {
   user: User;
   ownerPosts: Media[];
-  shareablePosts: Media[];
   engagementRate: number | null;
   typicalReach: number | null;
   typicalSaves: number | null;
@@ -28,13 +27,12 @@ type OwnerWorkspaceProps = {
 
 /**
  * Pattern — creator Insights Show code (`examples-pitchkit--creator-insights`).
- * One shell: SegmentedControl toggles Insights vs the shareable kit preview
- * so the selected-pill motion can play. No hard `/insights` ↔ `/k/…` nav.
+ * One shell: SegmentedControl toggles Insights vs Coming soon so the
+ * selected-pill motion can play. No hard `/insights` ↔ `/k/…` nav.
  */
 export function OwnerWorkspace({
   user,
   ownerPosts,
-  shareablePosts,
   engagementRate,
   typicalReach,
   typicalSaves,
@@ -52,12 +50,7 @@ export function OwnerWorkspace({
       <div className={CREATOR_INSIGHTS_BODY_BAND_CLASS}>
         <div className={CREATOR_INSIGHTS_BODY_INNER_CLASS}>
           {view === "pitchkit" ? (
-            <KitEdit
-              user={user}
-              posts={shareablePosts}
-              engagementRate={engagementRate}
-              canEdit
-            />
+            <PitchKitComingSoon />
           ) : (
             <OwnerChrome
               user={user}

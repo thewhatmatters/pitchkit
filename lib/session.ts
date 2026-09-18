@@ -89,7 +89,7 @@ export function insightsGate(session: Session | null): session is Session {
   return session != null;
 }
 
-/** Owner Edit on `/k/[handle]` only when the session cookie owns that handle. */
+/** True when the Pitchkit session cookie owns this handle. */
 export function sessionOwnsHandle(session: Session | null, handle: string): boolean {
   return session != null && session.handle === handle;
 }

@@ -33,7 +33,7 @@ Preconditions:
 
 ## Gotchas
 
-- An owner session on `/k/demo` still shows the public freeze (no Edit / nav). Owner preview is the Insights PitchKit segment.
+- An owner session on `/k/demo` still shows the public freeze (no Edit / nav / Coming soon). The owner PitchKit segment on `/insights` is Coming soon; this URL is the real kit.
 - Public kit omits `reach_series` even when owner Insights shows the chart.
 - Hidden posts are excluded **before** the six. A missing tile can be a leftover hide, not a rank bug. Restore via the hide-restore recipe if the kit looks permanently short.
 - Handle is frozen at `demo`. An Instagram rename would not move this URL unless they opt in on reconnect (WHA-313; stub does not offer it).
