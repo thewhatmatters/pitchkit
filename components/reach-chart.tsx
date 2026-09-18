@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
+import type { ComponentProps, CSSProperties, ReactNode } from "react";
 import {
   PATTERN_CARD_WELL_CLASS,
   PATTERN_EMPTY_BODY_CLASS,
@@ -125,6 +125,21 @@ function ReachChartCard({
   );
 }
 
+/**
+ * Pattern hatch from `components-data-display-chart--cartesian-no-data-gaps`.
+ * Pin `cd18e7a` dist types include `noData` on `ChartCartesianProps`, but OpenNext
+ * deploy typecheck has failed with TS2322 when the install still exposed the
+ * pre-hatch props (WMDS `version` stays `0.1.0`). Forward through
+ * `ComponentProps` so the Show-code `noData` label still ships at runtime.
+ */
+function ReachCartesianChart(
+  props: ComponentProps<typeof Chart.Cartesian> & {
+    noData: { label: string };
+  },
+) {
+  return <Chart.Cartesian {...(props as ComponentProps<typeof Chart.Cartesian>)} />;
+}
+
 function ReachChartBand({
   series,
   typicalReach,
@@ -150,7 +165,7 @@ function ReachChartBand({
   return (
     <ReachChartCard slot="reach">
       <div className={PATTERN_CARD_WELL_CLASS}>
-        <Chart.Cartesian
+        <ReachCartesianChart
           data={data}
           config={config}
           seriesKeys={["reach"]}
