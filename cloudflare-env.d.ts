@@ -4,6 +4,13 @@ interface CloudflareEnv {
     get(key: string): Promise<string | null>;
     put(key: string, value: string): Promise<void>;
   };
+  /** Present only after Randy binds Hyperdrive. Leave wrangler ids commented until then. */
+  HYPERDRIVE?: {
+    connectionString: string;
+  };
+  HYPERDRIVE_PREVIEW?: {
+    connectionString: string;
+  };
   IG_APP_ID?: string;
   IG_APP_SECRET?: string;
   TOKEN_KEY?: string;

@@ -1,21 +1,27 @@
 /**
- * Persist Graph poll snapshots until Hyperdrive exists.
- * Same User / Media columns as DATA.md. KV keys on HIDDEN_KIT (prefix `graph:`).
- * `reach_series` + audience stay on the kit payload, not SQL.
+ * Persist Graph poll snapshots.
+ * Hyperdrive bound → SQL is SoT for users / media (DATA.md columns).
+ * Else → KV `HIDDEN_KIT` under `graph:` keys (unchanged).
+ * `reach_series` + audience stay on the kit payload, not SQL — stored as
+ * `graph:payload:` extras when SQL owns the rows.
  */
 
 import type { RankedShare } from "./audience";
 import {
   readHiddenKitBinding,
+  resolveHiddenKitStore,
   type HiddenKitAccess,
   type HiddenKitNamespace,
 } from "./hidden-kit-kv";
+import { resolveHasHyperdrive } from "./hyperdrive";
 import type { ReachPoint } from "./reach-series";
 import type { Media, User } from "./schema";
+import { resolveSqlStore } from "./sql-store";
 
 export const GRAPH_USER_PREFIX = "graph:id:";
 export const GRAPH_HANDLE_PREFIX = "graph:handle:";
 export const GRAPH_IG_PREFIX = "graph:ig:";
+export const GRAPH_PAYLOAD_PREFIX = "graph:payload:";
 
 export type AudienceMixes = {
   country: RankedShare[];
@@ -51,6 +57,153 @@ function igKey(igUserId: string): string {
   return `${GRAPH_IG_PREFIX}${igUserId}`;
 }
 
+function payloadKey(userId: string): string {
+  return `${GRAPH_PAYLOAD_PREFIX}${userId}`;
+}
+
+export type GraphPayloadExtras = {
+  reach_series: ReachPoint[];
+  audience: AudienceMixes;
+  polled_at: string;
+};
+
+function extrasFromSnapshot(snapshot: GraphSnapshot): GraphPayloadExtras {
+  return {
+    reach_series: snapshot.reach_series,
+    audience: snapshot.audience,
+    polled_at: snapshot.polled_at,
+  };
+}
+
+function emptyExtras(polledAt = ""): GraphPayloadExtras {
+  return {
+    reach_series: [],
+    audience: EMPTY_AUDIENCE,
+    polled_at: polledAt,
+  };
+}
+
+function isPayloadExtras(value: unknown): value is GraphPayloadExtras {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  const row = value as GraphPayloadExtras;
+  return (
+    Array.isArray(row.reach_series) &&
+    row.audience != null &&
+    typeof row.polled_at === "string"
+  );
+}
+
+function parsePayloadExtras(raw: string | null): GraphPayloadExtras | null {
+  if (!raw) {
+    return null;
+  }
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    return isPayloadExtras(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+async function readPayloadExtras(
+  userId: string,
+  access: HiddenKitAccess,
+  fallbackPolledAt: string,
+): Promise<GraphPayloadExtras> {
+  const ns = await readHiddenKitBinding(access);
+  if (!ns) {
+    return emptyExtras(fallbackPolledAt);
+  }
+  return parsePayloadExtras(await ns.get(payloadKey(userId))) ?? emptyExtras(fallbackPolledAt);
+}
+
+async function writePayloadExtras(
+  userId: string,
+  extras: GraphPayloadExtras,
+  access: HiddenKitAccess,
+): Promise<void> {
+  const ns = await readHiddenKitBinding(access);
+  if (!ns) {
+    return;
+  }
+  try {
+    await ns.put(payloadKey(userId), JSON.stringify(extras));
+  } catch {
+    // Payload extras are not SQL. Kit still loads users/media.
+  }
+}
+
+function snapshotFromSql(
+  user: User,
+  media: Media[],
+  extras: GraphPayloadExtras,
+): GraphSnapshot {
+  return {
+    user,
+    media,
+    reach_series: extras.reach_series,
+    audience: extras.audience,
+    polled_at: extras.polled_at,
+  };
+}
+
+async function applyHiddenOverlayFromKv(
+  userId: string,
+  media: Media[],
+  access: HiddenKitAccess,
+): Promise<Media[]> {
+  const store = await resolveHiddenKitStore(access);
+  if (!store) {
+    return media;
+  }
+  const hidden = await store.get(userId);
+  if (!hidden) {
+    return media;
+  }
+  return media.map((row) => ({
+    ...row,
+    hidden_from_kit_at: row.hidden_from_kit_at ?? hidden[row.id] ?? null,
+  }));
+}
+
+async function writeSqlSnapshot(
+  snapshot: GraphSnapshot,
+  access: HiddenKitAccess,
+): Promise<boolean> {
+  const sql = await resolveSqlStore(access);
+  if (!sql) {
+    return false;
+  }
+  const media = await applyHiddenOverlayFromKv(snapshot.user.id, snapshot.media, access);
+  if (!(await sql.upsertUser(snapshot.user))) {
+    return false;
+  }
+  if (!(await sql.replaceUserMedia(snapshot.user.id, media))) {
+    return false;
+  }
+  await writePayloadExtras(snapshot.user.id, extrasFromSnapshot(snapshot), access);
+  return true;
+}
+
+async function readSqlSnapshotByUserId(
+  userId: string,
+  access: HiddenKitAccess,
+): Promise<GraphSnapshot | null> {
+  const sql = await resolveSqlStore(access);
+  if (!sql) {
+    return null;
+  }
+  const user = await sql.findUserById(userId);
+  if (!user) {
+    return null;
+  }
+  const media = await sql.listMediaByUserId(userId);
+  const extras = await readPayloadExtras(userId, access, user.connected_at);
+  return snapshotFromSql(user, media, extras);
+}
+
 function isSnapshot(value: unknown): value is GraphSnapshot {
   if (!value || typeof value !== "object") {
     return false;
@@ -82,6 +235,10 @@ export async function readGraphSnapshot(
   userId: string,
   access: HiddenKitAccess = "page",
 ): Promise<GraphSnapshot | null> {
+  const fromSql = await readSqlSnapshotByUserId(userId, access);
+  if (fromSql) {
+    return fromSql;
+  }
   const ns = await readHiddenKitBinding(access);
   if (!ns) {
     return null;
@@ -93,6 +250,15 @@ export async function readGraphSnapshotByHandle(
   handle: string,
   access: HiddenKitAccess = "page",
 ): Promise<GraphSnapshot | null> {
+  const sql = await resolveSqlStore(access);
+  if (sql) {
+    const user = await sql.findUserByHandle(handle);
+    if (user) {
+      const media = await sql.listMediaByUserId(user.id);
+      const extras = await readPayloadExtras(user.id, access, user.connected_at);
+      return snapshotFromSql(user, media, extras);
+    }
+  }
   const ns = await readHiddenKitBinding(access);
   if (!ns) {
     return null;
@@ -108,6 +274,15 @@ export async function readGraphSnapshotByIgUserId(
   igUserId: string,
   access: HiddenKitAccess = "page",
 ): Promise<GraphSnapshot | null> {
+  const sql = await resolveSqlStore(access);
+  if (sql) {
+    const user = await sql.findUserByIgUserId(igUserId);
+    if (user) {
+      const media = await sql.listMediaByUserId(user.id);
+      const extras = await readPayloadExtras(user.id, access, user.connected_at);
+      return snapshotFromSql(user, media, extras);
+    }
+  }
   const ns = await readHiddenKitBinding(access);
   if (!ns) {
     return null;
@@ -120,6 +295,10 @@ export async function readGraphSnapshotByIgUserId(
 }
 
 export async function listTakenHandles(access: HiddenKitAccess = "page"): Promise<Set<string>> {
+  const sql = await resolveSqlStore(access);
+  if (sql) {
+    return new Set<string>(["demo", ...(await sql.listHandles())]);
+  }
   // KV has no list in this binding surface. Taken set is the requested handle
   // plus any snapshot we can resolve — callers also pass seed `demo`.
   void access;
@@ -130,6 +309,13 @@ export async function writeGraphSnapshot(
   snapshot: GraphSnapshot,
   access: HiddenKitAccess = "page",
 ): Promise<boolean> {
+  const sql = await resolveSqlStore(access);
+  if (sql) {
+    return writeSqlSnapshot(snapshot, access);
+  }
+  if (await resolveHasHyperdrive(access)) {
+    return false;
+  }
   const ns = await readHiddenKitBinding(access);
   if (!ns) {
     return false;
@@ -176,14 +362,25 @@ export function disconnectGraphSnapshot(snapshot: GraphSnapshot, at: string): Gr
 }
 
 /**
- * Persist disconnect on the KV Graph snapshot (`graph:` until Neon).
- * No snapshot → nothing to stamp (seed `demo` stays the public seed).
+ * Persist disconnect: SQL `disconnected_at` + null tokens when Hyperdrive
+ * owns the user; else stamp the KV Graph snapshot. No row → false
+ * (seed `demo` stays the public seed).
  */
 export async function persistOwnerDisconnect(
   session: { handle: string; userId: string },
   access: HiddenKitAccess = "route",
   at: string = new Date().toISOString(),
 ): Promise<boolean> {
+  const sql = await resolveSqlStore(access);
+  if (sql) {
+    const owned = await sql.findUserById(session.userId);
+    if (owned) {
+      return sql.disconnectUser(session.userId, at);
+    }
+    if (await resolveHasHyperdrive(access)) {
+      return false;
+    }
+  }
   const snapshot =
     (await readGraphSnapshot(session.userId, access)) ??
     (await readGraphSnapshotByHandle(session.handle, access));

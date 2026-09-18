@@ -39,7 +39,7 @@ Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCH
 
 **Public from first successful connect.** No publish switch. Ingest builds the kit; `/k/[handle]` is live as soon as the `users` row exists.
 
-**Session:** Instagram proves who they are. Pitchkit still sets an **httpOnly cookie** for Insights, disconnect, and refresh. The cookie is our login, not the Instagram token. Continue GET/POST `/auth/instagram` starts Instagram Business Login when `IG_APP_ID` + `IG_APP_SECRET` are set (redirect URI default `https://pitchkit.app/auth/instagram`, exact dashboard match including trailing slash). Secrets missing → stub session for seed handle `demo`. If `resolveSession` succeeds (seed or Graph KV snapshot), `GET /` redirects to `/insights` — do not show Continue with Instagram to an already-authenticated owner. Signed-out visitors still get disclosure / Professional / personal-fail. **Sign out** (`/auth/sign-out`) clears `pitchkit_session` + `pitchkit_hidden` only; the public kit stays up. **Disconnect** (`POST /auth/disconnect`) clears those cookies, stamps `disconnected_at` on the Graph snapshot (KV `graph:` until Neon), nulls token fields so we stop polling, and 404s `/k/[handle]`. `/insights` without the cookie goes `/`. `/k/[handle]` does not need it. Personal Graph account → `/?error=personal`.
+**Session:** Instagram proves who they are. Pitchkit still sets an **httpOnly cookie** for Insights, disconnect, and refresh. The cookie is our login, not the Instagram token. Continue GET/POST `/auth/instagram` starts Instagram Business Login when `IG_APP_ID` + `IG_APP_SECRET` are set (redirect URI default `https://pitchkit.app/auth/instagram`, exact dashboard match including trailing slash). Secrets missing → stub session for seed handle `demo`. If `resolveSession` succeeds (seed, SQL user, or Graph KV snapshot), `GET /` redirects to `/insights` — do not show Continue with Instagram to an already-authenticated owner. Signed-out visitors still get disclosure / Professional / personal-fail. **Sign out** (`/auth/sign-out`) clears `pitchkit_session` + `pitchkit_hidden` only; the public kit stays up. **Disconnect** (`POST /auth/disconnect`) clears those cookies, stamps `disconnected_at` and nulls token fields (SQL when Hyperdrive is bound; else KV `graph:`), and 404s `/k/[handle]`. `/insights` without the cookie goes `/`. `/k/[handle]` does not need it. Personal Graph account → `/?error=personal`.
 
 Owner home: `/insights`. Pattern header (hug SegmentedControl) toggles Insights vs an in-page Coming soon placeholder. Brands only get `/k/[handle]` (shareable Pattern freeze; no owner nav).
 
@@ -54,7 +54,7 @@ Seed: `/k/demo`.
 | Creator | Continue with Instagram (Professional). Land on Insights. Share the kit URL. Reconnect, sign out, disconnect. Phone works. |
 | Brand | Open the kit. No account. |
 
-No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “contact for collab,” or geo on the **public kit**. `/insights` is the owner Graph layout (WMDS Pattern — creator Insights Show code shell + `PageHeader`, four-up Stat, `Chart.Cartesian` + `Chart.RankedBars`, Recent proof). Primary nav is the Pattern three-column header (PitchKit label + hug `SegmentedControl` Insights / PitchKit + Avatar) — no AppShell and no duplicate tabs on the page. Account is a quiet footer link. Mixes as `Chart.RankedBars`, not a map. Hide/restore posts through `hideFromKit(mediaId)` → `POST /api/media/hide` and `restoreToKit(mediaId)` → `POST /api/media/restore` (WHA-312). Success `{ mediaId, hiddenFromKitAt }`. Schema `media.hidden_from_kit_at`. Public kit filters before `selectSixPosts`; owner Insights keeps the row. FE partitions `hidden_from_kit_at` so Insights reload **"N shown"** excludes hidden (Restore chrome stays). Seed SoT is KV `HIDDEN_KIT` (`hidden:<userId>`) until Neon; httpOnly `pitchkit_hidden` is the owner reload mirror. No localStorage. No new Postgres columns for identity typed holes.
+No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “contact for collab,” or geo on the **public kit**. `/insights` is the owner Graph layout (WMDS Pattern — creator Insights Show code shell + `PageHeader`, four-up Stat, `Chart.Cartesian` + `Chart.RankedBars`, Recent proof). Primary nav is the Pattern three-column header (PitchKit label + hug `SegmentedControl` Insights / PitchKit + Avatar) — no AppShell and no duplicate tabs on the page. Account is a quiet footer link. Mixes as `Chart.RankedBars`, not a map. Hide/restore posts through `hideFromKit(mediaId)` → `POST /api/media/hide` and `restoreToKit(mediaId)` → `POST /api/media/restore` (WHA-312). Success `{ mediaId, hiddenFromKitAt }`. Schema `media.hidden_from_kit_at`. Public kit filters before `selectSixPosts`; owner Insights keeps the row. FE partitions `hidden_from_kit_at` so Insights reload **"N shown"** excludes hidden (Restore chrome stays). Seed SoT is KV `HIDDEN_KIT` (`hidden:<userId>`) until Neon; when Hyperdrive is bound, SQL `media.hidden_from_kit_at` is SoT. httpOnly `pitchkit_hidden` is the owner reload mirror. No localStorage. No new Postgres columns for identity typed holes.
 
 ---
 
@@ -124,7 +124,7 @@ A rollup **may** contain: a time bucket, a metric name, a hashed or global cohor
 | Thing | v1 |
 |---|---|
 | Neon | One project. **Region:** choose when we create the database. |
-| Hyperdrive | Prod binding `HYPERDRIVE`. Preview binding `HYPERDRIVE_PREVIEW` |
+| Hyperdrive | Prod binding `HYPERDRIVE`. Preview binding `HYPERDRIVE_PREVIEW`. Ids stay commented in `wrangler.jsonc` until Randy supplies them. Apply `db/*.sql` with `npm run db:apply`. |
 | R2 | Bucket `pitchkit-media`; public read for kit objects |
 | Cloudflare | **randy@whatmatters.so**. Domain `pitchkit.app` on the Worker. |
 | Secrets | `IG_APP_ID`, `IG_APP_SECRET`, `TOKEN_KEY`, Hyperdrive. Never commit values |
@@ -176,7 +176,7 @@ Personal fail, OAuth cancel → landing with the Professional message or unchang
 ## Build order
 
 1. Next.js App Router + Tailwind v4 on OpenNext Workers. Install WMDS from `github:thewhatmatters/wmds#<sha>` (local `../wmds` still fine). Neon + Hyperdrive + R2. Env names in README.  
-2. Schema from [DATA.md](./DATA.md) including empty `detections` and `weekly_counts`. Seed `demo`. SQL in `db/`. Until Hyperdrive exists, `/k/demo` and `/insights` read the in-repo seed (`lib/seed.ts`) with the same types. `TOKEN_KEY` not required for seed.  
+2. Schema from [DATA.md](./DATA.md) including empty `detections` and `weekly_counts`. Seed `demo`. SQL in `db/`. Apply once with `npm run db:apply` when a Neon URL exists. Until Hyperdrive is bound, `/k/demo` and `/insights` read the in-repo seed (`lib/seed.ts`) with the same types and KV `graph:` snapshots. When `HYPERDRIVE` is bound, SQL is SoT for live Graph users + hide/restore. `TOKEN_KEY` not required for seed.  
 3. Insights + public `/k/demo` (responsive, OG tags).  
 4. Cookie + stub Instagram → Insights.  
 5. Live Instagram for testers.  

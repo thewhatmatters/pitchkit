@@ -5,7 +5,7 @@ import { DEMO_HANDLE, seedUsers } from "./seed";
 /** Pitchkit session cookie — our login, not an Instagram token. */
 export const SESSION_COOKIE = "pitchkit_session";
 
-/** httpOnly hide overlay until Hyperdrive writes `media.hidden_from_kit_at`. */
+/** httpOnly hide overlay — owner reload mirror. SQL writes `media.hidden_from_kit_at` when Hyperdrive is bound. */
 export const HIDDEN_COOKIE = "pitchkit_hidden";
 
 /**

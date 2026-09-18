@@ -4,4 +4,4 @@
 -- Owner Insights still lists the post so restore / Undo works.
 
 ALTER TABLE media
-  ADD COLUMN hidden_from_kit_at timestamptz;
+  ADD COLUMN IF NOT EXISTS hidden_from_kit_at timestamptz;

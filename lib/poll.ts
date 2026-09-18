@@ -140,7 +140,7 @@ function mapGraphMedia(row: GraphMedia, userId: string, fetchedAt: string, previ
   }
   const image = mediaImageUrl(row);
   return {
-    id: previous?.id ?? `igm-${row.id}`,
+    id: previous?.id ?? crypto.randomUUID(),
     user_id: userId,
     ig_media_id: row.id,
     permalink: row.permalink ?? previous?.permalink ?? `https://www.instagram.com/p/${row.id}/`,

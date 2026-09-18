@@ -22,20 +22,20 @@ import {
 } from "./graph-store";
 import { encryptTokenIfPossible } from "./token-crypto";
 import { pollInsights, resolveAccessToken, shouldPollInsights } from "./poll";
+import { hasHyperdrive as hasHyperdriveFlag, resolveHasHyperdrive } from "./hyperdrive";
+import { sqlOwnsUser } from "./sql-store";
 
 export { hideFromKit, restoreToKit, HIDDEN_COOKIE, mergeHiddenOverlay } from "./hidden-kit";
 export type { HiddenOverlay, HideRestoreResult } from "./hidden-kit";
+export { hasHyperdriveFlag as hasHyperdrive, resolveHasHyperdrive };
 
 /**
- * Until Hyperdrive exists, /k/[handle] and /insights read the in-repo seed
- * unless a Graph snapshot (OAuth or operator token poll) is present.
- * Same User / Media types as the live Neon path. TOKEN_KEY is not required
- * for seed. Public /k/demo stays seed. Owner demo may overlay a live poll.
+ * Hyperdrive bound → SQL is SoT for live Graph users + hide/restore.
+ * Else /k/[handle] and /insights read the in-repo seed unless a Graph
+ * snapshot (OAuth or operator token poll) is present on KV `graph:` keys.
+ * Public `/k/demo` stays `lib/seed.ts`.
  * Hide/restore seed SoT: KV `HIDDEN_KIT` (`hidden:<userId>`) until Neon.
  */
-export function hasHyperdrive(): boolean {
-  return false;
-}
 
 export type LoadKitOptions = {
   refresh?: boolean;
@@ -65,12 +65,15 @@ async function findUserByHandle(handle: string): Promise<User | null> {
   return snapshot?.user ?? null;
 }
 
-function ownerFromSnapshot(
+async function ownerFromSnapshot(
   snapshot: GraphSnapshot,
   overlay: HiddenOverlay | null,
   now: Date,
-): PublicKit | null {
-  const media = applyHiddenOverlay(snapshot.media, overlay, snapshot.user.id);
+  access: HiddenKitAccess = "page",
+): Promise<PublicKit | null> {
+  const media = (await sqlOwnsUser(snapshot.user.id, access))
+    ? snapshot.media
+    : applyHiddenOverlay(snapshot.media, overlay, snapshot.user.id);
   const kit = assemblePublicKit(snapshot.user, media, now, {
     reach_series: snapshot.reach_series,
     audience: snapshot.audience,
@@ -92,9 +95,11 @@ export async function loadPublicKit(
       return null;
     }
     const fetched = seedMedia.filter((row) => row.user_id === user.id);
-    const media = hasHyperdrive()
-      ? fetched
-      : applyHiddenOverlay(fetched, await hiddenOverlayForHandle(handle, overlay), user.id);
+    const media = applyHiddenOverlay(
+      fetched,
+      await hiddenOverlayForHandle(handle, overlay),
+      user.id,
+    );
     return assemblePublicKit(user, excludeHiddenFromPublicKit(media), now);
   }
 
@@ -102,7 +107,7 @@ export async function loadPublicKit(
   if (!snapshot) {
     return null;
   }
-  const media = hasHyperdrive()
+  const media = (await sqlOwnsUser(snapshot.user.id))
     ? snapshot.media
     : applyHiddenOverlay(
         snapshot.media,
@@ -178,14 +183,14 @@ export async function loadOwnerKit(
       };
       await writeGraphSnapshot(snapshot, access);
       const resolvedOverlay = await hiddenOverlayForHandle(handle, overlay);
-      return ownerFromSnapshot(snapshot, resolvedOverlay, now);
+      return ownerFromSnapshot(snapshot, resolvedOverlay, now, access);
     }
     // Fail soft: last snapshot or seed. Personal is an auth-path concern.
   }
 
   if (live) {
     const resolvedOverlay = await hiddenOverlayForHandle(handle, overlay);
-    return ownerFromSnapshot(live, resolvedOverlay, now);
+    return ownerFromSnapshot(live, resolvedOverlay, now, access);
   }
 
   if (!seedUser) {
@@ -193,7 +198,7 @@ export async function loadOwnerKit(
   }
 
   const fetched = seedOwnerMedia.filter((row) => row.user_id === seedUser.id);
-  const media = hasHyperdrive()
+  const media = (await sqlOwnsUser(seedUser.id, access))
     ? fetched
     : applyHiddenOverlay(fetched, await hiddenOverlayForHandle(handle, overlay), seedUser.id);
   const kit = assemblePublicKit(seedUser, media, now, {
