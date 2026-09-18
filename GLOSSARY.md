@@ -7,7 +7,7 @@ Desk research, interviews unrun. Locked with Design 2026-09-02. User Research ow
 - Post kit: media insights `saved` / `shares` / `reach`.
 - Account chart: user insights `reach` `time_series` (includes stories + ads). Different from typical post `reach`.
 - If we ever label account-level saves: user insights `saves`, not `saved`.
-- `follower_demographics` breakdowns `country` / `city` / `age` / `gender` are live (v25/v26 Insights, Instagram Login). ≥100 followers or the metric is omitted — keep the owner Audience Card with an insufficient-data empty well; don’t paint invented zeros or EXAMPLE %. Honest `0` only when Graph returned a zero count. Top 45 only. Graph returns integer counts in `total_value.breakdowns.results.value`, not percents. Our math: % of located sample = `value / sum(results)`. **Never** % of `followers_count` (sums can be less than followers because Meta only counts people with demo data). Empty dataset: keep the Card, hide the bars. Backend persists those counts as objects when Insights lands; no extra Graph columns.
+- `follower_demographics` breakdowns `country` / `city` / `age` / `gender` are live (v25/v26 Insights, Instagram Login). ≥100 followers or the metric is omitted — keep the owner Audience Card with State — insufficient audience data (`No audience data yet` / `Connect Instagram Insights demographics when available.`); don’t paint invented zeros or EXAMPLE %. Honest `0` only when Graph returned a zero count. Top 45 only. Graph returns integer counts in `total_value.breakdowns.results.value`, not percents. Our math: % of located sample = `value / sum(results)`. **Never** % of `followers_count` (sums can be less than followers because Meta only counts people with demo data). Empty dataset: keep the Card, hide the bars. Backend persists those counts as objects when Insights lands; no extra Graph columns.
 - IG User `biography` and `website` are Public. Hide if empty. No IG User location field. No industry. Impressions stay off.
 - Engagement rate unlocked 2026-09-18: `(likes + comments + saves + shares) ÷ reach`. Account = **sum÷sum** on posts with Insights `reach` > 0. Hide (or —) when reach is missing. Tooltip: **of reach**, likes + comments + saves + shares in the numerator. Do not fall back to ÷ followers (that was the 2026-09-02 lock; removed). Public kit and Insights use the same formula.
 
@@ -41,9 +41,9 @@ People who bookmarked a typical post to come back. Intent, not applause. Stronge
 **30-day chart** — Insights only; trend object, not a fifth Stat.
 Reach over the last 30 days so a brand (and the creator before they share) can see typical vs a spike. Never paint an empty chart as zeros. This is **not** the same number as typical post reach.
 - Brand ~30s: typical vs a spike before they share.
-- Hide: until Insights (graph-unavailable omits the optional chart region). Empty / thin / all-zero with Insights → keep the Reach Card and show **No reach data yet**. Empty > zeros. Do not invent hatched in-series gaps.
+- Hide: until Insights (graph-unavailable omits the optional chart region). Empty / thin / all-zero with Insights → keep the Reach Card and show **No reach data yet**. Empty > zeros. Partial holes in a plottable 30-day window use Chart.Cartesian `noData` hatch (`null` / omitted days; `0` is plotted). Do not invent hatch UI.
 - Graph (live, Instagram Login): user insights `reach` `time_series` (`GET /{ig-user-id}/insights?metric=reach&period=day&metric_type=time_series`) — account unique reach (includes stories + ads). **Different number** from typical post media insights `reach`.
-- Persist for FE (kit payload, not a SQL table): `reach_series: { day: string /* YYYY-MM-DD UTC */, reach: number }[]`. Empty, all-zero, or too short with Insights → insufficient-reach empty band. No Insights → omit. Live poll when a token is present; seed/example only for the tokenless demo session. Do not invent `weekly_counts` columns.
+- Persist for FE (kit payload, not a SQL table): `reach_series: { day: string /* YYYY-MM-DD UTC */, reach: number | null }[]`. Empty, all-zero, or too short with Insights → insufficient-reach empty band. No Insights → omit. `null` / omitted calendar days in a plottable window hatch; `0` plots. Live poll when a token is present; seed/example only for the tokenless demo session. Do not invent `weekly_counts` columns.
 
 **Six posts** — ranked saves → reach → likes.
 Recent work a brand can match to the public grid. Likes-first would look like a vanity kit. Insights UI label: **Recent proof** (`Tab.Group` display sort Reach / Engagement / Saves; kit math stays this rank).
@@ -88,7 +88,7 @@ Randy unlocked country, age, and gender mix 2026-09-02 (city mix is the finer co
 **Country mix** — own object, not a Stat.
 Are they in my market?
 - Brand ~30s: are they in my market?
-- Hide bars: until Insights connected, if <100 followers (metric omitted), or empty dataset. Don’t paint invented zeros or EXAMPLE %. Honest `0` only when Graph returned a zero count. Owner Insights keeps the Audience Card with insufficient-data empty — do not omit the Card.
+- Hide bars: until Insights connected, if <100 followers (metric omitted), or empty dataset. Don’t paint invented zeros or EXAMPLE %. Honest `0` only when Graph returned a zero count. Owner Insights keeps the Audience Card with **No audience data yet** — do not omit the Card.
 - Paint: ranked % of located sample (bars or a short ranked list). **Not a map.**
 - Graph: `follower_demographics` breakdown `country`. Top 45. Counts in `total_value.breakdowns.results.value`.
 
@@ -145,4 +145,4 @@ Does the split match the customer?
 
 **Insights** — Instagram account analytics the creator connected. Typical reach, saves, the chart, Engagement rate, and country / city / age / gender mix require this. Public-only kits show Followers; Engagement rate hides (or —) until Insights reach exists.
 
-Country / city / age / gender mix are v1 objects (not Stats): % of located sample (`value / sum(results)`), never % of `followers_count`. Hide bars if omitted, <100 followers, or empty — keep the owner Audience Card with insufficient-data empty. Never EXAMPLE %. No IG User location field. No industry. Impressions stay off. `biography` / `website` are Public; hide if empty. Backend persists demo counts as objects when Insights lands; no extra Graph columns. Engagement rate is `(likes + comments + saves + shares) ÷ reach` (sum÷sum; hide when reach is missing).
+Country / city / age / gender mix are v1 objects (not Stats): % of located sample (`value / sum(results)`), never % of `followers_count`. Hide bars if omitted, <100 followers, or empty — keep the owner Audience Card with **No audience data yet**. Never EXAMPLE %. No IG User location field. No industry. Impressions stay off. `biography` / `website` are Public; hide if empty. Backend persists demo counts as objects when Insights lands; no extra Graph columns. Engagement rate is `(likes + comments + saves + shares) ÷ reach` (sum÷sum; hide when reach is missing).

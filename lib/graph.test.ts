@@ -102,4 +102,24 @@ describe("Instagram Login Graph client", () => {
       { day: "2026-09-02", reach: 12 },
     ]);
   });
+
+  it("keeps a Graph day with a null value as a Cartesian gap, not 0", () => {
+    const series = parseReachTimeSeries({
+      data: [
+        {
+          name: "reach",
+          values: [
+            { value: 12, end_time: "2026-09-01T07:00:00+0000" },
+            { value: null, end_time: "2026-09-02T07:00:00+0000" },
+            { value: 18, end_time: "2026-09-03T07:00:00+0000" },
+          ],
+        },
+      ],
+    });
+    assert.deepEqual(series, [
+      { day: "2026-09-01", reach: 12 },
+      { day: "2026-09-02", reach: null },
+      { day: "2026-09-03", reach: 18 },
+    ]);
+  });
 });

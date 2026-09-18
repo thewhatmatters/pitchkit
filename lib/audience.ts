@@ -49,7 +49,7 @@ export type AudienceFitSurface = "bars" | "empty";
 
 /**
  * Owner Insights Audience Card. Never omit for empty Graph / seed mixes.
- * `empty` = insufficient-data well (compose from Reach empty tokens).
+ * `empty` = insufficient-data well (`examples-pitchkit--insufficient-audience-data`).
  * `bars` = live ranked shares only.
  */
 export function audienceFitSurface(

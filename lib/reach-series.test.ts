@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import {
   REACH_CHART_DATE_TICK,
   reachChartDateTickCount,
+  fillReachCalendarGaps,
   reachChartSurface,
   reachSeriesToChartPoints,
   sanitizeReachSeries,
@@ -67,7 +68,7 @@ describe("reach_series chart hide rules", () => {
     assert.equal(reachChartSurface([{ day: "2026-09-01", reach: 12 }], false), "omit");
   });
 
-  it("keeps honest points and does not invent missing days", () => {
+  it("keeps honest points and fills calendar holes as null, not 0", () => {
     const series = [
       { day: "2026-09-01", reach: 1200 },
       { day: "2026-09-03", reach: 1400 },
@@ -77,23 +78,52 @@ describe("reach_series chart hide rules", () => {
       sanitizeReachSeries(series).map((point) => point.day),
       ["2026-09-01", "2026-09-03"],
     );
+    assert.deepEqual(fillReachCalendarGaps(series), [
+      { day: "2026-09-01", reach: 1200 },
+      { day: "2026-09-02", reach: null },
+      { day: "2026-09-03", reach: 1400 },
+    ]);
     const points = reachSeriesToChartPoints(series);
-    assert.equal(points.length, 2);
+    assert.equal(points.length, 3);
     assert.equal(points[0]!.date.toISOString(), "2026-09-01T00:00:00.000Z");
     assert.equal(points[0]!.reach, 1200);
     assert.equal("typical" in points[0]!, false);
-    assert.equal(points[1]!.date.toISOString(), "2026-09-03T00:00:00.000Z");
+    assert.equal(points[1]!.reach, null);
+    assert.equal(points[2]!.date.toISOString(), "2026-09-03T00:00:00.000Z");
   });
 
-  it("adds a constant Typical reach reference from the existing median, not extra days", () => {
+  it("plots Graph 0 and keeps explicit null as a gap", () => {
+    const series = [
+      { day: "2026-09-01", reach: 0 },
+      { day: "2026-09-02", reach: null },
+      { day: "2026-09-03", reach: 12 },
+    ];
+    assert.equal(shouldShowReachChart(series), true);
+    const points = reachSeriesToChartPoints(series);
+    assert.equal(points[0]!.reach, 0);
+    assert.equal(points[1]!.reach, null);
+    assert.equal(points[2]!.reach, 12);
+  });
+
+  it("does not fill a 30-day window when the whole series is unusable", () => {
+    assert.deepEqual(fillReachCalendarGaps([]), []);
+    assert.deepEqual(fillReachCalendarGaps([{ day: "2026-09-01", reach: 0 }]), [
+      { day: "2026-09-01", reach: 0 },
+    ]);
+    assert.equal(reachSeriesToChartPoints([]).length, 0);
+  });
+
+  it("adds a constant Typical reach reference from the existing median, including gap days", () => {
     const series = [
       { day: "2026-09-01", reach: 1200 },
       { day: "2026-09-03", reach: 1400 },
     ];
     const points = reachSeriesToChartPoints(series, 2175);
-    assert.equal(points.length, 2);
+    assert.equal(points.length, 3);
     assert.equal(points[0]!.typical, 2175);
+    assert.equal(points[1]!.reach, null);
     assert.equal(points[1]!.typical, 2175);
+    assert.equal(points[2]!.typical, 2175);
     assert.equal(reachSeriesToChartPoints(series, null)[0]!.typical, undefined);
   });
 });

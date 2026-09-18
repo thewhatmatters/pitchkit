@@ -305,11 +305,17 @@ describe("critical page contracts", () => {
     assert.match(chrome, /resolveOwnerAudience\(audience\)/);
     assert.match(audience, /AUDIENCE_INSUFFICIENT_TITLE/);
     assert.match(audience, /PATTERN_AUDIENCE_EMPTY_WELL_CLASS/);
-    assert.match(audience, /PATTERN_REACH_EMPTY_COPY_CLASS/);
+    assert.match(audience, /PATTERN_AUDIENCE_EMPTY_COPY_CLASS/);
+    assert.doesNotMatch(audience, /PATTERN_REACH_EMPTY_COPY_CLASS/);
     assert.match(audience, /audienceFitSurface/);
     assert.match(audience, /data-audience-slot=\{slot\}/);
     assert.doesNotMatch(audience, /if \(!visible\) \{\s*return null/);
-    assert.match(read("lib/copy.ts"), /AUDIENCE_INSUFFICIENT_TITLE = "Not enough audience data yet"/);
+    assert.match(read("lib/copy.ts"), /AUDIENCE_INSUFFICIENT_TITLE = "No audience data yet"/);
+    assert.match(
+      read("lib/copy.ts"),
+      /AUDIENCE_INSUFFICIENT_BODY =\s*"Connect Instagram Insights demographics when available\."/,
+    );
+    assert.doesNotMatch(read("lib/copy.ts"), /Not enough audience data yet/);
     assert.match(read("lib/audience.ts"), /resolveOwnerAudience/);
     assert.match(read("lib/audience.ts"), /Never EXAMPLE/);
     assert.match(chrome, /Refresh/);
@@ -322,8 +328,11 @@ describe("critical page contracts", () => {
     assert.match(chart, /animate="none"/);
     assert.match(read("components/owner-chrome.tsx"), /typicalReach=\{typicalReach\}/);
     assert.match(read("components/wmds.ts"), /chartMaxTicksForWidth/);
-    assert.match(read("package.json"), /wmds#dc813326028c0fe1cc5f3719466a32607bab4504/);
-    assert.doesNotMatch(read("package.json"), /55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab/);
+    assert.match(read("package.json"), /wmds#cd18e7a29afd0c0d774552c1a3d665f480f51bd4/);
+    assert.doesNotMatch(
+      read("package.json"),
+      /70da6a4c50d8efc1e687b20f231c6e4f1f6190c6|dc813326028c0fe1cc5f3719466a32607bab4504|55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab/,
+    );
     assert.match(page, /OwnerWorkspace/);
     assert.match(read("components/owner-workspace.tsx"), /CREATOR_INSIGHTS_PAGE_CLASS/);
     assert.match(read("components/owner-workspace.tsx"), /CREATOR_INSIGHTS_HEADER_BAND_CLASS/);
@@ -336,8 +345,17 @@ describe("critical page contracts", () => {
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--creator-insights/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--creator-insights-loading/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--insufficient-reach-data/);
+    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--insufficient-audience-data/);
+    assert.match(
+      read("components/pattern-tokens.ts"),
+      /examples-pitchkit--insufficient-reach-and-audience-data/,
+    );
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--graph-data-unavailable/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--shareable-pitchkit/);
+    assert.match(
+      read("components/pattern-tokens.ts"),
+      /components-data-display-chart--cartesian-no-data-gaps/,
+    );
     assert.match(
       read("components/pattern-tokens.ts"),
       /PATTERN_REACH_EMPTY_WELL_CLASS =\s*`\$\{PATTERN_CARD_WELL_CLASS\} items-center justify-center text-center`/,
@@ -347,6 +365,13 @@ describe("critical page contracts", () => {
       /PATTERN_REACH_EMPTY_COPY_CLASS =\s*`\$\{PATTERN_EMPTY_COPY_CLASS\} items-center text-center`/,
     );
     assert.match(read("components/reach-chart.tsx"), /PATTERN_REACH_EMPTY_COPY_CLASS/);
+    assert.match(
+      read("components/pattern-tokens.ts"),
+      /PATTERN_AUDIENCE_EMPTY_COPY_CLASS = PATTERN_REACH_EMPTY_COPY_CLASS/,
+    );
+    assert.match(chrome, /<ReachChart[\s\S]*<AudienceFit/);
+    assert.match(chart, /REACH_INSUFFICIENT_TITLE/);
+    assert.match(audience, /AUDIENCE_INSUFFICIENT_TITLE/);
     assert.match(read("components/pattern-tokens.ts"), /PATTERN_HEADER_SKELETON_COPY_CLASS/);
     assert.match(read("components/pattern-tokens.ts"), /PATTERN_REACH_CHART_MIN_HEIGHT = 344/);
     assert.match(read("lib/copy.ts"), /REACH_INSUFFICIENT_TITLE = "No reach data yet"/);
@@ -355,8 +380,12 @@ describe("critical page contracts", () => {
       /REACH_INSUFFICIENT_BODY =\s*"Connect more Instagram activity to plot the last 30 days\."/,
     );
     assert.doesNotMatch(read("lib/copy.ts"), /Not enough reach history yet|invent a chart from a/);
-    assert.doesNotMatch(chart, /hatch|hatched/);
-    assert.doesNotMatch(read("lib/reach-series.ts"), /hatch|hatched/);
+    assert.match(chart, /noData=\{\{ label: REACH_NO_DATA_LABEL \}\}/);
+    assert.match(chart, /seriesKeys=\{\["reach"\]\}/);
+    assert.match(read("lib/copy.ts"), /REACH_NO_DATA_LABEL = "No data"/);
+    assert.match(read("lib/reach-series.ts"), /fillReachCalendarGaps/);
+    assert.doesNotMatch(chart, /backgroundPatternDiagonalLines|hatchPattern/);
+    assert.doesNotMatch(read("components/insights-loading.tsx"), /noData|REACH_NO_DATA_LABEL/);
     assert.match(read("lib/reach-series.ts"), /reachChartSurface/);
     assert.match(read("app/insights/page.tsx"), /grid === "retrieving"/);
     assert.match(read("app/insights/page.tsx"), /grid !== "pulling"/);
@@ -373,7 +402,7 @@ describe("critical page contracts", () => {
     assert.match(loading, /<Skeleton/);
     assert.doesNotMatch(loading, /<Chart|Chart\.Loading|<Toaster/);
     assert.doesNotMatch(loading, /ExampleGridControls|GridOverlay/);
-    assert.doesNotMatch(loading, /No reach data yet|Not enough reach history yet/);
+    assert.doesNotMatch(loading, /No reach data yet|Not enough reach history yet|No audience data yet|Not enough audience data yet/);
     assert.doesNotMatch(chrome, /<Toaster/);
     assert.doesNotMatch(read("components/insights-loading.tsx"), /<Toaster/);
     assert.match(

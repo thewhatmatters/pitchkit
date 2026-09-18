@@ -17,7 +17,7 @@ import {
   cardTitleClasses,
   chartSeriesConfigFromKeys,
 } from "@/components/wmds";
-import { REACH_INSUFFICIENT_BODY, REACH_INSUFFICIENT_TITLE } from "@/lib/copy";
+import { REACH_INSUFFICIENT_BODY, REACH_INSUFFICIENT_TITLE, REACH_NO_DATA_LABEL } from "@/lib/copy";
 import {
   hasTypicalReachReference,
   reachChartSurface,
@@ -34,11 +34,13 @@ type ReachChartProps = {
 };
 
 /**
- * Canvas ReachCard. Surfaces from WMDS `dc81332`:
- * - chart — `examples-pitchkit--creator-insights`
+ * Canvas ReachCard. Surfaces from WMDS `cd18e7a`:
+ * - chart — `examples-pitchkit--creator-insights` (in-series gaps via Chart.Cartesian `noData`)
  * - empty — `examples-pitchkit--insufficient-reach-data` (keep Card + header; centered well)
  * - omit — `examples-pitchkit--graph-data-unavailable`
  * Retrieving (chrome up / Refresh) is Header + Chart.Loading, not Skeleton.
+ * Partial calendar holes use `components-data-display-chart--cartesian-no-data-gaps`.
+ * Do not invent hatch UI. Do not hatch the full-card empty or loading wells.
  */
 export function ReachChart({
   series,
@@ -151,9 +153,11 @@ function ReachChartBand({
         <Chart.Cartesian
           data={data}
           config={config}
+          seriesKeys={["reach"]}
           periodKind="month"
           minHeight={PATTERN_REACH_CHART_MIN_HEIGHT}
           animate="none"
+          noData={{ label: REACH_NO_DATA_LABEL }}
           aria-label="30-day account reach"
         />
         <Chart.Legend config={config} />

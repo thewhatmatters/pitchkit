@@ -39,13 +39,13 @@ export const REACH_INSUFFICIENT_TITLE = "No reach data yet";
 export const REACH_INSUFFICIENT_BODY =
   "Connect more Instagram activity to plot the last 30 days.";
 
-/**
- * Audience empty well — same Reach insufficient chrome until WMDS ships a
- * dedicated Audience empty Pattern. Do not invent EXAMPLE percents.
- */
-export const AUDIENCE_INSUFFICIENT_TITLE = "Not enough audience data yet";
+/** Pattern — Cartesian no-data gaps (`components-data-display-chart--cartesian-no-data-gaps`). */
+export const REACH_NO_DATA_LABEL = "No data";
+
+/** State — insufficient audience data (`examples-pitchkit--insufficient-audience-data`). */
+export const AUDIENCE_INSUFFICIENT_TITLE = "No audience data yet";
 export const AUDIENCE_INSUFFICIENT_BODY =
-  "Instagram has not returned follower demographics for this account (often under about 100 followers). Keep this card in the dashboard — PitchKit does not invent country, city, age, or gender percentages from an empty mix.";
+  "Connect Instagram Insights demographics when available.";
 
 /** Owner PitchKit segment — Coming soon (WMDS PitchKitPlaceholder copy). */
 export const PITCHKIT_COMING_SOON_BADGE = "Coming soon";

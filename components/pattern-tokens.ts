@@ -1,13 +1,16 @@
 /**
  * Interpolated Show code class strings from WMDS Examples/PitchKit at
- * `dc813326028c0fe1cc5f3719466a32607bab4504`.
+ * `cd18e7a29afd0c0d774552c1a3d665f480f51bd4`.
  *
  * Stories:
  * - `examples-pitchkit--creator-insights` (Pattern — creator Insights)
  * - `examples-pitchkit--creator-insights-loading` (Pattern — creator Insights (loading))
  * - `examples-pitchkit--insufficient-reach-data` (State — insufficient reach data)
+ * - `examples-pitchkit--insufficient-audience-data` (State — insufficient audience data)
+ * - `examples-pitchkit--insufficient-reach-and-audience-data` (State — insufficient reach and audience data)
  * - `examples-pitchkit--graph-data-unavailable` (State — Graph data unavailable; omit optional regions)
  * - `examples-pitchkit--shareable-pitchkit` (Pattern — shareable PitchKit)
+ * - `components-data-display-chart--cartesian-no-data-gaps` (in-series Reach hatch)
  *
  * Copy these literals. Do not import Storybook-only `pitchKitStyles`.
  */
@@ -57,7 +60,7 @@ export const PATTERN_REACH_CHART_MIN_HEIGHT = 344;
 export const PATTERN_REACH_EMPTY_WELL_CLASS =
   `${PATTERN_CARD_WELL_CLASS} items-center justify-center text-center`;
 
-/** Audience empty well — same Reach insufficient tokens until WMDS ships a dedicated Pattern. */
+/** Same centered empty well as Reach — keep the Audience band when Graph has no series. */
 export const PATTERN_AUDIENCE_EMPTY_WELL_CLASS = PATTERN_REACH_EMPTY_WELL_CLASS;
 
 export const PATTERN_EMPTY_COPY_CLASS = "flex max-w-lg flex-col gap-2";
@@ -65,6 +68,9 @@ export const PATTERN_EMPTY_COPY_CLASS = "flex max-w-lg flex-col gap-2";
 /** Centered title/body stack for the Reach empty well — unavailable empty copy stays left-aligned. */
 export const PATTERN_REACH_EMPTY_COPY_CLASS =
   `${PATTERN_EMPTY_COPY_CLASS} items-center text-center`;
+
+/** Same centered title/body stack as Reach — `examples-pitchkit--insufficient-audience-data`. */
+export const PATTERN_AUDIENCE_EMPTY_COPY_CLASS = PATTERN_REACH_EMPTY_COPY_CLASS;
 
 export const PATTERN_EMPTY_TITLE_CLASS = "type-heading-2 text-fg";
 
