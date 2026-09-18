@@ -4,7 +4,7 @@
 
 Canonical list of Postgres tables and columns. Product rules: [PLAN.md](./PLAN.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md).
 
-SQL: `db/001_users.sql`, `db/002_media.sql`, `db/003_detections.sql`, `db/004_weekly_counts.sql`, `db/005_media_hidden_from_kit.sql`. Types: `lib/schema.ts`. In-repo seed (same columns, not Graph): `lib/seed.ts`. Handle `demo` is frozen. Live kits freeze `users.handle` at first successful connect **by default**; optional update on reconnect if the Instagram username differs (WHA-313). Until Hyperdrive exists the Worker reads that seed. `TOKEN_KEY` is not required for seed rows (tokens stay null). The Pitchkit session is an httpOnly cookie (`pitchkit_session` = handle), not a Graph column and not the Instagram token.
+SQL: `db/001_users.sql`, `db/002_media.sql`, `db/003_detections.sql`, `db/004_weekly_counts.sql`, `db/005_media_hidden_from_kit.sql`. Types: `lib/schema.ts`. Host is **Supabase Postgres via Hyperdrive**. Client: `postgres` (postgres.js) over `env.HYPERDRIVE.connectionString` when the binding is present (`lib/postgres.ts`, `lib/sql-store.ts`) — not `@supabase/supabase-js` and not a Neon/Supabase serverless driver. Hyperdrive origin is the Supabase **direct** DB URI (port 5432), not the transaction pooler (6543). In-repo seed (same columns, not Graph): `lib/seed.ts`. Handle `demo` is frozen. Live kits freeze `users.handle` at first successful connect **by default**; optional update on reconnect if the Instagram username differs (WHA-313). Until Hyperdrive exists the Worker reads that seed and KV `graph:` snapshots. When `HYPERDRIVE` / `HYPERDRIVE_PREVIEW` is bound (non-empty `connectionString`), SQL is SoT for `users` / `media` / `hidden_from_kit_at`. Apply once: `HYPERDRIVE_LOCAL_CONNECTION_STRING='…' npm run db:apply`. `TOKEN_KEY` is not required for seed rows (tokens stay null). The Pitchkit session is an httpOnly cookie (`pitchkit_session` = handle), not a Graph column and not the Instagram token.
 
 Photos live in object storage (R2), **publicly readable** for kit objects (already public posts). Do not use expiring signed URLs for the kit. SQL stores keys, not image bytes.
 
@@ -123,7 +123,7 @@ No columns for:
 
 ## Disconnect
 
-Until Neon, stamp `users.disconnected_at` (ISO) on the KV Graph snapshot and null `token_encrypted` / `refresh_encrypted` / `token_expires_at`. `assemblePublicKit` then 404s `/k/[handle]`. Session cookies clear. SQL delete of `users` + `media` + R2 `{user_id}/` still finishes within 24 hours when Hyperdrive exists.
+When Hyperdrive is bound, stamp `users.disconnected_at` and null `token_encrypted` / `refresh_encrypted` / `token_expires_at` on the SQL row. Until then, stamp the same fields on the KV Graph snapshot. `assemblePublicKit` then 404s `/k/[handle]`. Session cookies clear. SQL delete of `users` + `media` + R2 `{user_id}/` still finishes within 24 hours.
 
 `weekly_counts` rows stay only if they cannot identify anyone.
 
@@ -135,7 +135,7 @@ Sign out does not write `disconnected_at`.
 
 `reach_series` is assembled onto the kit payload from the Insights poll (`user insights` `reach` `time_series` — account day buckets, stories + ads). Shape: `{ day: string /* YYYY-MM-DD UTC */, reach: number | null }[]`. Insights missing → omit the field (graph-unavailable). Empty or all-zero with Insights → `[]` and the insufficient-reach empty band. Do not zero-fill 30 days just to paint. Partial calendar holes in a plottable window become `null` for Chart.Cartesian `noData` hatch (`0` is plotted). **Not a SQL table for v1.** Do not invent `weekly_counts` columns for this. Audience mixes from `follower_demographics` are the same payload (no extra Graph columns). Empty / 0 rows (typical under ~100 followers) keep the owner Audience Card with State — insufficient audience data (`No audience data yet`). Never EXAMPLE percents. Never `audience ?? SEED_AUDIENCE` on live Insights. Never omit the Audience band.
 
-Owner demo seed (`loadOwnerKit`) includes ~30 labeled example points when no token. A live token (OAuth or operator `IG_USER_TOKEN`) polls Graph and persists a snapshot (KV `graph:` keys until Hyperdrive). Public `/k/demo` (`loadPublicKit`) stays seed and omits `reach_series`. Frontend: one WMDS Chart on `/insights` from `owner.reach_series` only; keep the Reach Card empty band when Insights exist but the series is unusable; omit when Graph never returned Insights. Never zero-fill. Public kit never paints the Chart. No period-over-period KPI deltas in the payload — do not invent Stat `trend`s.
+Owner demo seed (`loadOwnerKit`) includes ~30 labeled example points when no token. A live token (OAuth or operator `IG_USER_TOKEN`) polls Graph and persists users/media (SQL when Hyperdrive is bound; else KV `graph:` keys). `reach_series` + audience stay payload extras (`graph:payload:` when SQL owns the rows) — not a SQL table. Public `/k/demo` (`loadPublicKit`) stays seed and omits `reach_series`. Frontend: one WMDS Chart on `/insights` from `owner.reach_series` only; keep the Reach Card empty band when Insights exist but the series is unusable; omit when Graph never returned Insights. Never zero-fill. Public kit never paints the Chart. No period-over-period KPI deltas in the payload — do not invent Stat `trend`s.
 
 ## Hide from kit (WHA-312)
 
@@ -152,7 +152,7 @@ Stamped contract. Not a Graph column.
 | Public kit | filter `hidden_from_kit_at != null` **before** `selectSixPosts` |
 | Owner Insights | keep the row (`hidden_from_kit_at` set). FE partitions: **"N shown"** + rank = `null` only; Hidden rows stay for MoreMenu **Restore to kit** / toast Undo. Hide, restore, and Share kit toasts pass title + description. `npm test` fail-closes this partition. |
 
-**Seed path:** until Hyperdrive, seed SoT is KV `HIDDEN_KIT` (`hidden:<userId>` → JSON `Record<mediaId, ISO>`). httpOnly `pitchkit_hidden` (`{ userId, hidden }`) is the owner reload mirror. Public `/k/[handle]` reads KV for the kit owner, not the visitor cookie. FE calls the routes only — no localStorage. Do not invent Graph columns.
+**Seed path:** until Hyperdrive, seed SoT is KV `HIDDEN_KIT` (`hidden:<userId>` → JSON `Record<mediaId, ISO>`). httpOnly `pitchkit_hidden` (`{ userId, hidden }`) is the owner reload mirror. Public `/k/[handle]` reads KV for the kit owner, not the visitor cookie. **Hyperdrive path:** write `media.hidden_from_kit_at` on the SQL row. Binding detection is explicit (`lib/hyperdrive.ts`); missing / empty connection strings stay on KV. FE calls the routes only — no localStorage. Do not invent Graph columns.
 
 ## Optional kit URL update (WHA-313)
 

@@ -3,8 +3,10 @@ import {
   type HiddenKitAccess,
   type HiddenKitStore,
 } from "./hidden-kit-kv";
+import { resolveHasHyperdrive } from "./hyperdrive";
 import type { Media } from "./schema";
 import { seedMedia } from "./seed";
+import { resolveSqlStore } from "./sql-store";
 import {
   HIDDEN_COOKIE,
   resolveSession,
@@ -64,7 +66,7 @@ export type HiddenPersist = {
   write(userId: string, mediaId: string, hiddenFromKitAt: string | null): boolean;
 };
 
-/** Seed overlay persist. Hyperdrive SQL is not wired — inject a failing write to test 500. */
+/** Overlay persist hook. SQL hide/restore writes `media.hidden_from_kit_at` first. */
 export const defaultHiddenPersist: HiddenPersist = {
   write() {
     return true;
@@ -270,18 +272,46 @@ export async function hideFromKit(input: {
     return authorized;
   }
 
+  const access = input.access ?? "route";
+  const persist = input.persist ?? defaultHiddenPersist;
+  const proposedAt = (input.now ?? new Date()).toISOString();
+
+  const sql = await resolveSqlStore(access);
+  if (sql) {
+    const sqlRow = await sql.findMediaById(authorized.mediaId);
+    if (sqlRow) {
+      const hiddenFromKitAt = sqlRow.hidden_from_kit_at ?? proposedAt;
+      if (!persist.write(authorized.session.userId, authorized.mediaId, hiddenFromKitAt)) {
+        return failure("persist_failed");
+      }
+      const stamped = await sql.setHiddenFromKitAt(authorized.mediaId, hiddenFromKitAt);
+      if (stamped === false) {
+        return failure("persist_failed");
+      }
+      const hidden = { ...(input.overlay?.userId === authorized.session.userId ? input.overlay.hidden : {}) };
+      hidden[authorized.mediaId] = stamped ?? hiddenFromKitAt;
+      return {
+        ok: true,
+        mediaId: authorized.mediaId,
+        hiddenFromKitAt: stamped ?? hiddenFromKitAt,
+        overlay: { userId: authorized.session.userId, hidden },
+      };
+    }
+    if (await resolveHasHyperdrive(access)) {
+      return failure("persist_failed");
+    }
+  } else if (await resolveHasHyperdrive(access)) {
+    return failure("persist_failed");
+  }
+
   const store =
-    input.store === undefined
-      ? await resolveHiddenKitStore(input.access ?? "route")
-      : input.store;
+    input.store === undefined ? await resolveHiddenKitStore(access) : input.store;
   if (!store) {
     return failure("persist_failed");
   }
 
-  const persist = input.persist ?? defaultHiddenPersist;
   const hidden = await overlayBaseForWrite(authorized.session.userId, input.overlay, store);
-  const hiddenFromKitAt =
-    hidden[authorized.mediaId] ?? (input.now ?? new Date()).toISOString();
+  const hiddenFromKitAt = hidden[authorized.mediaId] ?? proposedAt;
 
   if (!persist.write(authorized.session.userId, authorized.mediaId, hiddenFromKitAt)) {
     return failure("persist_failed");
@@ -314,15 +344,42 @@ export async function restoreToKit(input: {
     return authorized;
   }
 
+  const access = input.access ?? "route";
+  const persist = input.persist ?? defaultHiddenPersist;
+
+  const sql = await resolveSqlStore(access);
+  if (sql) {
+    const sqlRow = await sql.findMediaById(authorized.mediaId);
+    if (sqlRow) {
+      if (!persist.write(authorized.session.userId, authorized.mediaId, null)) {
+        return failure("persist_failed");
+      }
+      const stamped = await sql.setHiddenFromKitAt(authorized.mediaId, null);
+      if (stamped === false) {
+        return failure("persist_failed");
+      }
+      const hidden = { ...(input.overlay?.userId === authorized.session.userId ? input.overlay.hidden : {}) };
+      delete hidden[authorized.mediaId];
+      return {
+        ok: true,
+        mediaId: authorized.mediaId,
+        hiddenFromKitAt: null,
+        overlay: { userId: authorized.session.userId, hidden },
+      };
+    }
+    if (await resolveHasHyperdrive(access)) {
+      return failure("persist_failed");
+    }
+  } else if (await resolveHasHyperdrive(access)) {
+    return failure("persist_failed");
+  }
+
   const store =
-    input.store === undefined
-      ? await resolveHiddenKitStore(input.access ?? "route")
-      : input.store;
+    input.store === undefined ? await resolveHiddenKitStore(access) : input.store;
   if (!store) {
     return failure("persist_failed");
   }
 
-  const persist = input.persist ?? defaultHiddenPersist;
   if (!persist.write(authorized.session.userId, authorized.mediaId, null)) {
     return failure("persist_failed");
   }

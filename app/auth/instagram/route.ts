@@ -24,8 +24,8 @@ import {
   isProfessionalAccount,
 } from "@/lib/graph";
 import {
+  listTakenHandles,
   readGraphSnapshotByIgUserId,
-  takenHandlesWith,
   writeGraphSnapshot,
 } from "@/lib/graph-store";
 import { pollInsights } from "@/lib/poll";
@@ -141,14 +141,15 @@ async function finishOAuth(request: Request, code: string, state: string | null)
   const url = new URL(request.url);
   const updateHandle = url.searchParams.get("update_handle") === "1";
   const igUsername = me.data.username ?? igUserId;
+  const taken = await listTakenHandles("route");
   const handle = existing
     ? handleAfterReconnect({
         existingHandle: existing.user.handle,
         igUsername,
         updateHandle,
-        taken: takenHandlesWith([existing.user.handle]),
+        taken,
       })
-    : uniqueHandle(pitchkitHandleFromUsername(igUsername), takenHandlesWith([]));
+    : uniqueHandle(pitchkitHandleFromUsername(igUsername), taken);
 
   const polled = await pollInsights({
     token: exchanged.tokens.accessToken,

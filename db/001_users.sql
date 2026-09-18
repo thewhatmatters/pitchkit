@@ -4,7 +4,7 @@
 -- token_encrypted / refresh_encrypted are ciphertext. TOKEN_KEY is a Workers
 -- secret and is never stored in SQL or git. Seed rows leave tokens null.
 
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
   id uuid PRIMARY KEY,
   ig_user_id text NOT NULL UNIQUE,
   handle text NOT NULL UNIQUE,

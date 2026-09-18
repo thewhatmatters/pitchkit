@@ -7,6 +7,6 @@
 -- Postgres needs at least one column. `_placeholder` is not a rollup field and
 -- must never store creator data. Drop it when real columns land.
 
-CREATE TABLE weekly_counts (
+CREATE TABLE IF NOT EXISTS weekly_counts (
   _placeholder boolean NOT NULL DEFAULT true
 );

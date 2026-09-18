@@ -2,7 +2,7 @@
 -- r2_key is the canonical image: carousel first frame, video poster only.
 -- Bytes live in R2, not SQL. Insights columns are nullable until fetch succeeds.
 
-CREATE TABLE media (
+CREATE TABLE IF NOT EXISTS media (
   id uuid PRIMARY KEY,
   user_id uuid NOT NULL REFERENCES users (id) ON DELETE CASCADE,
   ig_media_id text NOT NULL UNIQUE,
@@ -23,4 +23,4 @@ CREATE TABLE media (
   hidden_from_kit_at timestamptz
 );
 
-CREATE INDEX media_user_posted_at_idx ON media (user_id, posted_at DESC);
+CREATE INDEX IF NOT EXISTS media_user_posted_at_idx ON media (user_id, posted_at DESC);
