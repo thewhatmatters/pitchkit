@@ -17,9 +17,9 @@ import { InsightsStats } from "@/components/insights-stats";
 import { ProofPosts } from "@/components/proof-posts";
 import { ReachChart } from "@/components/reach-chart";
 import { resolveOwnerAudience } from "@/lib/audience";
+import { DisconnectControl } from "@/components/disconnect-control";
 import {
   INSIGHTS_PRIVATE,
-  STUB_DISCONNECT,
   TOAST_KIT_COPIED_DESCRIPTION,
   TOAST_KIT_COPIED_TITLE,
   TOAST_KIT_COPY_FAILED_DESCRIPTION,
@@ -99,7 +99,7 @@ export function OwnerChrome({
     return (
       <>
         <InsightsLoading onShare={() => void copyKitLink()} />
-        <OwnerAccountActions notice={notice} onDisconnect={() => setNotice(STUB_DISCONNECT)} />
+        <OwnerAccountActions notice={notice} />
       </>
     );
   }
@@ -164,18 +164,12 @@ export function OwnerChrome({
 
       <ProofPosts posts={posts} hasInsights={hasInsights} />
 
-      <OwnerAccountActions notice={notice} onDisconnect={() => setNotice(STUB_DISCONNECT)} />
+      <OwnerAccountActions notice={notice} />
     </>
   );
 }
 
-function OwnerAccountActions({
-  notice,
-  onDisconnect,
-}: {
-  notice: string | null;
-  onDisconnect: () => void;
-}) {
+function OwnerAccountActions({ notice }: { notice: string | null }) {
   return (
     <>
       <div className="col-span-full flex flex-wrap gap-2">
@@ -189,9 +183,7 @@ function OwnerAccountActions({
             Sign out
           </Button>
         </form>
-        <Button role="destructive" onClick={onDisconnect}>
-          Disconnect
-        </Button>
+        <DisconnectControl />
       </div>
 
       {notice ? <p className="col-span-full">{notice}</p> : null}

@@ -123,9 +123,11 @@ No columns for:
 
 ## Disconnect
 
-Delete `users` + `media` + R2 `{user_id}/`.
+Until Neon, stamp `users.disconnected_at` (ISO) on the KV Graph snapshot and null `token_encrypted` / `refresh_encrypted` / `token_expires_at`. `assemblePublicKit` then 404s `/k/[handle]`. Session cookies clear. SQL delete of `users` + `media` + R2 `{user_id}/` still finishes within 24 hours when Hyperdrive exists.
 
 `weekly_counts` rows stay only if they cannot identify anyone.
+
+Sign out does not write `disconnected_at`.
 
 ---
 

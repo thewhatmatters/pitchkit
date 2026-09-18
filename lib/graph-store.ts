@@ -157,3 +157,39 @@ export function takenHandlesWith(extra: Iterable<string>): Set<string> {
   return new Set(["demo", ...extra]);
 }
 
+/** Stamp disconnect on the user row and drop stored Graph tokens. */
+export function markUserDisconnected(user: User, at: string): User {
+  return {
+    ...user,
+    disconnected_at: at,
+    token_encrypted: null,
+    refresh_encrypted: null,
+    token_expires_at: null,
+  };
+}
+
+export function disconnectGraphSnapshot(snapshot: GraphSnapshot, at: string): GraphSnapshot {
+  return {
+    ...snapshot,
+    user: markUserDisconnected(snapshot.user, at),
+  };
+}
+
+/**
+ * Persist disconnect on the KV Graph snapshot (`graph:` until Neon).
+ * No snapshot → nothing to stamp (seed `demo` stays the public seed).
+ */
+export async function persistOwnerDisconnect(
+  session: { handle: string; userId: string },
+  access: HiddenKitAccess = "route",
+  at: string = new Date().toISOString(),
+): Promise<boolean> {
+  const snapshot =
+    (await readGraphSnapshot(session.userId, access)) ??
+    (await readGraphSnapshotByHandle(session.handle, access));
+  if (!snapshot) {
+    return false;
+  }
+  return writeGraphSnapshot(disconnectGraphSnapshot(snapshot, at), access);
+}
+

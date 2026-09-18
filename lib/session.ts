@@ -1,4 +1,4 @@
-import { readGraphSnapshotByHandle } from "./graph-store";
+import { persistOwnerDisconnect, readGraphSnapshotByHandle } from "./graph-store";
 import type { HiddenKitAccess } from "./hidden-kit-kv";
 import { DEMO_HANDLE, seedUsers } from "./seed";
 
@@ -17,6 +17,9 @@ export const AUTH_CONNECT_PATH = "/auth/instagram";
 
 /** FE posts here; cookie clear stays here. */
 export const AUTH_SIGNOUT_PATH = "/auth/sign-out";
+
+/** FE posts here; persist disconnect + cookie clear stay here. */
+export const AUTH_DISCONNECT_PATH = "/auth/disconnect";
 
 export const SESSION_MAX_AGE = 60 * 60 * 24 * 30;
 
@@ -84,6 +87,21 @@ export function sessionClearCookieHeader(secure: boolean): string {
 
 export function hiddenCookieClearHeader(secure: boolean): string {
   return serializeCookie(HIDDEN_COOKIE, "", secure, 0);
+}
+
+/** Read one cookie from a Request `Cookie` header. */
+export function readRequestCookie(request: Request, name: string): string | null {
+  const header = request.headers.get("cookie");
+  if (!header) {
+    return null;
+  }
+  for (const part of header.split(";")) {
+    const [key, ...rest] = part.trim().split("=");
+    if (key === name) {
+      return rest.join("=");
+    }
+  }
+  return null;
 }
 
 export function parseSessionValue(value: string | undefined | null): Session | null {
@@ -154,4 +172,18 @@ export function stubSignOut(request: Request): Response {
   headers.append("Set-Cookie", sessionClearCookieHeader(secure));
   headers.append("Set-Cookie", hiddenCookieClearHeader(secure));
   return new Response(null, { status: 303, headers });
+}
+
+/**
+ * Disconnect severs the Pitchkit↔Instagram connection for the signed-in owner.
+ * Sign out = cookie clear only (kit stays public).
+ * Disconnect = cookie clear + `disconnected_at` on the Graph snapshot + null tokens.
+ */
+export async function disconnectOwner(request: Request): Promise<Response> {
+  const value = readRequestCookie(request, SESSION_COOKIE);
+  const session = await resolveSession(value, "route");
+  if (session) {
+    await persistOwnerDisconnect(session, "route");
+  }
+  return stubSignOut(request);
 }

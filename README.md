@@ -24,7 +24,7 @@ On the connect screen, before they tap Instagram:
 
 > We only use your public posts and Instagram Insights to build your media kit. We don’t read DMs, who you follow, or unfollowers. Disconnect deletes your kit and the copies we stored.
 
-Landing stays product copy: disclosure, Professional note, **Continue with Instagram**. A quiet demo-session line may sit under the button. Do not lead with stub-token language.
+Landing stays product copy: disclosure, Professional note, **Continue with Instagram**. A quiet demo-session line may sit under the button. Do not lead with stub-token language. If they already have a resolvable `pitchkit_session`, `/` redirects to `/insights`.
 
 ---
 
@@ -47,7 +47,7 @@ Until Hyperdrive exists, `/k/demo` and tokenless `/insights` read the in-repo se
 
 Owner Insights kit (`loadOwnerKit`) includes seed/example `reach_series: { day, reach }[]` (`day` = YYYY-MM-DD UTC) when no token. A live token polls `graph.instagram.com` (`GRAPH_API_VERSION`, start `v25.0`) on Insights load if stale (&gt;6h) or Refresh. `/insights` reads `owner.reach_series` for one WMDS Chart; keep the Reach Card empty band when Insights exist but the series is empty, all-zero, or too short; omit when Graph never returned Insights. Never zero-fill. Public `/k/demo` (`loadPublicKit`) has no Insights and omits `reach_series`. Not a SQL table.
 
-Login: **Continue with Instagram** POST/GET `/auth/instagram`. With `IG_APP_ID` + `IG_APP_SECRET`, that is Instagram Business Login (scopes `instagram_business_basic`, `instagram_business_manage_insights`; redirect `https://pitchkit.app/auth/instagram`). Without secrets it sets an httpOnly seed session for handle `demo`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays the public shareable freeze (no owner Edit / Coming soon, even with a cookie). The Insights PitchKit segment is Coming soon.
+Login: **Continue with Instagram** POST/GET `/auth/instagram`. With `IG_APP_ID` + `IG_APP_SECRET`, that is Instagram Business Login (scopes `instagram_business_basic`, `instagram_business_manage_insights`; redirect `https://pitchkit.app/auth/instagram`). Without secrets it sets an httpOnly seed session for handle `demo`. `/insights` without that cookie redirects `/`. A resolvable session on `/` redirects to `/insights`. **Sign out** (`/auth/sign-out`) clears the cookie; the public kit stays up. **Disconnect** (`POST /auth/disconnect`) clears the cookie, stamps `disconnected_at` on the Graph snapshot, nulls tokens, and 404s `/k/[handle]`. `/k/demo` stays the public shareable freeze (no owner Edit / Coming soon, even with a cookie). The Insights PitchKit segment is Coming soon.
 
 `/insights` is the real owner layout (WMDS Pattern — creator Insights Show code `examples-pitchkit--creator-insights`: hug `SegmentedControl` in a three-column PitchKit / control / Avatar header on `grid-page min-h-screen … [--grid-column-gap:8px] [--grid-max:1140px] [padding-bottom:44px]`, body `band pt-6 sm:pt-8`, then `PageHeader`, four-up Stat, `Chart.Cartesian` + `Chart.RankedBars`, Recent proof with `Tab.Group`). PitchKit segment stays on this page and shows Coming soon. Public `/k/[handle]` copies Pattern — shareable PitchKit (`examples-pitchkit--shareable-pitchkit`). `GridOverlay` is Storybook-only. One `<Toaster position="bottom-right" />` at the app root. Full-bleed `<body className="bg-body min-h-screen">`. Hide-from-kit goes through `hideFromKit(mediaId)` / `restoreToKit(mediaId)` → `POST /api/media/hide` and `POST /api/media/restore` (`AlertDialog` + toast Undo). Restore and Share kit toasts also pass title + description. Public kit filters `hidden_from_kit_at` before the six; owner Insights keeps the row and partitions so reload **"N shown"** excludes hidden (Restore chrome stays). Insufficient `reach_series` keeps the Reach Card empty band; Graph-unavailable omits the optional chart. Empty audience mixes keep the Audience Card with **No audience data yet** / **Connect Instagram Insights demographics when available.** (never EXAMPLE percents). Both empties can show at once. Public seed Insights stay null — Engagement rate, reach, and saves hide, and the Chart is omitted (no ÷ followers). Owner demo seed has post Insights plus the example series; audience stays empty. Contact and past brands stay hidden on the public kit when blank. Kit Stat label is **Engagement rate**, never “ER”.
 
@@ -57,7 +57,7 @@ Login: **Continue with Instagram** POST/GET `/auth/instagram`. With `IG_APP_ID` 
 
 Postgres holds creator rows and the posts we fetched. Photos go in file storage, not in SQL. We only store what Instagram Login and Insights already give us. Full column list: [DATA.md](./DATA.md).
 
-Disconnect deletes the creator, their posts, and their files. Anonymous weekly totals stay only if they cannot identify anyone.
+Disconnect severs the Pitchkit↔Instagram connection: session cookies clear, `disconnected_at` is stamped, tokens are nulled, and the kit URL 404s. SQL + R2 `{user_id}/` purge still finishes within 24 hours when Neon exists. Sign out is cookie-only. Anonymous weekly totals stay only if they cannot identify anyone.
 
 ---
 
@@ -95,7 +95,7 @@ cp .dev.vars.example .dev.vars
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=personal`, `/auth/instagram` (stub or live OAuth), `/auth/sign-out`, `/insights`, `/insights?refresh=1`, `/insights?grid=pulling`, `/insights?grid=retrieving`, `/settings`, `/k/demo`, `/k/nope` (404), `POST /api/media/hide`, `POST /api/media/restore`, `/privacy`, `/delete`.
+Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=personal`, `/auth/instagram` (stub or live OAuth), `/auth/sign-out`, `/auth/disconnect`, `/insights`, `/insights?refresh=1`, `/insights?grid=pulling`, `/insights?grid=retrieving`, `/settings`, `/k/demo`, `/k/nope` (404), `POST /api/media/hide`, `POST /api/media/restore`, `/privacy`, `/delete`.
 
 ```bash
 npm test

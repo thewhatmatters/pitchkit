@@ -1,12 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { Accordion, Button, Card, cardBodyTextClasses, cardTitleClasses } from "@/components/wmds";
-import { STUB_DISCONNECT } from "@/lib/copy";
+import { DisconnectControl } from "@/components/disconnect-control";
 
 export function AccountSettings() {
-  const [notice, setNotice] = useState<string | null>(null);
-
   return (
     <Card variant="outlined" shape="rounded" padding="none" className="col-span-full">
       <Card.Header>
@@ -30,13 +27,10 @@ export function AccountSettings() {
                     Sign out
                   </Button>
                 </form>
-                <Button role="destructive" onClick={() => setNotice(STUB_DISCONNECT)}>
-                  Disconnect
-                </Button>
+                <DisconnectControl />
               </div>
             </Accordion.Item>
           </Accordion>
-          {notice ? <p className={cardBodyTextClasses}>{notice}</p> : null}
         </div>
       </Card.Body>
     </Card>
