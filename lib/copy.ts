@@ -35,9 +35,9 @@ export const TOAST_HIDE_FAILED_TITLE = "Could not hide this post";
 export const TOAST_RESTORE_FAILED_TITLE = "Could not restore this post";
 
 /** State — insufficient reach data (`examples-pitchkit--insufficient-reach-data`). */
-export const REACH_INSUFFICIENT_TITLE = "Not enough reach history yet";
+export const REACH_INSUFFICIENT_TITLE = "No reach data yet";
 export const REACH_INSUFFICIENT_BODY =
-  "Instagram has not returned enough daily reach to plot the last 30 days. Keep this card in the dashboard — PitchKit does not invent a chart from a missing, thin, or all-zero series.";
+  "Connect more Instagram activity to plot the last 30 days.";
 
 /** Owner PitchKit segment — Coming soon (WMDS PitchKitPlaceholder copy). */
 export const PITCHKIT_COMING_SOON_BADGE = "Coming soon";

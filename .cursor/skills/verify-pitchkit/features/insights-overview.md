@@ -8,7 +8,7 @@ Insights overview is the owner home after connect: PageHeader **Insights**, a fo
 - `insights-stats` shows Followers, Engagement rate, Typical reach, and Saves on the four-up.
 - `insights-reach-chart` shows the outlined Reach Card and `30-day account reach` plot (WHA-310 well).
 - `insights-audience` shows Audience fit RankedBars when mixes are non-empty.
-- `insights-insufficient-reach` keeps the Reach Card with **Not enough reach history yet** when Insights exist but the series is missing / thin / all-zero (not Skeleton, not Chart.Loading, not omit-band).
+- `insights-insufficient-reach` keeps the Reach Card with **No reach data yet** when Insights exist but the series is missing / thin / all-zero (not Skeleton, not Chart.Loading, not omit-band). Empty well is centered. Stats / Audience / proof may still show.
 - `insights-graph-unavailable` omits the optional Reach / empty audience regions when Graph never returned Insights.
 - `insights-loading` is the page-freeze skeleton at `/insights?grid=pulling` (Stat loading + Skeleton wells + six proof placeholders).
 - `insights-retrieving` is Header + Chart.Loading after chrome is up (`/insights?grid=retrieving` or Refresh).
@@ -39,7 +39,7 @@ Preconditions:
 
 - Brands never see this page. A `--fresh` `/insights` redirects to `/`.
 - Public `/k/demo` omits `reach_series`. Do not expect this chart on the public kit.
-- Insufficient reach keeps the Reach Card and shows **Not enough reach history yet**. Omitting that Card when Insights exist is a fail. A title-only Card without that empty copy is a fail. Skeleton / Chart.Loading in that empty well is a fail.
+- Insufficient reach keeps the Reach Card and shows **No reach data yet** / **Connect more Instagram activity to plot the last 30 days.** Omitting that Card when Insights exist is a fail. A title-only Card without that empty copy is a fail. Skeleton / Chart.Loading in that empty well is a fail. Do not invent hatched in-series gaps.
 - Graph-unavailable still omits the optional Reach region — do not invent the empty band when Insights never landed.
 - Spell **Engagement rate**. A label “ER” is a fail.
 - `/insights?grid=pulling` is the first-connect skeleton Pattern. `/insights?grid=retrieving` is Header + Chart.Loading. Default dry-run uses `/insights` with seed ready.

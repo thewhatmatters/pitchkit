@@ -4,10 +4,10 @@ import type { CSSProperties, ReactNode } from "react";
 import {
   PATTERN_CARD_WELL_CLASS,
   PATTERN_EMPTY_BODY_CLASS,
-  PATTERN_EMPTY_COPY_CLASS,
   PATTERN_EMPTY_TITLE_CLASS,
   PATTERN_REACH_CARD_CLASS,
   PATTERN_REACH_CHART_MIN_HEIGHT,
+  PATTERN_REACH_EMPTY_COPY_CLASS,
   PATTERN_REACH_EMPTY_WELL_CLASS,
 } from "@/components/pattern-tokens";
 import {
@@ -34,9 +34,9 @@ type ReachChartProps = {
 };
 
 /**
- * Canvas ReachCard. Surfaces from WMDS `55944ed`:
+ * Canvas ReachCard. Surfaces from WMDS `dc81332`:
  * - chart — `examples-pitchkit--creator-insights`
- * - empty — `examples-pitchkit--insufficient-reach-data` (keep Card + header)
+ * - empty — `examples-pitchkit--insufficient-reach-data` (keep Card + header; centered well)
  * - omit — `examples-pitchkit--graph-data-unavailable`
  * Retrieving (chrome up / Refresh) is Header + Chart.Loading, not Skeleton.
  */
@@ -72,7 +72,7 @@ export function ReachChart({
           className={PATTERN_REACH_EMPTY_WELL_CLASS}
           style={{ minHeight: PATTERN_REACH_CHART_MIN_HEIGHT } satisfies CSSProperties}
         >
-          <div className={PATTERN_EMPTY_COPY_CLASS}>
+          <div className={PATTERN_REACH_EMPTY_COPY_CLASS}>
             <h3 className={PATTERN_EMPTY_TITLE_CLASS}>{REACH_INSUFFICIENT_TITLE}</h3>
             <p className={PATTERN_EMPTY_BODY_CLASS}>{REACH_INSUFFICIENT_BODY}</p>
           </div>

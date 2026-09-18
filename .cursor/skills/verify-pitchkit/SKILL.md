@@ -116,7 +116,7 @@ Stable handles already in product:
 |---|---|
 | Owner nav | `aria-label="PitchKit primary navigation"` · **radio** Insights \| PitchKit (radiogroup; in-page on `/insights`) |
 | Stats | `aria-label="Instagram performance summary"` · Followers / **Engagement rate** / Typical reach / Saves |
-| Reach chart | `aria-label="30-day account reach"` · Card title **Reach over 30 days** · empty slot `data-chart-slot="empty"` + **Not enough reach history yet** · loading `aria-label="Loading reach over 30 days"` |
+| Reach chart | `aria-label="30-day account reach"` · Card title **Reach over 30 days** · empty slot `data-chart-slot="empty"` + **No reach data yet** · loading `aria-label="Loading reach over 30 days"` |
 | Proof tabs | `aria-label="Rank recent proof posts by"` · Reach / Engagement / Saves |
 | MoreMenu | `Manage ranked post N` / `Manage hidden post` |
 | Hide confirm | AlertDialog **Hide from kit** (title: Hide this post from PitchKit?) |

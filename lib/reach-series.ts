@@ -54,7 +54,7 @@ export type ReachChartSurface = "chart" | "empty" | "omit";
 /**
  * Owner Insights Reach Card.
  * - `omit` — Graph-unavailable (`examples-pitchkit--graph-data-unavailable`): Insights never landed.
- * - `empty` — insufficient reach (`examples-pitchkit--insufficient-reach-data`): series missing / thin / all-zero.
+ * - `empty` — insufficient reach (`examples-pitchkit--insufficient-reach-data`): series missing / thin / all-zero. Centered well.
  * - `chart` — at least one honest positive day.
  */
 export function reachChartSurface(
