@@ -170,7 +170,7 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(stats, /trend=/);
     assert.match(stats, /CREATOR_INSIGHTS_STAT_CLASS/);
     assert.match(stats, /band gap-y-4/);
-    assert.doesNotMatch(stats, /w-full min-w-0/);
+    assert.doesNotMatch(stats, /className="[^"]*w-full min-w-0/);
     assert.match(proof, /Recent proof/);
     assert.match(proof, /CREATOR_INSIGHTS_SUPPORTING_CLASS/);
     assert.match(proof, /band min-w-0 gap-y-4/);

@@ -14,7 +14,7 @@ type InsightsStatsProps = {
 
 /**
  * WMDS PitchKit creator Insights four-up on the page subgrid.
- * Spans match canvas `pitchKitStatClasses` — no `w-full min-w-0`.
+ * Spans match canvas `pitchKitStatClasses` only. Do not add full-width extras.
  * Do not lead with Engagement rate. Spell **Engagement rate** — never “ER”.
  * No period-over-period `trend` — seed/payload has no honest deltas.
  */
