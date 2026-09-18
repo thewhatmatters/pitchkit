@@ -2,14 +2,26 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { EyeOff, Repeat2, Undo2 } from "lucide-react";
-import { CREATOR_INSIGHTS_SUPPORTING_CLASS } from "@/lib/creator-insights-classes";
+import {
+  PATTERN_POST_CARD_CLASS,
+  PATTERN_POST_HEADER_START_CLASS,
+  PATTERN_POST_IMAGE_CLASS,
+  PATTERN_POST_METRIC_CLASS,
+  PATTERN_POST_METRIC_LABEL_CLASS,
+  PATTERN_POST_METRIC_VALUE_CLASS,
+  PATTERN_POST_METRICS_CLASS,
+  PATTERN_POSTS_HEADER_CLASS,
+  PATTERN_POSTS_PANEL_CLASS,
+  PATTERN_POSTS_SECTION_CLASS,
+  PATTERN_POSTS_TABS_CLASS,
+  PATTERN_SUPPORTING_CLASS,
+} from "@/components/pattern-tokens";
 import {
   AlertDialog,
   Badge,
   Card,
   MoreMenu,
   Tab,
-  cardLayoutBodyOccupantRadiusClasses,
   cardSubtitleClasses,
   cardTitleClasses,
   toast,
@@ -136,20 +148,18 @@ export function ProofPosts({ posts, hasInsights, loading = false }: ProofPostsPr
 
   if (loading) {
     return (
-      <section className="band min-w-0 gap-y-4">
+      <section className={PATTERN_POSTS_SECTION_CLASS}>
         <h2 className={`${cardTitleClasses} col-span-full`}>Recent proof</h2>
       </section>
     );
   }
 
   return (
-    <section className="band min-w-0 gap-y-4">
-      <div className="col-span-full flex flex-wrap items-end justify-between gap-3">
+    <section className={PATTERN_POSTS_SECTION_CLASS}>
+      <div className={PATTERN_POSTS_HEADER_CLASS}>
         <div>
           <h2 className={cardTitleClasses}>Recent proof</h2>
-          <p className={CREATOR_INSIGHTS_SUPPORTING_CLASS}>
-            {postNotice ?? proofMetricNotices[proofMetric]}
-          </p>
+          <p className={PATTERN_SUPPORTING_CLASS}>{postNotice ?? proofMetricNotices[proofMetric]}</p>
         </div>
         <Badge variant="neutral" emphasis="muted" size="sm">
           {shown.length} shown
@@ -164,7 +174,7 @@ export function ProofPosts({ posts, hasInsights, loading = false }: ProofPostsPr
             setPostNotice(null);
           }
         }}
-        className="col-span-full"
+        className={PATTERN_POSTS_TABS_CLASS}
       >
         <Tab value="reach" panelId="recent-proof-panel">
           Reach
@@ -176,7 +186,7 @@ export function ProofPosts({ posts, hasInsights, loading = false }: ProofPostsPr
           Saves
         </Tab>
       </Tab.Group>
-      <div id="recent-proof-panel" role="tabpanel" className="band col-span-full min-w-0 gap-y-4">
+      <div id="recent-proof-panel" role="tabpanel" className={PATTERN_POSTS_PANEL_CLASS}>
         {rankedPosts.map((post, index) => (
           <ProofPostCard
             key={post.id}
@@ -245,11 +255,11 @@ function ProofPostCard({
     <Card
       variant="outlined"
       shape="rounded"
-      className={`col-span-full min-w-0 md:col-span-4 lg:col-span-4${hidden ? " text-muted" : ""}`}
+      className={`${PATTERN_POST_CARD_CLASS}${hidden ? " text-muted" : ""}`}
     >
       <Card.Header
         start={
-          <span className="flex items-center gap-2">
+          <span className={PATTERN_POST_HEADER_START_CLASS}>
             {hidden ? (
               <Badge variant="neutral" emphasis="muted" size="sm">
                 Hidden
@@ -292,19 +302,17 @@ function ProofPostCard({
       />
       <Card.Body>
         <img
-          className={`aspect-[4/3] w-full bg-body object-cover ${cardLayoutBodyOccupantRadiusClasses}`}
+          className={PATTERN_POST_IMAGE_CLASS}
           src={publicObjectUrl(post.r2_key)}
           alt=""
         />
       </Card.Body>
       <Card.Footer>
-        <div className="grid w-full grid-cols-3 gap-3">
+        <div className={PATTERN_POST_METRICS_CLASS}>
           {metrics.map(([label, value]) => (
-            <span key={label} className="flex min-w-0 flex-col gap-1">
-              <span className="type-supporting font-medium uppercase tracking-wider text-muted">
-                {label}
-              </span>
-              <span className="font-mono text-sm tabular-nums text-fg">
+            <span key={label} className={PATTERN_POST_METRIC_CLASS}>
+              <span className={PATTERN_POST_METRIC_LABEL_CLASS}>{label}</span>
+              <span className={PATTERN_POST_METRIC_VALUE_CLASS}>
                 {value == null ? "—" : compactNumber.format(value)}
               </span>
             </span>

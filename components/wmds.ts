@@ -19,6 +19,7 @@ export {
   Status,
   Switch,
   Tab,
+  TextLink,
   Toaster,
   cardBodyTextClasses,
   cardLayoutBodyOccupantInsetXClasses,

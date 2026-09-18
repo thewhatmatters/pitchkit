@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  Card,
-  Chart,
-  cardLayoutBodyOccupantRadiusClasses,
-  cardSubtitleClasses,
-  cardTitleClasses,
-} from "@/components/wmds";
+  PATTERN_AUDIENCE_CARD_CLASS,
+  PATTERN_AUDIENCE_SECTION_CLASS,
+  PATTERN_AUDIENCE_WELL_CLASS,
+  PATTERN_SECTION_EYEBROW_CLASS,
+} from "@/components/pattern-tokens";
+import { Card, Chart, cardSubtitleClasses, cardTitleClasses } from "@/components/wmds";
 import { shouldShowAudienceMix, visibleAudienceMix, type RankedShare } from "@/lib/audience";
 
 type AudienceFitProps = {
@@ -29,19 +29,16 @@ function AudienceSection({ title, items }: { title: string; items: { label: stri
   }
 
   return (
-    <section className="flex min-w-0 flex-col gap-3">
-      <h3 className="type-supporting font-medium uppercase tracking-wider text-muted">
-        {title}
-      </h3>
+    <section className={PATTERN_AUDIENCE_SECTION_CLASS}>
+      <h3 className={PATTERN_SECTION_EYEBROW_CLASS}>{title}</h3>
       <Chart.RankedBars aria-label={`Audience by ${title.toLowerCase()}`} items={items} animate="none" />
     </section>
   );
 }
 
 /**
- * Canvas AudienceCard chrome: outlined + bodyTerminal, title + subtitle,
- * four-block well (`pitchKitAudienceWellClasses`). Hide the Card when every
- * mix is empty. Never paint zeros. Chart.RankedBars only — no invented bars.
+ * Owner Insights audience Card. Hide the whole Card when every mix is empty.
+ * Never paint zeros. Chart.RankedBars only — no invented bars.
  */
 export function AudienceFit({ country, city, age, gender }: AudienceFitProps) {
   const countries = toBars(country);
@@ -63,7 +60,7 @@ export function AudienceFit({ country, city, age, gender }: AudienceFitProps) {
       variant="outlined"
       shape="rounded"
       bodyTerminal
-      className="col-span-full min-w-0 lg:col-span-6"
+      className={PATTERN_AUDIENCE_CARD_CLASS}
     >
       <Card.Header
         start={
@@ -74,9 +71,7 @@ export function AudienceFit({ country, city, age, gender }: AudienceFitProps) {
         }
       />
       <Card.Body>
-        <div
-          className={`grid min-w-0 gap-y-6 bg-body px-3.5 py-4 [column-gap:var(--grid-column-gap)] sm:grid-cols-2 ${cardLayoutBodyOccupantRadiusClasses}`}
-        >
+        <div className={PATTERN_AUDIENCE_WELL_CLASS}>
           <AudienceSection title="Countries" items={countries} />
           <AudienceSection title="Cities" items={cities} />
           <AudienceSection title="Age" items={ages} />

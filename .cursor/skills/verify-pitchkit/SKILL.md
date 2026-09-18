@@ -114,7 +114,7 @@ Stable handles already in product:
 
 | Surface | Handle |
 |---|---|
-| Owner nav | `aria-label="PitchKit primary navigation"` · **radio** Insights \| PitchKit (radiogroup) |
+| Owner nav | `aria-label="PitchKit primary navigation"` · **radio** Insights \| PitchKit (radiogroup; in-page on `/insights`) |
 | Stats | `aria-label="Instagram performance summary"` · Followers / **Engagement rate** / Typical reach / Saves |
 | Reach chart | `aria-label="30-day account reach"` · Card title **Reach over 30 days** |
 | Proof tabs | `aria-label="Rank recent proof posts by"` · Reach / Engagement / Saves |

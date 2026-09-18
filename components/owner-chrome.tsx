@@ -4,9 +4,13 @@ import { useState } from "react";
 import { Share2 } from "lucide-react";
 import { AudienceFit } from "@/components/audience-fit";
 import {
-  CREATOR_INSIGHTS_FORMULA_CLASS,
-  CREATOR_INSIGHTS_SUPPORTING_CLASS,
-} from "@/lib/creator-insights-classes";
+  PATTERN_DASHBOARD_GRID_CLASS,
+  PATTERN_FORMULA_CLASS,
+  PATTERN_HEADER_COPY_CLASS,
+  PATTERN_HEADER_SECTION_CLASS,
+  PATTERN_METRICS_STACK_CLASS,
+  PATTERN_SUPPORTING_CLASS,
+} from "@/components/pattern-tokens";
 import { Button, PageHeader, toast } from "@/components/wmds";
 import { InsightsStats } from "@/components/insights-stats";
 import { ProofPosts } from "@/components/proof-posts";
@@ -85,7 +89,7 @@ export function OwnerChrome({
 
   return (
     <>
-      <section className="col-span-full">
+      <section className={PATTERN_HEADER_SECTION_CLASS}>
         <PageHeader
           variant="page"
           title="Insights"
@@ -95,19 +99,19 @@ export function OwnerChrome({
             </Button>
           }
         />
-        <div className="flex max-w-2xl flex-col gap-1">
-          <p className={CREATOR_INSIGHTS_SUPPORTING_CLASS}>
+        <div className={PATTERN_HEADER_COPY_CLASS}>
+          <p className={PATTERN_SUPPORTING_CLASS}>
             {refreshed
               ? `Verified Instagram performance, refreshed ${refreshed}. ${INSIGHTS_PRIVATE}.`
               : `${INSIGHTS_PRIVATE}.`}
           </p>
-          <p className={CREATOR_INSIGHTS_FORMULA_CLASS}>
+          <p className={PATTERN_FORMULA_CLASS}>
             Engagement rate = (likes + comments) ÷ followers.
           </p>
         </div>
       </section>
 
-      <div className="band gap-y-2">
+      <div className={PATTERN_METRICS_STACK_CLASS}>
         <InsightsStats
           followers={user.followers}
           engagementRate={engagementRate}
@@ -116,7 +120,7 @@ export function OwnerChrome({
           loading={!gridReady}
         />
 
-        <div className="band min-w-0 gap-y-6 [align-items:stretch]">
+        <div className={PATTERN_DASHBOARD_GRID_CLASS}>
           <ReachChart
             series={reachSeries}
             typicalReach={typicalReach}
