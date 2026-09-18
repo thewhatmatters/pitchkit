@@ -90,16 +90,15 @@ describe("audience mix hide-empty", () => {
     ].map((row) => row.label);
 
     for (const mixes of [liveEmpty, omitted, seed]) {
-      const labels = [
+      const labels: string[] = [
         ...mixes.country,
         ...mixes.city,
         ...mixes.age,
         ...mixes.gender,
       ].map((row) => row.label);
+      // Empty payload — no EXAMPLE country/city/age/gender labels to paint.
       assert.deepEqual(labels, []);
-      for (const label of exampleLabels) {
-        assert.equal(labels.includes(label), false, `empty audience must not paint ${label}`);
-      }
+      assert.ok(exampleLabels.length > 0);
     }
   });
 });
