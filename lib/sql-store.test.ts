@@ -51,7 +51,10 @@ function liveUser(partial: Partial<User> = {}): User {
 function recordingExecutor(handler: (text: string, values: readonly unknown[]) => SqlQueryRow[]) {
   const queries: { text: string; values: readonly unknown[] }[] = [];
   const executor: SqlExecutor = {
-    async query<T extends SqlQueryRow = SqlQueryRow>(text, values = []) {
+    async query<T extends SqlQueryRow = SqlQueryRow>(
+      text: string,
+      values: readonly unknown[] = [],
+    ): Promise<T[]> {
       queries.push({ text, values });
       assert.match(text, /\$1|IF NOT EXISTS/i);
       assert.equal(text.includes("${"), false);
