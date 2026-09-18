@@ -41,7 +41,7 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(page, /KitInventory/);
   });
 
-  it("owner views use SegmentedControl Insights | PitchKit on a 1140 grid", () => {
+  it("owner views use hug SegmentedControl Insights | PitchKit on the Pattern shell", () => {
     const nav = read("components/owner-nav.tsx");
     const frame = read("components/app-frame.tsx");
     const barrel = read("components/wmds.ts");
@@ -51,15 +51,30 @@ describe("critical page contracts", () => {
 
     assert.match(barrel, /SegmentedControl/);
     assert.match(barrel, /PageHeader/);
+    assert.match(barrel, /Avatar/);
     assert.match(nav, /SegmentedControl/);
     assert.match(nav, />Insights</);
     assert.match(nav, />PitchKit</);
     assert.match(nav, /aria-label="PitchKit primary navigation"/);
     assert.match(nav, /router\.push\("\/insights"\)/);
     assert.match(nav, /kitPath/);
+    assert.match(nav, /grid-cols-\[1fr_auto_1fr\]/);
+    assert.match(nav, /type-ui-label text-fg/);
+    assert.match(nav, /<Avatar/);
+    assert.match(nav, /size="sm"/);
+    assert.match(nav, /className="justify-self-end"/);
+    assert.doesNotMatch(nav, /^\s*layout="stretch"/m);
+    assert.doesNotMatch(nav, /className="[^"]*w-full/);
     assert.match(frame, /OWNER_GRID_MAX = "1140px"/);
     assert.match(frame, /OWNER_GRID_COLUMN_GAP = "8px"/);
     assert.match(frame, /OWNER_GRID_CLASS/);
+    assert.match(
+      frame,
+      /CREATOR_INSIGHTS_PAGE_CLASS =\s*"grid-page min-h-screen bg-body \[--grid-column-gap:8px\] \[--grid-max:1140px\] \[padding-bottom:44px\]"/,
+    );
+    assert.match(frame, /CREATOR_INSIGHTS_HEADER_BAND_CLASS = "band pb-4"/);
+    assert.match(frame, /CREATOR_INSIGHTS_BODY_BAND_CLASS = "band pt-8"/);
+    assert.match(frame, /CREATOR_INSIGHTS_BODY_INNER_CLASS = "band min-w-0 gap-y-8"/);
     assert.match(frame, /\[--grid-max:1140px\]/);
     assert.match(frame, /\[--grid-column-gap:8px\]/);
     assert.match(frame, /\[--grid-gutter:8px\]/);
@@ -70,11 +85,17 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(frame, /col-span-full flex flex-col/);
     assert.match(frame, /<div className="band">\{children\}<\/div>/);
     assert.doesNotMatch(frame, /["']use client["']/);
-    assert.match(insights, /OWNER_GRID_MAX/);
+    assert.match(insights, /CREATOR_INSIGHTS_PAGE_CLASS/);
+    assert.match(insights, /CREATOR_INSIGHTS_HEADER_BAND_CLASS/);
+    assert.match(insights, /CREATOR_INSIGHTS_BODY_BAND_CLASS/);
+    assert.match(insights, /CREATOR_INSIGHTS_BODY_INNER_CLASS/);
     assert.match(insights, /OwnerNav/);
     assert.match(insights, /insightsGate/);
+    assert.doesNotMatch(insights, /<AppFrame/);
+    assert.doesNotMatch(insights, /OWNER_GRID_MAX|OWNER_GRID_CLASS|min-h-dvh|py-6/);
     assert.match(kit, /OwnerNav/);
-    assert.match(kit, /OWNER_GRID_MAX/);
+    assert.match(kit, /CREATOR_INSIGHTS_PAGE_CLASS/);
+    assert.match(kit, /CREATOR_INSIGHTS_HEADER_BAND_CLASS/);
     assert.match(kit, /sessionOwnsHandle/);
     assert.match(settings, /OWNER_GRID_MAX/);
     assert.doesNotMatch(settings, /OwnerNav/);
@@ -178,6 +199,13 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(chart, /Chart\.Legend/);
     assert.match(read("components/wmds.ts"), /chartMaxTicksForWidth/);
     assert.match(read("package.json"), /wmds#73277bab5bd3ffc8dff678c12d4cdbc415b07a35/);
+    assert.match(page, /CREATOR_INSIGHTS_PAGE_CLASS/);
+    assert.match(page, /CREATOR_INSIGHTS_HEADER_BAND_CLASS/);
+    assert.match(page, /CREATOR_INSIGHTS_BODY_BAND_CLASS/);
+    assert.match(page, /CREATOR_INSIGHTS_BODY_INNER_CLASS/);
+    assert.doesNotMatch(page, /<AppFrame|layout="stretch"|min-h-dvh/);
+    assert.doesNotMatch(read("components/owner-nav.tsx"), /^\s*layout="stretch"/m);
+    assert.doesNotMatch(read("components/owner-nav.tsx"), /className="[^"]*w-full/);
     assert.doesNotMatch(page, /Owner Insights\. Brands never see this page/);
   });
 

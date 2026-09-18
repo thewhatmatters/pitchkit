@@ -3,6 +3,10 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it } from "node:test";
 import {
+  CREATOR_INSIGHTS_BODY_BAND_CLASS,
+  CREATOR_INSIGHTS_BODY_INNER_CLASS,
+  CREATOR_INSIGHTS_HEADER_BAND_CLASS,
+  CREATOR_INSIGHTS_PAGE_CLASS,
   OWNER_GRID_CLASS,
   OWNER_GRID_COLUMN_GAP,
   OWNER_GRID_MAX,
@@ -25,17 +29,36 @@ describe("fail-closed: owner grid gutter tokens (WHA-309)", () => {
     assert.match(OWNER_GRID_CLASS, /\bgrid-page\b/);
   });
 
-  it("AppFrame and owner pages use the exported owner class / max SoT", () => {
+  it("AppFrame and settings keep the exported owner class / max SoT", () => {
     const frame = read("components/app-frame.tsx");
-    const insights = read("app/insights/page.tsx");
-    const kit = read("app/k/[handle]/page.tsx");
     const settings = read("app/settings/page.tsx");
 
     assert.match(frame, /OWNER_GRID_CLASS/);
     assert.match(frame, /gridMax \? OWNER_GRID_CLASS/);
     assert.doesNotMatch(frame, /style=\{/);
-    assert.match(insights, /OWNER_GRID_MAX/);
-    assert.match(kit, /OWNER_GRID_MAX/);
     assert.match(settings, /OWNER_GRID_MAX/);
+  });
+
+  it("Insights and owner kit copy the Pattern — creator Insights page shell", () => {
+    const insights = read("app/insights/page.tsx");
+    const kit = read("app/k/[handle]/page.tsx");
+
+    assert.equal(
+      CREATOR_INSIGHTS_PAGE_CLASS,
+      "grid-page min-h-screen bg-body [--grid-column-gap:8px] [--grid-max:1140px] [padding-bottom:44px]",
+    );
+    assert.equal(CREATOR_INSIGHTS_HEADER_BAND_CLASS, "band pb-4");
+    assert.equal(CREATOR_INSIGHTS_BODY_BAND_CLASS, "band pt-8");
+    assert.equal(CREATOR_INSIGHTS_BODY_INNER_CLASS, "band min-w-0 gap-y-8");
+    assert.doesNotMatch(CREATOR_INSIGHTS_PAGE_CLASS, /min-h-dvh|py-6|grid-gutter/);
+    assert.match(insights, /CREATOR_INSIGHTS_PAGE_CLASS/);
+    assert.match(insights, /CREATOR_INSIGHTS_HEADER_BAND_CLASS/);
+    assert.match(insights, /CREATOR_INSIGHTS_BODY_BAND_CLASS/);
+    assert.match(insights, /CREATOR_INSIGHTS_BODY_INNER_CLASS/);
+    assert.match(kit, /CREATOR_INSIGHTS_PAGE_CLASS/);
+    assert.match(kit, /CREATOR_INSIGHTS_HEADER_BAND_CLASS/);
+    assert.match(kit, /CREATOR_INSIGHTS_BODY_BAND_CLASS/);
+    assert.match(kit, /CREATOR_INSIGHTS_BODY_INNER_CLASS/);
+    assert.doesNotMatch(insights, /<AppFrame|OWNER_GRID_MAX|layout="stretch"/);
   });
 });
