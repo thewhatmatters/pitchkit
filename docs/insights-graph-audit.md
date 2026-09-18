@@ -29,7 +29,7 @@ Operator dry-run: `IG_USER_TOKEN` on Insights poll when the user row has no encr
 | B | `GET /{id}/media` one page (`CAROUSEL_ALBUM` → `CAROUSEL`) | `media.*` + public image URL on `r2_key` until R2 |
 | C | `GET /{media-id}/insights?metric=reach,views,saved,shares` | `reach` / `saves` ← `saved` / `shares` / `impressions` ← `views`. HTTP 400 → skip Insights, keep likes/comments |
 | D | `GET /{id}/insights?metric=reach&period=day&metric_type=time_series` | kit `reach_series` (hide empty / all-zero) |
-| E | `GET /{id}/insights?metric=follower_demographics&…&breakdown=` | kit `audience` (% of located sample). Hide 0 rows |
+| E | `GET /{id}/insights?metric=follower_demographics&…&breakdown=` | kit `audience` (% of located sample). 0 rows → keep Audience Card empty well |
 | F | Insights load if `polled_at` &gt; 6h, or **Refresh** | A–E |
 
 `TOKEN_KEY` encrypts `users.token_encrypted` (`v1.<iv>.<cipher>`). Snapshots persist on KV `HIDDEN_KIT` (`graph:id:`, `graph:handle:`, `graph:ig:`) until Hyperdrive.
@@ -40,5 +40,5 @@ Operator dry-run: `IG_USER_TOKEN` on Insights poll when the user row has no encr
 
 - Typical reach / saves / Engagement rate: posts with Insights `reach` &gt; 0 only. Pre-conversion 400s are omitted from medians.
 - Chart: Insights + unusable series → insufficient-reach empty band (**No reach data yet**). Graph-unavailable omits the optional region. No “Graph data” badge. Do not invent hatched in-series gaps.
-- Audience: live demographics or keep the Card with insufficient-data empty. Never `EXAMPLE_*` percents. Never `audience ?? SEED_AUDIENCE`.
+- Audience: live demographics or keep the Card with **No audience data yet**. Never `EXAMPLE_*` percents. Never `audience ?? SEED_AUDIENCE`. Never omit the Audience band.
 - Public `/k/demo`: seed, no Insights.

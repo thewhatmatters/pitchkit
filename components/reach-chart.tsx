@@ -34,7 +34,7 @@ type ReachChartProps = {
 };
 
 /**
- * Canvas ReachCard. Surfaces from WMDS `dc81332`:
+ * Canvas ReachCard. Surfaces from WMDS `70da6a4`:
  * - chart — `examples-pitchkit--creator-insights`
  * - empty — `examples-pitchkit--insufficient-reach-data` (keep Card + header; centered well)
  * - omit — `examples-pitchkit--graph-data-unavailable`

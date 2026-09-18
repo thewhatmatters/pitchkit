@@ -3,12 +3,12 @@
 import type { CSSProperties } from "react";
 import {
   PATTERN_AUDIENCE_CARD_CLASS,
+  PATTERN_AUDIENCE_EMPTY_COPY_CLASS,
   PATTERN_AUDIENCE_EMPTY_WELL_CLASS,
   PATTERN_AUDIENCE_SECTION_CLASS,
   PATTERN_AUDIENCE_WELL_CLASS,
   PATTERN_EMPTY_BODY_CLASS,
   PATTERN_EMPTY_TITLE_CLASS,
-  PATTERN_REACH_EMPTY_COPY_CLASS,
   PATTERN_REACH_CHART_MIN_HEIGHT,
   PATTERN_SECTION_EYEBROW_CLASS,
 } from "@/components/pattern-tokens";
@@ -46,7 +46,7 @@ function AudienceSection({ title, items }: { title: string; items: { label: stri
 
 /**
  * Owner Insights audience Card. Keep the Card + header when mixes are empty
- * (insufficient-data well from Reach empty tokens). Never EXAMPLE percents.
+ * (`examples-pitchkit--insufficient-audience-data`). Never EXAMPLE percents.
  * Retrieving after chrome is up is Header + Chart.Loading — not this empty well.
  */
 export function AudienceFit({
@@ -91,7 +91,7 @@ export function AudienceFit({
             className={PATTERN_AUDIENCE_EMPTY_WELL_CLASS}
             style={{ minHeight: PATTERN_REACH_CHART_MIN_HEIGHT } satisfies CSSProperties}
           >
-            <div className={PATTERN_REACH_EMPTY_COPY_CLASS}>
+            <div className={PATTERN_AUDIENCE_EMPTY_COPY_CLASS}>
               <h3 className={PATTERN_EMPTY_TITLE_CLASS}>{AUDIENCE_INSUFFICIENT_TITLE}</h3>
               <p className={PATTERN_EMPTY_BODY_CLASS}>{AUDIENCE_INSUFFICIENT_BODY}</p>
             </div>

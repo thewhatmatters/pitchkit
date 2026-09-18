@@ -1,5 +1,5 @@
 /**
- * Pattern — creator Insights Show code tokens at WMDS `dc81332`.
+ * Pattern — creator Insights Show code tokens at WMDS `70da6a4`.
  * Re-exports the interpolated literals from `components/pattern-tokens.ts`.
  * `.grid-page` is max-width + centered — paint full-bleed `bg-body min-h-screen`
  * on `<body>` in `app/layout.tsx` so the column is not a gray island on white.
