@@ -33,7 +33,9 @@ Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCH
 
 **Kit URL:** `pitchkit.app/k/[handle]` — not `pitchkit.app/[handle]`. Root stays landing, Insights, privacy, delete. `/k/` never collides with those.
 
-**Handle** is frozen at first successful connect (Instagram username, slugified; `-2` if taken). If they rename on Instagram, **our URL does not change.** No redirect. Unknown or disconnected handle → **404**.
+**Handle** is frozen at first successful connect **by default** (Instagram username; keep `.` and `_`, do not hyphenate periods; `-2` if taken). If they rename on Instagram, **our URL does not change** unless they opt in on reconnect. Default = keep the existing URL. **No redirect** from the old path. Unknown or disconnected handle → **404**.
+
+**Optional kit URL update (WHA-313):** on reconnect, if Instagram returns a username different from `users.handle`, offer **Update kit URL to @{new}** with a clear warning that old `/k/…` links will 404 / stop working. Collision if taken: `-2` suffix. Stub Connect does not surface this yet — no live OAuth UI.
 
 **Public from first successful connect.** No publish switch. Ingest builds the kit; `/k/[handle]` is live as soon as the `users` row exists.
 
@@ -81,7 +83,7 @@ Short: *Public posts and Insights only. No DMs. No following list. Disconnect de
 **Privacy:** `https://pitchkit.app/privacy`  
 **Delete-all:** `https://pitchkit.app/delete` — same as Disconnect: Postgres `users` + `media` + R2 `{user_id}/` (see Storage).
 
-**Professional only.** If Graph says personal / login fails for that reason, show:
+**Professional only.** Business **or** Creator. Personal accounts cannot power Insights. If Graph says personal / login fails for that reason, land `/?error=personal` and show:
 
 > Pitchkit works with Instagram Professional accounts (Business or Creator). In Instagram, switch to Professional, then try again.
 
@@ -113,7 +115,7 @@ A rollup **may** contain: a time bucket, a metric name, a hashed or global cohor
 
 **Instagram deleted a post:** on that poll, drop our `media` row and its R2 object.
 
-**Token revoked or refresh fails:** public kit **stays** on last Postgres/R2. Owner sees **Reconnect Instagram**. Cookie still needed to reconnect.
+**Token revoked or refresh fails:** public kit **stays** on last Postgres/R2. Owner sees **Reconnect Instagram**. Cookie still needed to reconnect. Reconnect may offer WHA-313 if the Instagram username differs from `users.handle`.
 
 ---
 
@@ -165,7 +167,7 @@ Personal fail, OAuth cancel → landing with the Professional message or unchang
 ## Sequences
 
 1. OAuth (or stub) → token.  
-2. `GET /me` → `users`. Handle frozen. Followers + `media_count` live.  
+2. `GET /me` → `users`. Handle frozen at first connect by default. Optional WHA-313 URL update on reconnect if username differs. Followers + `media_count` live.  
 3. One page of media → `media` + R2 (carousel first frame, video poster). Insights nullable.  
 4. Cookie → `/insights`. `/k/[handle]` already public.
 

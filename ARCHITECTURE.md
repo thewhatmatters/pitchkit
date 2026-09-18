@@ -69,7 +69,7 @@ Same table as [PLAN.md](./PLAN.md#stack-locked). Short version:
 | Instagram | Login and Graph **only while the creator is connecting or we are polling**. Pin `GRAPH_API_VERSION`. No webhooks in v1. Stub connect does not call Graph. |
 | Hyperdrive → Neon | `users`, `media`, empty `detections` and `weekly_counts`. Bindings: `HYPERDRIVE` / `HYPERDRIVE_PREVIEW`. Until Hyperdrive exists, `/k/demo` and `/insights` read `lib/seed.ts` — same types as live. Schema SQL: `db/*.sql`. |
 | R2 `pitchkit-media` | Bytes. Public read for kit objects. Keys on `avatar_r2_key` / `r2_key`. Prefix `{user_id}/`. |
-| `/k/[handle]` | Last stored snapshot. If the token is dead, this page still works. |
+| `/k/[handle]` | Last stored snapshot. Handle frozen at first connect by default. Optional WHA-313 URL update on reconnect if the Instagram username differs (default = keep; old path 404s, no redirect). If the token is dead, this page still works. |
 | Cloudflare / Support | randy@whatmatters.so until we change it |
 
 ---

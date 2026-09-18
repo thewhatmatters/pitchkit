@@ -4,7 +4,7 @@
 
 Canonical list of Postgres tables and columns. Product rules: [PLAN.md](./PLAN.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md).
 
-SQL: `db/001_users.sql`, `db/002_media.sql`, `db/003_detections.sql`, `db/004_weekly_counts.sql`, `db/005_media_hidden_from_kit.sql`. Types: `lib/schema.ts`. In-repo seed (same columns, not Graph): `lib/seed.ts`. Handle `demo` is frozen. Until Hyperdrive exists the Worker reads that seed. `TOKEN_KEY` is not required for seed rows (tokens stay null). The Pitchkit session is an httpOnly cookie (`pitchkit_session` = handle), not a Graph column and not the Instagram token.
+SQL: `db/001_users.sql`, `db/002_media.sql`, `db/003_detections.sql`, `db/004_weekly_counts.sql`, `db/005_media_hidden_from_kit.sql`. Types: `lib/schema.ts`. In-repo seed (same columns, not Graph): `lib/seed.ts`. Handle `demo` is frozen. Live kits freeze `users.handle` at first successful connect **by default**; optional update on reconnect if the Instagram username differs (WHA-313). Until Hyperdrive exists the Worker reads that seed. `TOKEN_KEY` is not required for seed rows (tokens stay null). The Pitchkit session is an httpOnly cookie (`pitchkit_session` = handle), not a Graph column and not the Instagram token.
 
 Photos live in object storage (R2), **publicly readable** for kit objects (already public posts). Do not use expiring signed URLs for the kit. SQL stores keys, not image bytes.
 
@@ -20,7 +20,7 @@ One row per creator.
 |---|---|---|---|
 | `id` | our primary key | us | never |
 | `ig_user_id` | unique | Instagram Login | never (stable) |
-| `handle` | unique, frozen Pitchkit slug | from IG username at signup | never |
+| `handle` | unique Pitchkit slug, frozen at first connect by default | from IG username (keep `.` `_`; `-2` if taken) | first connect; optional reconnect update (WHA-313) |
 | `name` | display name | Graph | login / refresh |
 | `avatar_r2_key` | file key; bytes in R2 | Graph profile photo URL → R2 | if photo URL changed |
 | `followers` | live count | Graph | login / refresh |
@@ -152,9 +152,23 @@ Stamped contract. Not a Graph column.
 
 **Seed path:** until Hyperdrive, seed SoT is KV `HIDDEN_KIT` (`hidden:<userId>` → JSON `Record<mediaId, ISO>`). httpOnly `pitchkit_hidden` (`{ userId, hidden }`) is the owner reload mirror. Public `/k/[handle]` reads KV for the kit owner, not the visitor cookie. FE calls the routes only — no localStorage. Do not invent Graph columns.
 
+## Optional kit URL update (WHA-313)
+
+Stamped product lock. Same `users.handle` column — no new Graph field.
+
+| | |
+|---|---|
+| Default | frozen at first successful connect; IG rename does not move `/k/[handle]` |
+| Offer | on reconnect only, if Instagram username ≠ `users.handle`: **Update kit URL to @{new}** |
+| Warning | old `/k/…` links will 404 / stop working |
+| Keep | default choice; **no redirect** from the old path |
+| Collision | `-2` suffix if the new slug is taken |
+| Slug | preserve `.` and `_` from the IG username; do not hyphenate periods |
+| Stub | no-op until live OAuth; seed `demo` stays frozen |
+
 ## Graph hygiene (not extra columns)
 
-On poll: if Instagram no longer returns a post, delete that `media` row and its R2 object. Token revoke does not delete the kit; owner reconnects.
+On poll: if Instagram no longer returns a post, delete that `media` row and its R2 object. Token revoke does not delete the kit; owner reconnects. Reconnect may offer WHA-313 handle update when the Instagram username differs.
 
 ## TikTok
 

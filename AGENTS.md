@@ -6,8 +6,8 @@ Creator media kits at **pitchkit.app**. Humans start at [README.md](./README.md)
 
 ## Product lock
 
-- Kit URL: `pitchkit.app/k/[handle]`. Public on first successful connect. Handle frozen; IG rename does not move our URL. Missing/disconnected → 404.
-- Instagram is login (Professional only). Pitchkit session = httpOnly cookie (`pitchkit_session`). Stub Continue GET/POST `/auth/instagram` sets it for seed `demo` (not an Instagram token; seed tokens stay null). `/insights` without the cookie → `/`. Sign out `/auth/sign-out` clears it. Reconnect re-sets the same seed session. Disconnect control does not live-delete yet. `/k/[handle]` is public (no cookie).
+- Kit URL: `pitchkit.app/k/[handle]`. Public on first successful connect. Handle frozen by default; IG rename does not move our URL unless they opt in on reconnect (WHA-313: **Update kit URL to @{new}**; default = keep; old `/k/…` 404s; collision `-2`; keep `.` `_`). Missing/disconnected → 404.
+- Instagram is login (Professional only — Business **or** Creator; Personal cannot power Insights; `/?error=personal` + PROFESSIONAL copy). Pitchkit session = httpOnly cookie (`pitchkit_session`). Stub Continue GET/POST `/auth/instagram` sets it for seed `demo` (not an Instagram token; seed tokens stay null). `/insights` without the cookie → `/`. Sign out `/auth/sign-out` clears it. Reconnect re-sets the same seed session (no WHA-313 rename UI on the stub). Disconnect control does not live-delete yet. `/k/[handle]` is public (no cookie).
 - Connect **before** the button (`disclosure_version` = 1):
 
   > We only use your public posts and Instagram Insights to build your media kit. We don’t read DMs, who you follow, or unfollowers. Disconnect deletes your kit and the copies we stored.

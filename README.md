@@ -16,9 +16,9 @@ GitHub: [thewhatmatters/pitchkit](https://github.com/thewhatmatters/pitchkit).
 4. They land on **Insights** (private). SegmentedControl nav is Insights / PitchKit. **PitchKit** is the shareable `/k/[handle]` page. Account is a quiet footer link.
 5. Brands open `https://pitchkit.app/k/[handle]`. They do not sign in.
 
-Handle is taken from the Instagram username at signup and **does not change**. Local/demo kit: `/k/demo`.
+Handle is taken from the Instagram username at first successful connect and is **frozen by default**. Keep `.` and `_` (do not hyphenate periods); `-2` if taken. Local/demo kit: `/k/demo`.
 
-If they rename on Instagram, this URL stays put. TikTok, PDF, and extra profile fields are written in the plan as later — not v1.
+If they rename on Instagram, this URL stays put unless they opt in on reconnect ([WHA-313](https://linear.app/whatmatters/issue/WHA-313/optional-kit-url-update-when-ig-username-changes-on-reconnect)): **Update kit URL to @{new}**, with a warning that old `/k/…` links will 404 / stop working. Default is keep the existing URL (no redirect). Collision: `-2` if taken. Stub Connect does not offer this yet. TikTok, PDF, and extra profile fields are written in the plan as later — not v1.
 
 On the connect screen, before they tap Instagram:
 
