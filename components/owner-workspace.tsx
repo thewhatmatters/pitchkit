@@ -1,0 +1,82 @@
+"use client";
+
+import { useState } from "react";
+import {
+  CREATOR_INSIGHTS_BODY_BAND_CLASS,
+  CREATOR_INSIGHTS_BODY_INNER_CLASS,
+  CREATOR_INSIGHTS_HEADER_BAND_CLASS,
+  CREATOR_INSIGHTS_PAGE_CLASS,
+} from "@/components/pattern-tokens";
+import { KitEdit } from "@/components/kit-edit";
+import { OwnerChrome } from "@/components/owner-chrome";
+import { OwnerNav, type OwnerView } from "@/components/owner-nav";
+import { SupportFooter } from "@/components/support-footer";
+import type { ReachPoint } from "@/lib/reach-series";
+import type { Media, User } from "@/lib/schema";
+
+type OwnerWorkspaceProps = {
+  user: User;
+  ownerPosts: Media[];
+  shareablePosts: Media[];
+  engagementRate: number | null;
+  typicalReach: number | null;
+  typicalSaves: number | null;
+  reachSeries?: ReachPoint[] | null;
+  hasInsights: boolean;
+  gridReady: boolean;
+};
+
+/**
+ * Pattern — creator Insights Show code (`examples-pitchkit--creator-insights`).
+ * One shell: SegmentedControl toggles Insights vs the shareable kit preview
+ * so the selected-pill motion can play. No hard `/insights` ↔ `/k/…` nav.
+ */
+export function OwnerWorkspace({
+  user,
+  ownerPosts,
+  shareablePosts,
+  engagementRate,
+  typicalReach,
+  typicalSaves,
+  reachSeries,
+  hasInsights,
+  gridReady,
+}: OwnerWorkspaceProps) {
+  const [view, setView] = useState<OwnerView>("insights");
+
+  return (
+    <main className={CREATOR_INSIGHTS_PAGE_CLASS}>
+      <div className={CREATOR_INSIGHTS_HEADER_BAND_CLASS}>
+        <OwnerNav name={user.name} view={view} onViewChange={setView} />
+      </div>
+      <div className={CREATOR_INSIGHTS_BODY_BAND_CLASS}>
+        <div className={CREATOR_INSIGHTS_BODY_INNER_CLASS}>
+          {view === "pitchkit" ? (
+            <KitEdit
+              user={user}
+              posts={shareablePosts}
+              engagementRate={engagementRate}
+              canEdit
+            />
+          ) : (
+            <OwnerChrome
+              user={user}
+              posts={ownerPosts}
+              engagementRate={engagementRate}
+              typicalReach={typicalReach}
+              typicalSaves={typicalSaves}
+              reachSeries={reachSeries}
+              hasInsights={hasInsights}
+              gridReady={gridReady}
+            />
+          )}
+          <SupportFooter>
+            <p>
+              <a href="/settings">Account</a>
+            </p>
+          </SupportFooter>
+        </div>
+      </div>
+    </main>
+  );
+}

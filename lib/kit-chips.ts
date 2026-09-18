@@ -1,4 +1,12 @@
-/** Past-brand names on `/k/[handle]`. Wrap WMDS Chip. Hide empty. No marquee. */
+/**
+ * Past-brand names on the shareable kit. Pattern freeze uses outlined Cards.
+ * Hide empty. No marquee. No invented year or campaign summary.
+ */
+
+export type SourcedContactDetail =
+  | { kind: "email"; value: string; href: string }
+  | { kind: "website"; value: string; href: string }
+  | { kind: "text"; value: string };
 
 export function visibleBrandNames(brands: readonly string[] | null | undefined): string[] {
   if (!Array.isArray(brands) || brands.length === 0) {
@@ -15,4 +23,24 @@ export function shouldShowPastBrands(brands: readonly string[] | null | undefine
 export function sourcedContact(value: string | null | undefined): string | null {
   const trimmed = value?.trim() ?? "";
   return trimmed.length > 0 ? trimmed : null;
+}
+
+/** Map a creator-entered contact string. Do not invent website or location. */
+export function sourcedContactDetail(
+  value: string | null | undefined,
+): SourcedContactDetail | null {
+  const trimmed = sourcedContact(value);
+  if (trimmed == null) {
+    return null;
+  }
+
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+    return { kind: "email", value: trimmed, href: `mailto:${trimmed}` };
+  }
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    return { kind: "website", value: trimmed, href: trimmed };
+  }
+
+  return { kind: "text", value: trimmed };
 }

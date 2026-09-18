@@ -4,6 +4,7 @@ import { shouldShowAudienceMix, visibleAudienceMix } from "./audience";
 import {
   shouldShowPastBrands,
   sourcedContact,
+  sourcedContactDetail,
   visibleBrandNames,
 } from "./kit-chips";
 import { shouldRenderReachChartBand, shouldShowReachChart } from "./reach-series";
@@ -17,6 +18,21 @@ describe("past brand chips", () => {
     assert.equal(shouldShowPastBrands(["Acme"]), true);
     assert.equal(sourcedContact("  "), null);
     assert.equal(sourcedContact("hi@brand.com"), "hi@brand.com");
+    assert.deepEqual(sourcedContactDetail("hi@brand.com"), {
+      kind: "email",
+      value: "hi@brand.com",
+      href: "mailto:hi@brand.com",
+    });
+    assert.deepEqual(sourcedContactDetail("https://example.com"), {
+      kind: "website",
+      value: "https://example.com",
+      href: "https://example.com",
+    });
+    assert.deepEqual(sourcedContactDetail("studio desk"), {
+      kind: "text",
+      value: "studio desk",
+    });
+    assert.equal(sourcedContactDetail("  "), null);
   });
 });
 

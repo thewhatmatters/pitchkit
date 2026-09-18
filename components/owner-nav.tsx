@@ -1,42 +1,39 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
-import { CREATOR_INSIGHTS_TOPBAR_END_CLASS } from "@/lib/creator-insights-classes";
 import { Avatar, SegmentedControl } from "@/components/wmds";
-import { kitPath } from "@/lib/kit";
+import {
+  PATTERN_BRAND_CLASS,
+  PATTERN_TOPBAR_CLASS,
+  PATTERN_TOPBAR_END_CLASS,
+} from "@/components/pattern-tokens";
+
+export type OwnerView = "insights" | "pitchkit";
 
 type OwnerNavProps = {
-  handle: string;
   name: string;
+  view: OwnerView;
+  onViewChange: (view: OwnerView) => void;
 };
 
-/** WMDS Pattern — creator Insights three-column header. Hug control. Not a shell. */
-export function OwnerNav({ handle, name }: OwnerNavProps) {
-  const pathname = usePathname();
-  const router = useRouter();
-  const kitHref = kitPath(handle);
-  const view = pathname.startsWith("/k/") ? "pitchkit" : "insights";
-
+/** WMDS Pattern — creator Insights three-column header. Hug control. In-page view. */
+export function OwnerNav({ name, view, onViewChange }: OwnerNavProps) {
   return (
-    <header className="col-span-full grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-      <span className="type-label text-fg">PitchKit</span>
+    <header className={PATTERN_TOPBAR_CLASS}>
+      <span className={PATTERN_BRAND_CLASS}>PitchKit</span>
       <SegmentedControl
         aria-label="PitchKit primary navigation"
         size="sm"
         value={view}
         onValueChange={(value) => {
-          if (value === "insights") {
-            router.push("/insights");
-          }
-          if (value === "pitchkit") {
-            router.push(kitHref);
+          if (value === "insights" || value === "pitchkit") {
+            onViewChange(value);
           }
         }}
       >
         <SegmentedControl.Item value="insights">Insights</SegmentedControl.Item>
         <SegmentedControl.Item value="pitchkit">PitchKit</SegmentedControl.Item>
       </SegmentedControl>
-      <span className={CREATOR_INSIGHTS_TOPBAR_END_CLASS}>
+      <span className={PATTERN_TOPBAR_END_CLASS}>
         <Avatar name={name} size="sm" />
       </span>
     </header>

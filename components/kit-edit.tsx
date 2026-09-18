@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Button, Input, Switch } from "@/components/wmds";
-import { KitCard } from "@/components/kit-card";
 import { PastBrands } from "@/components/past-brands";
+import { ShareableKit } from "@/components/shareable-kit";
 import { sourcedContact, visibleBrandNames } from "@/lib/kit-chips";
 import type { Media, User } from "@/lib/schema";
 
@@ -11,11 +11,10 @@ type KitEditProps = {
   user: User;
   posts: Media[];
   engagementRate: number | null;
-  hasInsights: boolean;
   canEdit: boolean;
 };
 
-export function KitEdit({ user, posts, engagementRate, hasInsights, canEdit }: KitEditProps) {
+export function KitEdit({ user, posts, engagementRate, canEdit }: KitEditProps) {
   const [editing, setEditing] = useState(false);
   const [contact, setContact] = useState("");
   const [draftBrand, setDraftBrand] = useState("");
@@ -35,18 +34,20 @@ export function KitEdit({ user, posts, engagementRate, hasInsights, canEdit }: K
   }
 
   return (
-    <div className="col-span-full flex flex-col gap-4">
+    <>
       {canEdit ? (
-        <Switch
-          layout="settings"
-          label="Edit"
-          checked={editing}
-          onChange={(event) => setEditing(event.target.checked)}
-        />
+        <div className="col-span-full">
+          <Switch
+            layout="settings"
+            label="Edit"
+            checked={editing}
+            onChange={(event) => setEditing(event.target.checked)}
+          />
+        </div>
       ) : null}
 
       {canEdit && editing ? (
-        <div className="flex flex-col gap-3">
+        <div className="col-span-full flex flex-col gap-3">
           <Input
             label="Contact"
             description="Hidden when blank. Not stored on Insights."
@@ -55,7 +56,7 @@ export function KitEdit({ user, posts, engagementRate, hasInsights, canEdit }: K
           />
           <Input
             label="Past brand"
-            description="Wrap as chips. Empty stays hidden."
+            description="Cards on the kit. Empty stays hidden."
             value={draftBrand}
             onChange={(event) => setDraftBrand(event.target.value)}
             onKeyDown={(event) => {
@@ -72,14 +73,13 @@ export function KitEdit({ user, posts, engagementRate, hasInsights, canEdit }: K
         </div>
       ) : null}
 
-      <KitCard
+      <ShareableKit
         user={user}
         posts={posts}
         engagementRate={engagementRate}
-        hasInsights={hasInsights}
         pastBrands={visibleBrands}
         contact={visibleContact}
       />
-    </div>
+    </>
   );
 }

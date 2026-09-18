@@ -1,17 +1,9 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import {
-  CREATOR_INSIGHTS_BODY_BAND_CLASS,
-  CREATOR_INSIGHTS_BODY_INNER_CLASS,
-  CREATOR_INSIGHTS_HEADER_BAND_CLASS,
-  CREATOR_INSIGHTS_PAGE_CLASS,
-} from "@/components/app-frame";
-import { OwnerChrome } from "@/components/owner-chrome";
-import { OwnerNav } from "@/components/owner-nav";
-import { SupportFooter } from "@/components/support-footer";
+import { OwnerWorkspace } from "@/components/owner-workspace";
 import { HIDDEN_COOKIE, parseHiddenOverlay } from "@/lib/hidden-kit";
 import { insightsGate, parseSessionValue, SESSION_COOKIE } from "@/lib/session";
-import { hiddenOverlayForHandle, loadOwnerKit } from "@/lib/store";
+import { hiddenOverlayForHandle, loadOwnerKit, loadPublicKit } from "@/lib/store";
 
 type InsightsProps = {
   searchParams: Promise<{ grid?: string }>;
@@ -30,35 +22,23 @@ export default async function InsightsPage({ searchParams }: InsightsProps) {
     session.handle,
     parseHiddenOverlay(cookieStore.get(HIDDEN_COOKIE)?.value),
   );
-  const kit = await loadOwnerKit(session.handle, new Date(), overlay);
-  if (!kit) {
+  const ownerKit = await loadOwnerKit(session.handle, new Date(), overlay);
+  const shareableKit = await loadPublicKit(session.handle, new Date(), overlay);
+  if (!ownerKit || !shareableKit) {
     redirect("/");
   }
 
   return (
-    <main className={CREATOR_INSIGHTS_PAGE_CLASS}>
-      <div className={CREATOR_INSIGHTS_HEADER_BAND_CLASS}>
-        <OwnerNav handle={kit.user.handle} name={kit.user.name} />
-      </div>
-      <div className={CREATOR_INSIGHTS_BODY_BAND_CLASS}>
-        <div className={CREATOR_INSIGHTS_BODY_INNER_CLASS}>
-          <OwnerChrome
-            user={kit.user}
-            posts={kit.posts}
-            engagementRate={kit.engagementRate}
-            typicalReach={kit.typicalReach}
-            typicalSaves={kit.typicalSaves}
-            reachSeries={kit.reach_series}
-            hasInsights={kit.hasInsights}
-            gridReady={gridReady}
-          />
-          <SupportFooter>
-            <p>
-              <a href="/settings">Account</a>
-            </p>
-          </SupportFooter>
-        </div>
-      </div>
-    </main>
+    <OwnerWorkspace
+      user={ownerKit.user}
+      ownerPosts={ownerKit.posts}
+      shareablePosts={shareableKit.posts}
+      engagementRate={ownerKit.engagementRate}
+      typicalReach={ownerKit.typicalReach}
+      typicalSaves={ownerKit.typicalSaves}
+      reachSeries={ownerKit.reach_series}
+      hasInsights={ownerKit.hasInsights}
+      gridReady={gridReady}
+    />
   );
 }

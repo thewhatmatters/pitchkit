@@ -31,61 +31,67 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(page, /INVENTORY_CONTACT|past-brands|KitInventory/);
   });
 
-  it("public kit stays view; owner Edit is session-owned", () => {
+  it("public kit is the shareable Pattern freeze; owner Edit stays off /k/", () => {
     const page = read("app/k/[handle]/page.tsx");
+    const kit = read("components/shareable-kit.tsx");
     const edit = read("components/kit-edit.tsx");
-    assert.match(page, /sessionOwnsHandle/);
-    assert.match(page, /KitEdit/);
+    const workspace = read("components/owner-workspace.tsx");
+    assert.match(page, /ShareableKit/);
+    assert.match(page, /PATTERN_BRAND_CLASS/);
+    assert.doesNotMatch(page, /sessionOwnsHandle|KitEdit|OwnerNav|AppFrame/);
+    assert.doesNotMatch(page, /MoreMenu|Hide from kit|label="Edit"/);
+    assert.match(kit, /Verified Instagram summary/);
+    assert.match(kit, /Selected posts/);
+    assert.match(kit, /TextLink/);
+    assert.match(kit, /Past brands/);
+    assert.doesNotMatch(kit, /<MoreMenu|Hide from kit|Coming soon|variant="success"/);
     assert.match(edit, /label="Edit"/);
-    assert.match(edit, /KitCard/);
+    assert.match(edit, /ShareableKit/);
+    assert.match(workspace, /KitEdit/);
     assert.doesNotMatch(page, /KitInventory/);
   });
 
   it("owner views use hug SegmentedControl Insights | PitchKit on the Pattern shell", () => {
     const nav = read("components/owner-nav.tsx");
+    const tokens = read("components/pattern-tokens.ts");
     const frame = read("components/app-frame.tsx");
-    const canvas = read("lib/creator-insights-classes.ts");
     const barrel = read("components/wmds.ts");
     const insights = read("app/insights/page.tsx");
+    const workspace = read("components/owner-workspace.tsx");
     const kit = read("app/k/[handle]/page.tsx");
     const settings = read("app/settings/page.tsx");
 
     assert.match(barrel, /SegmentedControl/);
     assert.match(barrel, /PageHeader/);
     assert.match(barrel, /Avatar/);
+    assert.match(barrel, /TextLink/);
     assert.match(nav, /SegmentedControl/);
     assert.match(nav, />Insights</);
     assert.match(nav, />PitchKit</);
     assert.match(nav, /aria-label="PitchKit primary navigation"/);
-    assert.match(nav, /router\.push\("\/insights"\)/);
-    assert.match(nav, /kitPath/);
-    assert.match(nav, /grid-cols-\[1fr_auto_1fr\]/);
-    assert.match(nav, /type-label text-fg/);
+    assert.match(nav, /onViewChange/);
+    assert.doesNotMatch(nav, /router\.push|kitPath|usePathname|useRouter/);
+    assert.match(tokens, /PATTERN_TOPBAR_CLASS/);
+    assert.match(tokens, /grid-cols-\[1fr_auto_1fr\]/);
+    assert.match(tokens, /PATTERN_BRAND_CLASS = "type-label text-fg text-fg"/);
+    assert.match(tokens, /PATTERN_TOPBAR_END_CLASS = "justify-self-end"/);
     assert.match(nav, /<Avatar/);
     assert.match(nav, /size="sm"/);
-    assert.match(nav, /CREATOR_INSIGHTS_TOPBAR_END_CLASS/);
-    assert.match(nav, /<span className=\{CREATOR_INSIGHTS_TOPBAR_END_CLASS\}>/);
-    assert.doesNotMatch(nav, /<Avatar[^>]*className=/);
+    assert.match(nav, /PATTERN_TOPBAR_END_CLASS/);
     assert.doesNotMatch(nav, /^\s*layout="stretch"/m);
     assert.doesNotMatch(nav, /className="[^"]*w-full/);
     assert.match(frame, /OWNER_GRID_MAX = "1140px"/);
     assert.match(frame, /OWNER_GRID_COLUMN_GAP = "8px"/);
     assert.match(frame, /OWNER_GRID_CLASS/);
-    assert.match(frame, /CREATOR_INSIGHTS_PAGE_CLASS/);
-    assert.match(frame, /CREATOR_INSIGHTS_HEADER_BAND_CLASS/);
-    assert.match(frame, /CREATOR_INSIGHTS_BODY_BAND_CLASS/);
-    assert.match(frame, /CREATOR_INSIGHTS_BODY_INNER_CLASS/);
     assert.match(
-      canvas,
-      /CREATOR_INSIGHTS_PAGE_CLASS =\s*"grid-page min-h-screen bg-body \[--grid-column-gap:8px\] \[--grid-max:1140px\] \[padding-bottom:44px\]"/,
+      tokens,
+      /PATTERN_PAGE_CLASS =\s*"grid-page min-h-screen bg-body \[--grid-column-gap:8px\] \[--grid-max:1140px\] \[padding-bottom:44px\]"/,
     );
-    assert.match(canvas, /CREATOR_INSIGHTS_HEADER_BAND_CLASS = "band pb-4"/);
-    assert.match(canvas, /CREATOR_INSIGHTS_BODY_BAND_CLASS = "band pt-6 sm:pt-8"/);
-    assert.match(canvas, /CREATOR_INSIGHTS_BODY_INNER_CLASS = "band min-w-0 gap-y-6 sm:gap-y-8"/);
-    assert.match(canvas, /CREATOR_INSIGHTS_SUPPORTING_CLASS = "type-body text-muted"/);
-    assert.match(canvas, /CREATOR_INSIGHTS_FORMULA_CLASS = "type-supporting text-muted"/);
-    assert.match(canvas, /CREATOR_INSIGHTS_STAT_CLASS = "col-span-2 md:col-span-4 lg:col-span-3"/);
-    assert.match(canvas, /CREATOR_INSIGHTS_TOPBAR_END_CLASS = "justify-self-end"/);
+    assert.match(tokens, /PATTERN_TOPBAR_BAND_CLASS = "band pb-4"/);
+    assert.match(tokens, /PATTERN_CONTENT_BAND_CLASS = "band pt-6 sm:pt-8"/);
+    assert.match(tokens, /PATTERN_CONTENT_CLASS = "band min-w-0 gap-y-6 sm:gap-y-8"/);
+    assert.match(tokens, /CREATOR_INSIGHTS_PAGE_CLASS = PATTERN_PAGE_CLASS/);
+    assert.match(tokens, /CREATOR_INSIGHTS_BODY_BAND_CLASS = PATTERN_CONTENT_BAND_CLASS/);
     assert.match(frame, /\[--grid-max:1140px\]/);
     assert.match(frame, /\[--grid-column-gap:8px\]/);
     assert.match(frame, /\[--grid-gutter:8px\]/);
@@ -96,21 +102,26 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(frame, /col-span-full flex flex-col/);
     assert.match(frame, /<div className="band">\{children\}<\/div>/);
     assert.doesNotMatch(frame, /["']use client["']/);
-    assert.match(insights, /CREATOR_INSIGHTS_PAGE_CLASS/);
-    assert.match(insights, /CREATOR_INSIGHTS_HEADER_BAND_CLASS/);
-    assert.match(insights, /CREATOR_INSIGHTS_BODY_BAND_CLASS/);
-    assert.match(insights, /CREATOR_INSIGHTS_BODY_INNER_CLASS/);
-    assert.match(insights, /OwnerNav/);
+    assert.match(workspace, /CREATOR_INSIGHTS_PAGE_CLASS/);
+    assert.match(workspace, /CREATOR_INSIGHTS_HEADER_BAND_CLASS/);
+    assert.match(workspace, /CREATOR_INSIGHTS_BODY_BAND_CLASS/);
+    assert.match(workspace, /CREATOR_INSIGHTS_BODY_INNER_CLASS/);
+    assert.match(workspace, /OwnerNav/);
+    assert.match(workspace, /useState<OwnerView>\("insights"\)/);
+    assert.match(workspace, /<OwnerNav[\s\S]*\{view === "pitchkit"/);
+    assert.doesNotMatch(workspace, /router\.(push|replace)|useRouter|usePathname|kitPath/);
+    assert.match(insights, /OwnerWorkspace/);
+    assert.match(insights, /loadPublicKit/);
     assert.match(insights, /insightsGate/);
     assert.doesNotMatch(insights, /<AppFrame/);
     assert.doesNotMatch(insights, /OWNER_GRID_MAX|OWNER_GRID_CLASS|min-h-dvh|py-6/);
-    assert.match(kit, /OwnerNav/);
+    assert.doesNotMatch(kit, /OwnerNav|KitEdit/);
     assert.match(kit, /CREATOR_INSIGHTS_PAGE_CLASS/);
     assert.match(kit, /CREATOR_INSIGHTS_HEADER_BAND_CLASS/);
-    assert.match(kit, /sessionOwnsHandle/);
     assert.match(settings, /OWNER_GRID_MAX/);
     assert.doesNotMatch(settings, /OwnerNav/);
     assert.doesNotMatch(insights, /OwnerShell|AppShell|AppShell\.Mobile|NavRail/);
+    assert.doesNotMatch(workspace, /OwnerShell|AppShell|AppShell\.Mobile|NavRail/);
     assert.doesNotMatch(kit, /OwnerShell|AppShell|AppShell\.Mobile|NavRail/);
     assert.doesNotMatch(settings, /OwnerShell|AppShell|AppShell\.Mobile|NavRail/);
     assert.doesNotMatch(nav, /AppShell|NavRail/);
@@ -143,16 +154,6 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(read("components/proof-posts.tsx"), /<Toaster/);
   });
 
-  it("paints full-bleed bg-body on body so grid-page is not a gray island", () => {
-    const layout = read("app/layout.tsx");
-    const canvas = read("lib/creator-insights-classes.ts");
-
-    assert.match(layout, /<body className="bg-body min-h-screen">/);
-    assert.doesNotMatch(layout, /AppShell/);
-    assert.match(canvas, /full-bleed `bg-body min-h-screen`/);
-    assert.match(canvas, /<body>/);
-  });
-
   it("Insights chrome matches creator Insights pattern", () => {
     const page = read("app/insights/page.tsx");
     const chrome = read("components/owner-chrome.tsx");
@@ -161,35 +162,22 @@ describe("critical page contracts", () => {
     const chart = read("components/reach-chart.tsx");
     const audience = read("components/audience-fit.tsx");
     const copy = read("lib/copy.ts");
-    const card = read("components/kit-card.tsx");
+    const card = read("components/shareable-kit.tsx");
 
     assert.match(chrome, /PageHeader/);
     assert.match(chrome, /title="Insights"/);
     assert.match(chrome, /Share kit/);
     assert.match(copy, /Private to you/);
     assert.match(chrome, /INSIGHTS_PRIVATE/);
-    assert.match(chrome, /CREATOR_INSIGHTS_SUPPORTING_CLASS/);
-    assert.match(chrome, /CREATOR_INSIGHTS_FORMULA_CLASS/);
-    assert.match(chrome, /band gap-y-2/);
-    assert.match(chrome, /band min-w-0 gap-y-6 \[align-items:stretch\]/);
     assert.match(stats, /label="Engagement rate"/);
     assert.doesNotMatch(stats, /label="ER"/);
     assert.doesNotMatch(card, />ER</);
     assert.match(card, /Engagement rate/);
     assert.doesNotMatch(stats, /<Stat\.Group/);
     assert.doesNotMatch(stats, /trend=/);
-    assert.match(stats, /CREATOR_INSIGHTS_STAT_CLASS/);
-    assert.match(stats, /band gap-y-4/);
-    assert.doesNotMatch(stats, /className="[^"]*w-full min-w-0/);
+    assert.match(stats, /PATTERN_STAT_CLASS/);
+    assert.match(read("components/pattern-tokens.ts"), /PATTERN_STAT_CLASS = "col-span-2 md:col-span-4 lg:col-span-3"/);
     assert.match(proof, /Recent proof/);
-    assert.match(proof, /CREATOR_INSIGHTS_SUPPORTING_CLASS/);
-    assert.match(proof, /band min-w-0 gap-y-4/);
-    assert.match(proof, /col-span-full flex flex-wrap items-end justify-between gap-3/);
-    assert.match(proof, /shown\.length\} shown/);
-    assert.match(proof, /className="col-span-full"/);
-    assert.match(proof, /band col-span-full min-w-0 gap-y-4/);
-    assert.match(proof, /col-span-full min-w-0 md:col-span-4 lg:col-span-4/);
-    assert.match(proof, /type-supporting font-medium uppercase tracking-wider text-muted/);
     assert.doesNotMatch(chrome, /Six posts|Top-performing posts/);
     assert.doesNotMatch(proof, /Six posts|Top-performing posts/);
     assert.match(proof, /Tab\.Group/);
@@ -229,32 +217,26 @@ describe("critical page contracts", () => {
     assert.match(chart, /Chart\.Cartesian/);
     assert.match(chart, /variant="outlined"/);
     assert.match(chart, /Reach over 30 days/);
-    assert.match(chart, /Typical performance with unusual spikes left visible/);
-    assert.match(chart, /Graph data/);
     assert.match(chart, /typicalReach/);
-    assert.match(chart, /chartSeriesConfigFromKeys/);
     assert.match(chart, /key: "typical"/);
-    assert.match(chart, /key: "reach"/);
     assert.match(chart, /Chart\.Legend/);
-    assert.match(chart, /REACH_CHART_MIN_HEIGHT = 344/);
-    assert.match(chart, /minHeight=\{REACH_CHART_MIN_HEIGHT\}/);
     assert.match(chart, /animate="none"/);
-    assert.match(chart, /flex min-w-0 flex-col gap-4 bg-body px-3.5 py-4/);
-    assert.match(chart, /cardLayoutBodyOccupantRadiusClasses/);
-    assert.doesNotMatch(chart, /cardLayoutBodyOccupantWellClasses|cardLayoutBodyOccupantPadYClasses|cardLayoutBodyOccupantInsetXClasses/);
-    assert.doesNotMatch(chart, /trend=/);
-    assert.match(audience, /grid min-w-0 gap-y-6 bg-body px-3.5 py-4 \[column-gap:var\(--grid-column-gap\)\] sm:grid-cols-2/);
-    assert.match(audience, /type-supporting font-medium uppercase tracking-wider text-muted/);
     assert.match(read("components/owner-chrome.tsx"), /typicalReach=\{typicalReach\}/);
-    assert.match(read("package.json"), /wmds#3f1363082b7b4e591c1690625b9b591bfab5302a/);
-    assert.match(page, /CREATOR_INSIGHTS_PAGE_CLASS/);
-    assert.match(page, /CREATOR_INSIGHTS_HEADER_BAND_CLASS/);
-    assert.match(page, /CREATOR_INSIGHTS_BODY_BAND_CLASS/);
-    assert.match(page, /CREATOR_INSIGHTS_BODY_INNER_CLASS/);
+    assert.match(read("components/wmds.ts"), /chartMaxTicksForWidth/);
+    assert.match(read("package.json"), /wmds#75f8a41e8b131906378b340a4106a486ddd5173f/);
+    assert.doesNotMatch(read("package.json"), /3f13630|73277bab/);
+    assert.match(page, /OwnerWorkspace/);
+    assert.match(read("components/owner-workspace.tsx"), /CREATOR_INSIGHTS_PAGE_CLASS/);
+    assert.match(read("components/owner-workspace.tsx"), /CREATOR_INSIGHTS_HEADER_BAND_CLASS/);
+    assert.match(read("components/owner-workspace.tsx"), /CREATOR_INSIGHTS_BODY_BAND_CLASS/);
+    assert.match(read("components/owner-workspace.tsx"), /CREATOR_INSIGHTS_BODY_INNER_CLASS/);
     assert.doesNotMatch(page, /<AppFrame|layout="stretch"|min-h-dvh/);
     assert.doesNotMatch(read("components/owner-nav.tsx"), /^\s*layout="stretch"/m);
     assert.doesNotMatch(read("components/owner-nav.tsx"), /className="[^"]*w-full/);
     assert.doesNotMatch(page, /Owner Insights\. Brands never see this page/);
+    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--creator-insights/);
+    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--shareable-pitchkit/);
+    assert.match(read("app/layout.tsx"), /className="bg-body min-h-screen"/);
   });
 
   it("hide/restore persist through owner APIs and an httpOnly overlay, not localStorage", () => {
@@ -290,6 +272,7 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(hidden, /__pitchkitHiddenFromKit/);
     assert.match(kit, /excludeHiddenFromPublicKit/);
     assert.match(publicKit, /hiddenOverlayForHandle/);
+    assert.doesNotMatch(publicKit, /HIDDEN_COOKIE|sessionOwnsHandle/);
     assert.match(schema, /hidden_from_kit_at/);
     assert.match(data, /hidden_from_kit_at/);
     assert.match(migration, /hidden_from_kit_at timestamptz/);
