@@ -17,6 +17,11 @@ export type AudienceMixes = {
   gender: RankedShare[];
 };
 
+/** Owner / Graph payload — mixes may be omitted or null after an empty poll. */
+export type AudienceMixInput = {
+  [K in keyof AudienceMixes]?: RankedShare[] | null;
+};
+
 export function visibleAudienceMix(rows: RankedShare[] | null | undefined): RankedShare[] {
   if (!Array.isArray(rows) || rows.length === 0) {
     return [];
@@ -30,7 +35,7 @@ export function shouldShowAudienceMix(rows: RankedShare[] | null | undefined): b
 }
 
 export function hasVisibleAudienceMixes(
-  audience: Partial<AudienceMixes> | null | undefined,
+  audience: AudienceMixInput | null | undefined,
 ): boolean {
   return (
     shouldShowAudienceMix(audience?.country) ||
@@ -48,7 +53,7 @@ export type AudienceFitSurface = "bars" | "empty";
  * `bars` = live ranked shares only.
  */
 export function audienceFitSurface(
-  audience: Partial<AudienceMixes> | null | undefined,
+  audience: AudienceMixInput | null | undefined,
 ): AudienceFitSurface {
   return hasVisibleAudienceMixes(audience) ? "bars" : "empty";
 }
@@ -73,7 +78,7 @@ export const SEED_AUDIENCE = EMPTY_AUDIENCE_MIXES;
  * Never EXAMPLE country/city/age/gender percents.
  */
 export function resolveOwnerAudience(
-  audience: Partial<AudienceMixes> | null | undefined,
+  audience: AudienceMixInput | null | undefined,
 ): AudienceMixes {
   if (!audience) {
     return EMPTY_AUDIENCE_MIXES;
