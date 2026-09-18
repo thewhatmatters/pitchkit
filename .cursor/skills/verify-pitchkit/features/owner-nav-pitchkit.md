@@ -1,6 +1,6 @@
 # Owner nav ↔ PitchKit
 
-Owner primary navigation is a SegmentedControl — **Insights** / **PitchKit** — on the 1140 owner grid. PitchKit is the shareable `/k/demo` page; Insights stays private.
+Owner primary navigation is the Pattern — creator Insights three-column header: PitchKit label, a hug SegmentedControl — **Insights** / **PitchKit** — and Avatar. PitchKit is the shareable `/k/demo` page; Insights stays private. Do not expect `layout="stretch"` or a full-width control.
 
 ## Sub-features
 
@@ -23,9 +23,9 @@ Preconditions:
 - `control-pitchkit connect` and `doctor --require-session` succeeded.
 - Start on `/insights`.
 
-- **See nav.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /insights`. A control named **PitchKit primary navigation** contains **Insights** and **PitchKit**. Insights is the current view. Footer has a quiet **Account** link, not a third segment.
+- **See nav.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /insights`. The header shows a **PitchKit** brand label, a hug control named **PitchKit primary navigation** (**Insights** / **PitchKit**), and an Avatar. Insights is the current view. Footer has a quiet **Account** link, not a third segment.
 - **Open PitchKit.** Choose PitchKit. Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs click --role radio --name "PitchKit"`. Path is `/k/demo`. Title is `Demo Creator (@demo) · Pitchkit`. The kit card shows **Demo Creator**, `@demo`, Followers, and Engagement rate. Owner **Edit** switch may be present; Insights PageHeader / Recent proof / Share kit are absent on this page.
-- **Owner grid on kit.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs eval --js "getComputedStyle(document.querySelector('.grid-page')).getPropertyValue('--grid-max').trim()"`. `value` is `1140px`. `--grid-column-gap` and `--grid-gutter` are `8px`.
+- **Owner grid on kit.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs eval --js "getComputedStyle(document.querySelector('.grid-page')).getPropertyValue('--grid-max').trim()"`. `value` is `1140px`. `--grid-column-gap` is `8px` (Pattern Show code). Do not require `--grid-gutter:8px` on this shell.
 - **Return to Insights.** Choose Insights. Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs click --role radio --name "Insights"`. Path is `/insights`. PageHeader **Insights** returns.
 - **Anon has no nav.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /k/demo --fresh`. There is no **PitchKit primary navigation** and no **Edit** switch.
 - **Proof.** Capture both owner views. Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /insights` then `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs screenshot --path artifacts/owner-nav-pitchkit/insights.png` and `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs snapshot --aria --path artifacts/owner-nav-pitchkit/insights.aria.txt`. Repeat after `click --name "PitchKit"` into `artifacts/owner-nav-pitchkit/pitchkit.png` and `pitchkit.aria.txt`.

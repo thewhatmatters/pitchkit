@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
-import { AppFrame, OWNER_GRID_MAX } from "@/components/app-frame";
+import {
+  AppFrame,
+  CREATOR_INSIGHTS_BODY_BAND_CLASS,
+  CREATOR_INSIGHTS_BODY_INNER_CLASS,
+  CREATOR_INSIGHTS_HEADER_BAND_CLASS,
+  CREATOR_INSIGHTS_PAGE_CLASS,
+} from "@/components/app-frame";
 import { KitEdit } from "@/components/kit-edit";
 import { OwnerNav } from "@/components/owner-nav";
 import { SupportFooter } from "@/components/support-footer";
@@ -55,15 +61,21 @@ export default async function KitPage({ params }: KitPageProps) {
 
   if (canEdit) {
     return (
-      <AppFrame gridMax={OWNER_GRID_MAX}>
-        <OwnerNav handle={kit.user.handle} />
-        {card}
-        <SupportFooter>
-          <p>
-            <a href="/settings">Account</a>
-          </p>
-        </SupportFooter>
-      </AppFrame>
+      <main className={CREATOR_INSIGHTS_PAGE_CLASS}>
+        <div className={CREATOR_INSIGHTS_HEADER_BAND_CLASS}>
+          <OwnerNav handle={kit.user.handle} name={kit.user.name} />
+        </div>
+        <div className={CREATOR_INSIGHTS_BODY_BAND_CLASS}>
+          <div className={CREATOR_INSIGHTS_BODY_INNER_CLASS}>
+            {card}
+            <SupportFooter>
+              <p>
+                <a href="/settings">Account</a>
+              </p>
+            </SupportFooter>
+          </div>
+        </div>
+      </main>
     );
   }
 

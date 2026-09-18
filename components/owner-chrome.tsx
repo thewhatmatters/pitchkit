@@ -80,7 +80,7 @@ export function OwnerChrome({
   }
 
   return (
-    <div className="band col-span-full min-w-0 gap-y-6 sm:gap-y-8">
+    <>
       <section className="col-span-full">
         <PageHeader
           variant="page"
@@ -140,6 +140,6 @@ export function OwnerChrome({
       </div>
 
       {notice ? <p className="col-span-full">{notice}</p> : null}
-    </div>
+    </>
   );
 }
