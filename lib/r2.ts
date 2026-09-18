@@ -19,5 +19,9 @@ export function publicObjectUrl(r2Key: string | null): string {
     return "";
   }
 
+  if (r2Key.startsWith("https://") || r2Key.startsWith("http://")) {
+    return r2Key;
+  }
+
   return SEED_PUBLIC[r2Key] ?? "";
 }

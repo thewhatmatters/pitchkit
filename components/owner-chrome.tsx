@@ -17,15 +17,8 @@ import { ProofPosts } from "@/components/proof-posts";
 import { ReachChart } from "@/components/reach-chart";
 import { SEED_AUDIENCE } from "@/lib/audience";
 import { INSIGHTS_PRIVATE, STUB_DISCONNECT } from "@/lib/copy";
-import {
-  ENGAGEMENT_FORMULA,
-  EXAMPLE_AGE_MIX,
-  EXAMPLE_CITY_MIX,
-  EXAMPLE_COUNTRY_MIX,
-  EXAMPLE_GENDER_MIX,
-  inventoryLastUpdated,
-} from "@/lib/inventory";
-import { kitPath } from "@/lib/kit";
+import { ENGAGEMENT_FORMULA, inventoryLastUpdated } from "@/lib/inventory";
+import { kitPath, type KitAudience } from "@/lib/kit";
 import type { ReachPoint } from "@/lib/reach-series";
 import type { Media, User } from "@/lib/schema";
 
@@ -37,6 +30,7 @@ type OwnerChromeProps = {
   typicalSaves: number | null;
   reachSeries?: ReachPoint[] | null;
   hasInsights: boolean;
+  audience?: KitAudience | null;
   gridReady: boolean;
 };
 
@@ -65,18 +59,12 @@ export function OwnerChrome({
   typicalSaves,
   reachSeries,
   hasInsights,
+  audience,
   gridReady,
 }: OwnerChromeProps) {
   const [notice, setNotice] = useState<string | null>(null);
   const refreshed = formatRefreshedAt(inventoryLastUpdated(posts));
-  const audience = hasInsights
-    ? {
-        country: EXAMPLE_COUNTRY_MIX,
-        city: EXAMPLE_CITY_MIX,
-        age: EXAMPLE_AGE_MIX,
-        gender: EXAMPLE_GENDER_MIX,
-      }
-    : SEED_AUDIENCE;
+  const mixes = audience ?? SEED_AUDIENCE;
 
   async function copyKitLink() {
     const url = `${window.location.origin}${kitPath(user.handle)}`;
@@ -95,9 +83,17 @@ export function OwnerChrome({
           variant="page"
           title="Insights"
           end={
-            <Button role="secondary" size="sm" icon={<Share2 />} onClick={() => void copyKitLink()}>
-              Share kit
-            </Button>
+            <span className="flex flex-wrap items-center gap-2">
+              <form action="/insights" method="get">
+                <input type="hidden" name="refresh" value="1" />
+                <Button type="submit" role="secondary" size="sm">
+                  Refresh
+                </Button>
+              </form>
+              <Button role="secondary" size="sm" icon={<Share2 />} onClick={() => void copyKitLink()}>
+                Share kit
+              </Button>
+            </span>
           }
         />
         <div className={PATTERN_HEADER_COPY_CLASS}>
@@ -128,10 +124,10 @@ export function OwnerChrome({
             loading={!gridReady}
           />
           <AudienceFit
-            country={audience.country}
-            city={audience.city}
-            age={audience.age}
-            gender={audience.gender}
+            country={mixes.country}
+            city={mixes.city}
+            age={mixes.age}
+            gender={mixes.gender}
           />
         </div>
       </div>

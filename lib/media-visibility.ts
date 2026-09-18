@@ -8,6 +8,7 @@ import {
   type MediaVisibilityError,
   type MediaVisibilitySuccess,
 } from "@/lib/kit-visibility";
+import type { Media } from "@/lib/schema";
 import { seedMedia } from "@/lib/seed";
 import { insightsGate, type Session } from "@/lib/session";
 
@@ -21,6 +22,7 @@ export type ResolveMediaVisibilityInput = {
   body: unknown;
   overlay: HiddenOverlay;
   now?: Date;
+  catalog?: Media[];
 };
 
 export type ResolveMediaVisibilityResult =
@@ -36,7 +38,7 @@ function fail(error: MediaVisibilityError): ResolveMediaVisibilityResult {
  * Until Hyperdrive exists the caller persists `overlay` as an httpOnly cookie.
  */
 export function resolveMediaVisibility(input: ResolveMediaVisibilityInput): ResolveMediaVisibilityResult {
-  const { action, session, body, overlay, now = new Date() } = input;
+  const { action, session, body, overlay, now = new Date(), catalog = seedMedia } = input;
 
   if (!insightsGate(session)) {
     return fail("unauthenticated");
@@ -47,7 +49,7 @@ export function resolveMediaVisibility(input: ResolveMediaVisibilityInput): Reso
     return fail("invalid_body");
   }
 
-  const media = seedMedia.find((row) => row.id === mediaId);
+  const media = catalog.find((row) => row.id === mediaId);
   if (!media) {
     return fail("not_found");
   }

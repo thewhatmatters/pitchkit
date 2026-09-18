@@ -7,7 +7,7 @@ import type { Media } from "./schema";
 import { seedMedia } from "./seed";
 import {
   HIDDEN_COOKIE,
-  parseSessionValue,
+  resolveSession,
   SESSION_COOKIE,
   SESSION_MAX_AGE,
   type Session,
@@ -353,13 +353,15 @@ export async function mediaVisibilityResponse(
   request: Request,
   action: "hide" | "restore",
 ): Promise<Response> {
-  const session = parseSessionValue(cookieValue(request, SESSION_COOKIE));
+  const session = await resolveSession(cookieValue(request, SESSION_COOKIE), "route");
   const overlay = parseHiddenOverlay(cookieValue(request, HIDDEN_COOKIE));
   const mediaId = parseMediaId(await readJsonBody(request));
+  const { loadMediaCatalog } = await import("./store");
+  const catalog = session ? await loadMediaCatalog(session.userId, "route") : seedMedia;
   const outcome =
     action === "hide"
-      ? await hideFromKit({ session, mediaId, overlay, access: "route" })
-      : await restoreToKit({ session, mediaId, overlay, access: "route" });
+      ? await hideFromKit({ session, mediaId, overlay, access: "route", catalog })
+      : await restoreToKit({ session, mediaId, overlay, access: "route", catalog });
 
   if (!outcome.ok) {
     return Response.json(

@@ -93,12 +93,12 @@ export function typicalFromPosts(
     typicalReach: median(
       posts
         .map((post) => post.reach)
-        .filter((value): value is number => value != null && Number.isFinite(value)),
+        .filter((value): value is number => value != null && Number.isFinite(value) && value > 0),
     ),
     typicalSaves: median(
       posts
         .map((post) => post.saves)
-        .filter((value): value is number => value != null && Number.isFinite(value)),
+        .filter((value): value is number => value != null && Number.isFinite(value) && value > 0),
     ),
   };
 }

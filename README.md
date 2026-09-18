@@ -43,11 +43,11 @@ Landing stays product copy: disclosure, Professional note, **Continue with Insta
 | `lib/` | Schema types, in-repo seed, kit math (six-post rank + ER), `reach_series` hide rules |
 | `public/demo/` | Placeholder kit images (`r2_key` maps here until R2) |
 
-Until Hyperdrive exists, `/k/demo` and `/insights` read the in-repo seed (`lib/seed.ts`). Same `User` / `Media` types as live. `TOKEN_KEY` is not required for seed. Unknown handle (`/k/nope`) is 404. No Neon or Instagram token yet. Hide/restore seed SoT is KV `HIDDEN_KIT` until Neon; httpOnly `pitchkit_hidden` mirrors for owner reload. Brands hitting `/k/demo` see hides from KV without that cookie. When Hyperdrive exists, write `media.hidden_from_kit_at` instead.
+Until Hyperdrive exists, `/k/demo` and tokenless `/insights` read the in-repo seed (`lib/seed.ts`). Same `User` / `Media` types as live. A Graph poll (OAuth token or operator `IG_USER_TOKEN`) persists a snapshot on KV `HIDDEN_KIT` under `graph:` keys. `TOKEN_KEY` encrypts tokens at rest when present; not required for seed. Unknown handle (`/k/nope`) is 404. Hide/restore seed SoT is KV `HIDDEN_KIT` until Neon; httpOnly `pitchkit_hidden` mirrors for owner reload. Brands hitting `/k/demo` see hides from KV without that cookie. When Hyperdrive exists, write `users` / `media` / `hidden_from_kit_at` instead.
 
-Owner Insights kit (`loadOwnerKit`) includes seed/example `reach_series: { day, reach }[]` (`day` = YYYY-MM-DD UTC). `/insights` reads `owner.reach_series` for one WMDS Chart; hide when the field is omitted or empty. Never zero-fill. Public `/k/demo` (`loadPublicKit`) has no Insights and omits `reach_series`. Not a SQL table. No Graph poll in the seed.
+Owner Insights kit (`loadOwnerKit`) includes seed/example `reach_series: { day, reach }[]` (`day` = YYYY-MM-DD UTC) when no token. A live token polls `graph.instagram.com` (`GRAPH_API_VERSION`, start `v25.0`) on Insights load if stale (&gt;6h) or Refresh. `/insights` reads `owner.reach_series` for one WMDS Chart; hide when empty, all-zero, or too short. Never zero-fill. Public `/k/demo` (`loadPublicKit`) has no Insights and omits `reach_series`. Not a SQL table.
 
-Stub login: **Continue with Instagram** POST/GET `/auth/instagram` sets an httpOnly Pitchkit session for handle `demo` and redirects to `/insights`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays the public shareable freeze (no owner Edit / Coming soon, even with a cookie). The Insights PitchKit segment is Coming soon.
+Login: **Continue with Instagram** POST/GET `/auth/instagram`. With `IG_APP_ID` + `IG_APP_SECRET`, that is Instagram Business Login (scopes `instagram_business_basic`, `instagram_business_manage_insights`; redirect `https://pitchkit.app/auth/instagram`). Without secrets it sets an httpOnly seed session for handle `demo`. `/insights` without that cookie redirects `/`. Sign out clears the cookie. `/k/demo` stays the public shareable freeze (no owner Edit / Coming soon, even with a cookie). The Insights PitchKit segment is Coming soon.
 
 `/insights` is the real owner layout (WMDS Pattern — creator Insights Show code `examples-pitchkit--creator-insights`: hug `SegmentedControl` in a three-column PitchKit / control / Avatar header on `grid-page min-h-screen … [--grid-column-gap:8px] [--grid-max:1140px] [padding-bottom:44px]`, body `band pt-6 sm:pt-8`, then `PageHeader`, four-up Stat, `Chart.Cartesian` + `Chart.RankedBars`, Recent proof with `Tab.Group`). PitchKit segment stays on this page and shows Coming soon. Public `/k/[handle]` copies Pattern — shareable PitchKit (`examples-pitchkit--shareable-pitchkit`). `GridOverlay` is Storybook-only. One `<Toaster position="bottom-right" />` at the app root. Full-bleed `<body className="bg-body min-h-screen">`. Hide-from-kit goes through `hideFromKit(mediaId)` / `restoreToKit(mediaId)` → `POST /api/media/hide` and `POST /api/media/restore` (`AlertDialog` + toast Undo). Public kit filters `hidden_from_kit_at` before the six; owner Insights keeps the row and partitions so reload **"N shown"** excludes hidden (Restore chrome stays). Hide the entire Chart band if `reach_series` is omitted/`[]`. Public seed Insights stay null — Engagement rate, reach, saves, and the Chart hide (no ÷ followers). Owner demo seed has post Insights plus the example series. Contact and past brands stay hidden on the public kit when blank. Kit Stat label is **Engagement rate**, never “ER”.
 
@@ -83,7 +83,7 @@ npm install github:thewhatmatters/wmds#75f8a41e8b131906378b340a4106a486ddd5173f
 
 Cloudflare and Support (for now): randy@whatmatters.so. Neon region is chosen when we create the database.
 
-Env **names** only (see `.env.example`): `IG_APP_ID`, `IG_APP_SECRET`, `TOKEN_KEY`, plus Hyperdrive notes. Never commit values.
+Env **names** only (see `.env.example`): `IG_APP_ID`, `IG_APP_SECRET`, `TOKEN_KEY`, `GRAPH_API_VERSION`, optional `IG_USER_TOKEN` / `IG_REDIRECT_URI`, plus Hyperdrive notes. Never commit values.
 
 ---
 
@@ -95,7 +95,7 @@ cp .dev.vars.example .dev.vars
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=personal`, `/auth/instagram` (stub connect), `/auth/sign-out`, `/insights`, `/insights?grid=pulling`, `/settings`, `/k/demo`, `/k/nope` (404), `POST /api/media/hide`, `POST /api/media/restore`, `/privacy`, `/delete`.
+Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=personal`, `/auth/instagram` (stub or live OAuth), `/auth/sign-out`, `/insights`, `/insights?refresh=1`, `/insights?grid=pulling`, `/settings`, `/k/demo`, `/k/nope` (404), `POST /api/media/hide`, `POST /api/media/restore`, `/privacy`, `/delete`.
 
 ```bash
 npm test

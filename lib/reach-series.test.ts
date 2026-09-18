@@ -36,6 +36,14 @@ describe("reach_series chart hide rules", () => {
       shouldShowReachChart([{ day: "not-a-day", reach: 12 }]),
       false,
     );
+    assert.equal(
+      shouldShowReachChart([{ day: "2026-09-01", reach: 0 }, { day: "2026-09-02", reach: 0 }]),
+      false,
+    );
+    assert.equal(
+      shouldShowReachChart([{ day: "2026-09-01", reach: 12 }]),
+      true,
+    );
     assert.deepEqual(sanitizeReachSeries([]), []);
     assert.equal(shouldRenderReachChartBand([], 640), false);
     assert.equal(shouldRenderReachChartBand(undefined, 640), false);

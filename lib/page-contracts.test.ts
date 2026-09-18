@@ -9,7 +9,7 @@ function read(rel: string) {
 }
 
 describe("critical page contracts", () => {
-  it("landing Continue posts stub Instagram auth", () => {
+  it("landing Continue posts Instagram auth (live when secrets exist, else stub)", () => {
     const page = read("app/page.tsx");
     const button = read("components/connect-button.tsx");
     const copy = read("lib/copy.ts");
@@ -19,6 +19,12 @@ describe("critical page contracts", () => {
     assert.match(page, /DISCLOSURE/);
     assert.match(page, /PROFESSIONAL_NOTE/);
     assert.match(page, /DEMO_SESSION_NOTE/);
+    assert.match(page, /hasLiveAuthSecrets/);
+    assert.match(read("app/auth/instagram/route.ts"), /hasLiveAuthSecrets/);
+    assert.match(read("app/auth/instagram/route.ts"), /stubConnect/);
+    assert.match(read("lib/graph.ts"), /graph\.instagram\.com/);
+    assert.match(read("lib/graph.ts"), /GRAPH_API_VERSION|createGraphClient/);
+    assert.match(read("lib/poll.ts"), /POLL_STALE_MS = 6/);
     assert.match(copy, /Opens the demo Insights session/);
     assert.doesNotMatch(page, /STUB_CONNECT|Stub connect|no Instagram token/);
     assert.doesNotMatch(copy, /STUB_CONNECT|Stub connect|no Instagram token/);
@@ -27,7 +33,9 @@ describe("critical page contracts", () => {
   it("gates /insights on the session cookie", () => {
     const page = read("app/insights/page.tsx");
     assert.match(page, /insightsGate/);
+    assert.match(page, /resolveSession/);
     assert.match(page, /redirect\("\/"\)/);
+    assert.match(page, /refresh === "1"/);
     assert.doesNotMatch(page, /INVENTORY_CONTACT|past-brands|KitInventory/);
   });
 
@@ -223,6 +231,10 @@ describe("critical page contracts", () => {
     assert.match(chart, /Chart\.Cartesian/);
     assert.match(chart, /variant="outlined"/);
     assert.match(chart, /Reach over 30 days/);
+    assert.doesNotMatch(chart, /Graph data/);
+    assert.doesNotMatch(chrome, /EXAMPLE_COUNTRY_MIX|EXAMPLE_AGE_MIX/);
+    assert.match(chrome, /Refresh/);
+    assert.match(chrome, /name="refresh"/);
     assert.match(chart, /typicalReach/);
     assert.match(chart, /key: "typical"/);
     assert.match(chart, /Chart\.Legend/);
@@ -323,6 +335,7 @@ describe("critical page contracts", () => {
     const page = read("app/settings/page.tsx");
     const settings = read("components/account-settings.tsx");
     assert.match(page, /insightsGate/);
+    assert.match(page, /resolveSession/);
     assert.match(settings, /Reconnect Instagram/);
     assert.match(settings, new RegExp(AUTH_SIGNOUT_PATH));
     assert.doesNotMatch(settings, /past brand|Past brand|contact for collab/i);

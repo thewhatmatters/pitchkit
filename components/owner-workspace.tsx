@@ -11,6 +11,7 @@ import { OwnerChrome } from "@/components/owner-chrome";
 import { OwnerNav, type OwnerView } from "@/components/owner-nav";
 import { PitchKitComingSoon } from "@/components/pitchkit-coming-soon";
 import { SupportFooter } from "@/components/support-footer";
+import type { KitAudience } from "@/lib/kit";
 import type { ReachPoint } from "@/lib/reach-series";
 import type { Media, User } from "@/lib/schema";
 
@@ -22,6 +23,7 @@ type OwnerWorkspaceProps = {
   typicalSaves: number | null;
   reachSeries?: ReachPoint[] | null;
   hasInsights: boolean;
+  audience?: KitAudience | null;
   gridReady: boolean;
 };
 
@@ -38,6 +40,7 @@ export function OwnerWorkspace({
   typicalSaves,
   reachSeries,
   hasInsights,
+  audience,
   gridReady,
 }: OwnerWorkspaceProps) {
   const [view, setView] = useState<OwnerView>("insights");
@@ -60,6 +63,7 @@ export function OwnerWorkspace({
               typicalSaves={typicalSaves}
               reachSeries={reachSeries}
               hasInsights={hasInsights}
+              audience={audience}
               gridReady={gridReady}
             />
           )}

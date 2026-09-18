@@ -82,7 +82,7 @@ describe("insights static inventory", () => {
     assert.match(EXAMPLE_DATA_NOTE, /example data, not live Instagram/);
     assert.match(CONTACT_CAPTION, /email door/);
     assert.match(PAST_BRANDS_CAPTION, /Not a highlights gallery/);
-    assert.match(LAST_UPDATED_CAPTION, /Not a live Graph timestamp/);
+    assert.match(LAST_UPDATED_CAPTION, /seed or the Graph poll/);
     for (const word of FORBIDDEN) {
       assert.equal(
         INVENTORY_ITEM_IDS.some((id) => id.includes(word.replaceAll(" ", "-"))),
