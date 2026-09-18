@@ -150,7 +150,7 @@ Landing (disclosure + Professional note + support)
 
 | Route | Who | What |
 |---|---|---|
-| `/` | anyone | Pitch, disclosure, Continue with Instagram, Professional note, support |
+| `/` | anyone | Pitch, disclosure, Professional note, Continue with Instagram, quiet demo-session line under the button, support. Do not lead with stub-token / “no Instagram token” language. |
 | `/insights` | owner cookie | Graph-only Insights matching WMDS Pattern — creator Insights: `PageHeader`, four-up `Stat` (`col-span-2 md:col-span-4 lg:col-span-3`), outlined `Chart.Cartesian` + `Chart.RankedBars`, **Recent proof** with `Tab.Group`. Spell **Engagement rate** (never “ER”). No invented period-over-period trends. Hide the whole Chart band when `owner.reach_series` is omitted or `[]`. Hide empty audience mixes. `MoreMenu` + `AlertDialog` “Hide from kit” + `toast.add()` Undo via `hideFromKit` / `restoreToKit`. Owner proof partitions `hidden_from_kit_at` (`"N shown"` + rank = visible only; Hidden + Restore survive reload). Top nav is SegmentedControl Insights / PitchKit. No contact/past-brands holes. Reconnect / sign out / disconnect stay as buttons. Account is a quiet footer link. One root `Toaster`. |
 | `/k/[handle]` | public | Kit card + support footer. No owner nav. Owner session on this handle gets SegmentedControl + 1140 grid and can toggle Edit for contact + past brands. Share link stays view. Hidden posts stay off this card. |
 | `/settings` | owner cookie | Account only — reconnect / sign out / disconnect. 1140 grid, no SegmentedControl. Quiet Insights link in the footer. No past-brands or contact slots. |
