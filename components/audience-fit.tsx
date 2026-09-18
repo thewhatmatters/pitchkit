@@ -30,7 +30,9 @@ function AudienceSection({ title, items }: { title: string; items: { label: stri
 
   return (
     <section className="flex min-w-0 flex-col gap-3">
-      <h3 className="text-xs uppercase tracking-wide text-muted">{title}</h3>
+      <h3 className="type-supporting font-medium uppercase tracking-wider text-muted">
+        {title}
+      </h3>
       <Chart.RankedBars aria-label={`Audience by ${title.toLowerCase()}`} items={items} animate="none" />
     </section>
   );

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { EyeOff, Repeat2, Undo2 } from "lucide-react";
+import { CREATOR_INSIGHTS_SUPPORTING_CLASS } from "@/lib/creator-insights-classes";
 import {
   AlertDialog,
   Badge,
@@ -135,18 +136,20 @@ export function ProofPosts({ posts, hasInsights, loading = false }: ProofPostsPr
 
   if (loading) {
     return (
-      <section className="band col-span-full min-w-0 gap-y-4">
+      <section className="band min-w-0 gap-y-4">
         <h2 className={`${cardTitleClasses} col-span-full`}>Recent proof</h2>
       </section>
     );
   }
 
   return (
-    <section className="band col-span-full min-w-0 gap-y-4">
+    <section className="band min-w-0 gap-y-4">
       <div className="col-span-full flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className={cardTitleClasses}>Recent proof</h2>
-          <p className="text-muted">{postNotice ?? proofMetricNotices[proofMetric]}</p>
+          <p className={CREATOR_INSIGHTS_SUPPORTING_CLASS}>
+            {postNotice ?? proofMetricNotices[proofMetric]}
+          </p>
         </div>
         <Badge variant="neutral" emphasis="muted" size="sm">
           {shown.length} shown
@@ -298,7 +301,9 @@ function ProofPostCard({
         <div className="grid w-full grid-cols-3 gap-3">
           {metrics.map(([label, value]) => (
             <span key={label} className="flex min-w-0 flex-col gap-1">
-              <span className="text-muted">{label}</span>
+              <span className="type-supporting font-medium uppercase tracking-wider text-muted">
+                {label}
+              </span>
               <span className="font-mono text-sm tabular-nums text-fg">
                 {value == null ? "—" : compactNumber.format(value)}
               </span>

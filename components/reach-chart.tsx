@@ -4,9 +4,7 @@ import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import {
   Card,
   Chart,
-  cardLayoutBodyOccupantInsetXClasses,
-  cardLayoutBodyOccupantPadYClasses,
-  cardLayoutBodyOccupantWellClasses,
+  cardLayoutBodyOccupantRadiusClasses,
   cardSubtitleClasses,
   cardTitleClasses,
   chartMaxTicksForWidth,
@@ -23,8 +21,8 @@ import {
 /** Matches WMDS Chart.Cartesian default host height. */
 const REACH_CHART_MIN_HEIGHT = 240;
 
-/** WMDS Occupancy history Card occupant well — Organisms/Chart story (975b649). */
-const reachChartOccupantWellClasses = `flex flex-col gap-3 ${cardLayoutBodyOccupantPadYClasses} ${cardLayoutBodyOccupantWellClasses} ${cardLayoutBodyOccupantInsetXClasses}`;
+/** Canvas `pitchKitCardWellClasses` — not the Occupancy history occupant well. */
+const reachChartOccupantWellClasses = `flex min-w-0 flex-col gap-4 bg-body px-3.5 py-4 ${cardLayoutBodyOccupantRadiusClasses}`;
 
 type ReachChartProps = {
   series?: ReachPoint[] | null;
