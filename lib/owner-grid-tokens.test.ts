@@ -71,5 +71,6 @@ describe("fail-closed: owner grid gutter tokens (WHA-309)", () => {
     assert.match(kit, /CREATOR_INSIGHTS_BODY_BAND_CLASS/);
     assert.match(kit, /CREATOR_INSIGHTS_BODY_INNER_CLASS/);
     assert.doesNotMatch(insights, /<AppFrame|OWNER_GRID_MAX|layout="stretch"/);
+    assert.match(read("app/layout.tsx"), /<body className="bg-body min-h-screen">/);
   });
 });

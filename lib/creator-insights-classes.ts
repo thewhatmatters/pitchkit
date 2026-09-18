@@ -2,6 +2,8 @@
  * WMDS Examples/PitchKit live Storybook canvas (`pitchKitStyles.ts`).
  * `typographyClass` is not a package export — use the pin's `type-*` utilities.
  * Pattern Show code matches the live canvas after WMDS #10 (`3f136308`).
+ * `.grid-page` is max-width + centered — paint full-bleed `bg-body min-h-screen`
+ * on `<body>` in `app/layout.tsx` so the column is not a gray island on white.
  */
 
 export const CREATOR_INSIGHTS_PAGE_CLASS =
