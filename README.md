@@ -118,3 +118,5 @@ Deploy to Workers (needs Cloudflare auth and bindings):
 ```bash
 npm run deploy
 ```
+
+Workers Builds: dashboard non-prod deploy is `npx wrangler versions upload` (no OpenNext step). `wrangler.jsonc` `build.command` runs `npx opennextjs-cloudflare build` so `.open-next/worker.js` exists before upload. Seed deploy does not need `TOKEN_KEY` / Hyperdrive / R2. Production last succeeded with `npm run deploy` (OpenNext build + deploy).

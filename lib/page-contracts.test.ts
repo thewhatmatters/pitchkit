@@ -219,6 +219,14 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(restore, /localStorage/);
   });
 
+  it("Workers Builds wrangler upload generates the OpenNext worker first", () => {
+    const wrangler = read("wrangler.jsonc");
+    const pkg = read("package.json");
+    assert.match(wrangler, /"main": "\.open-next\/worker\.js"/);
+    assert.match(wrangler, /opennextjs-cloudflare build/);
+    assert.match(pkg, /opennextjs-cloudflare build && opennextjs-cloudflare deploy/);
+  });
+
   it("settings is account only", () => {
     const page = read("app/settings/page.tsx");
     const settings = read("components/account-settings.tsx");
