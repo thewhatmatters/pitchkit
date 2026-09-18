@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { afterEach, describe, it } from "node:test";
 import { resetHyperdriveForTests, setHasHyperdriveForTests } from "./hyperdrive";
 import type { SqlExecutor, SqlQueryRow } from "./postgres";
-import { POSTGRES_CLIENT } from "./postgres";
+import { asQueryRows, POSTGRES_CLIENT } from "./postgres";
 import type { Media, User } from "./schema";
 import {
   DISCONNECT_USER_SQL,
@@ -51,11 +51,14 @@ function liveUser(partial: Partial<User> = {}): User {
 function recordingExecutor(handler: (text: string, values: readonly unknown[]) => SqlQueryRow[]) {
   const queries: { text: string; values: readonly unknown[] }[] = [];
   const executor: SqlExecutor = {
-    async query(text, values = []) {
+    async query<T extends SqlQueryRow = SqlQueryRow>(
+      text: string,
+      values: readonly unknown[] = [],
+    ): Promise<T[]> {
       queries.push({ text, values });
       assert.match(text, /\$1|IF NOT EXISTS/i);
       assert.equal(text.includes("${"), false);
-      return handler(text, values);
+      return asQueryRows<T>(handler(text, values));
     },
   };
   return { executor, queries };
