@@ -251,9 +251,14 @@ describe("critical page contracts", () => {
       read("components/pattern-tokens.ts"),
       /PATTERN_PLACEHOLDER_BODY_CLASS = "type-body text-fg max-w-md text-muted"/,
     );
-    assert.match(read("components/pitchkit-coming-soon.tsx"), /Coming soon/);
-    assert.match(read("components/pitchkit-coming-soon.tsx"), /Shareable PitchKit/);
-    assert.match(read("lib/copy.ts"), /PITCHKIT_COMING_SOON_TITLE/);
+    assert.match(read("components/pitchkit-coming-soon.tsx"), /PITCHKIT_COMING_SOON_BADGE/);
+    assert.match(read("components/pitchkit-coming-soon.tsx"), /PITCHKIT_COMING_SOON_TITLE/);
+    assert.match(read("lib/copy.ts"), /PITCHKIT_COMING_SOON_BADGE = "Coming soon"/);
+    assert.match(read("lib/copy.ts"), /PITCHKIT_COMING_SOON_TITLE = "Shareable PitchKit"/);
+    assert.match(
+      read("lib/copy.ts"),
+      /verified insights, selected posts, contact details, and past-brand proof/,
+    );
     assert.match(read("app/layout.tsx"), /className="bg-body min-h-screen"/);
   });
 
