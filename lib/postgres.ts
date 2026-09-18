@@ -32,6 +32,18 @@ const HYPERDRIVE_POSTGRES_OPTIONS = {
   prepare: true,
 } as const;
 
+/**
+ * postgres.js `sql.unsafe` yields `(Row & Iterable<Row>)[]`. That does not
+ * overlap a caller `T extends SqlQueryRow`, so OpenNext typecheck rejects
+ * `as T[]` (TS2352). Assert through `unknown` — rows stay untyped SQL
+ * records; `sql-store` maps them onto User / Media.
+ */
+export function asQueryRows<T extends SqlQueryRow = SqlQueryRow>(
+  rows: readonly unknown[],
+): T[] {
+  return rows as unknown as T[];
+}
+
 export function createPostgresExecutor(connectionString: string): SqlExecutor {
   const sql = postgres(connectionString, HYPERDRIVE_POSTGRES_OPTIONS);
   return {
@@ -40,7 +52,7 @@ export function createPostgresExecutor(connectionString: string): SqlExecutor {
       values: readonly unknown[] = [],
     ): Promise<T[]> {
       const rows = await sql.unsafe(text, values as never[]);
-      return [...rows] as T[];
+      return asQueryRows<T>([...rows]);
     },
   };
 }
