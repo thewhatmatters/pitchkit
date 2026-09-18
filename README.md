@@ -74,7 +74,7 @@ Disconnect deletes the creator, their posts, and their files. Anonymous weekly t
 Install WMDS pinned to a main SHA:
 
 ```bash
-npm install github:thewhatmatters/wmds#2f3d828374e02566af5419f21e937c02b958135f
+npm install github:thewhatmatters/wmds#73277bab5bd3ffc8dff678c12d4cdbc415b07a35
 ```
 
 `prepare` builds `dist/`. Local `npm install ../wmds` still works after `npm run build` there. `postinstall` / `predev` / `prebuild` copy Geist font files into the WMDS `dist/files` path that `styles.css` expects (otherwise Next 500s on the font URLs). Chart needs the `@visx/visx` peer. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md), WMDS [`CONSUMING.md`](https://github.com/thewhatmatters/wmds/blob/main/CONSUMING.md).
@@ -118,3 +118,5 @@ Deploy to Workers (needs Cloudflare auth and bindings):
 ```bash
 npm run deploy
 ```
+
+Workers Builds: dashboard non-prod deploy is `npx wrangler versions upload` (no OpenNext step). `wrangler.jsonc` `build.command` runs `npx opennextjs-cloudflare build` so `.open-next/worker.js` exists before upload. Seed deploy does not need `TOKEN_KEY` / Hyperdrive / R2. Production last succeeded with `npm run deploy` (OpenNext build + deploy).

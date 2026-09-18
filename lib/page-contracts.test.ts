@@ -170,7 +170,7 @@ describe("critical page contracts", () => {
     assert.match(chart, /animate="none"/);
     assert.doesNotMatch(chart, /Chart\.Legend/);
     assert.match(read("components/wmds.ts"), /chartMaxTicksForWidth/);
-    assert.match(read("package.json"), /wmds#2f3d828374e02566af5419f21e937c02b958135f/);
+    assert.match(read("package.json"), /wmds#73277bab5bd3ffc8dff678c12d4cdbc415b07a35/);
     assert.doesNotMatch(page, /Owner Insights\. Brands never see this page/);
   });
 
@@ -217,6 +217,14 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(store, /localStorage/);
     assert.doesNotMatch(hide, /localStorage/);
     assert.doesNotMatch(restore, /localStorage/);
+  });
+
+  it("Workers Builds wrangler upload generates the OpenNext worker first", () => {
+    const wrangler = read("wrangler.jsonc");
+    const pkg = read("package.json");
+    assert.match(wrangler, /"main": "\.open-next\/worker\.js"/);
+    assert.match(wrangler, /opennextjs-cloudflare build/);
+    assert.match(pkg, /opennextjs-cloudflare build && opennextjs-cloudflare deploy/);
   });
 
   it("settings is account only", () => {

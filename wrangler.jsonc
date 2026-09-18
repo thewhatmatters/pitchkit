@@ -2,6 +2,11 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "main": ".open-next/worker.js",
   "name": "pitchkit",
+  // Workers Builds non-prod is `npx wrangler versions upload` with an empty dashboard
+  // build command. Generate the OpenNext worker before wrangler looks for main.
+  "build": {
+    "command": "npx opennextjs-cloudflare build",
+  },
   "compatibility_date": "2026-09-02",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": {
