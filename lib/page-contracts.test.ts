@@ -143,6 +143,16 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(read("components/proof-posts.tsx"), /<Toaster/);
   });
 
+  it("paints full-bleed bg-body on body so grid-page is not a gray island", () => {
+    const layout = read("app/layout.tsx");
+    const canvas = read("lib/creator-insights-classes.ts");
+
+    assert.match(layout, /<body className="bg-body min-h-screen">/);
+    assert.doesNotMatch(layout, /AppShell/);
+    assert.match(canvas, /full-bleed `bg-body min-h-screen`/);
+    assert.match(canvas, /<body>/);
+  });
+
   it("Insights chrome matches creator Insights pattern", () => {
     const page = read("app/insights/page.tsx");
     const chrome = read("components/owner-chrome.tsx");
