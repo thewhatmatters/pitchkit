@@ -44,7 +44,7 @@ Keep implementation details out of the map. Name only user paths, stable handles
 
 ## Features
 
-- [Connect session](./connect-session.md) — landing → Continue with Instagram → `/insights` with a session.
+- [Connect session](./connect-session.md) — landing → Continue with Instagram → `/insights` with a session. Revisiting `/` with that cookie stays on Insights.
 - [Insights overview](./insights-overview.md) — PageHeader, four-up Stats, Reach chart / insufficient-reach empty / loading skeleton, Audience bars. **Dry-run target.**
 - [Owner nav ↔ PitchKit](./owner-nav-pitchkit.md) — SegmentedControl Insights / PitchKit in-page on `/insights` (PitchKit = Coming soon).
 - [Hide / restore proof](./hide-restore-proof.md) — MoreMenu hide → dialog → toast Undo; reload + anon kit; Restore. Mutates live KV.

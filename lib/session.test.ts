@@ -1,10 +1,20 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
-import { DEMO_HANDLE, DEMO_USER_ID, seedUser } from "./seed";
+import { afterEach, describe, it } from "node:test";
+import { EMPTY_AUDIENCE, persistOwnerDisconnect, readGraphSnapshot, writeGraphSnapshot } from "./graph-store";
+import { createMemoryHiddenKit, setHiddenKitNamespaceForTests } from "./hidden-kit";
+import { assemblePublicKit } from "./kit";
+import type { User } from "./schema";
+import { DEMO_HANDLE, DEMO_USER_ID, seedMedia, seedUser } from "./seed";
+import { loadPublicKit } from "./store";
 import {
+  AUTH_DISCONNECT_PATH,
+  HIDDEN_COOKIE,
   SESSION_COOKIE,
+  disconnectOwner,
   insightsGate,
   parseSessionValue,
+  readRequestCookie,
+  resolveSession,
   sessionClearCookieHeader,
   sessionCookieClearOptions,
   sessionCookieSetOptions,
@@ -12,6 +22,33 @@ import {
   stubConnect,
   stubSignOut,
 } from "./session";
+
+const NOW = "2026-09-18T22:00:00.000Z";
+
+function liveUser(partial: Partial<User> = {}): User {
+  return {
+    id: "u-rxndy",
+    ig_user_id: "ig-rxndy",
+    handle: "rxndy.dxniel",
+    name: "Randy",
+    avatar_r2_key: null,
+    followers: 100,
+    media_count: 10,
+    token_encrypted: "enc-token",
+    refresh_encrypted: "enc-refresh",
+    token_expires_at: "2026-10-01T00:00:00.000Z",
+    connected_at: "2026-09-01T00:00:00.000Z",
+    disconnected_at: null,
+    consent_index: false,
+    ig_account_type: "BUSINESS",
+    disclosure_version: 1,
+    ...partial,
+  };
+}
+
+afterEach(() => {
+  setHiddenKitNamespaceForTests(undefined);
+});
 
 describe("session cookie", () => {
   it("sets an httpOnly Pitchkit session for seed handle demo, not a token", () => {
@@ -94,5 +131,99 @@ describe("insights gate", () => {
       assert.equal(signOut.headers.get("location"), "http://localhost/");
       assert.match(signOut.headers.get("set-cookie") ?? "", /Max-Age=0/);
     }
+  });
+
+  it("treats a resolvable session as signed-in so home can gate to Insights", () => {
+    assert.equal(insightsGate(parseSessionValue(DEMO_HANDLE)), true);
+    assert.equal(insightsGate(null), false);
+  });
+});
+
+describe("disconnect vs sign out", () => {
+  it("sign out clears cookies only and leaves a live Graph kit public", async () => {
+    setHiddenKitNamespaceForTests(createMemoryHiddenKit());
+    const user = liveUser();
+    assert.equal(
+      await writeGraphSnapshot({
+        user,
+        media: seedMedia,
+        reach_series: [],
+        audience: EMPTY_AUDIENCE,
+        polled_at: NOW,
+      }),
+      true,
+    );
+
+    const signOut = stubSignOut(new Request("http://localhost/auth/sign-out", { method: "POST" }));
+    assert.equal(signOut.status, 303);
+    const cookies = signOut.headers.getSetCookie();
+    assert.ok(cookies.some((row) => row.includes(`${SESSION_COOKIE}=`) && row.includes("Max-Age=0")));
+    assert.ok(cookies.some((row) => row.includes(`${HIDDEN_COOKIE}=`) && row.includes("Max-Age=0")));
+
+    const kit = await loadPublicKit(user.handle, new Date(NOW));
+    assert.ok(kit);
+    assert.equal(kit.user.disconnected_at, null);
+    assert.equal((await readGraphSnapshot(user.id))?.user.token_encrypted, "enc-token");
+  });
+
+  it("disconnect persists disconnected_at, clears tokens and session, and 404s the public kit", async () => {
+    setHiddenKitNamespaceForTests(createMemoryHiddenKit());
+    const user = liveUser();
+    assert.equal(
+      await writeGraphSnapshot({
+        user,
+        media: seedMedia,
+        reach_series: [],
+        audience: EMPTY_AUDIENCE,
+        polled_at: NOW,
+      }),
+      true,
+    );
+
+    const session = await resolveSession(user.handle, "route");
+    assert.deepEqual(session, { handle: user.handle, userId: user.id });
+    assert.equal(insightsGate(session), true);
+
+    const response = await disconnectOwner(
+      new Request(`http://localhost${AUTH_DISCONNECT_PATH}`, {
+        method: "POST",
+        headers: { cookie: `${SESSION_COOKIE}=${user.handle}` },
+      }),
+    );
+    assert.equal(response.status, 303);
+    assert.equal(response.headers.get("location"), "http://localhost/");
+    const cookies = response.headers.getSetCookie();
+    assert.ok(cookies.some((row) => row.includes(`${SESSION_COOKIE}=`) && row.includes("Max-Age=0")));
+    assert.ok(cookies.some((row) => row.includes(`${HIDDEN_COOKIE}=`) && row.includes("Max-Age=0")));
+
+    const snapshot = await readGraphSnapshot(user.id);
+    assert.ok(snapshot);
+    assert.ok(snapshot.user.disconnected_at);
+    assert.equal(snapshot.user.token_encrypted, null);
+    assert.equal(snapshot.user.refresh_encrypted, null);
+    assert.equal(snapshot.user.token_expires_at, null);
+
+    assert.equal(await resolveSession(user.handle, "route"), null);
+    assert.equal(await loadPublicKit(user.handle, new Date(NOW)), null);
+    assert.equal(assemblePublicKit(snapshot.user, snapshot.media, new Date(NOW)), null);
+  });
+
+  it("persistOwnerDisconnect stamps an existing snapshot without inventing a seed row", async () => {
+    setHiddenKitNamespaceForTests(createMemoryHiddenKit());
+    const user = liveUser({ handle: "tester" });
+    assert.equal(
+      await writeGraphSnapshot({
+        user,
+        media: seedMedia,
+        reach_series: [],
+        audience: EMPTY_AUDIENCE,
+        polled_at: NOW,
+      }),
+      true,
+    );
+    assert.equal(await persistOwnerDisconnect({ handle: user.handle, userId: user.id }, "route", NOW), true);
+    assert.equal((await readGraphSnapshot(user.id))?.user.disconnected_at, NOW);
+    assert.equal(await persistOwnerDisconnect({ handle: DEMO_HANDLE, userId: DEMO_USER_ID }), false);
+    assert.equal(readRequestCookie(new Request("http://localhost/"), SESSION_COOKIE), null);
   });
 });

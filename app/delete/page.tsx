@@ -17,8 +17,10 @@ export default function DeletePage() {
           The kit URL returns 404. We start immediately and finish within 24 hours.
         </PageCopy>
         <PageCopy>
-          Stub — this page does not delete anything yet. Disconnect on Insights is
-          the same control; live delete is not wired.
+          Disconnect on Insights or Settings is that control: it signs you out,
+          stamps the kit disconnected (public URL 404s), and stops Graph polling.
+          SQL and R2 file purge still finish within 24 hours when Neon exists.
+          This page does not delete anything by itself.
         </PageCopy>
       </PageCard>
       <SupportFooter />

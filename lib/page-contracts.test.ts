@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it } from "node:test";
-import { AUTH_CONNECT_PATH, AUTH_SIGNOUT_PATH } from "./session";
+import { AUTH_CONNECT_PATH, AUTH_DISCONNECT_PATH, AUTH_SIGNOUT_PATH } from "./session";
 
 function read(rel: string) {
   return readFileSync(join(process.cwd(), rel), "utf8");
@@ -41,7 +41,11 @@ describe("critical page contracts", () => {
     assert.match(button, /Continue with Instagram/);
     assert.match(page, new RegExp(`action="${AUTH_CONNECT_PATH}"`));
     assert.match(page, /method="post"/);
+    assert.match(page, /resolveSession/);
+    assert.match(page, /insightsGate/);
+    assert.match(page, /redirect\("\/insights"\)/);
     assert.match(page, /DISCLOSURE/);
+    assert.match(page, /PERSONAL_FAIL/);
     assert.match(page, /PROFESSIONAL_NOTE/);
     assert.match(page, /DEMO_SESSION_NOTE/);
     assert.match(page, /hasLiveAuthSecrets/);
@@ -53,6 +57,7 @@ describe("critical page contracts", () => {
     assert.match(copy, /Opens the demo Insights session/);
     assert.doesNotMatch(page, /STUB_CONNECT|Stub connect|no Instagram token/);
     assert.doesNotMatch(copy, /STUB_CONNECT|Stub connect|no Instagram token/);
+    assert.doesNotMatch(copy, /STUB_DISCONNECT|That control does not run yet/);
   });
 
   it("gates /insights on the session cookie", () => {
@@ -487,10 +492,21 @@ describe("critical page contracts", () => {
   it("settings is account only", () => {
     const page = read("app/settings/page.tsx");
     const settings = read("components/account-settings.tsx");
+    const disconnect = read("components/disconnect-control.tsx");
+    const chrome = read("components/owner-chrome.tsx");
     assert.match(page, /insightsGate/);
     assert.match(page, /resolveSession/);
     assert.match(settings, /Reconnect Instagram/);
     assert.match(settings, new RegExp(AUTH_SIGNOUT_PATH));
+    assert.match(settings, /DisconnectControl/);
+    assert.match(disconnect, new RegExp(`action="${AUTH_DISCONNECT_PATH}"`));
+    assert.match(disconnect, /method="post"/);
+    assert.match(disconnect, /<AlertDialog/);
+    assert.match(disconnect, /confirmLabel="Disconnect"/);
+    assert.match(read("app/auth/disconnect/route.ts"), /disconnectOwner/);
+    assert.match(chrome, /DisconnectControl/);
+    assert.doesNotMatch(settings, /STUB_DISCONNECT/);
+    assert.doesNotMatch(chrome, /STUB_DISCONNECT/);
     assert.doesNotMatch(settings, /past brand|Past brand|contact for collab/i);
     assert.doesNotMatch(page, /past brand|Past brand/i);
   });

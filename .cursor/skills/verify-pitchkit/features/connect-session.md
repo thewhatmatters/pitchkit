@@ -8,6 +8,7 @@ Connect session lets a creator read the collection note, tap **Continue with Ins
 - `connect-continue` submits **Continue with Instagram** and sets `pitchkit_session`.
 - `connect-insights` lands on `/insights` (not `/`).
 - `connect-gate` keeps `/insights` off-limits without that cookie.
+- `connect-home` sends a resolvable session on `/` to `/insights` (do not show Continue again).
 
 ## How to get to it (user POV)
 
@@ -28,12 +29,15 @@ Preconditions:
 - **Session present.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs cookies --name pitchkit_session`. `present` is `true` and `httpOnly` is `true`.
 - **Doctor with session.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs doctor --require-session`. `ok` is `true`.
 - **Gate without cookie.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /insights --fresh`. The URL is `/` (307), not Insights chrome.
+- **Signed-in home.** After connect, run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /`. The URL path becomes `/insights`. Do not show **Continue with Instagram**.
 - **Proof.** Capture Insights after connect. Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs screenshot --path artifacts/connect-session/insights.png` and `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs snapshot --aria --path artifacts/connect-session/insights.aria.txt`. Artifacts show PageHeader **Insights** and nav **Insights** / **PitchKit**.
 
 ## Gotchas
 
 - Without `IG_APP_ID` / `IG_APP_SECRET` the path is still the seed stub (not an Instagram token). Seed tokens stay null. A live Meta dialog on production means those secrets are set — that is Phase 2 Auth, not a regression.
 - `/insights` without `pitchkit_session` redirects home. Do not treat a landing screenshot as a connected session.
+- After connect, `goto /` must land on `/insights`, not the Continue gate.
 - Reconnect re-sets the same seed session. It does not create a second handle. WHA-313 optional URL update is live OAuth only.
 - `GET /auth/instagram` also sets the cookie. Using that URL skips the disclosure — do not call the disclosure sub-feature verified.
-- Sign out (`/auth/sign-out`) clears the session. A later owner recipe must `connect` again.
+- Sign out (`/auth/sign-out`) clears the session. The public kit stays up. A later owner recipe must `connect` again.
+- Disconnect (`/auth/disconnect`) clears the session and stamps `disconnected_at` on a Graph snapshot so `/k/[handle]` 404s. Shared seed `/k/demo` has no snapshot, so persist is a no-op.
