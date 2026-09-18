@@ -13,7 +13,7 @@ function bytesToB64Url(bytes: Uint8Array): string {
   return btoa(binary).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
 }
 
-function b64UrlToBytes(value: string): Uint8Array {
+function b64UrlToBytes(value: string): Uint8Array<ArrayBuffer> {
   const padded = value.replaceAll("-", "+").replaceAll("_", "/");
   const pad = padded.length % 4 === 0 ? "" : "=".repeat(4 - (padded.length % 4));
   const binary = atob(padded + pad);
@@ -22,6 +22,13 @@ function b64UrlToBytes(value: string): Uint8Array {
     out[i] = binary.charCodeAt(i);
   }
   return out;
+}
+
+/** SubtleCrypto BufferSource rejects Uint8Array<ArrayBufferLike> (TS 5.7+ DOM). */
+function asBufferSource(bytes: Uint8Array): Uint8Array<ArrayBuffer> {
+  const copy = new Uint8Array(bytes.byteLength);
+  copy.set(bytes);
+  return copy;
 }
 
 async function importKey(tokenKey: string): Promise<CryptoKey> {
@@ -33,7 +40,7 @@ export async function encryptToken(plaintext: string, tokenKey: string): Promise
   const key = await importKey(tokenKey);
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const cipher = await crypto.subtle.encrypt(
-    { name: "AES-GCM", iv },
+    { name: "AES-GCM", iv: asBufferSource(iv) },
     key,
     new TextEncoder().encode(plaintext),
   );
@@ -55,7 +62,11 @@ export async function decryptToken(
     const key = await importKey(tokenKey);
     const iv = b64UrlToBytes(parts[1]!);
     const data = b64UrlToBytes(parts[2]!);
-    const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, data);
+    const plain = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv: asBufferSource(iv) },
+      key,
+      asBufferSource(data),
+    );
     return new TextDecoder().decode(plain);
   } catch {
     return null;
