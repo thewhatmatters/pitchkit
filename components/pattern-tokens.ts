@@ -1,9 +1,12 @@
 /**
  * Interpolated Show code class strings from WMDS Examples/PitchKit at
- * `75f8a41e8b131906378b340a4106a486ddd5173f`.
+ * `55944edfc8039b6682882c65d1a956b1e51fba21`.
  *
  * Stories:
  * - `examples-pitchkit--creator-insights` (Pattern — creator Insights)
+ * - `examples-pitchkit--creator-insights-loading` (Pattern — creator Insights (loading))
+ * - `examples-pitchkit--insufficient-reach-data` (State — insufficient reach data)
+ * - `examples-pitchkit--graph-data-unavailable` (State — Graph data unavailable; omit optional regions)
  * - `examples-pitchkit--shareable-pitchkit` (Pattern — shareable PitchKit)
  *
  * Copy these literals. Do not import Storybook-only `pitchKitStyles`.
@@ -47,6 +50,27 @@ export const PATTERN_AUDIENCE_CARD_CLASS = "col-span-full min-w-0 lg:col-span-6"
 
 export const PATTERN_CARD_WELL_CLASS =
   "flex min-w-0 flex-col gap-4 bg-body px-3.5 py-4 rounded-[var(--radius-card-body)]";
+
+/** Matches Chart.Cartesian `minHeight` on the Reach well — keep empty/skeleton bands the same. */
+export const PATTERN_REACH_CHART_MIN_HEIGHT = 344;
+
+export const PATTERN_REACH_EMPTY_WELL_CLASS = `${PATTERN_CARD_WELL_CLASS} justify-center`;
+
+export const PATTERN_EMPTY_COPY_CLASS = "flex max-w-lg flex-col gap-2";
+
+export const PATTERN_EMPTY_TITLE_CLASS = "type-heading-2 text-fg";
+
+export const PATTERN_EMPTY_BODY_CLASS = "type-body text-fg text-muted";
+
+export const PATTERN_HEADER_SKELETON_COPY_CLASS = "flex max-w-2xl flex-col gap-2";
+
+export const PATTERN_HEADER_SKELETON_STACK_CLASS = "flex flex-col gap-1";
+
+export const PATTERN_SKELETON_LEGEND_ROW_CLASS = "flex flex-wrap gap-4";
+
+export const PATTERN_AUDIENCE_SKELETON_SECTION_CLASS = "flex min-w-0 flex-col gap-3";
+
+export const PATTERN_AUDIENCE_SKELETON_BARS_CLASS = "flex min-w-0 flex-col gap-2";
 
 export const PATTERN_AUDIENCE_WELL_CLASS =
   "grid min-w-0 gap-y-6 bg-body px-3.5 py-4 [column-gap:var(--grid-column-gap)] sm:grid-cols-2 rounded-[var(--radius-card-body)]";

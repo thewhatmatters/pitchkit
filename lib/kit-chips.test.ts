@@ -7,7 +7,7 @@ import {
   sourcedContactDetail,
   visibleBrandNames,
 } from "./kit-chips";
-import { shouldRenderReachChartBand, shouldShowReachChart } from "./reach-series";
+import { reachChartSurface, shouldRenderReachChartBand, shouldShowReachChart } from "./reach-series";
 
 describe("past brand chips", () => {
   it("hides empty or blank names and keeps honest names", () => {
@@ -47,13 +47,15 @@ describe("audience mix hide-empty", () => {
 });
 
 describe("reach chart hide contract", () => {
-  it("hides when reach_series is empty", () => {
+  it("does not paint Cartesian when reach_series is empty", () => {
     assert.equal(shouldShowReachChart([]), false);
     assert.equal(shouldShowReachChart(undefined), false);
     assert.equal(shouldShowReachChart([{ day: "2026-09-01", reach: 10 }]), true);
+    assert.equal(reachChartSurface([], true), "empty");
+    assert.equal(reachChartSurface(undefined, false), "omit");
   });
 
-  it("hides the whole band — no header alone — until the plot can paint", () => {
+  it("skips Cartesian — no plot — until the host can paint", () => {
     const series = [{ day: "2026-09-01", reach: 10 }];
     assert.equal(shouldRenderReachChartBand([], 640), false);
     assert.equal(shouldRenderReachChartBand(series, 0), false);

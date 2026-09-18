@@ -25,6 +25,7 @@ type OwnerWorkspaceProps = {
   hasInsights: boolean;
   audience?: KitAudience | null;
   gridReady: boolean;
+  retrieving?: boolean;
 };
 
 /**
@@ -42,6 +43,7 @@ export function OwnerWorkspace({
   hasInsights,
   audience,
   gridReady,
+  retrieving = false,
 }: OwnerWorkspaceProps) {
   const [view, setView] = useState<OwnerView>("insights");
 
@@ -65,6 +67,7 @@ export function OwnerWorkspace({
               hasInsights={hasInsights}
               audience={audience}
               gridReady={gridReady}
+              retrieving={retrieving}
             />
           )}
           <SupportFooter>

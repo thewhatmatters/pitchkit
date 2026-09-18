@@ -1,6 +1,6 @@
 # Insights overview
 
-Insights overview is the owner home after connect: PageHeader **Insights**, a four-up performance summary, the 30-day Reach chart Card when a series exists, and Audience RankedBars when mixes are present.
+Insights overview is the owner home after connect: PageHeader **Insights**, a four-up performance summary, the 30-day Reach chart Card when a series exists (or the insufficient-reach empty band when Insights exist but the series is thin/zero), and Audience RankedBars when mixes are present.
 
 ## Sub-features
 
@@ -8,7 +8,10 @@ Insights overview is the owner home after connect: PageHeader **Insights**, a fo
 - `insights-stats` shows Followers, Engagement rate, Typical reach, and Saves on the four-up.
 - `insights-reach-chart` shows the outlined Reach Card and `30-day account reach` plot (WHA-310 well).
 - `insights-audience` shows Audience fit RankedBars when mixes are non-empty.
-- `insights-empty-hide` hides empty chart series and empty audience mixes (do not invent zeros).
+- `insights-insufficient-reach` keeps the Reach Card with **Not enough reach history yet** when Insights exist but the series is missing / thin / all-zero (not Skeleton, not Chart.Loading, not omit-band).
+- `insights-graph-unavailable` omits the optional Reach / empty audience regions when Graph never returned Insights.
+- `insights-loading` is the page-freeze skeleton at `/insights?grid=pulling` (Stat loading + Skeleton wells + six proof placeholders).
+- `insights-retrieving` is Header + Chart.Loading after chrome is up (`/insights?grid=retrieving` or Refresh).
 
 ## How to get to it (user POV)
 
@@ -36,9 +39,10 @@ Preconditions:
 
 - Brands never see this page. A `--fresh` `/insights` redirects to `/`.
 - Public `/k/demo` omits `reach_series`. Do not expect this chart on the public kit.
-- Hide the whole Reach band when the series is empty — a title-only Card is a fail.
+- Insufficient reach keeps the Reach Card and shows **Not enough reach history yet**. Omitting that Card when Insights exist is a fail. A title-only Card without that empty copy is a fail. Skeleton / Chart.Loading in that empty well is a fail.
+- Graph-unavailable still omits the optional Reach region — do not invent the empty band when Insights never landed.
 - Spell **Engagement rate**. A label “ER” is a fail.
-- `/insights?grid=pulling` is a loading variant. Default dry-run uses `/insights` with seed ready.
+- `/insights?grid=pulling` is the first-connect skeleton Pattern. `/insights?grid=retrieving` is Header + Chart.Loading. Default dry-run uses `/insights` with seed ready.
 - Do not invent period-over-period trends. Seed has none.
 - Each harness command is a new browser. `goto` then a later `wait` does not keep the painted page. Screenshot/snapshot/eval settle the Reach plot themselves when `[data-chart-slot="reach"]` is present. Pass `--wait-selector` for anything else.
 - Live `demo` may already show a Hidden proof row (observed: **5 shown** + **Manage hidden post**). That is leftover KV, not a failed overview. Do not hide another post from this recipe.

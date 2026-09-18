@@ -21,8 +21,9 @@ export type PublicKit = {
   engagementRate: number | null;
   hasInsights: boolean;
   /**
-   * One series: account reach (stories + ads). FE: hide Chart when omitted or [].
-   * Do not zero-fill a missing Insights window.
+   * One series: account reach (stories + ads).
+   * Insights missing → omit (graph-unavailable). Unusable series → []
+   * (insufficient-reach empty band). Do not zero-fill a missing window.
    */
   reach_series?: ReachPoint[];
   typicalReach: number | null;
@@ -132,7 +133,7 @@ export function assemblePublicKit(
     hasInsights,
     typicalReach: typical.typicalReach,
     typicalSaves: typical.typicalSaves,
-    // Insights missing → omit (Chart hides). Unusable series → [] (Chart still hides).
+    // Insights missing → omit (graph-unavailable). Unusable series → [] (empty band).
     ...(hasInsights
       ? {
           reach_series: shouldShowReachChart(options.reach_series)

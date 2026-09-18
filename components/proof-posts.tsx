@@ -67,10 +67,9 @@ function formatPostedAt(iso: string): string {
 type ProofPostsProps = {
   posts: Media[];
   hasInsights: boolean;
-  loading?: boolean;
 };
 
-export function ProofPosts({ posts, hasInsights, loading = false }: ProofPostsProps) {
+export function ProofPosts({ posts, hasInsights }: ProofPostsProps) {
   const [ownerPosts, setOwnerPosts] = useState(posts);
   const [proofMetric, setProofMetric] = useState<PostSortKey>(DEFAULT_POST_SORT);
   const [postNotice, setPostNotice] = useState<string | null>(null);
@@ -162,14 +161,6 @@ export function ProofPosts({ posts, hasInsights, loading = false }: ProofPostsPr
       title: TOAST_POST_RESTORED_TITLE,
       description: TOAST_POST_RESTORED_DESCRIPTION,
     });
-  }
-
-  if (loading) {
-    return (
-      <section className={PATTERN_POSTS_SECTION_CLASS}>
-        <h2 className={`${cardTitleClasses} col-span-full`}>Recent proof</h2>
-      </section>
-    );
   }
 
   return (

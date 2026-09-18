@@ -4,6 +4,7 @@ import {
   PATTERN_AUDIENCE_CARD_CLASS,
   PATTERN_AUDIENCE_SECTION_CLASS,
   PATTERN_AUDIENCE_WELL_CLASS,
+  PATTERN_REACH_CHART_MIN_HEIGHT,
   PATTERN_SECTION_EYEBROW_CLASS,
 } from "@/components/pattern-tokens";
 import { Card, Chart, cardSubtitleClasses, cardTitleClasses } from "@/components/wmds";
@@ -14,6 +15,7 @@ type AudienceFitProps = {
   city?: RankedShare[] | null;
   age?: RankedShare[] | null;
   gender?: RankedShare[] | null;
+  retrieving?: boolean;
 };
 
 function toBars(rows: RankedShare[] | null | undefined) {
@@ -40,18 +42,24 @@ function AudienceSection({ title, items }: { title: string; items: { label: stri
  * Owner Insights audience Card. Hide the whole Card when every mix is empty.
  * Never paint zeros. Chart.RankedBars only — no invented bars.
  */
-export function AudienceFit({ country, city, age, gender }: AudienceFitProps) {
+export function AudienceFit({
+  country,
+  city,
+  age,
+  gender,
+  retrieving = false,
+}: AudienceFitProps) {
   const countries = toBars(country);
   const cities = toBars(city);
   const ages = toBars(age);
   const genders = toBars(gender);
+  const visible =
+    shouldShowAudienceMix(country) ||
+    shouldShowAudienceMix(city) ||
+    shouldShowAudienceMix(age) ||
+    shouldShowAudienceMix(gender);
 
-  if (
-    !shouldShowAudienceMix(country) &&
-    !shouldShowAudienceMix(city) &&
-    !shouldShowAudienceMix(age) &&
-    !shouldShowAudienceMix(gender)
-  ) {
+  if (!visible) {
     return null;
   }
 
@@ -61,6 +69,8 @@ export function AudienceFit({ country, city, age, gender }: AudienceFitProps) {
       shape="rounded"
       bodyTerminal
       className={PATTERN_AUDIENCE_CARD_CLASS}
+      aria-busy={retrieving || undefined}
+      aria-label={retrieving ? "Retrieving audience fit" : undefined}
     >
       <Card.Header
         start={
@@ -71,12 +81,18 @@ export function AudienceFit({ country, city, age, gender }: AudienceFitProps) {
         }
       />
       <Card.Body>
-        <div className={PATTERN_AUDIENCE_WELL_CLASS}>
-          <AudienceSection title="Countries" items={countries} />
-          <AudienceSection title="Cities" items={cities} />
-          <AudienceSection title="Age" items={ages} />
-          <AudienceSection title="Gender" items={genders} />
-        </div>
+        {retrieving ? (
+          <div className={PATTERN_AUDIENCE_WELL_CLASS}>
+            <Chart.Loading minHeight={PATTERN_REACH_CHART_MIN_HEIGHT} />
+          </div>
+        ) : (
+          <div className={PATTERN_AUDIENCE_WELL_CLASS}>
+            <AudienceSection title="Countries" items={countries} />
+            <AudienceSection title="Cities" items={cities} />
+            <AudienceSection title="Age" items={ages} />
+            <AudienceSection title="Gender" items={genders} />
+          </div>
+        )}
       </Card.Body>
     </Card>
   );

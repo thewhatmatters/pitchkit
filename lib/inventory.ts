@@ -20,7 +20,7 @@ export const TYPICAL_SAVES_CAPTION = "Typical post.";
 export const CHART_SLOT_TITLE = "30-day reach chart";
 
 export const CHART_SLOT_CAPTION =
-  "WMDS Chart.Cartesian area in the PitchKit canvas Card well. Hide the whole band when reach_series is empty. Never zero-fill.";
+  "WMDS Chart.Cartesian area in the PitchKit canvas Card well. Insufficient series keeps the Card with the empty Pattern. Graph-unavailable omits the optional region. Never zero-fill.";
 
 export const SIX_POSTS_RANK = "Ranked saves, then reach, then likes. Last 30 days.";
 

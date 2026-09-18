@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Share2 } from "lucide-react";
 import { AudienceFit } from "@/components/audience-fit";
+import { InsightsLoading } from "@/components/insights-loading";
 import {
   PATTERN_DASHBOARD_GRID_CLASS,
   PATTERN_FORMULA_CLASS,
@@ -39,6 +40,7 @@ type OwnerChromeProps = {
   hasInsights: boolean;
   audience?: KitAudience | null;
   gridReady: boolean;
+  retrieving?: boolean;
 };
 
 function formatRefreshedAt(iso: string | null): string | null {
@@ -68,8 +70,11 @@ export function OwnerChrome({
   hasInsights,
   audience,
   gridReady,
+  retrieving: retrievingProp = false,
 }: OwnerChromeProps) {
   const [notice, setNotice] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const retrieving = retrievingProp || refreshing;
   const refreshed = formatRefreshedAt(inventoryLastUpdated(posts));
   const mixes = audience ?? SEED_AUDIENCE;
 
@@ -90,6 +95,15 @@ export function OwnerChrome({
     }
   }
 
+  if (!gridReady) {
+    return (
+      <>
+        <InsightsLoading onShare={() => void copyKitLink()} />
+        <OwnerAccountActions notice={notice} onDisconnect={() => setNotice(STUB_DISCONNECT)} />
+      </>
+    );
+  }
+
   return (
     <>
       <section className={PATTERN_HEADER_SECTION_CLASS}>
@@ -98,7 +112,7 @@ export function OwnerChrome({
           title="Insights"
           end={
             <span className="flex flex-wrap items-center gap-2">
-              <form action="/insights" method="get">
+              <form action="/insights" method="get" onSubmit={() => setRefreshing(true)}>
                 <input type="hidden" name="refresh" value="1" />
                 <Button type="submit" role="secondary" size="sm">
                   Refresh
@@ -128,26 +142,42 @@ export function OwnerChrome({
           engagementRate={engagementRate}
           typicalReach={typicalReach}
           typicalSaves={typicalSaves}
-          loading={!gridReady}
+          loading={retrieving}
         />
 
         <div className={PATTERN_DASHBOARD_GRID_CLASS}>
           <ReachChart
             series={reachSeries}
             typicalReach={typicalReach}
-            loading={!gridReady}
+            hasInsights={hasInsights}
+            retrieving={retrieving}
           />
           <AudienceFit
             country={mixes.country}
             city={mixes.city}
             age={mixes.age}
             gender={mixes.gender}
+            retrieving={retrieving}
           />
         </div>
       </div>
 
-      <ProofPosts posts={posts} hasInsights={hasInsights} loading={!gridReady} />
+      <ProofPosts posts={posts} hasInsights={hasInsights} />
 
+      <OwnerAccountActions notice={notice} onDisconnect={() => setNotice(STUB_DISCONNECT)} />
+    </>
+  );
+}
+
+function OwnerAccountActions({
+  notice,
+  onDisconnect,
+}: {
+  notice: string | null;
+  onDisconnect: () => void;
+}) {
+  return (
+    <>
       <div className="col-span-full flex flex-wrap gap-2">
         <form action="/auth/instagram" method="post">
           <Button type="submit" role="secondary">
@@ -159,7 +189,7 @@ export function OwnerChrome({
             Sign out
           </Button>
         </form>
-        <Button role="destructive" onClick={() => setNotice(STUB_DISCONNECT)}>
+        <Button role="destructive" onClick={onDisconnect}>
           Disconnect
         </Button>
       </div>
