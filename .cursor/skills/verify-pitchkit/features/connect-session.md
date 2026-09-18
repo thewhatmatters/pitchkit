@@ -32,7 +32,7 @@ Preconditions:
 
 ## Gotchas
 
-- The stub is not an Instagram token. Seed tokens stay null. A live Meta dialog would be a product regression.
+- Without `IG_APP_ID` / `IG_APP_SECRET` the path is still the seed stub (not an Instagram token). Seed tokens stay null. A live Meta dialog on production means those secrets are set — that is Phase 2 Auth, not a regression.
 - `/insights` without `pitchkit_session` redirects home. Do not treat a landing screenshot as a connected session.
 - Reconnect re-sets the same seed session. It does not create a second handle. WHA-313 optional URL update is live OAuth only.
 - `GET /auth/instagram` also sets the cookie. Using that URL skips the disclosure — do not call the disclosure sub-feature verified.

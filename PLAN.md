@@ -39,7 +39,7 @@ Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCH
 
 **Public from first successful connect.** No publish switch. Ingest builds the kit; `/k/[handle]` is live as soon as the `users` row exists.
 
-**Session:** Instagram proves who they are. Pitchkit still sets an **httpOnly cookie** for Insights, disconnect, and refresh. The cookie is our login, not the Instagram token. Until live OAuth, stub Continue (GET/POST `/auth/instagram`) sets that cookie for seed handle `demo`. Sign out clears it. `/insights` without the cookie goes `/`. `/k/[handle]` does not need it.
+**Session:** Instagram proves who they are. Pitchkit still sets an **httpOnly cookie** for Insights, disconnect, and refresh. The cookie is our login, not the Instagram token. Continue GET/POST `/auth/instagram` starts Instagram Business Login when `IG_APP_ID` + `IG_APP_SECRET` are set (redirect URI default `https://pitchkit.app/auth/instagram`, exact dashboard match including trailing slash). Secrets missing → stub session for seed handle `demo`. Sign out clears it. `/insights` without the cookie goes `/`. `/k/[handle]` does not need it. Personal Graph account → `/?error=personal`.
 
 Owner home: `/insights`. Pattern header (hug SegmentedControl) toggles Insights vs an in-page Coming soon placeholder. Brands only get `/k/[handle]` (shareable Pattern freeze; no owner nav).
 
@@ -64,7 +64,7 @@ No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “c
 
 **Engagement rate:** `(likes + comments + saves + shares) / reach` on those six (unlocked 2026-09-18). Account rate is **sum(interactions) ÷ sum(reach)** on posts with Insights `reach` > 0 — not an average of per-post rates. Hide (or show —) when reach is missing, null, or 0. **Do not** fall back to ÷ followers. Same formula on the public kit and Insights. If Insights are missing, hide Engagement rate, reach, saves, and the chart. Saves/shares are media insights `saved` / `shares` (Instagram Login), not Facebook-only `saved_count` / `shares_count`. Spell **Engagement rate** (never “ER”).
 
-**Chart series:** Insights kit payload exposes one `reach_series` (`{ day, reach }`, `day` = YYYY-MM-DD UTC). Account reach day buckets (stories + ads). Empty or omit hides the **entire Chart band**. Do not invent 30 zeros. `/insights` reads `owner.reach_series` only. Pattern ReachCard: `Chart.Cartesian` at `minHeight` 344 with daily reach plus a constant Typical reach reference from the existing `typicalReach` median (not a second Graph time series), `Chart.Legend`, `animate="none"`. Header: **Reach over 30 days**. No Stat `trend` deltas. Audience uses `Chart.RankedBars` and hides when mixes are empty. Owner demo seed includes ~30 labeled example reach points plus inventory example mixes so RankedBars can paint (not live Graph). Public `/k/demo` omits Insights. Seed only; no Graph poll in this path.
+**Chart series:** Insights kit payload exposes one `reach_series` (`{ day, reach }`, `day` = YYYY-MM-DD UTC). Account reach day buckets (stories + ads). Empty or all-zero hides the **entire Chart band**. Do not invent 30 zeros. `/insights` reads `owner.reach_series` only. Pattern ReachCard: `Chart.Cartesian` at `minHeight` 344 with daily reach plus a constant Typical reach reference from the existing `typicalReach` median (not a second Graph time series), `Chart.Legend`, `animate="none"`. Header: **Reach over 30 days**. No Stat `trend` deltas. Audience uses `Chart.RankedBars` from live `follower_demographics` (hide when 0 rows / &lt;100 followers). Never EXAMPLE percents. Owner demo seed (no token) includes ~30 labeled example reach points; audience stays empty. Public `/k/demo` omits Insights. Live token → Graph poll on Insights load when `fetched_at` / `polled_at` is older than 6 hours, or Refresh.
 
 **Carousel:** first child frame (cover) into R2. **Video:** poster only on the kit, never the file.
 
@@ -87,7 +87,7 @@ Short: *Public posts and Insights only. No DMs. No following list. Disconnect de
 
 > Pitchkit works with Instagram Professional accounts (Business or Creator). In Instagram, switch to Professional, then try again.
 
-**Stub vs live OAuth:** same `users` / `media` schema. Stub fills the same columns. Review pending → stub + seed `demo`. Testers on a live app use real OAuth. Do not fork the data model.
+**Stub vs live OAuth:** same `users` / `media` schema. Stub fills the same columns. Secrets missing → stub + seed `demo`. Testers with `IG_APP_ID` / `IG_APP_SECRET` use Instagram Business Login. Optional operator `IG_USER_TOKEN` polls Graph on the demo Insights session without flipping public `/k/demo`. Do not fork the data model.
 
 Screencast to capture: disclosure on connect → Instagram permissions → Insights inventory → copy link → public `/k/[handle]`.
 

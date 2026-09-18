@@ -2,7 +2,6 @@
 
 import type { ReactNode } from "react";
 import {
-  Badge,
   Card,
   Chart,
   cardLayoutBodyOccupantRadiusClasses,
@@ -77,11 +76,7 @@ function ReachChartCard({
             </p>
           </>
         }
-        end={
-          <Badge variant="neutral" emphasis="muted" size="sm">
-            Graph data
-          </Badge>
-        }
+        end={null}
       />
       <Card.Body>
         <div className={reachChartOccupantWellClasses}>{children}</div>

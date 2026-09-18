@@ -1,3 +1,5 @@
+import { readGraphSnapshotByHandle } from "./graph-store";
+import type { HiddenKitAccess } from "./hidden-kit-kv";
 import { DEMO_HANDLE, seedUsers } from "./seed";
 
 /** Pitchkit session cookie — our login, not an Instagram token. */
@@ -58,9 +60,22 @@ function serializeCookie(name: string, value: string, secure: boolean, maxAge: n
   return parts.join("; ");
 }
 
+export function serializeSessionCookie(
+  name: string,
+  value: string,
+  secure: boolean,
+  maxAge: number,
+): string {
+  return serializeCookie(name, value, secure, maxAge);
+}
+
 /** Sets the session for seed handle `demo`. Value is the handle, not a token. */
 export function sessionSetCookieHeader(secure: boolean): string {
-  return serializeCookie(SESSION_COOKIE, DEMO_HANDLE, secure, SESSION_MAX_AGE);
+  return sessionSetCookieHeaderForHandle(DEMO_HANDLE, secure);
+}
+
+export function sessionSetCookieHeaderForHandle(handle: string, secure: boolean): string {
+  return serializeCookie(SESSION_COOKIE, handle, secure, SESSION_MAX_AGE);
 }
 
 export function sessionClearCookieHeader(secure: boolean): string {
@@ -82,6 +97,25 @@ export function parseSessionValue(value: string | undefined | null): Session | n
   }
 
   return { handle: user.handle, userId: user.id };
+}
+
+/** Seed first, then a live Graph snapshot handle (Phase 2 OAuth). */
+export async function resolveSession(
+  value: string | undefined | null,
+  access: HiddenKitAccess = "page",
+): Promise<Session | null> {
+  const seed = parseSessionValue(value);
+  if (seed) {
+    return seed;
+  }
+  if (!value) {
+    return null;
+  }
+  const snapshot = await readGraphSnapshotByHandle(value, access);
+  if (!snapshot || snapshot.user.disconnected_at) {
+    return null;
+  }
+  return { handle: snapshot.user.handle, userId: snapshot.user.id };
 }
 
 /** `/insights` without a valid Pitchkit session goes home. */

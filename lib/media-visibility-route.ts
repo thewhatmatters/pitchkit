@@ -11,7 +11,8 @@ import {
   resolveMediaVisibility,
   type MediaVisibilityFailure,
 } from "@/lib/media-visibility";
-import { parseSessionValue, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/session";
+import { loadMediaCatalog } from "@/lib/store";
+import { resolveSession, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/session";
 
 export { resolveMediaVisibility } from "@/lib/media-visibility";
 
@@ -20,7 +21,7 @@ export async function mediaVisibilityPost(
   action: MediaVisibilityAction,
 ): Promise<NextResponse> {
   const cookieStore = await cookies();
-  const session = parseSessionValue(cookieStore.get(SESSION_COOKIE)?.value);
+  const session = await resolveSession(cookieStore.get(SESSION_COOKIE)?.value, "route");
 
   let body: unknown;
   try {
@@ -33,7 +34,8 @@ export async function mediaVisibilityPost(
   }
 
   const overlay = parseHiddenCookie(cookieStore.get(HIDDEN_COOKIE)?.value);
-  const resolved = resolveMediaVisibility({ action, session, body, overlay });
+  const catalog = session ? await loadMediaCatalog(session.userId, "route") : [];
+  const resolved = resolveMediaVisibility({ action, session, body, overlay, catalog });
   if (!resolved.ok) {
     return NextResponse.json(resolved.body, { status: resolved.status });
   }

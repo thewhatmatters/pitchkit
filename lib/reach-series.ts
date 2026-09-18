@@ -37,8 +37,16 @@ export function sanitizeReachSeries(series: ReachPoint[] | null | undefined): Re
   );
 }
 
+export function hasPositiveReach(series: ReachPoint[] | null | undefined): boolean {
+  return sanitizeReachSeries(series).some((point) => point.reach > 0);
+}
+
+/**
+ * Hide when empty, omitted, invalid-only, or all-zero (sparse Graph days).
+ * One honest positive day is enough to paint; do not invent the rest.
+ */
 export function shouldShowReachChart(series: ReachPoint[] | null | undefined): boolean {
-  return sanitizeReachSeries(series).length > 0;
+  return hasPositiveReach(series);
 }
 
 /**

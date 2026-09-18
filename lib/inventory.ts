@@ -38,7 +38,7 @@ export const USERNAME_CAPTION = "Frozen Pitchkit handle.";
 export const PHOTO_CAPTION = "Avatar from the demo seed when present.";
 
 export const LAST_UPDATED_CAPTION =
-  "Seed media fetched_at. Not a live Graph timestamp.";
+  "Latest media fetched_at from seed or the Graph poll. Not Date.now().";
 
 export const CONTACT_CAPTION =
   "Typed hole (email door). Hidden when blank. Do not invent an address.";

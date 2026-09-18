@@ -1,11 +1,19 @@
+import type { RankedShare } from "./audience";
 import { engagementRate, typicalFromPosts } from "./engagement";
-import { isUtcDay, type ReachPoint } from "./reach-series";
+import { isUtcDay, shouldShowReachChart, type ReachPoint } from "./reach-series";
 import type { Media, User } from "./schema";
 
 export type { ReachPoint } from "./reach-series";
 export { isUtcDay };
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+
+export type KitAudience = {
+  country: RankedShare[];
+  city: RankedShare[];
+  age: RankedShare[];
+  gender: RankedShare[];
+};
 
 export type PublicKit = {
   user: User;
@@ -19,11 +27,14 @@ export type PublicKit = {
   reach_series?: ReachPoint[];
   typicalReach: number | null;
   typicalSaves: number | null;
+  /** Owner Insights only. Live Graph or empty — never EXAMPLE percents. */
+  audience?: KitAudience;
 };
 
 export type AssembleKitOptions = {
   /** Seed/example or poll-derived. Ignored when Insights are missing. */
   reach_series?: ReachPoint[];
+  audience?: KitAudience;
 };
 
 export function kitPath(handle: string) {
@@ -121,7 +132,14 @@ export function assemblePublicKit(
     hasInsights,
     typicalReach: typical.typicalReach,
     typicalSaves: typical.typicalSaves,
-    // Insights missing → omit (Chart hides). Do not invent 30 zeros.
-    ...(hasInsights ? { reach_series: options.reach_series ?? [] } : {}),
+    // Insights missing → omit (Chart hides). Unusable series → [] (Chart still hides).
+    ...(hasInsights
+      ? {
+          reach_series: shouldShowReachChart(options.reach_series)
+            ? (options.reach_series ?? [])
+            : [],
+        }
+      : {}),
+    ...(options.audience ? { audience: options.audience } : {}),
   };
 }

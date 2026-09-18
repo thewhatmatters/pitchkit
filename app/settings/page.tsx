@@ -4,12 +4,12 @@ import { AccountSettings } from "@/components/account-settings";
 import { AppFrame, OWNER_GRID_MAX } from "@/components/app-frame";
 import { SupportFooter } from "@/components/support-footer";
 import { HIDDEN_COOKIE, parseHiddenOverlay } from "@/lib/hidden-kit";
-import { insightsGate, parseSessionValue, SESSION_COOKIE } from "@/lib/session";
+import { insightsGate, resolveSession, SESSION_COOKIE } from "@/lib/session";
 import { hiddenOverlayForHandle, loadOwnerKit } from "@/lib/store";
 
 export default async function SettingsPage() {
   const cookieStore = await cookies();
-  const session = parseSessionValue(cookieStore.get(SESSION_COOKIE)?.value);
+  const session = await resolveSession(cookieStore.get(SESSION_COOKIE)?.value, "page");
   if (!insightsGate(session)) {
     redirect("/");
   }
