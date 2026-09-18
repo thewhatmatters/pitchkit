@@ -104,6 +104,17 @@ export const PATTERN_CONTACT_ROW_CLASS =
 
 export const PATTERN_BRAND_BODY_CLASS = "type-body text-fg text-muted py-[16px] px-3.5";
 
+/**
+ * Owner PitchKit segment empty state — interpolated from WMDS `73277bab`
+ * `pitchKitPlaceholder*` (`typographyClass` is not a package export).
+ */
+export const PATTERN_PLACEHOLDER_CLASS =
+  "col-span-full flex min-h-[60vh] flex-col items-center justify-center gap-3 text-center";
+
+export const PATTERN_PLACEHOLDER_TITLE_CLASS = "type-heading-1 text-fg tracking-tight";
+
+export const PATTERN_PLACEHOLDER_BODY_CLASS = "type-body text-fg max-w-md text-muted";
+
 /** Owner Insights / owner workspace `<main>` — same as shareable Pattern page. */
 export const CREATOR_INSIGHTS_PAGE_CLASS = PATTERN_PAGE_CLASS;
 

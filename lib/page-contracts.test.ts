@@ -39,7 +39,7 @@ describe("critical page contracts", () => {
     assert.match(page, /ShareableKit/);
     assert.match(page, /PATTERN_BRAND_CLASS/);
     assert.doesNotMatch(page, /sessionOwnsHandle|KitEdit|OwnerNav|AppFrame/);
-    assert.doesNotMatch(page, /MoreMenu|Hide from kit|label="Edit"/);
+    assert.doesNotMatch(page, /MoreMenu|Hide from kit|label="Edit"|Coming soon|PitchKitComingSoon/);
     assert.match(kit, /Verified Instagram summary/);
     assert.match(kit, /Selected posts/);
     assert.match(kit, /TextLink/);
@@ -47,7 +47,8 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(kit, /<MoreMenu|Hide from kit|Coming soon|variant="success"/);
     assert.match(edit, /label="Edit"/);
     assert.match(edit, /ShareableKit/);
-    assert.match(workspace, /KitEdit/);
+    assert.doesNotMatch(workspace, /KitEdit/);
+    assert.match(workspace, /PitchKitComingSoon/);
     assert.doesNotMatch(page, /KitInventory/);
   });
 
@@ -109,9 +110,11 @@ describe("critical page contracts", () => {
     assert.match(workspace, /OwnerNav/);
     assert.match(workspace, /useState<OwnerView>\("insights"\)/);
     assert.match(workspace, /<OwnerNav[\s\S]*\{view === "pitchkit"/);
+    assert.match(workspace, /PitchKitComingSoon/);
+    assert.doesNotMatch(workspace, /KitEdit|ShareableKit/);
     assert.doesNotMatch(workspace, /router\.(push|replace)|useRouter|usePathname|kitPath/);
     assert.match(insights, /OwnerWorkspace/);
-    assert.match(insights, /loadPublicKit/);
+    assert.doesNotMatch(insights, /loadPublicKit/);
     assert.match(insights, /insightsGate/);
     assert.doesNotMatch(insights, /<AppFrame/);
     assert.doesNotMatch(insights, /OWNER_GRID_MAX|OWNER_GRID_CLASS|min-h-dvh|py-6/);
@@ -236,6 +239,26 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(page, /Owner Insights\. Brands never see this page/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--creator-insights/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--shareable-pitchkit/);
+    assert.match(
+      read("components/pattern-tokens.ts"),
+      /PATTERN_PLACEHOLDER_CLASS =\s*"col-span-full flex min-h-\[60vh\] flex-col items-center justify-center gap-3 text-center"/,
+    );
+    assert.match(
+      read("components/pattern-tokens.ts"),
+      /PATTERN_PLACEHOLDER_TITLE_CLASS = "type-heading-1 text-fg tracking-tight"/,
+    );
+    assert.match(
+      read("components/pattern-tokens.ts"),
+      /PATTERN_PLACEHOLDER_BODY_CLASS = "type-body text-fg max-w-md text-muted"/,
+    );
+    assert.match(read("components/pitchkit-coming-soon.tsx"), /PITCHKIT_COMING_SOON_BADGE/);
+    assert.match(read("components/pitchkit-coming-soon.tsx"), /PITCHKIT_COMING_SOON_TITLE/);
+    assert.match(read("lib/copy.ts"), /PITCHKIT_COMING_SOON_BADGE = "Coming soon"/);
+    assert.match(read("lib/copy.ts"), /PITCHKIT_COMING_SOON_TITLE = "Shareable PitchKit"/);
+    assert.match(
+      read("lib/copy.ts"),
+      /verified insights, selected posts, contact details, and past-brand proof/,
+    );
     assert.match(read("app/layout.tsx"), /className="bg-body min-h-screen"/);
   });
 

@@ -46,6 +46,6 @@ Keep implementation details out of the map. Name only user paths, stable handles
 
 - [Connect session](./connect-session.md) — landing → Continue with Instagram → `/insights` with a session.
 - [Insights overview](./insights-overview.md) — PageHeader, four-up Stats, Reach chart, Audience bars. **Dry-run target.**
-- [Owner nav ↔ PitchKit](./owner-nav-pitchkit.md) — SegmentedControl Insights / PitchKit in-page on `/insights`.
+- [Owner nav ↔ PitchKit](./owner-nav-pitchkit.md) — SegmentedControl Insights / PitchKit in-page on `/insights` (PitchKit = Coming soon).
 - [Hide / restore proof](./hide-restore-proof.md) — MoreMenu hide → dialog → toast Undo; reload + anon kit; Restore. Mutates live KV.
 - [Public kit](./public-kit.md) — `/k/demo` without a session: kit card, six-or-fewer posts, no Insights chrome.
