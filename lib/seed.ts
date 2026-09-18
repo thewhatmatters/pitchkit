@@ -1,7 +1,7 @@
 import type { ReachPoint } from "./kit";
 import type { Detection, Media, User, WeeklyCount } from "./schema";
 
-/** Frozen Pitchkit handle for the in-repo seed. Live kits freeze at first connect. */
+/** Frozen Pitchkit handle for the in-repo seed. Live kits freeze at first connect by default (WHA-313 optional reconnect update). */
 export const DEMO_HANDLE = "demo";
 
 export const DEMO_USER_ID = "00000000-0000-4000-8000-000000000001";

@@ -34,6 +34,6 @@ Preconditions:
 
 - The stub is not an Instagram token. Seed tokens stay null. A live Meta dialog would be a product regression.
 - `/insights` without `pitchkit_session` redirects home. Do not treat a landing screenshot as a connected session.
-- Reconnect re-sets the same seed session. It does not create a second handle.
+- Reconnect re-sets the same seed session. It does not create a second handle. WHA-313 optional URL update is live OAuth only.
 - `GET /auth/instagram` also sets the cookie. Using that URL skips the disclosure — do not call the disclosure sub-feature verified.
 - Sign out (`/auth/sign-out`) clears the session. A later owner recipe must `connect` again.

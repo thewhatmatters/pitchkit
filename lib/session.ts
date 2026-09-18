@@ -6,7 +6,11 @@ export const SESSION_COOKIE = "pitchkit_session";
 /** httpOnly hide overlay until Hyperdrive writes `media.hidden_from_kit_at`. */
 export const HIDDEN_COOKIE = "pitchkit_hidden";
 
-/** Stub and future live Instagram Login share this path. FE posts here; cookie write stays here. */
+/**
+ * Stub and future live Instagram Login share this path. FE posts here; cookie write stays here.
+ * WHA-313: live reconnect may offer optional kit URL update when IG username ≠ users.handle.
+ * Stub Connect stays seed `demo` — no rename UI.
+ */
 export const AUTH_CONNECT_PATH = "/auth/instagram";
 
 /** FE posts here; cookie clear stays here. */
@@ -102,6 +106,7 @@ export function sessionRedirect(request: Request, path: string, setCookie: strin
   });
 }
 
+/** Seed `demo` only. WHA-313 optional "Update kit URL to @{new}" waits on live OAuth. */
 export function stubConnect(request: Request): Response {
   return sessionRedirect(request, "/insights", sessionSetCookieHeader(isHttpsRequest(request)));
 }

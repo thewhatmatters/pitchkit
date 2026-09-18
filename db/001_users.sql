@@ -1,5 +1,6 @@
 -- users — one row per creator. Columns: DATA.md.
--- Handle is frozen at first successful connect. IG rename does not move our URL.
+-- Handle is frozen at first successful connect by default (WHA-313).
+-- Optional reconnect update if IG username differs; default = keep URL.
 -- token_encrypted / refresh_encrypted are ciphertext. TOKEN_KEY is a Workers
 -- secret and is never stored in SQL or git. Seed rows leave tokens null.
 
