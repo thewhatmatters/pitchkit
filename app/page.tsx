@@ -2,7 +2,7 @@ import { AppFrame } from "@/components/app-frame";
 import { ConnectButton } from "@/components/connect-button";
 import { PageCard, PageCopy } from "@/components/page-card";
 import { SupportFooter } from "@/components/support-footer";
-import { DISCLOSURE, PERSONAL_FAIL, PROFESSIONAL_NOTE, STUB_CONNECT } from "@/lib/copy";
+import { DEMO_SESSION_NOTE, DISCLOSURE, PERSONAL_FAIL, PROFESSIONAL_NOTE } from "@/lib/copy";
 
 type LandingProps = {
   searchParams: Promise<{ error?: string }>;
@@ -29,7 +29,7 @@ export default async function LandingPage({ searchParams }: LandingProps) {
         <form action="/auth/instagram" method="post">
           <ConnectButton />
         </form>
-        <PageCopy>{STUB_CONNECT}</PageCopy>
+        <PageCopy>{DEMO_SESSION_NOTE}</PageCopy>
       </PageCard>
       <SupportFooter />
     </AppFrame>

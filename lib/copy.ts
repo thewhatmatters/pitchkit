@@ -15,8 +15,8 @@ export const EMPTY_GRID = "Pulling your grid…";
 export const STUB_DISCONNECT =
   "Disconnect deletes your kit and the copies we stored. That control does not run yet.";
 
-export const STUB_CONNECT =
-  "Stub connect — no Instagram token. Sets a Pitchkit session for demo and continues to Insights.";
+/** Quiet demo honesty — under Continue, not in the hero. */
+export const DEMO_SESSION_NOTE = "Opens the demo Insights session.";
 
 /** Quiet Insights cue — cookie-gated page. Do not shout at brands. */
 export const INSIGHTS_PRIVATE = "Private to you";

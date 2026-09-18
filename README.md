@@ -24,6 +24,8 @@ On the connect screen, before they tap Instagram:
 
 > We only use your public posts and Instagram Insights to build your media kit. We don’t read DMs, who you follow, or unfollowers. Disconnect deletes your kit and the copies we stored.
 
+Landing stays product copy: disclosure, Professional note, **Continue with Instagram**. A quiet demo-session line may sit under the button. Do not lead with stub-token language.
+
 ---
 
 ## Where things live

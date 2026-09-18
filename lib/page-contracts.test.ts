@@ -12,9 +12,16 @@ describe("critical page contracts", () => {
   it("landing Continue posts stub Instagram auth", () => {
     const page = read("app/page.tsx");
     const button = read("components/connect-button.tsx");
+    const copy = read("lib/copy.ts");
     assert.match(button, /Continue with Instagram/);
     assert.match(page, new RegExp(`action="${AUTH_CONNECT_PATH}"`));
     assert.match(page, /method="post"/);
+    assert.match(page, /DISCLOSURE/);
+    assert.match(page, /PROFESSIONAL_NOTE/);
+    assert.match(page, /DEMO_SESSION_NOTE/);
+    assert.match(copy, /Opens the demo Insights session/);
+    assert.doesNotMatch(page, /STUB_CONNECT|Stub connect|no Instagram token/);
+    assert.doesNotMatch(copy, /STUB_CONNECT|Stub connect|no Instagram token/);
   });
 
   it("gates /insights on the session cookie", () => {
