@@ -381,6 +381,8 @@ describe("critical page contracts", () => {
     );
     assert.doesNotMatch(read("lib/copy.ts"), /Not enough reach history yet|invent a chart from a/);
     assert.match(chart, /noData=\{\{ label: REACH_NO_DATA_LABEL \}\}/);
+    assert.match(chart, /as ComponentProps<typeof Chart\.Cartesian>/);
+    assert.match(chart, /function ReachCartesianChart/);
     assert.match(chart, /seriesKeys=\{\["reach"\]\}/);
     assert.match(read("lib/copy.ts"), /REACH_NO_DATA_LABEL = "No data"/);
     assert.match(read("lib/reach-series.ts"), /fillReachCalendarGaps/);

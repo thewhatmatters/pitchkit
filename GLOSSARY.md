@@ -41,7 +41,7 @@ People who bookmarked a typical post to come back. Intent, not applause. Stronge
 **30-day chart** — Insights only; trend object, not a fifth Stat.
 Reach over the last 30 days so a brand (and the creator before they share) can see typical vs a spike. Never paint an empty chart as zeros. This is **not** the same number as typical post reach.
 - Brand ~30s: typical vs a spike before they share.
-- Hide: until Insights (graph-unavailable omits the optional chart region). Empty / thin / all-zero with Insights → keep the Reach Card and show **No reach data yet**. Empty > zeros. Partial holes in a plottable 30-day window use Chart.Cartesian `noData` hatch (`null` / omitted days; `0` is plotted). Do not invent hatch UI.
+- Hide: until Insights (graph-unavailable omits the optional chart region). Empty / thin / all-zero with Insights → keep the Reach Card and show **No reach data yet**. Empty > zeros. Partial holes in a plottable 30-day window use Chart.Cartesian `noData` hatch (`null` / omitted days; `0` is plotted). Keep the Show-code label; do not invent hatch UI.
 - Graph (live, Instagram Login): user insights `reach` `time_series` (`GET /{ig-user-id}/insights?metric=reach&period=day&metric_type=time_series`) — account unique reach (includes stories + ads). **Different number** from typical post media insights `reach`.
 - Persist for FE (kit payload, not a SQL table): `reach_series: { day: string /* YYYY-MM-DD UTC */, reach: number | null }[]`. Empty, all-zero, or too short with Insights → insufficient-reach empty band. No Insights → omit. `null` / omitted calendar days in a plottable window hatch; `0` plots. Live poll when a token is present; seed/example only for the tokenless demo session. Do not invent `weekly_counts` columns.
 
