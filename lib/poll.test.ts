@@ -133,6 +133,12 @@ describe("Insights poll", () => {
     assert.equal(legacy?.insights_fetched_at, null);
     assert.deepEqual(result.snapshot.reach_series, []);
     assert.deepEqual(result.snapshot.audience.country, []);
+    assert.deepEqual(result.snapshot.audience, {
+      country: [],
+      city: [],
+      age: [],
+      gender: [],
+    });
   });
 
   it("loadOwnerKit stays on seed when secrets and token are missing", async () => {
@@ -143,6 +149,13 @@ describe("Insights poll", () => {
     assert.equal(owner.user.handle, DEMO_HANDLE);
     assert.equal(owner.hasInsights, true);
     assert.ok(owner.reach_series && owner.reach_series.length === 30);
-    assert.deepEqual(owner.audience?.country, []);
+    // Tokenless seed may keep example reach_series; audience stays empty
+    // (insufficient-data Card), never EXAMPLE country/city/age/gender mixes.
+    assert.deepEqual(owner.audience, {
+      country: [],
+      city: [],
+      age: [],
+      gender: [],
+    });
   });
 });

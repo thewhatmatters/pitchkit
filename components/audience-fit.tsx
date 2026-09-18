@@ -1,14 +1,20 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import {
   PATTERN_AUDIENCE_CARD_CLASS,
+  PATTERN_AUDIENCE_EMPTY_WELL_CLASS,
   PATTERN_AUDIENCE_SECTION_CLASS,
   PATTERN_AUDIENCE_WELL_CLASS,
+  PATTERN_EMPTY_BODY_CLASS,
+  PATTERN_EMPTY_TITLE_CLASS,
+  PATTERN_REACH_EMPTY_COPY_CLASS,
   PATTERN_REACH_CHART_MIN_HEIGHT,
   PATTERN_SECTION_EYEBROW_CLASS,
 } from "@/components/pattern-tokens";
 import { Card, Chart, cardSubtitleClasses, cardTitleClasses } from "@/components/wmds";
-import { shouldShowAudienceMix, visibleAudienceMix, type RankedShare } from "@/lib/audience";
+import { audienceFitSurface, visibleAudienceMix, type RankedShare } from "@/lib/audience";
+import { AUDIENCE_INSUFFICIENT_BODY, AUDIENCE_INSUFFICIENT_TITLE } from "@/lib/copy";
 
 type AudienceFitProps = {
   country?: RankedShare[] | null;
@@ -39,8 +45,9 @@ function AudienceSection({ title, items }: { title: string; items: { label: stri
 }
 
 /**
- * Owner Insights audience Card. Hide the whole Card when every mix is empty.
- * Never paint zeros. Chart.RankedBars only — no invented bars.
+ * Owner Insights audience Card. Keep the Card + header when mixes are empty
+ * (insufficient-data well from Reach empty tokens). Never EXAMPLE percents.
+ * Retrieving after chrome is up is Header + Chart.Loading — not this empty well.
  */
 export function AudienceFit({
   country,
@@ -53,15 +60,8 @@ export function AudienceFit({
   const cities = toBars(city);
   const ages = toBars(age);
   const genders = toBars(gender);
-  const visible =
-    shouldShowAudienceMix(country) ||
-    shouldShowAudienceMix(city) ||
-    shouldShowAudienceMix(age) ||
-    shouldShowAudienceMix(gender);
-
-  if (!visible) {
-    return null;
-  }
+  const surface = audienceFitSurface({ country, city, age, gender });
+  const slot = retrieving ? "retrieving" : surface === "bars" ? "bars" : "empty";
 
   return (
     <Card
@@ -69,6 +69,7 @@ export function AudienceFit({
       shape="rounded"
       bodyTerminal
       className={PATTERN_AUDIENCE_CARD_CLASS}
+      data-audience-slot={slot}
       aria-busy={retrieving || undefined}
       aria-label={retrieving ? "Retrieving audience fit" : undefined}
     >
@@ -84,6 +85,16 @@ export function AudienceFit({
         {retrieving ? (
           <div className={PATTERN_AUDIENCE_WELL_CLASS}>
             <Chart.Loading minHeight={PATTERN_REACH_CHART_MIN_HEIGHT} />
+          </div>
+        ) : surface === "empty" ? (
+          <div
+            className={PATTERN_AUDIENCE_EMPTY_WELL_CLASS}
+            style={{ minHeight: PATTERN_REACH_CHART_MIN_HEIGHT } satisfies CSSProperties}
+          >
+            <div className={PATTERN_REACH_EMPTY_COPY_CLASS}>
+              <h3 className={PATTERN_EMPTY_TITLE_CLASS}>{AUDIENCE_INSUFFICIENT_TITLE}</h3>
+              <p className={PATTERN_EMPTY_BODY_CLASS}>{AUDIENCE_INSUFFICIENT_BODY}</p>
+            </div>
           </div>
         ) : (
           <div className={PATTERN_AUDIENCE_WELL_CLASS}>

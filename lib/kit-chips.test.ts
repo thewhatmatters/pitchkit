@@ -1,6 +1,18 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { shouldShowAudienceMix, visibleAudienceMix } from "./audience";
+import {
+  audienceFitSurface,
+  resolveOwnerAudience,
+  SEED_AUDIENCE,
+  shouldShowAudienceMix,
+  visibleAudienceMix,
+} from "./audience";
+import {
+  EXAMPLE_AGE_MIX,
+  EXAMPLE_CITY_MIX,
+  EXAMPLE_COUNTRY_MIX,
+  EXAMPLE_GENDER_MIX,
+} from "./inventory";
 import {
   shouldShowPastBrands,
   sourcedContact,
@@ -37,12 +49,58 @@ describe("past brand chips", () => {
 });
 
 describe("audience mix hide-empty", () => {
-  it("hides empty mixes and drops zero rows", () => {
+  it("hides empty mix bars and drops invented-zero rows", () => {
     assert.equal(shouldShowAudienceMix([]), false);
     assert.equal(shouldShowAudienceMix([{ label: "US", percent: 0 }]), false);
     assert.deepEqual(visibleAudienceMix([{ label: "US", percent: 37 }]), [
       { label: "US", percent: 37 },
     ]);
+  });
+
+  it("keeps the owner Audience Card surface when Graph / seed mixes are empty", () => {
+    assert.equal(audienceFitSurface(null), "empty");
+    assert.equal(audienceFitSurface(undefined), "empty");
+    assert.equal(audienceFitSurface(SEED_AUDIENCE), "empty");
+    assert.equal(audienceFitSurface(resolveOwnerAudience(null)), "empty");
+    assert.equal(
+      audienceFitSurface({
+        country: EXAMPLE_COUNTRY_MIX,
+        city: [],
+        age: [],
+        gender: [],
+      }),
+      "bars",
+    );
+  });
+
+  it("live/empty owner audience never resolves to EXAMPLE labels", () => {
+    const liveEmpty = resolveOwnerAudience({
+      country: [],
+      city: [],
+      age: [],
+      gender: [],
+    });
+    const omitted = resolveOwnerAudience(null);
+    const seed = resolveOwnerAudience(SEED_AUDIENCE);
+    const exampleLabels = [
+      ...EXAMPLE_COUNTRY_MIX,
+      ...EXAMPLE_CITY_MIX,
+      ...EXAMPLE_AGE_MIX,
+      ...EXAMPLE_GENDER_MIX,
+    ].map((row) => row.label);
+
+    for (const mixes of [liveEmpty, omitted, seed]) {
+      const labels = [
+        ...mixes.country,
+        ...mixes.city,
+        ...mixes.age,
+        ...mixes.gender,
+      ].map((row) => row.label);
+      assert.deepEqual(labels, []);
+      for (const label of exampleLabels) {
+        assert.equal(labels.includes(label), false, `empty audience must not paint ${label}`);
+      }
+    }
   });
 });
 

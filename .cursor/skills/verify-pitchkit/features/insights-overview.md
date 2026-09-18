@@ -1,6 +1,6 @@
 # Insights overview
 
-Insights overview is the owner home after connect: PageHeader **Insights**, a four-up performance summary, the 30-day Reach chart Card when a series exists (or the insufficient-reach empty band when Insights exist but the series is thin/zero), and Audience RankedBars when mixes are present.
+Insights overview is the owner home after connect: PageHeader **Insights**, a four-up performance summary, the 30-day Reach chart Card when a series exists (or the insufficient-reach empty band when Insights exist but the series is thin/zero), and Audience RankedBars when mixes are present (or the insufficient-audience empty well when mixes are empty).
 
 ## Sub-features
 
@@ -8,8 +8,9 @@ Insights overview is the owner home after connect: PageHeader **Insights**, a fo
 - `insights-stats` shows Followers, Engagement rate, Typical reach, and Saves on the four-up.
 - `insights-reach-chart` shows the outlined Reach Card and `30-day account reach` plot (WHA-310 well).
 - `insights-audience` shows Audience fit RankedBars when mixes are non-empty.
+- `insights-insufficient-audience` keeps the Audience Card with **Not enough audience data yet** when mixes are empty after Graph or on the tokenless seed (not Skeleton, not Chart.Loading, not EXAMPLE %, not omit-card).
 - `insights-insufficient-reach` keeps the Reach Card with **No reach data yet** when Insights exist but the series is missing / thin / all-zero (not Skeleton, not Chart.Loading, not omit-band). Empty well is centered. Stats / Audience / proof may still show.
-- `insights-graph-unavailable` omits the optional Reach / empty audience regions when Graph never returned Insights.
+- `insights-graph-unavailable` omits the optional Reach region when Graph never returned Insights.
 - `insights-loading` is the page-freeze skeleton at `/insights?grid=pulling` (Stat loading + Skeleton wells + six proof placeholders).
 - `insights-retrieving` is Header + Chart.Loading after chrome is up (`/insights?grid=retrieving` or Refresh).
 
@@ -30,7 +31,7 @@ Preconditions:
 - **Open Insights.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /insights`. Path is `/insights`. Heading **Insights**. Copy includes **Private to you** and **Engagement rate = (likes + comments + saves + shares) ÷ reach.**
 - **Four-up Stats.** The group `Instagram performance summary` lists **Followers**, **Engagement rate**, **Typical reach**, and **Saves**. Seed complete-kit values: Followers `10,000`, Engagement rate `9.5%`, Typical reach `2,175`, Saves `42`. Live may already have a Hidden proof post (`N shown` < 6); typicals stay on the six-or-fewer still shown. Still require the four labels and no “ER”.
 - **Reach chart.** A Card titled **Reach over 30 days** is present (`[data-chart-slot="reach"]`). The plot waits for a real host width inside the occupant well (WHA-310). Screenshot/snapshot/eval settle for `[aria-label="30-day account reach"]` in the **same** process — a standalone `wait` cannot help the next command. Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs eval --js "document.querySelector('[aria-label=\"30-day account reach\"]') !== null"` (expect `true`) and `data-x-ticks` not `"0"`. Occupant well plus painted area both visible.
-- **Audience.** When mixes exist, **Audience fit** is visible with RankedBars named **Audience by countries**, **Audience by cities**, **Audience by age**, and **Audience by gender**. If a mix is empty, that section is absent (no zero bars).
+- **Audience.** When mixes exist, **Audience fit** is visible with RankedBars named **Audience by countries**, **Audience by cities**, **Audience by age**, and **Audience by gender**. If every mix is empty, the Card stays with **Not enough audience data yet** (`[data-audience-slot="empty"]`) — no EXAMPLE country/city/age/gender percents, no zero bars. A single empty mix hides that section only.
 - **Gap tokens.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs eval --js "getComputedStyle(document.querySelector('.grid-page')).getPropertyValue('--grid-max').trim()"` (expect `1140px`) and the same for `--grid-column-gap` (expect `8px`). Pattern canvas does not set `--grid-gutter` on this `<main>`.
 - **Page surface.** `document.body` class list includes `bg-body` and `min-h-screen`. Body and `.grid-page` share the same computed background — no white margins around a gray column.
 - **Proof.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs screenshot --path artifacts/insights-overview/overview.png` and `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs snapshot --aria --path artifacts/insights-overview/overview.aria.txt`. Both identify Pitchkit, Insights, the four Stat labels, and the reach chart name.
@@ -40,7 +41,8 @@ Preconditions:
 - Brands never see this page. A `--fresh` `/insights` redirects to `/`.
 - Public `/k/demo` omits `reach_series`. Do not expect this chart on the public kit.
 - Insufficient reach keeps the Reach Card and shows **No reach data yet** / **Connect more Instagram activity to plot the last 30 days.** Omitting that Card when Insights exist is a fail. A title-only Card without that empty copy is a fail. Skeleton / Chart.Loading in that empty well is a fail. Do not invent hatched in-series gaps.
-- Graph-unavailable still omits the optional Reach region — do not invent the empty band when Insights never landed.
+- Empty audience keeps the Audience Card and shows **Not enough audience data yet**. Omitting that Card, painting EXAMPLE mixes, or putting Skeleton / Chart.Loading in that empty well is a fail.
+- Graph-unavailable still omits the optional Reach region — do not invent the empty reach band when Insights never landed.
 - Spell **Engagement rate**. A label “ER” is a fail.
 - `/insights?grid=pulling` is the first-connect skeleton Pattern. `/insights?grid=retrieving` is Header + Chart.Loading. Default dry-run uses `/insights` with seed ready.
 - Do not invent period-over-period trends. Seed has none.

@@ -40,5 +40,5 @@ Operator dry-run: `IG_USER_TOKEN` on Insights poll when the user row has no encr
 
 - Typical reach / saves / Engagement rate: posts with Insights `reach` &gt; 0 only. Pre-conversion 400s are omitted from medians.
 - Chart: Insights + unusable series → insufficient-reach empty band (**No reach data yet**). Graph-unavailable omits the optional region. No “Graph data” badge. Do not invent hatched in-series gaps.
-- Audience: live demographics or empty. Never `EXAMPLE_*` percents.
+- Audience: live demographics or keep the Card with insufficient-data empty. Never `EXAMPLE_*` percents. Never `audience ?? SEED_AUDIENCE`.
 - Public `/k/demo`: seed, no Insights.

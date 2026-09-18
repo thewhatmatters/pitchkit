@@ -277,6 +277,14 @@ describe("reach_series kit payload", () => {
       Object.keys(seedOwnerMedia[0]!).sort(),
       [...MEDIA_COLUMNS].sort(),
     );
+    // Seed/demo owner: example reach_series only. Audience stays empty so
+    // Insights can keep the Card with insufficient-data copy — never EXAMPLE %.
+    assert.deepEqual(owner.audience, {
+      country: [],
+      city: [],
+      age: [],
+      gender: [],
+    });
   });
 
   it("public kit filters hidden media before selecting the six; owner Insights keeps the row", async () => {

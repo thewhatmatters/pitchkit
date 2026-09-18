@@ -57,6 +57,9 @@ export const PATTERN_REACH_CHART_MIN_HEIGHT = 344;
 export const PATTERN_REACH_EMPTY_WELL_CLASS =
   `${PATTERN_CARD_WELL_CLASS} items-center justify-center text-center`;
 
+/** Audience empty well — same Reach insufficient tokens until WMDS ships a dedicated Pattern. */
+export const PATTERN_AUDIENCE_EMPTY_WELL_CLASS = PATTERN_REACH_EMPTY_WELL_CLASS;
+
 export const PATTERN_EMPTY_COPY_CLASS = "flex max-w-lg flex-col gap-2";
 
 /** Centered title/body stack for the Reach empty well — unavailable empty copy stays left-aligned. */

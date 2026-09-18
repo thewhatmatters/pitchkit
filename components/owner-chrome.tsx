@@ -16,7 +16,7 @@ import { Button, PageHeader, toast } from "@/components/wmds";
 import { InsightsStats } from "@/components/insights-stats";
 import { ProofPosts } from "@/components/proof-posts";
 import { ReachChart } from "@/components/reach-chart";
-import { SEED_AUDIENCE } from "@/lib/audience";
+import { resolveOwnerAudience } from "@/lib/audience";
 import {
   INSIGHTS_PRIVATE,
   STUB_DISCONNECT,
@@ -76,7 +76,7 @@ export function OwnerChrome({
   const [refreshing, setRefreshing] = useState(false);
   const retrieving = retrievingProp || refreshing;
   const refreshed = formatRefreshedAt(inventoryLastUpdated(posts));
-  const mixes = audience ?? SEED_AUDIENCE;
+  const mixes = resolveOwnerAudience(audience);
 
   async function copyKitLink() {
     const url = `${window.location.origin}${kitPath(user.handle)}`;
