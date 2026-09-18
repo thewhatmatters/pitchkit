@@ -188,6 +188,8 @@ describe("critical page contracts", () => {
     assert.match(layout, /<AppToaster \/>/);
     assert.doesNotMatch(read("components/owner-chrome.tsx"), /<Toaster/);
     assert.doesNotMatch(read("components/proof-posts.tsx"), /<Toaster/);
+    assert.doesNotMatch(read("components/insights-loading.tsx"), /<Toaster/);
+    assert.doesNotMatch(read("components/reach-chart.tsx"), /<Toaster/);
   });
 
   it("Insights product toasts pass title and description", () => {
@@ -289,18 +291,26 @@ describe("critical page contracts", () => {
     assert.match(chart, /Chart\.Cartesian/);
     assert.match(chart, /variant="outlined"/);
     assert.match(chart, /Reach over 30 days/);
+    assert.match(chart, /REACH_INSUFFICIENT_TITLE/);
+    assert.match(chart, /reachChartSurface/);
+    assert.match(chart, /hasInsights/);
+    assert.match(chart, /retrieving/);
+    assert.match(chart, /Chart\.Loading/);
+    assert.match(chart, /data-chart-slot=\{slot\}/);
     assert.doesNotMatch(chart, /Graph data/);
     assert.doesNotMatch(chrome, /EXAMPLE_COUNTRY_MIX|EXAMPLE_AGE_MIX/);
     assert.match(chrome, /Refresh/);
     assert.match(chrome, /name="refresh"/);
+    assert.match(chrome, /InsightsLoading/);
+    assert.match(chrome, /setRefreshing\(true\)/);
     assert.match(chart, /typicalReach/);
     assert.match(chart, /key: "typical"/);
     assert.match(chart, /Chart\.Legend/);
     assert.match(chart, /animate="none"/);
     assert.match(read("components/owner-chrome.tsx"), /typicalReach=\{typicalReach\}/);
     assert.match(read("components/wmds.ts"), /chartMaxTicksForWidth/);
-    assert.match(read("package.json"), /wmds#75f8a41e8b131906378b340a4106a486ddd5173f/);
-    assert.doesNotMatch(read("package.json"), /3f13630|73277bab/);
+    assert.match(read("package.json"), /wmds#55944edfc8039b6682882c65d1a956b1e51fba21/);
+    assert.doesNotMatch(read("package.json"), /75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab/);
     assert.match(page, /OwnerWorkspace/);
     assert.match(read("components/owner-workspace.tsx"), /CREATOR_INSIGHTS_PAGE_CLASS/);
     assert.match(read("components/owner-workspace.tsx"), /CREATOR_INSIGHTS_HEADER_BAND_CLASS/);
@@ -311,7 +321,34 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(read("components/owner-nav.tsx"), /className="[^"]*w-full/);
     assert.doesNotMatch(page, /Owner Insights\. Brands never see this page/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--creator-insights/);
+    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--creator-insights-loading/);
+    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--insufficient-reach-data/);
+    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--graph-data-unavailable/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--shareable-pitchkit/);
+    assert.match(read("components/pattern-tokens.ts"), /PATTERN_REACH_EMPTY_WELL_CLASS/);
+    assert.match(read("components/pattern-tokens.ts"), /PATTERN_HEADER_SKELETON_COPY_CLASS/);
+    assert.match(read("components/pattern-tokens.ts"), /PATTERN_REACH_CHART_MIN_HEIGHT = 344/);
+    assert.match(read("lib/copy.ts"), /REACH_INSUFFICIENT_TITLE = "Not enough reach history yet"/);
+    assert.match(read("lib/copy.ts"), /missing, thin, or all-zero series/);
+    assert.match(read("lib/reach-series.ts"), /reachChartSurface/);
+    assert.match(read("app/insights/page.tsx"), /grid === "retrieving"/);
+    assert.match(read("app/insights/page.tsx"), /grid !== "pulling"/);
+
+    const loading = read("components/insights-loading.tsx");
+    assert.match(loading, /label="Followers" value="" loading/);
+    assert.match(loading, /label="Engagement rate" value="" loading/);
+    assert.match(loading, /label="Typical reach" value="" loading/);
+    assert.match(loading, /label="Saves" value="" loading/);
+    assert.match(loading, /aria-label="Loading reach over 30 days"/);
+    assert.match(loading, /aria-label="Loading audience fit"/);
+    assert.match(loading, /aria-label="Loading recent proof"/);
+    assert.match(loading, /proofSkeletonCount = 6/);
+    assert.match(loading, /<Skeleton/);
+    assert.doesNotMatch(loading, /<Chart|Chart\.Loading|<Toaster/);
+    assert.doesNotMatch(loading, /ExampleGridControls|GridOverlay/);
+    assert.doesNotMatch(loading, /Not enough reach history yet/);
+    assert.doesNotMatch(chrome, /<Toaster/);
+    assert.doesNotMatch(read("components/insights-loading.tsx"), /<Toaster/);
     assert.match(
       read("components/pattern-tokens.ts"),
       /PATTERN_PLACEHOLDER_CLASS =\s*"col-span-full flex min-h-\[60vh\] flex-col items-center justify-center gap-3 text-center"/,

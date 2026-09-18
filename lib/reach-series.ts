@@ -21,7 +21,7 @@ export function isUtcDay(value: string): boolean {
 
 /**
  * Keep only honest points. Do not invent missing days or lag placeholders.
- * Empty / omit → hide the Chart (never paint zeros).
+ * Unusable series never become a painted Chart (never paint zeros).
  */
 export function sanitizeReachSeries(series: ReachPoint[] | null | undefined): ReachPoint[] {
   if (!Array.isArray(series) || series.length === 0) {
@@ -42,16 +42,34 @@ export function hasPositiveReach(series: ReachPoint[] | null | undefined): boole
 }
 
 /**
- * Hide when empty, omitted, invalid-only, or all-zero (sparse Graph days).
- * One honest positive day is enough to paint; do not invent the rest.
+ * Paint Cartesian only when there is at least one honest positive day.
+ * Missing / thin / all-zero is not a chart — see `reachChartSurface`.
  */
 export function shouldShowReachChart(series: ReachPoint[] | null | undefined): boolean {
   return hasPositiveReach(series);
 }
 
+export type ReachChartSurface = "chart" | "empty" | "omit";
+
 /**
- * Plot ink inside the occupant well. Empty/omit series still hides the
- * whole band. Host width 0 keeps the Card + well chrome and skips Cartesian.
+ * Owner Insights Reach Card.
+ * - `omit` — Graph-unavailable (`examples-pitchkit--graph-data-unavailable`): Insights never landed.
+ * - `empty` — insufficient reach (`examples-pitchkit--insufficient-reach-data`): series missing / thin / all-zero.
+ * - `chart` — at least one honest positive day.
+ */
+export function reachChartSurface(
+  series: ReachPoint[] | null | undefined,
+  hasInsights: boolean,
+): ReachChartSurface {
+  if (!hasInsights) {
+    return "omit";
+  }
+  return shouldShowReachChart(series) ? "chart" : "empty";
+}
+
+/**
+ * Plot ink inside the occupant well. Host width 0 skips Cartesian.
+ * Insufficient-reach still keeps the Card; this only gates the plot.
  */
 export function shouldRenderReachChartBand(
   series: ReachPoint[] | null | undefined,

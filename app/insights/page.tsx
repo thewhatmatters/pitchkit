@@ -18,6 +18,7 @@ export default async function InsightsPage({ searchParams }: InsightsProps) {
   }
 
   const gridReady = grid !== "pulling";
+  const retrieving = grid === "retrieving";
   const overlay = await hiddenOverlayForHandle(
     session.handle,
     parseHiddenOverlay(cookieStore.get(HIDDEN_COOKIE)?.value),
@@ -41,6 +42,7 @@ export default async function InsightsPage({ searchParams }: InsightsProps) {
       hasInsights={ownerKit.hasInsights}
       audience={ownerKit.audience}
       gridReady={gridReady}
+      retrieving={retrieving}
     />
   );
 }

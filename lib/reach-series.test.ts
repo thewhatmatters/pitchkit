@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import {
   REACH_CHART_DATE_TICK,
   reachChartDateTickCount,
+  reachChartSurface,
   reachSeriesToChartPoints,
   sanitizeReachSeries,
   shouldRenderReachChartBand,
@@ -28,7 +29,7 @@ describe("reach_series chart hide rules", () => {
     assert.equal(utcDayFromGraphEndTime("2026-09-07T00:00:00-0500"), "2026-09-07");
   });
 
-  it("hides the Chart when series is empty, omitted, or only invalid points", () => {
+  it("does not paint Cartesian when series is empty, omitted, or only invalid points", () => {
     assert.equal(shouldShowReachChart(undefined), false);
     assert.equal(shouldShowReachChart(null), false);
     assert.equal(shouldShowReachChart([]), false);
@@ -47,6 +48,23 @@ describe("reach_series chart hide rules", () => {
     assert.deepEqual(sanitizeReachSeries([]), []);
     assert.equal(shouldRenderReachChartBand([], 640), false);
     assert.equal(shouldRenderReachChartBand(undefined, 640), false);
+  });
+
+  it("keeps the Reach Card empty band when Insights exist but the series is unusable", () => {
+    assert.equal(reachChartSurface([], true), "empty");
+    assert.equal(reachChartSurface(undefined, true), "empty");
+    assert.equal(reachChartSurface(null, true), "empty");
+    assert.equal(
+      reachChartSurface([{ day: "2026-09-01", reach: 0 }, { day: "2026-09-02", reach: 0 }], true),
+      "empty",
+    );
+    assert.equal(reachChartSurface([{ day: "2026-09-01", reach: 12 }], true), "chart");
+  });
+
+  it("omits the optional Reach region when Graph Insights never landed", () => {
+    assert.equal(reachChartSurface([], false), "omit");
+    assert.equal(reachChartSurface(undefined, false), "omit");
+    assert.equal(reachChartSurface([{ day: "2026-09-01", reach: 12 }], false), "omit");
   });
 
   it("keeps honest points and does not invent missing days", () => {

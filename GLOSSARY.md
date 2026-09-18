@@ -41,9 +41,9 @@ People who bookmarked a typical post to come back. Intent, not applause. Stronge
 **30-day chart** — Insights only; trend object, not a fifth Stat.
 Reach over the last 30 days so a brand (and the creator before they share) can see typical vs a spike. Never paint an empty chart as zeros. This is **not** the same number as typical post reach.
 - Brand ~30s: typical vs a spike before they share.
-- Hide: until Insights. Empty > zeros.
+- Hide: until Insights (graph-unavailable omits the optional chart region). Empty / thin / all-zero with Insights → keep the Reach Card and show **Not enough reach history yet**. Empty > zeros.
 - Graph (live, Instagram Login): user insights `reach` `time_series` (`GET /{ig-user-id}/insights?metric=reach&period=day&metric_type=time_series`) — account unique reach (includes stories + ads). **Different number** from typical post media insights `reach`.
-- Persist for FE (kit payload, not a SQL table): `reach_series: { day: string /* YYYY-MM-DD UTC */, reach: number }[]`. Empty, all-zero, or too short → hide Chart. Live poll when a token is present; seed/example only for the tokenless demo session. Do not invent `weekly_counts` columns.
+- Persist for FE (kit payload, not a SQL table): `reach_series: { day: string /* YYYY-MM-DD UTC */, reach: number }[]`. Empty, all-zero, or too short with Insights → insufficient-reach empty band. No Insights → omit. Live poll when a token is present; seed/example only for the tokenless demo session. Do not invent `weekly_counts` columns.
 
 **Six posts** — ranked saves → reach → likes.
 Recent work a brand can match to the public grid. Likes-first would look like a vanity kit. Insights UI label: **Recent proof** (`Tab.Group` display sort Reach / Engagement / Saves; kit math stays this rank).
