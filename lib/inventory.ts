@@ -11,7 +11,7 @@ export const INVENTORY_INTRO =
 
 export const EXAMPLE_DATA_NOTE = "example data, not live Instagram";
 
-export const ENGAGEMENT_FORMULA = "(likes + comments) ÷ followers";
+export const ENGAGEMENT_FORMULA = "(likes + comments + saves + shares) ÷ reach";
 
 export const TYPICAL_REACH_CAPTION = "Unique accounts who usually see a post.";
 
@@ -89,7 +89,8 @@ export type InventoryItemId = (typeof INVENTORY_ITEM_IDS)[number];
  * Tooltip = first sentence. Do not invent if a term is missing.
  */
 export const GLOSSARY_FIRST_SENTENCE: Partial<Record<InventoryItemId, string>> = {
-  "engagement-rate": "Share of followers who interact with a typical post.",
+  "engagement-rate":
+    "Share of reach who interact with a typical post (likes + comments + saves + shares).",
   followers: "Accounts following this profile right now.",
   "typical-reach": "Unique accounts that usually see a post.",
   saves: "People who bookmarked a typical post to come back.",

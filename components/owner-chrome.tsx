@@ -18,6 +18,7 @@ import { ReachChart } from "@/components/reach-chart";
 import { SEED_AUDIENCE } from "@/lib/audience";
 import { INSIGHTS_PRIVATE, STUB_DISCONNECT } from "@/lib/copy";
 import {
+  ENGAGEMENT_FORMULA,
   EXAMPLE_AGE_MIX,
   EXAMPLE_CITY_MIX,
   EXAMPLE_COUNTRY_MIX,
@@ -106,7 +107,7 @@ export function OwnerChrome({
               : `${INSIGHTS_PRIVATE}.`}
           </p>
           <p className={PATTERN_FORMULA_CLASS}>
-            Engagement rate = (likes + comments) ÷ followers.
+            Engagement rate = {ENGAGEMENT_FORMULA}.
           </p>
         </div>
       </section>

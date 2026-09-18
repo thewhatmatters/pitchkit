@@ -1,18 +1,62 @@
-/** Locked kit math: (likes + comments) / followers on the six posts. */
-export function engagementRate(
-  posts: Array<{ like_count: number; comments_count: number }>,
-  followers: number,
-): number | null {
-  if (followers <= 0) {
+/** Media fields needed for locked Engagement rate math. */
+export type EngagementMedia = {
+  like_count: number;
+  comments_count: number;
+  reach: number | null;
+  saves?: number | null;
+  shares?: number | null;
+};
+
+/** Insights `reach` is the only ER denominator. Missing / null / 0 / non-finite → hide. */
+export function hasInsightsReach(post: Pick<EngagementMedia, "reach">): boolean {
+  return post.reach != null && Number.isFinite(post.reach) && post.reach > 0;
+}
+
+/**
+ * Numerator: likes + comments + saves + shares.
+ * Null saves/shares are omitted (not invented as displayed zeros).
+ */
+export function postInteractions(post: EngagementMedia): number {
+  return (
+    post.like_count +
+    post.comments_count +
+    (post.saves ?? 0) +
+    (post.shares ?? 0)
+  );
+}
+
+/** Per-post Engagement rate when that media has Insights `reach` > 0. */
+export function postEngagementRate(post: EngagementMedia): number | null {
+  if (!hasInsightsReach(post) || post.reach == null) {
     return null;
   }
 
-  const engagement = posts.reduce(
-    (total, post) => total + post.like_count + post.comments_count,
-    0,
-  );
+  return postInteractions(post) / post.reach;
+}
 
-  return engagement / followers;
+/**
+ * Locked 2026-09-18: (likes + comments + saves + shares) ÷ reach.
+ * Account / typical rate = sum(interactions) ÷ sum(reach) on posts with
+ * Insights reach > 0 — not an average of per-post rates (avoids small-post skew).
+ * No qualifying reach → null (hide or —). Do not fall back to ÷ followers.
+ */
+export function engagementRate(posts: EngagementMedia[]): number | null {
+  let interactions = 0;
+  let reach = 0;
+
+  for (const post of posts) {
+    if (!hasInsightsReach(post) || post.reach == null) {
+      continue;
+    }
+    interactions += postInteractions(post);
+    reach += post.reach;
+  }
+
+  if (reach <= 0) {
+    return null;
+  }
+
+  return interactions / reach;
 }
 
 export function formatEngagementRate(rate: number | null): string {

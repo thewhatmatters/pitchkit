@@ -88,7 +88,7 @@ export function selectSixPosts(media: Media[], now: Date = new Date()): Media[] 
   return picked;
 }
 
-/** Insights missing → still show ER; hide reach, saves, and the chart. */
+/** Insights missing → hide Engagement rate (or —); hide reach, saves, and the chart. */
 export function kitHasInsights(posts: Media[]): boolean {
   return posts.some(
     (post) =>
@@ -117,7 +117,7 @@ export function assemblePublicKit(
   return {
     user,
     posts,
-    engagementRate: engagementRate(posts, user.followers),
+    engagementRate: engagementRate(posts),
     hasInsights,
     typicalReach: typical.typicalReach,
     typicalSaves: typical.typicalSaves,

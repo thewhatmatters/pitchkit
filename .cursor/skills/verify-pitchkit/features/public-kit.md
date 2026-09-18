@@ -5,7 +5,7 @@ The public kit is what a brand sees at `/k/demo` without a Pitchkit session: Pat
 ## Sub-features
 
 - `kit-identity` shows Demo Creator, `@demo`, and the Instagram chip.
-- `kit-stats` shows Followers and Engagement rate only (no Typical reach / Saves / chart).
+- `kit-stats` shows Followers and Engagement rate only (no Typical reach / Saves / chart). Public seed has no Insights reach, so Engagement rate is — (do not expect a percent from ÷ followers).
 - `kit-posts` shows at most six **Selected posts** (fewer if some are hidden) with likes/comments only.
 - `kit-no-insights` omits SegmentedControl, PageHeader Insights, Recent proof, Share kit, Edit, and reach series.
 - `kit-404` unknown handles (`/k/nope`) are not found.
@@ -25,7 +25,7 @@ Preconditions:
 - If a prior hide left posts out, this kit may show fewer than six — still valid. Do not hide more here.
 
 - **Open signed out.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /k/demo --fresh`. Title is `Demo Creator (@demo) · Pitchkit`. Status 200.
-- **Kit freeze.** Body shows a PitchKit wordmark, **Demo Creator**, `@demo`, **Followers** (`10,000` on a complete seed), **Engagement rate** (not “ER”), and **Selected posts**. Contact and past brands stay hidden when blank.
+- **Kit freeze.** Body shows a PitchKit wordmark, **Demo Creator**, `@demo`, **Followers** (`10,000` on a complete seed), **Engagement rate** (not “ER”; public seed paints — because reach is missing), and **Selected posts**. Contact and past brands stay hidden when blank.
 - **Posts.** Selected-post cards, six-or-fewer. Public seed has no Insights on posts — likes/comments, not reach/saves. No MoreMenu / hide / swap.
 - **No owner chrome.** There is no **PitchKit primary navigation**, no PageHeader **Insights**, no **Recent proof**, no **Share kit**, no **30-day account reach**, no **Private to you**, no **Edit** switch.
 - **Unknown handle.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /k/nope --fresh`. Title is `Not found` (or the not-found page). Not a kit card.

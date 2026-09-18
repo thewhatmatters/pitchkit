@@ -174,6 +174,9 @@ describe("critical page contracts", () => {
     assert.match(chrome, /INSIGHTS_PRIVATE/);
     assert.match(stats, /label="Engagement rate"/);
     assert.doesNotMatch(stats, /label="ER"/);
+    assert.match(chrome, /ENGAGEMENT_FORMULA/);
+    assert.match(read("lib/inventory.ts"), /\(likes \+ comments \+ saves \+ shares\) ÷ reach/);
+    assert.doesNotMatch(chrome, /÷ followers/);
     assert.doesNotMatch(card, />ER</);
     assert.match(card, /Engagement rate/);
     assert.doesNotMatch(stats, /<Stat\.Group/);

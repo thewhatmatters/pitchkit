@@ -72,7 +72,10 @@ describe("insights static inventory", () => {
     ]);
     assert.equal(LOCKED_KIT_OBJECT_IDS.length, 12);
     assert.equal(INVENTORY_ITEM_IDS.length, 18);
-    assert.match(ENGAGEMENT_FORMULA, /likes \+ comments/);
+    assert.equal(ENGAGEMENT_FORMULA, "(likes + comments + saves + shares) ÷ reach");
+    assert.match(ENGAGEMENT_FORMULA, /saves \+ shares/);
+    assert.match(ENGAGEMENT_FORMULA, /÷ reach/);
+    assert.doesNotMatch(ENGAGEMENT_FORMULA, /followers/);
     assert.equal(CHART_SLOT_TITLE, "30-day reach chart");
     assert.match(COUNTRY_MIX_CAPTION, /Instagram located/);
     assert.match(COUNTRY_MIX_CAPTION, /not of all followers/);
@@ -165,5 +168,11 @@ describe("insights static inventory", () => {
       assert.equal(GLOSSARY_FIRST_SENTENCE[id], undefined, id);
     }
     assert.equal(Object.keys(GLOSSARY_FIRST_SENTENCE).length, 12);
+    assert.match(GLOSSARY_FIRST_SENTENCE["engagement-rate"]!, /of reach/);
+    assert.match(
+      GLOSSARY_FIRST_SENTENCE["engagement-rate"]!,
+      /likes \+ comments \+ saves \+ shares/,
+    );
+    assert.doesNotMatch(GLOSSARY_FIRST_SENTENCE["engagement-rate"]!, /followers/);
   });
 });
