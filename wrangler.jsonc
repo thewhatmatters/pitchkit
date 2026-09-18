@@ -28,7 +28,8 @@
       "id": "8a50f78eca5e4bf7bbabc96d9f9df63c",
     },
   ],
-  // Neon via Hyperdrive — TODO: uncomment when Randy supplies ids.
+  // Supabase Postgres via Hyperdrive — TODO: uncomment when Randy supplies ids.
+  // Origin URI in the Hyperdrive config: Supabase direct (port 5432), not pooler 6543.
   // Do not invent Hyperdrive ids. Empty id strings are invalid.
   // Prod: HYPERDRIVE. Preview: HYPERDRIVE_PREVIEW.
   // "hyperdrive": [

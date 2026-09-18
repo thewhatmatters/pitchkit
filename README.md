@@ -33,7 +33,7 @@ Landing stays product copy: disclosure, Professional note, **Continue with Insta
 | File | What it is |
 |---|---|
 | [PLAN.md](./PLAN.md) | Product and build brief |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | How the pieces connect (Workers, Graph, Neon, R2) |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | How the pieces connect (Workers, Graph, Supabase via Hyperdrive, R2) |
 | [DATA.md](./DATA.md) | Database tables and column names |
 | [GLOSSARY.md](./GLOSSARY.md) | What each kit number means (first sentence is the Insights inventory definition) |
 | [AGENTS.md](./AGENTS.md) | Short lock list for coding agents |
@@ -43,15 +43,15 @@ Landing stays product copy: disclosure, Professional note, **Continue with Insta
 | `lib/` | Schema types, in-repo seed, kit math (six-post rank + ER), `reach_series` chart / empty / omit surfaces |
 | `public/demo/` | Placeholder kit images (`r2_key` maps here until R2) |
 
-Until Hyperdrive exists, `/k/demo` and tokenless `/insights` read the in-repo seed (`lib/seed.ts`). Same `User` / `Media` types as live. A Graph poll (OAuth token or operator `IG_USER_TOKEN`) persists a snapshot on KV `HIDDEN_KIT` under `graph:` keys. When the Worker `HYPERDRIVE` (or `HYPERDRIVE_PREVIEW`) binding has a non-empty `connectionString`, SQL is SoT for live Graph `users` / `media` / `hidden_from_kit_at` via postgres.js (`lib/postgres.ts`). Missing binding stays on KV + seed — `npm test` does not need Neon. `TOKEN_KEY` encrypts tokens at rest when present; not required for seed. Unknown handle (`/k/nope`) is 404. Hide/restore seed SoT is KV `HIDDEN_KIT` until Neon; httpOnly `pitchkit_hidden` mirrors for owner reload. Brands hitting `/k/demo` see hides from KV without that cookie.
+Until Hyperdrive exists, `/k/demo` and tokenless `/insights` read the in-repo seed (`lib/seed.ts`). Same `User` / `Media` types as live. A Graph poll (OAuth token or operator `IG_USER_TOKEN`) persists a snapshot on KV `HIDDEN_KIT` under `graph:` keys. When the Worker `HYPERDRIVE` (or `HYPERDRIVE_PREVIEW`) binding has a non-empty `connectionString`, SQL is SoT for live Graph `users` / `media` / `hidden_from_kit_at` via postgres.js (`lib/postgres.ts`) against **Supabase Postgres**. Do not use `@supabase/supabase-js` on the Worker. Missing binding stays on KV + seed — `npm test` does not need a live database. `TOKEN_KEY` encrypts tokens at rest when present; not required for seed. Unknown handle (`/k/nope`) is 404. Hide/restore seed SoT is KV `HIDDEN_KIT` until Hyperdrive; httpOnly `pitchkit_hidden` mirrors for owner reload. Brands hitting `/k/demo` see hides from KV without that cookie.
 
-Apply schema once Neon exists (one-shot, not a migration framework):
+Apply schema once Supabase exists (one-shot, not a migration framework). Use the **direct** URI (port 5432), not the transaction pooler (6543):
 
 ```bash
-HYPERDRIVE_LOCAL_CONNECTION_STRING='postgresql://…' npm run db:apply
+HYPERDRIVE_LOCAL_CONNECTION_STRING='postgresql://…:5432/postgres' npm run db:apply
 ```
 
-That runs `db/*.sql` in order (`IF NOT EXISTS`: `users`, `media`, empty `detections`, empty `weekly_counts`, `hidden_from_kit_at`). Leave `wrangler.jsonc` hyperdrive ids commented until Randy supplies them.
+That runs `db/*.sql` in order (`IF NOT EXISTS`: `users`, `media`, empty `detections`, empty `weekly_counts`, `hidden_from_kit_at`). Leave `wrangler.jsonc` hyperdrive ids commented until Randy supplies them. Point the Hyperdrive config at the same direct URI.
 
 Owner Insights kit (`loadOwnerKit`) includes seed/example `reach_series: { day, reach }[]` (`day` = YYYY-MM-DD UTC) when no token. A live token polls `graph.instagram.com` (`GRAPH_API_VERSION`, start `v25.0`) on Insights load if stale (&gt;6h) or Refresh. `/insights` reads `owner.reach_series` for one WMDS Chart; keep the Reach Card empty band when Insights exist but the series is empty, all-zero, or too short; omit when Graph never returned Insights. Never zero-fill. Public `/k/demo` (`loadPublicKit`) has no Insights and omits `reach_series`. Not a SQL table.
 
@@ -65,7 +65,7 @@ Login: **Continue with Instagram** POST/GET `/auth/instagram`. With `IG_APP_ID` 
 
 Postgres holds creator rows and the posts we fetched. Photos go in file storage, not in SQL. We only store what Instagram Login and Insights already give us. Full column list: [DATA.md](./DATA.md).
 
-Disconnect severs the Pitchkit↔Instagram connection: session cookies clear, `disconnected_at` is stamped, tokens are nulled, and the kit URL 404s. SQL + R2 `{user_id}/` purge still finishes within 24 hours when Neon exists. Sign out is cookie-only. Anonymous weekly totals stay only if they cannot identify anyone.
+Disconnect severs the Pitchkit↔Instagram connection: session cookies clear, `disconnected_at` is stamped, tokens are nulled, and the kit URL 404s. SQL + R2 `{user_id}/` purge still finishes within 24 hours when Hyperdrive is bound. Sign out is cookie-only. Anonymous weekly totals stay only if they cannot identify anyone.
 
 ---
 
@@ -76,7 +76,7 @@ Disconnect severs the Pitchkit↔Instagram connection: session cookies clear, `d
 | App | Next.js App Router, TypeScript, Tailwind v4 |
 | UI | WMDS (`@whatmatters/wmds`). No shadcn. Storybook stays in the WMDS repo. |
 | Compute | Cloudflare Workers, official OpenNext (`@opennextjs/cloudflare`) |
-| DB | Neon Postgres + Hyperdrive |
+| DB | Supabase Postgres via Hyperdrive |
 | Files | R2 `pitchkit-media` |
 | Auth | Instagram Login + httpOnly cookie |
 | Charts | WMDS `Chart` (`@visx/visx` peer). No Nivo in this app. |
@@ -89,7 +89,7 @@ npm install github:thewhatmatters/wmds#cd18e7a29afd0c0d774552c1a3d665f480f51bd4
 
 `prepare` builds `dist/`. Local `npm install ../wmds` still works after `npm run build` there. `postinstall` / `predev` / `prebuild` copy Geist font files into the WMDS `dist/files` path that `styles.css` expects (otherwise Next 500s on the font URLs). Chart needs the `@visx/visx` peer. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md), WMDS [`CONSUMING.md`](https://github.com/thewhatmatters/wmds/blob/main/CONSUMING.md).
 
-Cloudflare and Support (for now): randy@whatmatters.so. Neon region is chosen when we create the database.
+Cloudflare and Support (for now): randy@whatmatters.so. Supabase region is chosen when we create the database. Hyperdrive uses the direct Postgres port (5432), not the 6543 pooler.
 
 Env **names** only (see `.env.example`): `IG_APP_ID`, `IG_APP_SECRET`, `TOKEN_KEY`, `GRAPH_API_VERSION`, optional `IG_USER_TOKEN` / `IG_REDIRECT_URI`, plus Hyperdrive binding notes and optional `HYPERDRIVE_LOCAL_CONNECTION_STRING`. Never commit values.
 
@@ -109,7 +109,7 @@ Open [http://localhost:3000](http://localhost:3000). Routes: `/`, `/?error=perso
 npm test
 ```
 
-Tests cover six-post rank (saves → reach → likes), Engagement rate hide when Insights reach is missing (sum÷sum of reach, not ÷ followers), owner `reach_series` shape, public kit omitting the series, Chart surface rules (insufficient-reach empty band vs graph-unavailable omit; occupant well + in-well paint gate), date-tick helper usage, owner Pattern shell (hug SegmentedControl + in-page PitchKit Coming soon, no AppShell), AppFrame settings/landing class SoT `OWNER_GRID_CLASS` with Tailwind `[--grid-max:1140px] [--grid-column-gap:8px] [--grid-gutter:8px]` (WHA-309; not React `style`), Insights chrome (no duplicate tabs, Engagement rate label, four-up `Stat` `col-span-2 md:col-span-4 lg:col-span-3` not `Stat.Group`, Recent proof sort keys, private copy, Pattern Card well + `Chart.Cartesian.Tooltip`), shareable kit freeze (no Edit/MoreMenu), past-brand hide-empty, live/empty audience never painting EXAMPLE mixes (insufficient Audience Card stays), hide/restore persistence (`hidden_from_kit_at`, public exclude-before-six, owner include + Insights partition so **"N shown"** / rank use `hidden_from_kit_at == null` only, KV `HIDDEN_KIT` SoT + httpOnly `pitchkit_hidden` owner mirror, no localStorage), Hide-from-kit WMDS `AlertDialog` confirm exposing accessible dialog semantics (`role=dialog` / `alertdialog`), set/clear of the Pitchkit session cookie plus the Insights gate, Hyperdrive binding detection (fail-closed without Neon), and SQL users/media/hide/disconnect contracts against a mocked client. Fail-closed rails: `lib/owner-grid-tokens.test.ts`, `lib/kit-visibility.test.ts` shown partition, `lib/alert-dialog-role.test.ts`.
+Tests cover six-post rank (saves → reach → likes), Engagement rate hide when Insights reach is missing (sum÷sum of reach, not ÷ followers), owner `reach_series` shape, public kit omitting the series, Chart surface rules (insufficient-reach empty band vs graph-unavailable omit; occupant well + in-well paint gate), date-tick helper usage, owner Pattern shell (hug SegmentedControl + in-page PitchKit Coming soon, no AppShell), AppFrame settings/landing class SoT `OWNER_GRID_CLASS` with Tailwind `[--grid-max:1140px] [--grid-column-gap:8px] [--grid-gutter:8px]` (WHA-309; not React `style`), Insights chrome (no duplicate tabs, Engagement rate label, four-up `Stat` `col-span-2 md:col-span-4 lg:col-span-3` not `Stat.Group`, Recent proof sort keys, private copy, Pattern Card well + `Chart.Cartesian.Tooltip`), shareable kit freeze (no Edit/MoreMenu), past-brand hide-empty, live/empty audience never painting EXAMPLE mixes (insufficient Audience Card stays), hide/restore persistence (`hidden_from_kit_at`, public exclude-before-six, owner include + Insights partition so **"N shown"** / rank use `hidden_from_kit_at == null` only, KV `HIDDEN_KIT` SoT + httpOnly `pitchkit_hidden` owner mirror, no localStorage), Hide-from-kit WMDS `AlertDialog` confirm exposing accessible dialog semantics (`role=dialog` / `alertdialog`), set/clear of the Pitchkit session cookie plus the Insights gate, Hyperdrive binding detection (fail-closed without a live database), and SQL users/media/hide/disconnect contracts against a mocked client. Fail-closed rails: `lib/owner-grid-tokens.test.ts`, `lib/kit-visibility.test.ts` shown partition, `lib/alert-dialog-role.test.ts`.
 
 Production-shaped local Workers runtime (official OpenNext):
 

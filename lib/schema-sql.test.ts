@@ -34,7 +34,8 @@ describe("schema SQL one-shot apply", () => {
 
   it("leaves wrangler Hyperdrive ids commented until Randy supplies them", () => {
     const wrangler = readFileSync(join(process.cwd(), "wrangler.jsonc"), "utf8");
-    assert.match(wrangler, /\/\/ Neon via Hyperdrive/);
+    assert.match(wrangler, /\/\/ Supabase Postgres via Hyperdrive/);
+    assert.match(wrangler, /port 5432/);
     assert.match(wrangler, /\/\/\s+"hyperdrive":/);
     assert.doesNotMatch(wrangler, /^\s+"hyperdrive":/m);
     assert.match(wrangler, /<todo-hyperdrive-id>/);

@@ -31,8 +31,8 @@ describe("Hyperdrive binding detection", () => {
   });
 
   it("accepts only a non-empty connectionString on HYPERDRIVE then PREVIEW", () => {
-    assert.deepEqual(bindingFromUnknown({ connectionString: "postgresql://neon" }), {
-      connectionString: "postgresql://neon",
+    assert.deepEqual(bindingFromUnknown({ connectionString: "postgresql://db.example:5432/postgres" }), {
+      connectionString: "postgresql://db.example:5432/postgres",
     });
     assert.deepEqual(
       hyperdriveFromEnv({

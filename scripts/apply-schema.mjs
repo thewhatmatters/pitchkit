@@ -4,9 +4,9 @@
  * Creates users, media, empty detections, empty weekly_counts, and
  * media.hidden_from_kit_at. Files use IF NOT EXISTS so re-runs are safe.
  *
- * Usage (after Randy has a Neon URL):
- *   HYPERDRIVE_LOCAL_CONNECTION_STRING='postgresql://…' npm run db:apply
- *   DATABASE_URL='postgresql://…' npm run db:apply
+ * Usage (after Randy has the Supabase **direct** URI, port 5432):
+ *   HYPERDRIVE_LOCAL_CONNECTION_STRING='postgresql://…:5432/postgres' npm run db:apply
+ *   DATABASE_URL='postgresql://…:5432/postgres' npm run db:apply
  */
 
 import { readdir, readFile } from "node:fs/promises";
@@ -18,13 +18,12 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const connectionString = (
   process.env.HYPERDRIVE_LOCAL_CONNECTION_STRING ||
   process.env.DATABASE_URL ||
-  process.env.NEON_DATABASE_URL ||
   ""
 ).trim();
 
 if (!connectionString) {
   console.error(
-    "Set HYPERDRIVE_LOCAL_CONNECTION_STRING or DATABASE_URL to the Neon URL, then re-run npm run db:apply.",
+    "Set HYPERDRIVE_LOCAL_CONNECTION_STRING or DATABASE_URL to the Supabase direct URI (port 5432), then re-run npm run db:apply.",
   );
   process.exit(1);
 }

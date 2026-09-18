@@ -34,7 +34,7 @@ export { hasHyperdriveFlag as hasHyperdrive, resolveHasHyperdrive };
  * Else /k/[handle] and /insights read the in-repo seed unless a Graph
  * snapshot (OAuth or operator token poll) is present on KV `graph:` keys.
  * Public `/k/demo` stays `lib/seed.ts`.
- * Hide/restore seed SoT: KV `HIDDEN_KIT` (`hidden:<userId>`) until Neon.
+ * Hide/restore seed SoT: KV `HIDDEN_KIT` (`hidden:<userId>`) until Hyperdrive.
  */
 
 export type LoadKitOptions = {

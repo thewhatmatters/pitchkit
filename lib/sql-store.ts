@@ -1,6 +1,6 @@
 /**
- * users / media CRUD against DATA.md columns.
- * Parameterized SQL only. No ORM.
+ * users / media CRUD against DATA.md columns (Supabase Postgres via Hyperdrive).
+ * Parameterized SQL only. No ORM. No @supabase/supabase-js.
  * Used when a Hyperdrive (or local) connection string is present.
  */
 
