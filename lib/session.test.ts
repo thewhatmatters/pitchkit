@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { afterEach, describe, it } from "node:test";
+import { emptySecrets, setSecretsForTests } from "./env";
 import { EMPTY_AUDIENCE, persistOwnerDisconnect, readGraphSnapshot, writeGraphSnapshot } from "./graph-store";
 import { createMemoryHiddenKit, setHiddenKitNamespaceForTests } from "./hidden-kit";
 import { assemblePublicKit } from "./kit";
@@ -48,6 +49,7 @@ function liveUser(partial: Partial<User> = {}): User {
 
 afterEach(() => {
   setHiddenKitNamespaceForTests(undefined);
+  setSecretsForTests(undefined);
 });
 
 describe("session cookie", () => {
@@ -136,6 +138,39 @@ describe("insights gate", () => {
   it("treats a resolvable session as signed-in so home can gate to Insights", () => {
     assert.equal(insightsGate(parseSessionValue(DEMO_HANDLE)), true);
     assert.equal(insightsGate(null), false);
+  });
+
+  it("resolves seed demo when live auth secrets are absent (stub path)", async () => {
+    setSecretsForTests(emptySecrets());
+    const session = await resolveSession(DEMO_HANDLE, "page");
+    assert.deepEqual(session, { handle: DEMO_HANDLE, userId: DEMO_USER_ID });
+    assert.equal(insightsGate(session), true);
+  });
+
+  it("does not treat leftover seed demo as signed-in when live auth secrets exist", async () => {
+    setSecretsForTests({ ...emptySecrets(), IG_APP_ID: "id", IG_APP_SECRET: "secret" });
+    const session = await resolveSession(DEMO_HANDLE, "page");
+    assert.equal(session, null);
+    assert.equal(insightsGate(session), false);
+  });
+
+  it("still resolves a live Graph snapshot handle when live auth secrets exist", async () => {
+    setSecretsForTests({ ...emptySecrets(), IG_APP_ID: "id", IG_APP_SECRET: "secret" });
+    setHiddenKitNamespaceForTests(createMemoryHiddenKit());
+    const user = liveUser();
+    assert.equal(
+      await writeGraphSnapshot({
+        user,
+        media: seedMedia,
+        reach_series: [],
+        audience: EMPTY_AUDIENCE,
+        polled_at: NOW,
+      }),
+      true,
+    );
+    const session = await resolveSession(user.handle, "route");
+    assert.deepEqual(session, { handle: user.handle, userId: user.id });
+    assert.equal(insightsGate(session), true);
   });
 });
 

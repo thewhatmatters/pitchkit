@@ -8,6 +8,9 @@ export const PROFESSIONAL_NOTE =
 export const PERSONAL_FAIL =
   "Pitchkit works with Instagram Professional accounts (Business or Creator). In Instagram, switch to Professional, then try again.";
 
+export const PERSIST_FAIL =
+  "We could not save your Instagram connection. Try Continue with Instagram again.";
+
 export const SUPPORT_EMAIL = "randy@whatmatters.so";
 
 export const EMPTY_GRID = "Pulling your grid…";
