@@ -534,6 +534,10 @@ describe("critical page contracts", () => {
     assert.match(read("lib/hidden-kit-kv.ts"), /async: true/);
     assert.match(read("wrangler.jsonc"), /"binding": "HIDDEN_KIT"/);
     assert.match(read("wrangler.jsonc"), /8a50f78eca5e4bf7bbabc96d9f9df63c/);
+    assert.match(read("wrangler.jsonc"), /^\s+"hyperdrive":/m);
+    assert.match(read("wrangler.jsonc"), /"binding": "HYPERDRIVE"/);
+    assert.match(read("wrangler.jsonc"), /"binding": "HYPERDRIVE_PREVIEW"/);
+    assert.match(read("wrangler.jsonc"), /bf225442516d44f599e083b72df886cd/);
     assert.doesNotMatch(hidden, /__pitchkitHiddenFromKit/);
     assert.match(kit, /excludeHiddenFromPublicKit/);
     assert.match(publicKit, /hiddenOverlayForHandle/);
