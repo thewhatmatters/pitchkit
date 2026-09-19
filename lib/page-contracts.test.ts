@@ -82,6 +82,13 @@ describe("critical page contracts", () => {
     assert.match(kit, /Selected posts/);
     assert.match(kit, /TextLink/);
     assert.match(kit, /Past brands/);
+    assert.match(kit, /CreatorIdentityStrip/);
+    assert.match(kit, /PATTERN_IDENTITY_NAMEPLATE_CLASS/);
+    assert.match(kit, /examples-pitchkit--creator-identity-public/);
+    assert.match(kit, /nameAs="h1"/);
+    assert.match(kit, /showProfessionalChip/);
+    assert.doesNotMatch(kit, /<Chip readOnly size="sm">\s*Instagram\s*<\/Chip>/);
+    assert.doesNotMatch(kit, /biography|heatmap|EXAMPLE %/);
     assert.doesNotMatch(kit, /<MoreMenu|Hide from kit|Coming soon|variant="success"/);
     assert.match(edit, /label="Edit"/);
     assert.match(edit, /ShareableKit/);
@@ -159,7 +166,8 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(kit, /OwnerNav|KitEdit/);
     assert.match(kit, /CREATOR_INSIGHTS_PAGE_CLASS/);
     assert.match(kit, /CREATOR_INSIGHTS_HEADER_BAND_CLASS/);
-    assert.match(settings, /OWNER_GRID_MAX/);
+    assert.doesNotMatch(settings, /OWNER_GRID_MAX|OWNER_GRID_CLASS|<AppFrame/);
+    assert.match(read("components/account-settings.tsx"), /PATTERN_PAGE_CLASS/);
     assert.doesNotMatch(settings, /OwnerNav/);
     assert.doesNotMatch(insights, /OwnerShell|AppShell|AppShell\.Mobile|NavRail/);
     assert.doesNotMatch(workspace, /OwnerShell|AppShell|AppShell\.Mobile|NavRail/);
@@ -333,10 +341,10 @@ describe("critical page contracts", () => {
     assert.match(chart, /animate="none"/);
     assert.match(read("components/owner-chrome.tsx"), /typicalReach=\{typicalReach\}/);
     assert.match(read("components/wmds.ts"), /chartMaxTicksForWidth/);
-    assert.match(read("package.json"), /wmds#cd18e7a29afd0c0d774552c1a3d665f480f51bd4/);
+    assert.match(read("package.json"), /wmds#14d50cda0302e263cb350409f2cea34de03c7c2e/);
     assert.doesNotMatch(
       read("package.json"),
-      /70da6a4c50d8efc1e687b20f231c6e4f1f6190c6|dc813326028c0fe1cc5f3719466a32607bab4504|55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab/,
+      /cd18e7a29afd0c0d774552c1a3d665f480f51bd4|70da6a4c50d8efc1e687b20f231c6e4f1f6190c6|dc813326028c0fe1cc5f3719466a32607bab4504|55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab/,
     );
     assert.match(page, /OwnerWorkspace/);
     assert.match(read("components/owner-workspace.tsx"), /CREATOR_INSIGHTS_PAGE_CLASS/);
@@ -357,6 +365,20 @@ describe("critical page contracts", () => {
     );
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--graph-data-unavailable/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--shareable-pitchkit/);
+    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--creator-identity-public/);
+    assert.match(
+      read("components/pattern-tokens.ts"),
+      /examples-pitchkit--creator-identity-owner-settings/,
+    );
+    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--creator-identity-loading/);
+    assert.match(
+      read("components/pattern-tokens.ts"),
+      /examples-pitchkit--creator-identity-missing-photo/,
+    );
+    assert.match(
+      read("components/pattern-tokens.ts"),
+      /examples-pitchkit--creator-identity-missing-name/,
+    );
     assert.match(
       read("components/pattern-tokens.ts"),
       /components-data-display-chart--cartesian-no-data-gaps/,
@@ -494,8 +516,25 @@ describe("critical page contracts", () => {
     const settings = read("components/account-settings.tsx");
     const disconnect = read("components/disconnect-control.tsx");
     const chrome = read("components/owner-chrome.tsx");
+    const strip = read("components/creator-identity-strip.tsx");
+    const identityBlocks = toastAddBlocks(settings);
     assert.match(page, /insightsGate/);
     assert.match(page, /resolveSession/);
+    assert.match(page, /AccountSettings/);
+    assert.match(page, /kit\.user/);
+    assert.doesNotMatch(page, /<AppFrame|OWNER_GRID_MAX|OwnerNav/);
+    assert.match(settings, /examples-pitchkit--creator-identity-owner-settings/);
+    assert.match(settings, /Connected Instagram/);
+    assert.match(settings, /Share kit/);
+    assert.match(settings, /kitPath/);
+    assert.match(settings, />\s*Copy\s*</);
+    assert.match(settings, /Last synced/);
+    assert.match(settings, /title="Settings"/);
+    assert.match(settings, /CreatorIdentityStrip/);
+    assert.match(settings, /nameAs="p"/);
+    assert.match(settings, /showProfessionalChip/);
+    assert.match(settings, /PATTERN_SETTINGS_CARD_CLASS/);
+    assert.match(settings, /PATTERN_PAGE_CLASS/);
     assert.match(settings, /Reconnect Instagram/);
     assert.match(settings, new RegExp(AUTH_SIGNOUT_PATH));
     assert.match(settings, /DisconnectControl/);
@@ -505,9 +544,24 @@ describe("critical page contracts", () => {
     assert.match(disconnect, /confirmLabel="Disconnect"/);
     assert.match(read("app/auth/disconnect/route.ts"), /disconnectOwner/);
     assert.match(chrome, /DisconnectControl/);
+    assert.equal(identityBlocks.length, 2);
+    for (const block of identityBlocks) {
+      assert.match(block, /\btitle:/);
+      assert.match(block, /\bdescription:/);
+    }
+    assert.match(settings, /TOAST_KIT_COPIED_TITLE/);
+    assert.match(settings, /TOAST_KIT_COPIED_DESCRIPTION/);
+    assert.match(strip, /displayName != null/);
+    assert.match(strip, /followersCount == null/);
+    assert.match(strip, /CreatorIdentityStripSkeleton/);
+    assert.match(read("components/pattern-tokens.ts"), /PATTERN_IDENTITY_NAMEPLATE_CLASS/);
+    assert.match(read("lib/creator-identity.ts"), /professionalAccountLabel/);
     assert.doesNotMatch(settings, /STUB_DISCONNECT/);
     assert.doesNotMatch(chrome, /STUB_DISCONNECT/);
     assert.doesNotMatch(settings, /past brand|Past brand|contact for collab/i);
+    assert.doesNotMatch(settings, /Coming soon|KitEdit|ShareableKit|<Stat|Chart\./);
+    assert.doesNotMatch(settings, /biography|heatmap|EXAMPLE %/);
     assert.doesNotMatch(page, /past brand|Past brand/i);
+    assert.doesNotMatch(read("components/owner-workspace.tsx"), /CreatorIdentityStrip|AccountSettings/);
   });
 });
