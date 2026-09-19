@@ -12,10 +12,13 @@ import { landingErrorCopy } from "./copy";
 import {
   cookieHandleAfterPersist,
   finishLiveOAuth,
+  lastWinsSetCookie,
   oauthLandingPath,
+  oauthSuccessSetCookies,
   sessionCookieAfterPersist,
 } from "./oauth-finish";
 import { snapshotFromMe } from "./poll";
+import { DEMO_HANDLE } from "./seed";
 import { SESSION_COOKIE } from "./session";
 
 const STATE = "oauth-state-unit";
@@ -29,10 +32,32 @@ function liveSecrets() {
   return { ...emptySecrets(), IG_APP_ID: "id", IG_APP_SECRET: "secret" };
 }
 
-function finishRequest(path = `/auth/instagram?code=ok&state=${STATE}`): Request {
+function finishRequest(
+  path = `/auth/instagram?code=ok&state=${STATE}`,
+  extraCookie?: string,
+): Request {
+  const cookie = extraCookie
+    ? `${extraCookie}; ${OAUTH_STATE_COOKIE}=${STATE}`
+    : `${OAUTH_STATE_COOKIE}=${STATE}`;
   return new Request(`http://localhost${path}`, {
-    headers: { cookie: `${OAUTH_STATE_COOKIE}=${STATE}` },
+    headers: { cookie },
   });
+}
+
+function assertSessionOverwrite(response: Response, handle: string) {
+  assert.equal(response.status, 303);
+  assert.equal(response.headers.get("location"), "http://localhost/insights");
+  const cookies = response.headers.getSetCookie();
+  assert.equal(cookies.length, 1);
+  assert.match(cookies[0], new RegExp(`${SESSION_COOKIE}=${handle.replace(".", "\\.")}`));
+  assert.doesNotMatch(cookies[0], new RegExp(OAUTH_STATE_COOKIE));
+  // OpenNext/Workers may keep only Headers.get("set-cookie") or the last cookie.
+  assert.match(
+    response.headers.get("set-cookie") ?? "",
+    new RegExp(`${SESSION_COOKIE}=${handle.replace(".", "\\.")}`),
+  );
+  assert.match(lastWinsSetCookie(cookies) ?? "", new RegExp(`${SESSION_COOKIE}=${handle.replace(".", "\\.")}`));
+  assert.deepEqual(oauthSuccessSetCookies(cookies[0]), cookies);
 }
 
 function graphFetch(overrides: { mediaOk?: boolean; meOk?: boolean } = {}): typeof fetch {
@@ -95,6 +120,23 @@ describe("cookie after persist", () => {
     assert.match(cookie.cookie, /HttpOnly/i);
   });
 
+  it("success Set-Cookie is only the session so a last-wins fold overwrites demo", () => {
+    const session = sessionCookieAfterPersist({
+      persisted: true,
+      handle: "rxndy.dxniel",
+      secure: true,
+    });
+    assert.equal(session.ok, true);
+    if (!session.ok) {
+      return;
+    }
+    const cookies = oauthSuccessSetCookies(session.cookie);
+    assert.equal(cookies.length, 1);
+    assert.equal(lastWinsSetCookie(cookies), session.cookie);
+    assert.match(cookies[0], new RegExp(`${SESSION_COOKIE}=rxndy\\.dxniel`));
+    assert.doesNotMatch(cookies[0], /pitchkit_oauth_state/);
+  });
+
   it("does not set a cookie when write is false", () => {
     assert.deepEqual(cookieHandleAfterPersist(false, "rxndy.dxniel"), {
       ok: false,
@@ -137,11 +179,25 @@ describe("finishLiveOAuth", () => {
       state: STATE,
       secrets: liveSecrets(),
     });
-    assert.equal(response.status, 303);
-    assert.equal(response.headers.get("location"), "http://localhost/insights");
-    const cookies = response.headers.getSetCookie();
-    assert.ok(cookies.some((row) => row.includes(`${SESSION_COOKIE}=rxndy.dxniel`)));
-    assert.ok(cookies.some((row) => row.includes(`${OAUTH_STATE_COOKIE}=`) && row.includes("Max-Age=0")));
+    assertSessionOverwrite(response, "rxndy.dxniel");
+  });
+
+  it("overwrites leftover pitchkit_session=demo with the persisted handle", async () => {
+    setSecretsForTests(liveSecrets());
+    setHiddenKitNamespaceForTests(createMemoryHiddenKit());
+    mock.method(globalThis, "fetch", graphFetch());
+
+    const response = await finishLiveOAuth({
+      request: finishRequest(
+        `/auth/instagram?code=ok&state=${STATE}`,
+        `${SESSION_COOKIE}=${DEMO_HANDLE}`,
+      ),
+      code: "ok",
+      state: STATE,
+      secrets: liveSecrets(),
+    });
+    assertSessionOverwrite(response, "rxndy.dxniel");
+    assert.doesNotMatch(response.headers.get("set-cookie") ?? "", new RegExp(`${SESSION_COOKIE}=${DEMO_HANDLE}`));
   });
 
   it("persists a minimal snapshot and logs in when Insights poll fails after /me", async () => {
@@ -155,12 +211,7 @@ describe("finishLiveOAuth", () => {
       state: STATE,
       secrets: liveSecrets(),
     });
-    assert.equal(response.status, 303);
-    assert.equal(response.headers.get("location"), "http://localhost/insights");
-    assert.match(
-      response.headers.get("set-cookie") ?? "",
-      new RegExp(`${SESSION_COOKIE}=rxndy\\.dxniel`),
-    );
+    assertSessionOverwrite(response, "rxndy.dxniel");
   });
 
   it("surfaces persist without a session cookie when both writes fail", async () => {
@@ -177,8 +228,10 @@ describe("finishLiveOAuth", () => {
     assert.equal(response.status, 303);
     assert.equal(response.headers.get("location"), "http://localhost/?error=persist");
     const cookies = response.headers.getSetCookie();
+    assert.equal(cookies.length, 1);
     assert.ok(cookies.every((row) => !row.includes(`${SESSION_COOKIE}=rxndy.dxniel`)));
     assert.ok(cookies.some((row) => row.includes(`${SESSION_COOKIE}=`) && row.includes("Max-Age=0")));
+    assert.match(response.headers.get("set-cookie") ?? "", /Max-Age=0/);
   });
 
   it("surfaces oauth_state on mismatch and clears leftover session", async () => {
@@ -190,11 +243,10 @@ describe("finishLiveOAuth", () => {
     });
     assert.equal(response.status, 303);
     assert.equal(response.headers.get("location"), "http://localhost/?error=oauth_state");
-    assert.ok(
-      response.headers
-        .getSetCookie()
-        .some((row) => row.includes(`${SESSION_COOKIE}=`) && row.includes("Max-Age=0")),
-    );
+    const abortCookies = response.headers.getSetCookie();
+    assert.equal(abortCookies.length, 1);
+    assert.ok(abortCookies[0].includes(`${SESSION_COOKIE}=`) && abortCookies[0].includes("Max-Age=0"));
+    assert.match(response.headers.get("set-cookie") ?? "", /Max-Age=0/);
   });
 
   it("surfaces oauth_exchange when the token exchange fails", async () => {
