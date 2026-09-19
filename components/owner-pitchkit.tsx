@@ -3,8 +3,11 @@
 import { useMemo, useState } from "react";
 import { EyeOff } from "lucide-react";
 import { CreatorIdentityStrip } from "@/components/creator-identity-strip";
+import { EngagementRateFormulaTooltip } from "@/components/engagement-rate-info";
+import { ShareKitButton } from "@/components/share-kit-button";
 import {
   PATTERN_CONTACT_CARD_CLASS,
+  PATTERN_HEADER_SECTION_CLASS,
   PATTERN_CONTACT_ROW_CLASS,
   PATTERN_CONTACT_ROWS_CLASS,
   PATTERN_IDENTITY_SECTION_CLASS,
@@ -26,8 +29,10 @@ import {
   AlertDialog,
   Card,
   MoreMenu,
+  PageHeader,
   Stat,
   TextLink,
+  cardSubtitleClasses,
   cardTitleClasses,
   toast,
 } from "@/components/wmds";
@@ -53,6 +58,7 @@ import {
   stampHiddenFromKit,
 } from "@/lib/kit-visibility";
 import { excludeHiddenFromPublicKit, selectSixPosts } from "@/lib/kit";
+import { formatPostedAt } from "@/lib/posted-at";
 import { publicObjectUrl } from "@/lib/r2";
 import type { Media, User } from "@/lib/schema";
 
@@ -177,6 +183,14 @@ export function OwnerPitchKit({
 
   return (
     <>
+      <section className={PATTERN_HEADER_SECTION_CLASS}>
+        <PageHeader
+          variant="page"
+          title="PitchKit"
+          end={<ShareKitButton handle={user.handle} />}
+        />
+      </section>
+
       <section className={PATTERN_IDENTITY_SECTION_CLASS}>
         <CreatorIdentityStrip identity={identity} nameAs="h1" showProfessionalChip />
       </section>
@@ -195,6 +209,7 @@ export function OwnerPitchKit({
           className={PATTERN_KIT_STAT_CLASS}
           label="Engagement rate"
           value={formatEngagementRate(rate)}
+          end={<EngagementRateFormulaTooltip />}
         />
       </div>
 
@@ -216,6 +231,9 @@ export function OwnerPitchKit({
               className={PATTERN_POST_CARD_CLASS}
             >
               <Card.Header
+                start={
+                  <span className={cardSubtitleClasses}>{formatPostedAt(post.posted_at)}</span>
+                }
                 end={
                   <MoreMenu
                     aria-label={`Manage selected post ${index + 1}`}

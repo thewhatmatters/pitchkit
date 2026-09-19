@@ -41,6 +41,7 @@ import {
   restoreToKit,
   stampHiddenFromKit,
 } from "@/lib/kit-visibility";
+import { formatPostedAt } from "@/lib/posted-at";
 import { DEFAULT_POST_SORT, isPostSortKey, sortPosts, type PostSortKey } from "@/lib/post-sort";
 import { publicObjectUrl } from "@/lib/r2";
 import type { Media } from "@/lib/schema";
@@ -55,14 +56,6 @@ const compactNumber = new Intl.NumberFormat("en", {
   notation: "compact",
   maximumFractionDigits: 1,
 });
-
-function formatPostedAt(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    timeZone: "UTC",
-  });
-}
 
 type ProofPostsProps = {
   posts: Media[];

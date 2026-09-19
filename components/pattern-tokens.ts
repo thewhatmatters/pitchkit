@@ -11,6 +11,7 @@
  * - `examples-pitchkit--graph-data-unavailable` (State — Graph data unavailable; omit optional regions)
  * - `examples-pitchkit--shareable-pitchkit` (Pattern — shareable PitchKit)
  * - `examples-pitchkit--owner-pitch-kit` (Pattern — owner PitchKit)
+ * Post dates in product include the year (`Dec 17, 2024`); stories may omit year.
  * - `examples-pitchkit--creator-identity-public` (Pattern — creator identity (public))
  * - `examples-pitchkit--creator-identity-owner-settings` (Pattern — creator identity (owner settings))
  * - `examples-pitchkit--creator-identity-loading` (State — creator identity loading)
@@ -63,8 +64,9 @@ export const PATTERN_CARD_WELL_CLASS =
 /** Matches Chart.Cartesian `minHeight` on the Reach well — keep empty/skeleton bands the same. */
 export const PATTERN_REACH_CHART_MIN_HEIGHT = 344;
 
+/** Pattern empty well + fill the terminal Card.Body so justify-center can act. */
 export const PATTERN_REACH_EMPTY_WELL_CLASS =
-  `${PATTERN_CARD_WELL_CLASS} items-center justify-center text-center`;
+  `${PATTERN_CARD_WELL_CLASS} h-full w-full items-center justify-center text-center`;
 
 /** Same centered empty well as Reach — keep the Audience band when Graph has no series. */
 export const PATTERN_AUDIENCE_EMPTY_WELL_CLASS = PATTERN_REACH_EMPTY_WELL_CLASS;

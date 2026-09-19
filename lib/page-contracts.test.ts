@@ -93,6 +93,10 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(workspace, /KitEdit|PitchKitComingSoon|Coming soon/);
     assert.match(workspace, /OwnerPitchKit/);
     assert.match(ownerKit, /examples-pitchkit--owner-pitch-kit/);
+    assert.match(ownerKit, /ShareKitButton/);
+    assert.match(ownerKit, /title="PitchKit"/);
+    assert.match(ownerKit, /EngagementRateFormulaTooltip/);
+    assert.match(ownerKit, /formatPostedAt/);
     assert.match(ownerKit, /CreatorIdentityStrip/);
     assert.match(ownerKit, /PATTERN_IDENTITY_SECTION_CLASS/);
     assert.match(ownerKit, /Manage selected post/);
@@ -212,12 +216,12 @@ describe("critical page contracts", () => {
   });
 
   it("Insights product toasts pass title and description", () => {
-    const chrome = read("components/owner-chrome.tsx");
+    const share = read("components/share-kit-button.tsx");
     const proof = read("components/proof-posts.tsx");
     const copy = read("lib/copy.ts");
     const layout = read("app/layout.tsx");
     const ownerKit = read("components/owner-pitchkit.tsx");
-    const sources = [chrome, proof, ownerKit];
+    const sources = [share, proof, ownerKit];
     const blocks = sources.flatMap(toastAddBlocks);
 
     assert.equal(blocks.length, 10);
@@ -235,8 +239,8 @@ describe("critical page contracts", () => {
     assert.match(copy, /TOAST_POST_RESTORED_DESCRIPTION = "It appears in the shareable PitchKit again."/);
     assert.match(copy, /TOAST_HIDE_FAILED_TITLE/);
     assert.match(copy, /TOAST_RESTORE_FAILED_TITLE/);
-    assert.match(chrome, /TOAST_KIT_COPIED_TITLE/);
-    assert.match(chrome, /TOAST_KIT_COPIED_DESCRIPTION/);
+    assert.match(share, /TOAST_KIT_COPIED_TITLE/);
+    assert.match(share, /TOAST_KIT_COPIED_DESCRIPTION/);
     assert.match(proof, /TOAST_POST_HIDDEN_TITLE/);
     assert.match(proof, /TOAST_POST_HIDDEN_DESCRIPTION/);
     assert.match(proof, /TOAST_POST_RESTORED_TITLE/);
@@ -261,12 +265,21 @@ describe("critical page contracts", () => {
 
     assert.match(chrome, /PageHeader/);
     assert.match(chrome, /title="Insights"/);
-    assert.match(chrome, /Share kit/);
+    assert.match(chrome, /ShareKitButton/);
+    assert.match(read("components/owner-pitchkit.tsx"), /ShareKitButton/);
+    assert.match(read("components/share-kit-button.tsx"), /Share kit/);
     assert.match(copy, /Private to you/);
     assert.match(chrome, /INSIGHTS_PRIVATE/);
     assert.match(stats, /label="Engagement rate"/);
     assert.doesNotMatch(stats, /label="ER"/);
-    assert.match(chrome, /ENGAGEMENT_FORMULA/);
+    assert.match(stats, /EngagementRateFormulaTooltip/);
+    assert.match(read("components/engagement-rate-info.tsx"), /ENGAGEMENT_FORMULA/);
+    assert.match(read("components/engagement-rate-info.tsx"), /<Tooltip/);
+    assert.match(read("components/engagement-rate-info.tsx"), /IconButton/);
+    assert.match(read("components/wmds.ts"), /Tooltip/);
+    assert.match(read("components/wmds.ts"), /IconButton/);
+    assert.doesNotMatch(chrome, /ENGAGEMENT_FORMULA/);
+    assert.doesNotMatch(chrome, /PATTERN_FORMULA_CLASS/);
     assert.match(read("lib/inventory.ts"), /\(likes \+ comments \+ saves \+ shares\) ÷ reach/);
     assert.doesNotMatch(chrome, /÷ followers/);
     assert.doesNotMatch(card, />ER</);
@@ -275,6 +288,9 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(stats, /trend=/);
     assert.match(stats, /PATTERN_STAT_CLASS/);
     assert.match(read("components/pattern-tokens.ts"), /PATTERN_STAT_CLASS = "col-span-2 md:col-span-4 lg:col-span-3"/);
+    assert.match(read("lib/posted-at.ts"), /year: "numeric"/);
+    assert.match(proof, /formatPostedAt/);
+    assert.doesNotMatch(proof, /month: "short"/);
     assert.match(proof, /Recent proof/);
     assert.doesNotMatch(chrome, /Six posts|Top-performing posts/);
     assert.doesNotMatch(proof, /Six posts|Top-performing posts/);
@@ -405,7 +421,7 @@ describe("critical page contracts", () => {
     );
     assert.match(
       read("components/pattern-tokens.ts"),
-      /PATTERN_REACH_EMPTY_WELL_CLASS =\s*`\$\{PATTERN_CARD_WELL_CLASS\} items-center justify-center text-center`/,
+      /PATTERN_REACH_EMPTY_WELL_CLASS =\s*`\$\{PATTERN_CARD_WELL_CLASS\} h-full w-full items-center justify-center text-center`/,
     );
     assert.match(
       read("components/pattern-tokens.ts"),

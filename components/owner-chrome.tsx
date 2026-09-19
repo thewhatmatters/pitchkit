@@ -1,32 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { Share2 } from "lucide-react";
 import { AudienceFit } from "@/components/audience-fit";
 import { InsightsLoading } from "@/components/insights-loading";
 import {
   PATTERN_DASHBOARD_GRID_CLASS,
-  PATTERN_FORMULA_CLASS,
   PATTERN_HEADER_COPY_CLASS,
   PATTERN_HEADER_SECTION_CLASS,
   PATTERN_METRICS_STACK_CLASS,
   PATTERN_SUPPORTING_CLASS,
 } from "@/components/pattern-tokens";
-import { Button, PageHeader, toast } from "@/components/wmds";
+import { Button, PageHeader } from "@/components/wmds";
 import { InsightsStats } from "@/components/insights-stats";
 import { ProofPosts } from "@/components/proof-posts";
 import { ReachChart } from "@/components/reach-chart";
+import { ShareKitButton } from "@/components/share-kit-button";
 import { resolveOwnerAudience } from "@/lib/audience";
 import { DisconnectControl } from "@/components/disconnect-control";
-import {
-  INSIGHTS_PRIVATE,
-  TOAST_KIT_COPIED_DESCRIPTION,
-  TOAST_KIT_COPIED_TITLE,
-  TOAST_KIT_COPY_FAILED_DESCRIPTION,
-  TOAST_KIT_COPY_FAILED_TITLE,
-} from "@/lib/copy";
-import { ENGAGEMENT_FORMULA, inventoryLastUpdated } from "@/lib/inventory";
-import { kitPath, type KitAudience } from "@/lib/kit";
+import { INSIGHTS_PRIVATE } from "@/lib/copy";
+import { inventoryLastUpdated } from "@/lib/inventory";
+import type { KitAudience } from "@/lib/kit";
 import type { ReachPoint } from "@/lib/reach-series";
 import type { Media, User } from "@/lib/schema";
 
@@ -80,27 +73,10 @@ export function OwnerChrome({
   const refreshed = formatRefreshedAt(inventoryLastUpdated(posts));
   const mixes = resolveOwnerAudience(audience);
 
-  async function copyKitLink() {
-    const url = `${window.location.origin}${kitPath(user.handle)}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      toast.add({
-        title: TOAST_KIT_COPIED_TITLE,
-        description: TOAST_KIT_COPIED_DESCRIPTION,
-      });
-    } catch {
-      toast.add({
-        title: TOAST_KIT_COPY_FAILED_TITLE,
-        description: TOAST_KIT_COPY_FAILED_DESCRIPTION,
-      });
-      setNotice(url);
-    }
-  }
-
   if (!gridReady) {
     return (
       <>
-        <InsightsLoading onShare={() => void copyKitLink()} />
+        <InsightsLoading handle={user.handle} onCopyFailed={setNotice} />
         <OwnerAccountActions notice={notice} />
       </>
     );
@@ -120,9 +96,7 @@ export function OwnerChrome({
                   Refresh
                 </Button>
               </form>
-              <Button role="secondary" size="sm" icon={<Share2 />} onClick={() => void copyKitLink()}>
-                Share kit
-              </Button>
+              <ShareKitButton handle={user.handle} onCopyFailed={setNotice} />
             </span>
           }
         />
@@ -131,9 +105,6 @@ export function OwnerChrome({
             {refreshed
               ? `Verified Instagram performance, refreshed ${refreshed}. ${INSIGHTS_PRIVATE}.`
               : `${INSIGHTS_PRIVATE}.`}
-          </p>
-          <p className={PATTERN_FORMULA_CLASS}>
-            Engagement rate = {ENGAGEMENT_FORMULA}.
           </p>
         </div>
       </section>

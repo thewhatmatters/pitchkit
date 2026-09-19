@@ -1,5 +1,6 @@
 "use client";
 
+import { EngagementRateFormulaTooltip } from "@/components/engagement-rate-info";
 import { PATTERN_STAT_CLASS, PATTERN_STATS_BAND_CLASS } from "@/components/pattern-tokens";
 import { Stat } from "@/components/wmds";
 import { formatCount, formatEngagementRate } from "@/lib/engagement";
@@ -44,6 +45,7 @@ export function InsightsStats({
         label="Engagement rate"
         value={formatEngagementRate(engagementRate)}
         loading={loading}
+        end={loading ? undefined : <EngagementRateFormulaTooltip />}
       />
       {showInsightsMetrics ? (
         <Stat
