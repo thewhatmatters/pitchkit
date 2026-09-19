@@ -41,6 +41,8 @@ export default async function InsightsPage({ searchParams }: InsightsProps) {
       reachSeries={ownerKit.reach_series}
       hasInsights={ownerKit.hasInsights}
       audience={ownerKit.audience}
+      intro={ownerKit.intro}
+      pastBrands={ownerKit.past_brands}
       gridReady={gridReady}
       retrieving={retrieving}
     />

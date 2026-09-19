@@ -21,6 +21,7 @@ export {
   Status,
   Switch,
   Tab,
+  TextArea,
   TextLink,
   Tooltip,
   Toaster,
@@ -34,5 +35,6 @@ export {
   chartMaxTicksForWidth,
   chartSeriesConfigFromKeys,
   chartSeriesConfigFromTone,
+  dialogFooterActionsClasses,
   toast,
 } from "@whatmatters/wmds";

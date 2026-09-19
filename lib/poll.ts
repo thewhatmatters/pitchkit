@@ -166,6 +166,8 @@ export function snapshotFromMe(input: {
     reach_series: [],
     audience: EMPTY_AUDIENCE,
     polled_at: fetchedAt,
+    intro: input.existing?.intro ?? null,
+    past_brands: input.existing?.past_brands ?? [],
   };
 }
 
@@ -317,6 +319,8 @@ export async function pollInsights(options: PollOptions): Promise<PollResult> {
       reach_series: reachSeries,
       audience,
       polled_at: fetchedAt,
+      intro: existing?.intro ?? null,
+      past_brands: existing?.past_brands ?? [],
     },
   };
 }

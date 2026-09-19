@@ -2,6 +2,8 @@
 
 import { Button, Card, Stat, TextLink, cardTitleClasses } from "@/components/wmds";
 import { CreatorIdentityStrip } from "@/components/creator-identity-strip";
+import { PublicIntro } from "@/components/kit-intro";
+import { PublicPastBrands } from "@/components/past-brands";
 import {
   PATTERN_CALLOUT_ACTIONS_CLASS,
   PATTERN_CALLOUT_BODY_CLASS,
@@ -10,6 +12,7 @@ import {
   PATTERN_CONTACT_ROW_CLASS,
   PATTERN_CONTACT_ROWS_CLASS,
   PATTERN_IDENTITY_NAMEPLATE_CLASS,
+  PATTERN_INTRO_STACK_CLASS,
   PATTERN_KIT_POST_METRICS_CLASS,
   PATTERN_KIT_STAT_CLASS,
   PATTERN_POST_CARD_CLASS,
@@ -26,11 +29,8 @@ import {
 } from "@/components/pattern-tokens";
 import { creatorIdentityFromUser } from "@/lib/creator-identity";
 import { formatCount, formatEngagementRate } from "@/lib/engagement";
-import {
-  shouldShowPastBrands,
-  sourcedContactDetail,
-  visibleBrandNames,
-} from "@/lib/kit-chips";
+import { sourcedContactDetail } from "@/lib/kit-chips";
+import type { PastBrand } from "@/lib/kit-profile";
 import { publicObjectUrl } from "@/lib/r2";
 import type { Media, User } from "@/lib/schema";
 
@@ -43,7 +43,8 @@ type ShareableKitProps = {
   user: User;
   posts: Media[];
   engagementRate: number | null;
-  pastBrands?: readonly string[];
+  pastBrands?: readonly PastBrand[];
+  intro?: string | null;
   contact?: string | null;
   /**
    * Unsigned visitor who is not the kit owner.
@@ -84,6 +85,8 @@ function PublicCreatePitchkitBand() {
 /**
  * Pattern — shareable PitchKit Show code (`examples-pitchkit--shareable-pitch-kit`)
  * plus Pattern — creator identity (public) (`examples-pitchkit--creator-identity-public`)
+ * plus Pattern — intro (public) (`examples-pitchkit--intro-public`)
+ * plus Pattern — past brands (public) (`examples-pitchkit--past-brands-public`)
  * for the nameplate. Kit Stats / selected posts stay the shareable freeze.
  * No owner management. `showCreateBand` is the unsigned anon CTA.
  */
@@ -92,17 +95,20 @@ export function ShareableKit({
   posts,
   engagementRate,
   pastBrands = [],
+  intro = null,
   contact = null,
   showCreateBand = false,
 }: ShareableKitProps) {
   const contactDetail = sourcedContactDetail(contact);
-  const brands = visibleBrandNames(pastBrands);
   const identity = creatorIdentityFromUser(user);
 
   return (
     <>
       <section className={PATTERN_IDENTITY_NAMEPLATE_CLASS}>
-        <CreatorIdentityStrip identity={identity} nameAs="h1" showProfessionalChip />
+        <div className={PATTERN_INTRO_STACK_CLASS}>
+          <CreatorIdentityStrip identity={identity} nameAs="h1" showProfessionalChip />
+          <PublicIntro intro={intro} />
+        </div>
       </section>
 
       <div
@@ -208,30 +214,7 @@ export function ShareableKit({
         </section>
       ) : null}
 
-      {shouldShowPastBrands(brands) ? (
-        <section className={PATTERN_POSTS_SECTION_CLASS}>
-          <div className={PATTERN_POSTS_HEADER_CLASS}>
-            <div>
-              <h2 className={cardTitleClasses}>Past brands</h2>
-              <p className={PATTERN_SUPPORTING_CLASS}>
-                Campaigns already shipped with this creator.
-              </p>
-            </div>
-          </div>
-          <div className={PATTERN_POSTS_PANEL_CLASS}>
-            {brands.map((name) => (
-              <Card
-                key={name}
-                variant="outlined"
-                shape="rounded"
-                className={PATTERN_POST_CARD_CLASS}
-              >
-                <Card.Header start={<h3 className={cardTitleClasses}>{name}</h3>} />
-              </Card>
-            ))}
-          </div>
-        </section>
-      ) : null}
+      <PublicPastBrands brands={pastBrands} />
 
       {showCreateBand ? <PublicCreatePitchkitBand /> : null}
     </>

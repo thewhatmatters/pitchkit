@@ -16,8 +16,17 @@ import {
   type HiddenKitNamespace,
 } from "./hidden-kit-kv";
 import { resolveHasHyperdrive } from "./hyperdrive";
+import {
+  EMPTY_KIT_PROFILE,
+  kitProfileFromUnknown,
+  normalizeIntro,
+  normalizePastBrands,
+  type KitProfile,
+  type PastBrand,
+} from "./kit-profile";
 import type { ReachPoint } from "./reach-series";
 import type { Media, User } from "./schema";
+import { DEMO_HANDLE, seedOwnerMedia, seedReachSeries, seedUsers } from "./seed";
 import { resolveSqlStore } from "./sql-store";
 
 export const GRAPH_USER_PREFIX = "graph:id:";
@@ -45,6 +54,10 @@ export type GraphSnapshot = {
   reach_series: ReachPoint[];
   audience: AudienceMixes;
   polled_at: string;
+  /** Pitchkit-owned intro. Optional on disk — parse stays tolerant. */
+  intro?: string | null;
+  /** Ordered `{ id, name }`. Optional on disk — parse stays tolerant. */
+  past_brands?: PastBrand[];
 };
 
 function snapshotKey(userId: string): string {
@@ -67,13 +80,18 @@ export type GraphPayloadExtras = {
   reach_series: ReachPoint[];
   audience: AudienceMixes;
   polled_at: string;
+  intro?: string | null;
+  past_brands?: PastBrand[];
 };
 
 function extrasFromSnapshot(snapshot: GraphSnapshot): GraphPayloadExtras {
+  const profile = kitProfileFromUnknown(snapshot.intro, snapshot.past_brands);
   return {
     reach_series: snapshot.reach_series,
     audience: snapshot.audience,
     polled_at: snapshot.polled_at,
+    intro: profile.intro,
+    past_brands: profile.past_brands,
   };
 }
 
@@ -82,6 +100,8 @@ function emptyExtras(polledAt = ""): GraphPayloadExtras {
     reach_series: [],
     audience: EMPTY_AUDIENCE,
     polled_at: polledAt,
+    intro: null,
+    past_brands: [],
   };
 }
 
@@ -142,12 +162,15 @@ function snapshotFromSql(
   media: Media[],
   extras: GraphPayloadExtras,
 ): GraphSnapshot {
+  const profile = kitProfileFromUnknown(extras.intro, extras.past_brands);
   return {
     user,
     media,
     reach_series: extras.reach_series,
     audience: extras.audience,
     polled_at: extras.polled_at,
+    intro: profile.intro,
+    past_brands: profile.past_brands,
   };
 }
 
@@ -236,10 +259,33 @@ function parseSnapshot(raw: string | null): GraphSnapshot | null {
   }
   try {
     const parsed: unknown = JSON.parse(raw);
-    return isSnapshot(parsed) ? parsed : null;
+    if (!isSnapshot(parsed)) {
+      return null;
+    }
+    const profile = kitProfileFromUnknown(parsed.intro, parsed.past_brands);
+    return {
+      ...parsed,
+      intro: profile.intro,
+      past_brands: profile.past_brands,
+    };
   } catch {
     return null;
   }
+}
+
+function mergeKitProfile(
+  next: GraphSnapshot,
+  previous: GraphSnapshot | null,
+): GraphSnapshot {
+  const profile = kitProfileFromUnknown(
+    next.intro !== undefined ? next.intro : previous?.intro,
+    next.past_brands !== undefined ? next.past_brands : previous?.past_brands,
+  );
+  return {
+    ...next,
+    intro: profile.intro,
+    past_brands: profile.past_brands,
+  };
 }
 
 export async function readGraphSnapshot(
@@ -370,7 +416,8 @@ async function putSnapshot(ns: HiddenKitNamespace, snapshot: GraphSnapshot): Pro
     if (previous && previous.user.handle !== snapshot.user.handle) {
       await ns.put(handleKey(previous.user.handle), "");
     }
-    await ns.put(snapshotKey(snapshot.user.id), JSON.stringify(snapshot));
+    const merged = mergeKitProfile(snapshot, previous);
+    await ns.put(snapshotKey(snapshot.user.id), JSON.stringify(merged));
     await ns.put(handleKey(snapshot.user.handle), snapshot.user.id);
     await ns.put(igKey(snapshot.user.ig_user_id), snapshot.user.id);
     return true;
@@ -400,6 +447,58 @@ export function disconnectGraphSnapshot(snapshot: GraphSnapshot, at: string): Gr
     ...snapshot,
     user: markUserDisconnected(snapshot.user, at),
   };
+}
+
+export function snapshotKitProfile(snapshot: GraphSnapshot | null | undefined): KitProfile {
+  if (!snapshot) {
+    return { ...EMPTY_KIT_PROFILE };
+  }
+  return kitProfileFromUnknown(snapshot.intro, snapshot.past_brands);
+}
+
+/**
+ * Owner intro / past brands → KV Graph snapshot via writeGraphSnapshot.
+ * Demo without a snapshot writes seed user/media plus the profile fields.
+ */
+export async function persistOwnerKitProfile(
+  session: { handle: string; userId: string },
+  profile: KitProfile,
+  access: HiddenKitAccess = "route",
+): Promise<boolean> {
+  const intro = normalizeIntro(profile.intro);
+  const pastBrands = normalizePastBrands(profile.past_brands);
+  const existing =
+    (await readGraphSnapshot(session.userId, access)) ??
+    (await readGraphSnapshotByHandle(session.handle, access));
+  if (existing) {
+    return writeGraphSnapshot(
+      {
+        ...existing,
+        intro,
+        past_brands: pastBrands,
+      },
+      access,
+    );
+  }
+  if (session.handle !== DEMO_HANDLE) {
+    return false;
+  }
+  const seedUser = seedUsers.find((row) => row.id === session.userId) ?? seedUsers[0];
+  if (!seedUser) {
+    return false;
+  }
+  return writeGraphSnapshot(
+    {
+      user: seedUser,
+      media: seedOwnerMedia.filter((row) => row.user_id === seedUser.id),
+      reach_series: seedReachSeries,
+      audience: EMPTY_AUDIENCE,
+      polled_at: "",
+      intro,
+      past_brands: pastBrands,
+    },
+    access,
+  );
 }
 
 /**

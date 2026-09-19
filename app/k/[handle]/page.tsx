@@ -61,6 +61,8 @@ export default async function KitPage({ params }: KitPageProps) {
             user={kit.user}
             posts={kit.posts}
             engagementRate={kit.engagementRate}
+            intro={kit.intro}
+            pastBrands={kit.past_brands}
             showCreateBand={session == null}
           />
           <SupportFooter />

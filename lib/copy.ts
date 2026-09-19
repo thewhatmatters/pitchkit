@@ -76,6 +76,9 @@ export const TOAST_POST_RESTORED_TITLE = "Post restored to kit";
 export const TOAST_POST_RESTORED_DESCRIPTION = "It appears in the shareable PitchKit again.";
 export const TOAST_HIDE_FAILED_TITLE = "Could not hide this post";
 export const TOAST_RESTORE_FAILED_TITLE = "Could not restore this post";
+export const TOAST_KIT_PROFILE_FAILED_TITLE = "Could not save kit profile";
+export const TOAST_KIT_PROFILE_FAILED_DESCRIPTION =
+  "Intro and past brands could not be stored. Try again.";
 
 /** State — insufficient reach data (`examples-pitchkit--insufficient-reach-data`). */
 export const REACH_INSUFFICIENT_TITLE = "No reach data yet";
