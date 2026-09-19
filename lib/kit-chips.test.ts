@@ -7,6 +7,7 @@ import {
   SEED_AUDIENCE,
   shouldShowAudienceMix,
   visibleAudienceMix,
+  type RankedShare,
 } from "./audience";
 import {
   EXAMPLE_AGE_MIX,
@@ -88,6 +89,12 @@ describe("audience mix hide-empty", () => {
       { label: "Canada", value: 11 },
     ]);
     assert.deepEqual(publicCountries([]), []);
+    const readonlyRows: readonly RankedShare[] = [
+      { label: "United States", percent: 42 },
+    ];
+    assert.deepEqual(publicCountries(readonlyRows), [
+      { label: "United States", value: 42 },
+    ]);
   });
 
   it("live/empty owner audience never resolves to EXAMPLE labels", () => {

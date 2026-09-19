@@ -31,14 +31,16 @@ export type PublicCountryBar = {
 };
 
 export function publicCountries(
-  rows: RankedShare[] | null | undefined,
+  rows: readonly RankedShare[] | null | undefined,
 ): PublicCountryBar[] {
   return visibleAudienceMix(rows)
     .slice(0, PITCHKIT_PUBLIC_COUNTRIES_MAX)
     .map((row) => ({ label: row.label, value: row.percent }));
 }
 
-export function visibleAudienceMix(rows: RankedShare[] | null | undefined): RankedShare[] {
+export function visibleAudienceMix(
+  rows: readonly RankedShare[] | null | undefined,
+): RankedShare[] {
   if (!Array.isArray(rows) || rows.length === 0) {
     return [];
   }
@@ -46,7 +48,9 @@ export function visibleAudienceMix(rows: RankedShare[] | null | undefined): Rank
   return rows.filter((row) => Number.isFinite(row.percent) && row.percent > 0);
 }
 
-export function shouldShowAudienceMix(rows: RankedShare[] | null | undefined): boolean {
+export function shouldShowAudienceMix(
+  rows: readonly RankedShare[] | null | undefined,
+): boolean {
   return visibleAudienceMix(rows).length > 0;
 }
 
