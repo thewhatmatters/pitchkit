@@ -58,6 +58,8 @@ describe("critical page contracts", () => {
     assert.match(auth, /stubConnect/);
     assert.match(auth, /const persisted = await writeGraphSnapshot/);
     assert.match(auth, /if \(!persisted\)/);
+    assert.match(auth, /resolveSession\(snapshot\.user\.handle/);
+    assert.match(auth, /if \(!session\)/);
     assert.match(auth, /error=persist/);
     assert.match(auth, /sessionClearCookieHeader/);
     assert.match(auth, /oauthFinishAbortCookies/);
@@ -66,8 +68,9 @@ describe("critical page contracts", () => {
     const writeStart = graphStore.indexOf("export async function writeGraphSnapshot");
     const persistStart = graphStore.indexOf("export async function persistOwnerDisconnect");
     const writeFn = graphStore.slice(writeStart, persistStart > writeStart ? persistStart : undefined);
-    assert.match(writeFn, /return writeKvSnapshot\(snapshot, access\)/);
+    assert.match(writeFn, /return await writeKvSnapshot\(snapshot, access\)/);
     assert.doesNotMatch(writeFn, /if \(await resolveHasHyperdrive\(access\)\) \{\s*return false;/);
+    assert.match(read("lib/graph-store.ts"), /Thrown DB \/ overlay errors must not escape writeGraphSnapshot/);
     assert.match(read("lib/graph.ts"), /graph\.instagram\.com/);
     assert.match(read("lib/graph.ts"), /GRAPH_API_VERSION|createGraphClient/);
     assert.match(read("lib/poll.ts"), /POLL_STALE_MS = 6/);
@@ -551,7 +554,8 @@ describe("critical page contracts", () => {
     assert.match(read("lib/hidden-kit-kv.ts"), /async: true/);
     assert.match(read("wrangler.jsonc"), /"binding": "HIDDEN_KIT"/);
     assert.match(read("wrangler.jsonc"), /8a50f78eca5e4bf7bbabc96d9f9df63c/);
-    assert.match(read("wrangler.jsonc"), /^\s+"hyperdrive":/m);
+    assert.match(read("wrangler.jsonc"), /\/\/\s+"hyperdrive":/);
+    assert.doesNotMatch(read("wrangler.jsonc"), /^\s+"hyperdrive":/m);
     assert.match(read("wrangler.jsonc"), /"binding": "HYPERDRIVE"/);
     assert.match(read("wrangler.jsonc"), /"binding": "HYPERDRIVE_PREVIEW"/);
     assert.match(read("wrangler.jsonc"), /bf225442516d44f599e083b72df886cd/);

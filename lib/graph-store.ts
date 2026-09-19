@@ -174,36 +174,45 @@ async function writeSqlSnapshot(
   snapshot: GraphSnapshot,
   access: HiddenKitAccess,
 ): Promise<boolean> {
-  const sql = await resolveSqlStore(access);
-  if (!sql) {
+  try {
+    const sql = await resolveSqlStore(access);
+    if (!sql) {
+      return false;
+    }
+    const media = await applyHiddenOverlayFromKv(snapshot.user.id, snapshot.media, access);
+    if (!(await sql.upsertUser(snapshot.user))) {
+      return false;
+    }
+    if (!(await sql.replaceUserMedia(snapshot.user.id, media))) {
+      return false;
+    }
+    await writePayloadExtras(snapshot.user.id, extrasFromSnapshot(snapshot), access);
+    return true;
+  } catch {
+    // Thrown DB / overlay errors must not escape writeGraphSnapshot.
     return false;
   }
-  const media = await applyHiddenOverlayFromKv(snapshot.user.id, snapshot.media, access);
-  if (!(await sql.upsertUser(snapshot.user))) {
-    return false;
-  }
-  if (!(await sql.replaceUserMedia(snapshot.user.id, media))) {
-    return false;
-  }
-  await writePayloadExtras(snapshot.user.id, extrasFromSnapshot(snapshot), access);
-  return true;
 }
 
 async function readSqlSnapshotByUserId(
   userId: string,
   access: HiddenKitAccess,
 ): Promise<GraphSnapshot | null> {
-  const sql = await resolveSqlStore(access);
-  if (!sql) {
+  try {
+    const sql = await resolveSqlStore(access);
+    if (!sql) {
+      return null;
+    }
+    const user = await sql.findUserById(userId);
+    if (!user) {
+      return null;
+    }
+    const media = await sql.listMediaByUserId(userId);
+    const extras = await readPayloadExtras(userId, access, user.connected_at);
+    return snapshotFromSql(user, media, extras);
+  } catch {
     return null;
   }
-  const user = await sql.findUserById(userId);
-  if (!user) {
-    return null;
-  }
-  const media = await sql.listMediaByUserId(userId);
-  const extras = await readPayloadExtras(userId, access, user.connected_at);
-  return snapshotFromSql(user, media, extras);
 }
 
 function isSnapshot(value: unknown): value is GraphSnapshot {
@@ -252,14 +261,18 @@ export async function readGraphSnapshotByHandle(
   handle: string,
   access: HiddenKitAccess = "page",
 ): Promise<GraphSnapshot | null> {
-  const sql = await resolveSqlStore(access);
-  if (sql) {
-    const user = await sql.findUserByHandle(handle);
-    if (user) {
-      const media = await sql.listMediaByUserId(user.id);
-      const extras = await readPayloadExtras(user.id, access, user.connected_at);
-      return snapshotFromSql(user, media, extras);
+  try {
+    const sql = await resolveSqlStore(access);
+    if (sql) {
+      const user = await sql.findUserByHandle(handle);
+      if (user) {
+        const media = await sql.listMediaByUserId(user.id);
+        const extras = await readPayloadExtras(user.id, access, user.connected_at);
+        return snapshotFromSql(user, media, extras);
+      }
     }
+  } catch {
+    // SQL threw — fall through to KV so a KV persist is still resolvable.
   }
   const ns = await readHiddenKitBinding(access);
   if (!ns) {
@@ -276,14 +289,18 @@ export async function readGraphSnapshotByIgUserId(
   igUserId: string,
   access: HiddenKitAccess = "page",
 ): Promise<GraphSnapshot | null> {
-  const sql = await resolveSqlStore(access);
-  if (sql) {
-    const user = await sql.findUserByIgUserId(igUserId);
-    if (user) {
-      const media = await sql.listMediaByUserId(user.id);
-      const extras = await readPayloadExtras(user.id, access, user.connected_at);
-      return snapshotFromSql(user, media, extras);
+  try {
+    const sql = await resolveSqlStore(access);
+    if (sql) {
+      const user = await sql.findUserByIgUserId(igUserId);
+      if (user) {
+        const media = await sql.listMediaByUserId(user.id);
+        const extras = await readPayloadExtras(user.id, access, user.connected_at);
+        return snapshotFromSql(user, media, extras);
+      }
     }
+  } catch {
+    // SQL threw — fall through to KV.
   }
   const ns = await readHiddenKitBinding(access);
   if (!ns) {
@@ -297,9 +314,13 @@ export async function readGraphSnapshotByIgUserId(
 }
 
 export async function listTakenHandles(access: HiddenKitAccess = "page"): Promise<Set<string>> {
-  const sql = await resolveSqlStore(access);
-  if (sql) {
-    return new Set<string>(["demo", ...(await sql.listHandles())]);
+  try {
+    const sql = await resolveSqlStore(access);
+    if (sql) {
+      return new Set<string>(["demo", ...(await sql.listHandles())]);
+    }
+  } catch {
+    // SQL threw — seed `demo` only (KV has no list).
   }
   // KV has no list in this binding surface. Taken set is the requested handle
   // plus any snapshot we can resolve — callers also pass seed `demo`.
@@ -311,17 +332,25 @@ export async function writeGraphSnapshot(
   snapshot: GraphSnapshot,
   access: HiddenKitAccess = "page",
 ): Promise<boolean> {
-  const sql = await resolveSqlStore(access);
-  if (sql) {
-    try {
-      if (await writeSqlSnapshot(snapshot, access)) {
-        return true;
+  try {
+    const sql = await resolveSqlStore(access);
+    if (sql) {
+      try {
+        if (await writeSqlSnapshot(snapshot, access)) {
+          return true;
+        }
+      } catch {
+        // SQL upsert threw — still try KV so OAuth can persist.
       }
-    } catch {
-      // SQL upsert threw — still try KV so OAuth can persist.
     }
+  } catch {
+    // resolveSqlStore / Hyperdrive client threw — still try KV.
   }
-  return writeKvSnapshot(snapshot, access);
+  try {
+    return await writeKvSnapshot(snapshot, access);
+  } catch {
+    return false;
+  }
 }
 
 async function writeKvSnapshot(

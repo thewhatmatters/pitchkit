@@ -28,14 +28,15 @@
       "id": "8a50f78eca5e4bf7bbabc96d9f9df63c",
     },
   ],
-  // Supabase Postgres via Hyperdrive — config `pitchkit`
-  // (id bf225442516d44f599e083b72df886cd). Same id for preview MVP.
+  // Supabase Postgres via Hyperdrive — TODO: uncomment when SQL persist is fixed.
+  // Config `pitchkit` (id bf225442516d44f599e083b72df886cd). Same id for preview MVP.
   // Origin URI in the Hyperdrive config: Supabase direct (port 5432), not pooler 6543.
+  // Do not invent Hyperdrive ids.
   // Prod: HYPERDRIVE. Preview: HYPERDRIVE_PREVIEW.
-  "hyperdrive": [
-    { "binding": "HYPERDRIVE", "id": "bf225442516d44f599e083b72df886cd" },
-    { "binding": "HYPERDRIVE_PREVIEW", "id": "bf225442516d44f599e083b72df886cd" },
-  ],
+  // "hyperdrive": [
+  //   { "binding": "HYPERDRIVE", "id": "bf225442516d44f599e083b72df886cd" },
+  //   { "binding": "HYPERDRIVE_PREVIEW", "id": "bf225442516d44f599e083b72df886cd" },
+  // ],
   // Kit images — bucket name planned as pitchkit-media. Public read for kit objects.
   // "r2_buckets": [
   //   { "binding": "MEDIA", "bucket_name": "pitchkit-media" },

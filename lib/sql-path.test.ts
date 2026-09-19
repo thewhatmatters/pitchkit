@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
 import { afterEach, describe, it } from "node:test";
-import { EMPTY_AUDIENCE, persistOwnerDisconnect, readGraphSnapshot, writeGraphSnapshot } from "./graph-store";
+import { emptySecrets, setSecretsForTests } from "./env";
+import { EMPTY_AUDIENCE, persistOwnerDisconnect, readGraphSnapshot, readGraphSnapshotByHandle, writeGraphSnapshot } from "./graph-store";
 import { createMemoryHiddenKit, hideFromKit, restoreToKit, setHiddenKitNamespaceForTests } from "./hidden-kit";
 import { resetHyperdriveForTests, setHasHyperdriveForTests } from "./hyperdrive";
 import type { User } from "./schema";
 import { DEMO_HANDLE, DEMO_USER_ID, seedMedia } from "./seed";
-import { parseSessionValue } from "./session";
+import { parseSessionValue, resolveSession } from "./session";
 import { createMemorySqlStore, resetSqlStoreForTests, setSqlStoreForTests, type SqlStore } from "./sql-store";
 import { loadPublicKit } from "./store";
 
@@ -37,6 +38,7 @@ afterEach(() => {
   resetSqlStoreForTests();
   resetHyperdriveForTests();
   setHiddenKitNamespaceForTests(undefined);
+  setSecretsForTests(undefined);
 });
 
 describe("Hyperdrive SQL path", () => {
@@ -185,6 +187,105 @@ describe("Hyperdrive SQL path", () => {
     );
     const stored = await readGraphSnapshot(user.id);
     assert.equal(stored?.user.handle, user.handle);
+  });
+
+  it("persists via KV when Hyperdrive is unbound", async () => {
+    const user = liveUser();
+    setHasHyperdriveForTests(false);
+    resetSqlStoreForTests();
+    setHiddenKitNamespaceForTests(createMemoryHiddenKit());
+    setSecretsForTests({ ...emptySecrets(), IG_APP_ID: "id", IG_APP_SECRET: "secret" });
+
+    assert.equal(
+      await writeGraphSnapshot({
+        user,
+        media: [],
+        reach_series: [],
+        audience: EMPTY_AUDIENCE,
+        polled_at: NOW,
+      }),
+      true,
+    );
+    const stored = await readGraphSnapshot(user.id);
+    assert.ok(stored);
+    assert.equal(stored.user.handle, user.handle);
+    assert.deepEqual(await resolveSession(user.handle, "route"), {
+      handle: user.handle,
+      userId: user.id,
+    });
+  });
+
+  it("falls back to KV when SQL upsert throws", async () => {
+    const user = liveUser();
+    const sql = createMemorySqlStore();
+    const failing: SqlStore = {
+      ...sql,
+      async upsertUser() {
+        throw new Error("connection reset");
+      },
+      async replaceUserMedia() {
+        throw new Error("connection reset");
+      },
+    };
+    setSqlStoreForTests(failing);
+    setHasHyperdriveForTests(true);
+    setHiddenKitNamespaceForTests(createMemoryHiddenKit());
+    setSecretsForTests({ ...emptySecrets(), IG_APP_ID: "id", IG_APP_SECRET: "secret" });
+
+    assert.equal(
+      await writeGraphSnapshot({
+        user,
+        media: seedMedia.map((row) => ({ ...row, user_id: user.id })),
+        reach_series: [],
+        audience: EMPTY_AUDIENCE,
+        polled_at: NOW,
+      }),
+      true,
+    );
+    assert.equal(await sql.findUserById(user.id), null);
+    const stored = await readGraphSnapshot(user.id);
+    assert.ok(stored);
+    assert.equal(stored.user.handle, user.handle);
+    assert.deepEqual(await resolveSession(user.handle, "route"), {
+      handle: user.handle,
+      userId: user.id,
+    });
+  });
+
+  it("reads the KV snapshot when SQL find-by-handle throws", async () => {
+    const user = liveUser();
+    setHasHyperdriveForTests(false);
+    setHiddenKitNamespaceForTests(createMemoryHiddenKit());
+    assert.equal(
+      await writeGraphSnapshot({
+        user,
+        media: [],
+        reach_series: [],
+        audience: EMPTY_AUDIENCE,
+        polled_at: NOW,
+      }),
+      true,
+    );
+
+    const throwing: SqlStore = {
+      ...createMemorySqlStore(),
+      async findUserByHandle() {
+        throw new Error("sql read failed");
+      },
+      async findUserById() {
+        throw new Error("sql read failed");
+      },
+    };
+    setSqlStoreForTests(throwing);
+    setHasHyperdriveForTests(true);
+    setSecretsForTests({ ...emptySecrets(), IG_APP_ID: "id", IG_APP_SECRET: "secret" });
+
+    const stored = await readGraphSnapshotByHandle(user.handle);
+    assert.equal(stored?.user.handle, user.handle);
+    assert.deepEqual(await resolveSession(user.handle, "route"), {
+      handle: user.handle,
+      userId: user.id,
+    });
   });
 
   it("returns false only when SQL is unavailable and KV is missing; hide still fail-closes", async () => {

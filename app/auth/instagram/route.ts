@@ -32,6 +32,7 @@ import { pollInsights } from "@/lib/poll";
 import { encryptTokenIfPossible } from "@/lib/token-crypto";
 import {
   isHttpsRequest,
+  resolveSession,
   serializeSessionCookie,
   SESSION_COOKIE,
   SESSION_MAX_AGE,
@@ -187,6 +188,18 @@ async function finishOAuth(request: Request, code: string, state: string | null)
   };
   const persisted = await writeGraphSnapshot(snapshot, "route");
   if (!persisted) {
+    return redirectWithCookies(request, "/?error=persist", abortCookies);
+  }
+
+  let session = null;
+  try {
+    session = await resolveSession(snapshot.user.handle, "route");
+  } catch {
+    session = null;
+  }
+  if (!session) {
+    // Persist reported success but the app cannot resolve this handle —
+    // never set a cookie Insights will bounce back to Connect.
     return redirectWithCookies(request, "/?error=persist", abortCookies);
   }
 
