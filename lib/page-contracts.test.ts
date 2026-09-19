@@ -101,6 +101,10 @@ describe("critical page contracts", () => {
     assert.match(ownerKit, /PATTERN_IDENTITY_SECTION_CLASS/);
     assert.match(ownerKit, /Manage selected post/);
     assert.match(ownerKit, /Hide from kit/);
+    assert.match(
+      ownerKit,
+      /<Card\.Header\s+start=\{\s*<span className=\{cardSubtitleClasses\}>\{formatPostedAt\(post\.posted_at\)\}<\/span>\s*\}\s+end=\{\s*<MoreMenu/,
+    );
     assert.match(ownerKit, /hideFromKit/);
     assert.match(ownerKit, /restoreToKit/);
     assert.doesNotMatch(ownerKit, /Coming soon|label="Edit"|Swap post|bio|rates/);
@@ -376,10 +380,10 @@ describe("critical page contracts", () => {
     assert.match(chart, /animate="none"/);
     assert.match(read("components/owner-chrome.tsx"), /typicalReach=\{typicalReach\}/);
     assert.match(read("components/wmds.ts"), /chartMaxTicksForWidth/);
-    assert.match(read("package.json"), /wmds#9b4a1798aff97322b4167519c14ec802a1878b97/);
+    assert.match(read("package.json"), /wmds#368560cd22bee2c5320b0b0e8038c30affa4bdea/);
     assert.doesNotMatch(
       read("package.json"),
-      /0718bdcb87975d3389ad11770bb479c293d33200|14d50cda0302e263cb350409f2cea34de03c7c2e|cd18e7a29afd0c0d774552c1a3d665f480f51bd4|70da6a4c50d8efc1e687b20f231c6e4f1f6190c6|dc813326028c0fe1cc5f3719466a32607bab4504|55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab/,
+      /9b4a1798aff97322b4167519c14ec802a1878b97|0718bdcb87975d3389ad11770bb479c293d33200|14d50cda0302e263cb350409f2cea34de03c7c2e|cd18e7a29afd0c0d774552c1a3d665f480f51bd4|70da6a4c50d8efc1e687b20f231c6e4f1f6190c6|dc813326028c0fe1cc5f3719466a32607bab4504|55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab/,
     );
     assert.match(page, /OwnerWorkspace/);
     assert.match(read("components/owner-workspace.tsx"), /CREATOR_INSIGHTS_PAGE_CLASS/);
@@ -425,7 +429,15 @@ describe("critical page contracts", () => {
     );
     assert.match(
       read("components/pattern-tokens.ts"),
-      /PATTERN_REACH_EMPTY_COPY_CLASS =\s*"flex max-w-lg flex-col items-center gap-3 text-center"/,
+      /PATTERN_REACH_EMPTY_COPY_CLASS =\s*`\$\{PATTERN_EMPTY_COPY_CLASS\} items-center text-center`/,
+    );
+    assert.match(
+      read("components/pattern-tokens.ts"),
+      /PATTERN_EMPTY_COPY_CLASS = "flex max-w-lg flex-col gap-2"/,
+    );
+    assert.doesNotMatch(
+      read("components/pattern-tokens.ts"),
+      /PATTERN_REACH_EMPTY_COPY_CLASS =\s*"[^"]*gap-3/,
     );
     assert.match(read("components/reach-chart.tsx"), /PATTERN_REACH_EMPTY_COPY_CLASS/);
     assert.match(read("components/reach-chart.tsx"), /<Badge variant="neutral" emphasis="muted">\{REACH_NO_DATA_LABEL\}<\/Badge>/);
