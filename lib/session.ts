@@ -1,3 +1,4 @@
+import { hasLiveAuthSecrets, readSecrets } from "./env";
 import { persistOwnerDisconnect, readGraphSnapshotByHandle } from "./graph-store";
 import type { HiddenKitAccess } from "./hidden-kit-kv";
 import { DEMO_HANDLE, seedUsers } from "./seed";
@@ -117,14 +118,20 @@ export function parseSessionValue(value: string | undefined | null): Session | n
   return { handle: user.handle, userId: user.id };
 }
 
-/** Seed first, then a live Graph snapshot handle (Phase 2 OAuth). */
+/** Seed first (stub only), then a live Graph snapshot handle (Phase 2 OAuth). */
 export async function resolveSession(
   value: string | undefined | null,
   access: HiddenKitAccess = "page",
 ): Promise<Session | null> {
   const seed = parseSessionValue(value);
   if (seed) {
-    return seed;
+    const secrets = await readSecrets(access);
+    // Live Instagram Login is configured — leftover seed `demo` is not signed in.
+    // Public `/k/demo` stays; this gate is the owner cookie only.
+    if (!hasLiveAuthSecrets(secrets)) {
+      return seed;
+    }
+    return null;
   }
   if (!value) {
     return null;

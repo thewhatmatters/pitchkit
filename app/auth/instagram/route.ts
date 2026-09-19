@@ -35,7 +35,7 @@ import {
   serializeSessionCookie,
   SESSION_COOKIE,
   SESSION_MAX_AGE,
-  sessionRedirect,
+  sessionClearCookieHeader,
   stubConnect,
 } from "@/lib/session";
 
@@ -74,6 +74,15 @@ function parseCookie(request: Request, name: string): string | null {
   return null;
 }
 
+/** Failed live OAuth finish: drop oauth state and any leftover seed `demo` session. */
+function oauthFinishAbortCookies(request: Request): string[] {
+  const secure = isHttpsRequest(request);
+  return [
+    cookieHeader(OAUTH_STATE_COOKIE, "", secure, 0),
+    sessionClearCookieHeader(secure),
+  ];
+}
+
 async function beginOAuth(request: Request): Promise<Response> {
   const secrets = await readSecrets("route");
   if (!hasLiveAuthSecrets(secrets)) {
@@ -101,12 +110,13 @@ async function beginOAuth(request: Request): Promise<Response> {
 async function finishOAuth(request: Request, code: string, state: string | null): Promise<Response> {
   const secrets = await readSecrets("route");
   const secure = isHttpsRequest(request);
+  const abortCookies = oauthFinishAbortCookies(request);
   const clearState = cookieHeader(OAUTH_STATE_COOKIE, "", secure, 0);
 
   if (state) {
     const expected = parseCookie(request, OAUTH_STATE_COOKIE);
     if (!expected || expected !== state) {
-      return redirectWithCookies(request, "/", [clearState]);
+      return redirectWithCookies(request, "/", abortCookies);
     }
   }
 
@@ -117,7 +127,7 @@ async function finishOAuth(request: Request, code: string, state: string | null)
     redirectUri,
   });
   if (!exchanged.ok) {
-    return redirectWithCookies(request, "/", [clearState]);
+    return redirectWithCookies(request, "/", abortCookies);
   }
 
   const client = createGraphClient({
@@ -126,15 +136,15 @@ async function finishOAuth(request: Request, code: string, state: string | null)
   });
   const me = await fetchMe(client);
   if (!me.ok) {
-    return redirectWithCookies(request, "/", [clearState]);
+    return redirectWithCookies(request, "/", abortCookies);
   }
   if (isPersonalAccount(me.data.account_type) || (me.data.account_type != null && !isProfessionalAccount(me.data.account_type))) {
-    return redirectWithCookies(request, "/?error=personal", [clearState]);
+    return redirectWithCookies(request, "/?error=personal", abortCookies);
   }
 
   const igUserId = igUserIdFromMe(me.data) ?? exchanged.tokens.userId;
   if (!igUserId) {
-    return redirectWithCookies(request, "/", [clearState]);
+    return redirectWithCookies(request, "/", abortCookies);
   }
 
   const existing = await readGraphSnapshotByIgUserId(igUserId, "route");
@@ -160,9 +170,9 @@ async function finishOAuth(request: Request, code: string, state: string | null)
   });
   if (!polled.ok) {
     if (polled.reason === "personal") {
-      return redirectWithCookies(request, "/?error=personal", [clearState]);
+      return redirectWithCookies(request, "/?error=personal", abortCookies);
     }
-    return redirectWithCookies(request, "/", [clearState]);
+    return redirectWithCookies(request, "/", abortCookies);
   }
 
   const tokenEncrypted = await encryptTokenIfPossible(exchanged.tokens.accessToken, secrets.TOKEN_KEY);
@@ -175,7 +185,10 @@ async function finishOAuth(request: Request, code: string, state: string | null)
       token_expires_at: exchanged.tokens.expiresAt,
     },
   };
-  await writeGraphSnapshot(snapshot, "route");
+  const persisted = await writeGraphSnapshot(snapshot, "route");
+  if (!persisted) {
+    return redirectWithCookies(request, "/?error=persist", abortCookies);
+  }
 
   const sessionCookie = cookieHeader(
     SESSION_COOKIE,
@@ -190,10 +203,10 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const denied = oauthCallbackError(url.searchParams);
   if (denied === "personal") {
-    return sessionRedirect(request, "/?error=personal", cookieHeader(OAUTH_STATE_COOKIE, "", isHttpsRequest(request), 0));
+    return redirectWithCookies(request, "/?error=personal", oauthFinishAbortCookies(request));
   }
   if (denied === "denied") {
-    return sessionRedirect(request, "/", cookieHeader(OAUTH_STATE_COOKIE, "", isHttpsRequest(request), 0));
+    return redirectWithCookies(request, "/", oauthFinishAbortCookies(request));
   }
 
   const code = url.searchParams.get("code");
