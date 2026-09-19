@@ -62,6 +62,12 @@ describe("critical page contracts", () => {
     assert.match(auth, /sessionClearCookieHeader/);
     assert.match(auth, /oauthFinishAbortCookies/);
     assert.match(copy, /We could not save your Instagram connection/);
+    const graphStore = read("lib/graph-store.ts");
+    const writeStart = graphStore.indexOf("export async function writeGraphSnapshot");
+    const persistStart = graphStore.indexOf("export async function persistOwnerDisconnect");
+    const writeFn = graphStore.slice(writeStart, persistStart > writeStart ? persistStart : undefined);
+    assert.match(writeFn, /return writeKvSnapshot\(snapshot, access\)/);
+    assert.doesNotMatch(writeFn, /if \(await resolveHasHyperdrive\(access\)\) \{\s*return false;/);
     assert.match(read("lib/graph.ts"), /graph\.instagram\.com/);
     assert.match(read("lib/graph.ts"), /GRAPH_API_VERSION|createGraphClient/);
     assert.match(read("lib/poll.ts"), /POLL_STALE_MS = 6/);

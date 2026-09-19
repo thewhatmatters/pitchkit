@@ -34,7 +34,7 @@ Preconditions:
 
 ## Gotchas
 
-- Without `IG_APP_ID` / `IG_APP_SECRET` the path is still the seed stub (not an Instagram token). Seed tokens stay null. A live Meta dialog on production means those secrets are set — that is Phase 2 Auth, not a regression. Leftover `pitchkit_session=demo` must not enter Insights when those secrets exist; landing stays **Continue with Instagram**.
+- Without `IG_APP_ID` / `IG_APP_SECRET` the path is still the seed stub (not an Instagram token). Seed tokens stay null. A live Meta dialog on production means those secrets are set — that is Phase 2 Auth, not a regression. Leftover `pitchkit_session=demo` must not enter Insights when those secrets exist; landing stays **Continue with Instagram**. Live OAuth persist tries SQL first; if that write fails, KV `graph:` still saves so login does not loop on Connect. `/?error=persist` only if both writes fail.
 - `/insights` without `pitchkit_session` redirects home. Do not treat a landing screenshot as a connected session.
 - After connect, `goto /` must land on `/insights`, not the Continue gate.
 - Reconnect re-sets the same seed session. It does not create a second handle. WHA-313 optional URL update is live OAuth only.

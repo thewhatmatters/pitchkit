@@ -1,7 +1,9 @@
 /**
  * Persist Graph poll snapshots.
- * Hyperdrive bound → SQL is SoT for users / media (DATA.md columns).
- * Else → KV `HIDDEN_KIT` under `graph:` keys (unchanged).
+ * Hyperdrive bound → SQL is preferred SoT for users / media (DATA.md columns).
+ * If SQL write fails or the SQL store is missing, fall back to KV `HIDDEN_KIT`
+ * under `graph:` keys (same as pre-Hyperdrive). Never refuse KV solely because
+ * Hyperdrive is bound. False only when both writes fail / KV is missing.
  * `reach_series` + audience stay on the kit payload, not SQL — stored as
  * `graph:payload:` extras when SQL owns the rows.
  */
@@ -311,11 +313,21 @@ export async function writeGraphSnapshot(
 ): Promise<boolean> {
   const sql = await resolveSqlStore(access);
   if (sql) {
-    return writeSqlSnapshot(snapshot, access);
+    try {
+      if (await writeSqlSnapshot(snapshot, access)) {
+        return true;
+      }
+    } catch {
+      // SQL upsert threw — still try KV so OAuth can persist.
+    }
   }
-  if (await resolveHasHyperdrive(access)) {
-    return false;
-  }
+  return writeKvSnapshot(snapshot, access);
+}
+
+async function writeKvSnapshot(
+  snapshot: GraphSnapshot,
+  access: HiddenKitAccess,
+): Promise<boolean> {
   const ns = await readHiddenKitBinding(access);
   if (!ns) {
     return false;
