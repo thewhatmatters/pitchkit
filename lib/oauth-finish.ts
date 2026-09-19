@@ -1,7 +1,9 @@
 /**
  * Live Instagram OAuth finish: persist the in-memory snapshot, then set
- * `pitchkit_session` to that handle. Do not re-read the handle from storage —
- * a KV/SQL miss after a true write recreates the Connect loop.
+ * `pitchkit_session` to that handle on a single `Set-Cookie`. Do not re-read
+ * the handle from storage — a KV/SQL miss after a true write recreates the
+ * Connect loop. Do not pair oauth-state clear on the success 303: OpenNext
+ * on Workers can fold multiple Set-Cookie and leave leftover seed `demo`.
  */
 
 import type { PitchkitSecrets } from "./env";
@@ -87,13 +89,38 @@ export function sessionCookieAfterPersist(input: {
   };
 }
 
-function cookieHeader(name: string, value: string, secure: boolean, maxAge: number): string {
-  return serializeSessionCookie(name, value, secure, maxAge);
+/**
+ * OpenNext on Workers may fold multiple `Set-Cookie` (Record last-wins, or
+ * comma-join via `Headers.get`). A paired oauth-state clear on the success
+ * 303 can drop `pitchkit_session` and leave leftover seed `demo`.
+ * Capture 2026-09-19: callback Location `/insights`, follow-up GET `/insights`
+ * still sent `Cookie: pitchkit_session=demo` (Referer l.instagram.com).
+ */
+export function oauthSuccessSetCookies(sessionCookie: string): string[] {
+  return [sessionCookie];
+}
+
+/** Last `Set-Cookie` is what a last-wins fold keeps. */
+export function lastWinsSetCookie(cookies: string[]): string | undefined {
+  return cookies.length === 0 ? undefined : cookies[cookies.length - 1];
 }
 
 function redirectWithCookies(request: Request, path: string, cookies: string[]): Response {
+  const location = new URL(path, request.url).toString();
+  // One cookie → object-form header (same as stub `sessionRedirect`).
+  // Two+ still append, but the session-critical cookie must be last.
+  if (cookies.length === 1) {
+    return new Response(null, {
+      status: 303,
+      headers: {
+        Location: location,
+        "Set-Cookie": cookies[0],
+        "Cache-Control": "no-store",
+      },
+    });
+  }
   const headers = new Headers({
-    Location: new URL(path, request.url).toString(),
+    Location: location,
     "Cache-Control": "no-store",
   });
   for (const cookie of cookies) {
@@ -102,13 +129,9 @@ function redirectWithCookies(request: Request, path: string, cookies: string[]):
   return new Response(null, { status: 303, headers });
 }
 
-/** Failed live OAuth finish: drop oauth state and any leftover seed `demo` session. */
+/** Failed live OAuth finish: clear leftover seed `demo` (single header so a fold cannot keep it). */
 export function oauthFinishAbortCookies(request: Request): string[] {
-  const secure = isHttpsRequest(request);
-  return [
-    cookieHeader(OAUTH_STATE_COOKIE, "", secure, 0),
-    sessionClearCookieHeader(secure),
-  ];
+  return [sessionClearCookieHeader(isHttpsRequest(request))];
 }
 
 export async function finishLiveOAuth(input: {
@@ -120,7 +143,6 @@ export async function finishLiveOAuth(input: {
   const { request, code, state, secrets } = input;
   const secure = isHttpsRequest(request);
   const abortCookies = oauthFinishAbortCookies(request);
-  const clearState = cookieHeader(OAUTH_STATE_COOKIE, "", secure, 0);
 
   if (state) {
     const expected = readRequestCookie(request, OAUTH_STATE_COOKIE);
@@ -219,5 +241,5 @@ export async function finishLiveOAuth(input: {
   if (!after.ok) {
     return redirectWithCookies(request, oauthLandingPath("persist"), abortCookies);
   }
-  return redirectWithCookies(request, "/insights", [after.cookie, clearState]);
+  return redirectWithCookies(request, "/insights", oauthSuccessSetCookies(after.cookie));
 }
