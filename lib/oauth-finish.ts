@@ -7,11 +7,7 @@
  */
 
 import type { PitchkitSecrets } from "./env";
-import {
-  handleAfterReconnect,
-  pitchkitHandleFromUsername,
-  uniqueHandle,
-} from "./handle";
+import { liveOAuthHandle } from "./handle";
 import {
   createGraphClient,
   fetchMe,
@@ -186,14 +182,12 @@ export async function finishLiveOAuth(input: {
   const updateHandle = url.searchParams.get("update_handle") === "1";
   const igUsername = me.data.username ?? igUserId;
   const taken = await listTakenHandles("route");
-  const handle = existing
-    ? handleAfterReconnect({
-        existingHandle: existing.user.handle,
-        igUsername,
-        updateHandle,
-        taken,
-      })
-    : uniqueHandle(pitchkitHandleFromUsername(igUsername), taken);
+  const handle = liveOAuthHandle({
+    existingHandle: existing?.user.handle,
+    igUsername,
+    updateHandle,
+    taken,
+  });
 
   const polled = await pollInsights({
     token: exchanged.tokens.accessToken,

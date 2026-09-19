@@ -9,6 +9,7 @@ import {
   OAUTH_STATE_COOKIE,
 } from "./instagram-oauth";
 import { landingErrorCopy } from "./copy";
+import { EMPTY_AUDIENCE, readGraphSnapshotByHandle, writeGraphSnapshot } from "./graph-store";
 import {
   cookieHandleAfterPersist,
   finishLiveOAuth,
@@ -19,7 +20,7 @@ import {
 } from "./oauth-finish";
 import { snapshotFromMe } from "./poll";
 import { DEMO_HANDLE } from "./seed";
-import { SESSION_COOKIE } from "./session";
+import { SESSION_COOKIE, stubConnect } from "./session";
 
 const STATE = "oauth-state-unit";
 const NOW = new Date("2026-09-19T18:00:00.000Z");
@@ -182,6 +183,57 @@ describe("finishLiveOAuth", () => {
     assertSessionOverwrite(response, "rxndy.dxniel");
   });
 
+  it("escapes a Graph snapshot stuck on demo when /me username is not demo", async () => {
+    setSecretsForTests(liveSecrets());
+    setHiddenKitNamespaceForTests(createMemoryHiddenKit());
+    mock.method(globalThis, "fetch", graphFetch());
+    assert.equal(
+      await writeGraphSnapshot({
+        user: {
+          id: "u-contaminated",
+          ig_user_id: "1784",
+          handle: DEMO_HANDLE,
+          name: "Randy",
+          avatar_r2_key: null,
+          followers: 200,
+          media_count: 3,
+          token_encrypted: null,
+          refresh_encrypted: null,
+          token_expires_at: null,
+          connected_at: "2026-09-01T00:00:00.000Z",
+          disconnected_at: null,
+          consent_index: false,
+          ig_account_type: "BUSINESS",
+          disclosure_version: 1,
+        },
+        media: [],
+        reach_series: [],
+        audience: EMPTY_AUDIENCE,
+        polled_at: NOW.toISOString(),
+      }),
+      true,
+    );
+
+    const response = await finishLiveOAuth({
+      request: finishRequest(
+        `/auth/instagram?code=ok&state=${STATE}`,
+        `${SESSION_COOKIE}=${DEMO_HANDLE}`,
+      ),
+      code: "ok",
+      state: STATE,
+      secrets: liveSecrets(),
+    });
+    assertSessionOverwrite(response, "rxndy.dxniel");
+    assert.doesNotMatch(
+      response.headers.get("set-cookie") ?? "",
+      new RegExp(`${SESSION_COOKIE}=${DEMO_HANDLE}(?:;|$)`),
+    );
+    const migrated = await readGraphSnapshotByHandle("rxndy.dxniel", "route");
+    assert.equal(migrated?.user.handle, "rxndy.dxniel");
+    assert.equal(migrated?.user.ig_user_id, "1784");
+    assert.equal(migrated?.user.id, "u-contaminated");
+  });
+
   it("overwrites leftover pitchkit_session=demo with the persisted handle", async () => {
     setSecretsForTests(liveSecrets());
     setHiddenKitNamespaceForTests(createMemoryHiddenKit());
@@ -293,5 +345,17 @@ describe("snapshotFromMe", () => {
     assert.deepEqual(snapshot.reach_series, []);
     assert.deepEqual(snapshot.audience, { country: [], city: [], age: [], gender: [] });
     assert.equal(snapshot.polled_at, NOW.toISOString());
+  });
+});
+
+describe("stub seed session", () => {
+  it("still sets pitchkit_session=demo when live secrets are absent", () => {
+    setSecretsForTests(emptySecrets());
+    const response = stubConnect(new Request("http://localhost/auth/instagram"));
+    assert.equal(response.status, 303);
+    assert.match(
+      response.headers.get("set-cookie") ?? "",
+      new RegExp(`${SESSION_COOKIE}=${DEMO_HANDLE}`),
+    );
   });
 });

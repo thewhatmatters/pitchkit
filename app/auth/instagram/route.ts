@@ -25,7 +25,8 @@ export const dynamic = "force-dynamic";
 
 // WHA-313: live reconnect may offer optional kit URL update when Instagram
 // returns a username different from users.handle (`update_handle=1`).
-// Default = keep. Seed `demo` stays frozen. Stub Connect has no rename UI.
+// Default = keep. Stub Connect stays seed `demo` (no rename UI). Live finish
+// never assigns session handle `demo` when `/me` username is not `demo`.
 
 function cookieHeader(name: string, value: string, secure: boolean, maxAge: number): string {
   return serializeSessionCookie(name, value, secure, maxAge);
