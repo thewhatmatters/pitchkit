@@ -1,6 +1,6 @@
 /**
  * Interpolated Show code class strings from WMDS Examples/PitchKit at
- * `14d50cda0302e263cb350409f2cea34de03c7c2e`.
+ * `0718bdcb87975d3389ad11770bb479c293d33200`.
  *
  * Stories:
  * - `examples-pitchkit--creator-insights` (Pattern — creator Insights)
@@ -70,11 +70,11 @@ export const PATTERN_AUDIENCE_EMPTY_WELL_CLASS = PATTERN_REACH_EMPTY_WELL_CLASS;
 
 export const PATTERN_EMPTY_COPY_CLASS = "flex max-w-lg flex-col gap-2";
 
-/** Centered title/body stack for the Reach empty well — unavailable empty copy stays left-aligned. */
+/** Centered Badge → title → body — same stack as Coming soon (`examples-pitchkit--insufficient-reach-data`). */
 export const PATTERN_REACH_EMPTY_COPY_CLASS =
-  `${PATTERN_EMPTY_COPY_CLASS} items-center text-center`;
+  "flex max-w-lg flex-col items-center gap-3 text-center";
 
-/** Same centered title/body stack as Reach — `examples-pitchkit--insufficient-audience-data`. */
+/** Same centered Badge stack as Reach — `examples-pitchkit--insufficient-audience-data`. */
 export const PATTERN_AUDIENCE_EMPTY_COPY_CLASS = PATTERN_REACH_EMPTY_COPY_CLASS;
 
 export const PATTERN_EMPTY_TITLE_CLASS = "type-heading-2 text-fg";

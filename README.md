@@ -84,7 +84,7 @@ Disconnect severs the Pitchkit↔Instagram connection: session cookies clear, `d
 Install WMDS pinned to a main SHA:
 
 ```bash
-npm install github:thewhatmatters/wmds#14d50cda0302e263cb350409f2cea34de03c7c2e
+npm install github:thewhatmatters/wmds#0718bdcb87975d3389ad11770bb479c293d33200
 ```
 
 `prepare` builds `dist/`. Local `npm install ../wmds` still works after `npm run build` there. `postinstall` / `predev` / `prebuild` copy Geist font files into the WMDS `dist/files` path that `styles.css` expects (otherwise Next 500s on the font URLs). Chart needs the `@visx/visx` peer. Details: [PLAN.md](./PLAN.md#stack-locked), [ARCHITECTURE.md](./ARCHITECTURE.md), WMDS [`CONSUMING.md`](https://github.com/thewhatmatters/wmds/blob/main/CONSUMING.md).

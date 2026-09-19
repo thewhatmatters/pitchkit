@@ -11,6 +11,7 @@ import {
   PATTERN_REACH_EMPTY_WELL_CLASS,
 } from "@/components/pattern-tokens";
 import {
+  Badge,
   Card,
   Chart,
   cardSubtitleClasses,
@@ -36,7 +37,7 @@ type ReachChartProps = {
 /**
  * Canvas ReachCard. Surfaces from WMDS `cd18e7a`:
  * - chart — `examples-pitchkit--creator-insights` (in-series gaps via Chart.Cartesian `noData`)
- * - empty — `examples-pitchkit--insufficient-reach-data` (keep Card + header; centered well)
+ * - empty — `examples-pitchkit--insufficient-reach-data` (keep Card + header; Badge → title → body)
  * - omit — `examples-pitchkit--graph-data-unavailable`
  * Retrieving (chrome up / Refresh) is Header + Chart.Loading, not Skeleton.
  * Partial calendar holes use `components-data-display-chart--cartesian-no-data-gaps`.
@@ -75,6 +76,7 @@ export function ReachChart({
           style={{ minHeight: PATTERN_REACH_CHART_MIN_HEIGHT } satisfies CSSProperties}
         >
           <div className={PATTERN_REACH_EMPTY_COPY_CLASS}>
+            <Badge variant="neutral" emphasis="muted">{REACH_NO_DATA_LABEL}</Badge>
             <h3 className={PATTERN_EMPTY_TITLE_CLASS}>{REACH_INSUFFICIENT_TITLE}</h3>
             <p className={PATTERN_EMPTY_BODY_CLASS}>{REACH_INSUFFICIENT_BODY}</p>
           </div>

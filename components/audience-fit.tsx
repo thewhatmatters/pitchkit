@@ -12,9 +12,13 @@ import {
   PATTERN_REACH_CHART_MIN_HEIGHT,
   PATTERN_SECTION_EYEBROW_CLASS,
 } from "@/components/pattern-tokens";
-import { Card, Chart, cardSubtitleClasses, cardTitleClasses } from "@/components/wmds";
+import { Badge, Card, Chart, cardSubtitleClasses, cardTitleClasses } from "@/components/wmds";
 import { audienceFitSurface, visibleAudienceMix, type RankedShare } from "@/lib/audience";
-import { AUDIENCE_INSUFFICIENT_BODY, AUDIENCE_INSUFFICIENT_TITLE } from "@/lib/copy";
+import {
+  AUDIENCE_INSUFFICIENT_BODY,
+  AUDIENCE_INSUFFICIENT_TITLE,
+  REACH_NO_DATA_LABEL,
+} from "@/lib/copy";
 
 type AudienceFitProps = {
   country?: RankedShare[] | null;
@@ -46,7 +50,8 @@ function AudienceSection({ title, items }: { title: string; items: { label: stri
 
 /**
  * Owner Insights audience Card. Keep the Card + header when mixes are empty
- * (`examples-pitchkit--insufficient-audience-data`). Never EXAMPLE percents.
+ * (`examples-pitchkit--insufficient-audience-data`; Badge → title → body).
+ * Never EXAMPLE percents.
  * Retrieving after chrome is up is Header + Chart.Loading — not this empty well.
  */
 export function AudienceFit({
@@ -92,6 +97,7 @@ export function AudienceFit({
             style={{ minHeight: PATTERN_REACH_CHART_MIN_HEIGHT } satisfies CSSProperties}
           >
             <div className={PATTERN_AUDIENCE_EMPTY_COPY_CLASS}>
+              <Badge variant="neutral" emphasis="muted">{REACH_NO_DATA_LABEL}</Badge>
               <h3 className={PATTERN_EMPTY_TITLE_CLASS}>{AUDIENCE_INSUFFICIENT_TITLE}</h3>
               <p className={PATTERN_EMPTY_BODY_CLASS}>{AUDIENCE_INSUFFICIENT_BODY}</p>
             </div>
