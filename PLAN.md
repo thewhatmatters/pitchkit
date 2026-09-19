@@ -124,7 +124,7 @@ A rollup **may** contain: a time bucket, a metric name, a hashed or global cohor
 | Thing | v1 |
 |---|---|
 | Supabase | One project. **Region:** choose when we create the database. Point Hyperdrive at the **direct** Postgres URI (port 5432). Do not use the transaction pooler (6543) — Hyperdrive already pools. |
-| Hyperdrive | Prod binding `HYPERDRIVE`. Preview binding `HYPERDRIVE_PREVIEW`. Ids stay commented in `wrangler.jsonc` until Randy supplies them. Apply `db/*.sql` with `npm run db:apply`. OpenNext typecheck: postgres.js `sql.unsafe` rows assert through `unknown` onto `SqlQueryRow` (`asQueryRows` in `lib/postgres.ts`) — do not `as T[]`. |
+| Hyperdrive | Prod binding `HYPERDRIVE`. Preview binding `HYPERDRIVE_PREVIEW`. Both bind Hyperdrive config `pitchkit` (`bf225442516d44f599e083b72df886cd`) in `wrangler.jsonc` — same id for preview MVP. Apply `db/*.sql` with `npm run db:apply`. OpenNext typecheck: postgres.js `sql.unsafe` rows assert through `unknown` onto `SqlQueryRow` (`asQueryRows` in `lib/postgres.ts`) — do not `as T[]`. |
 | R2 | Bucket `pitchkit-media`; public read for kit objects |
 | Cloudflare | **randy@whatmatters.so**. Domain `pitchkit.app` on the Worker. |
 | Secrets | `IG_APP_ID`, `IG_APP_SECRET`, `TOKEN_KEY`, Hyperdrive. Never commit values |

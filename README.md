@@ -51,7 +51,7 @@ Apply schema once Supabase exists (one-shot, not a migration framework). Use the
 HYPERDRIVE_LOCAL_CONNECTION_STRING='postgresql://…:5432/postgres' npm run db:apply
 ```
 
-That runs `db/*.sql` in order (`IF NOT EXISTS`: `users`, `media`, empty `detections`, empty `weekly_counts`, `hidden_from_kit_at`). Leave `wrangler.jsonc` hyperdrive ids commented until Randy supplies them. Point the Hyperdrive config at the same direct URI.
+That runs `db/*.sql` in order (`IF NOT EXISTS`: `users`, `media`, empty `detections`, empty `weekly_counts`, `hidden_from_kit_at`). `wrangler.jsonc` binds `HYPERDRIVE` and `HYPERDRIVE_PREVIEW` to Hyperdrive config `pitchkit` (`bf225442516d44f599e083b72df886cd`; same id for preview MVP). Point the Hyperdrive config at the same direct URI.
 
 Owner Insights kit (`loadOwnerKit`) includes seed/example `reach_series: { day, reach }[]` (`day` = YYYY-MM-DD UTC) when no token. A live token polls `graph.instagram.com` (`GRAPH_API_VERSION`, start `v25.0`) on Insights load if stale (&gt;6h) or Refresh. `/insights` reads `owner.reach_series` for one WMDS Chart; keep the Reach Card empty band when Insights exist but the series is empty, all-zero, or too short; omit when Graph never returned Insights. Never zero-fill. Public `/k/demo` (`loadPublicKit`) has no Insights and omits `reach_series`. Not a SQL table.
 
