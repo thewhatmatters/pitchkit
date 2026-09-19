@@ -44,4 +44,5 @@ Preconditions:
 - Toast Undo is easy to miss (`duration` ~6s). Reload + Restore is the persistence proof; Undo is the owner convenience path.
 - Owner cookie `pitchkit_hidden` is a mirror. Brands have no cookie — if anon `/k/demo` still shows the post after hide, KV SoT failed (WHA-312 cold Map / persist).
 - `restore-seed` POSTs the six seed IDs. That is cleanup, not the user path. Do not cite it as hide-restore proof.
+- The owner PitchKit tab also hides via **Manage selected post N** (same API + toast Undo). This recipe still proves persistence from Insights Recent proof (Hidden + Restore survive reload). Do not leave either surface hidden.
 - Do not run this feature in parallel with another agent.

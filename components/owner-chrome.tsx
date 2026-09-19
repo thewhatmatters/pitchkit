@@ -33,6 +33,7 @@ import type { Media, User } from "@/lib/schema";
 type OwnerChromeProps = {
   user: User;
   posts: Media[];
+  onPostsChange?: (posts: Media[] | ((current: Media[]) => Media[])) => void;
   engagementRate: number | null;
   typicalReach: number | null;
   typicalSaves: number | null;
@@ -63,6 +64,7 @@ function formatRefreshedAt(iso: string | null): string | null {
 export function OwnerChrome({
   user,
   posts,
+  onPostsChange,
   engagementRate,
   typicalReach,
   typicalSaves,
@@ -162,7 +164,7 @@ export function OwnerChrome({
         </div>
       </div>
 
-      <ProofPosts posts={posts} hasInsights={hasInsights} />
+      <ProofPosts posts={posts} hasInsights={hasInsights} onPostsChange={onPostsChange} />
 
       <OwnerAccountActions notice={notice} />
     </>

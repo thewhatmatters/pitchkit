@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   CREATOR_INSIGHTS_BODY_BAND_CLASS,
   CREATOR_INSIGHTS_BODY_INNER_CLASS,
@@ -9,7 +9,7 @@ import {
 } from "@/components/pattern-tokens";
 import { OwnerChrome } from "@/components/owner-chrome";
 import { OwnerNav, type OwnerView } from "@/components/owner-nav";
-import { PitchKitComingSoon } from "@/components/pitchkit-coming-soon";
+import { OwnerPitchKit } from "@/components/owner-pitchkit";
 import { SupportFooter } from "@/components/support-footer";
 import type { KitAudience } from "@/lib/kit";
 import type { ReachPoint } from "@/lib/reach-series";
@@ -29,8 +29,9 @@ type OwnerWorkspaceProps = {
 };
 
 /**
- * Pattern — creator Insights Show code (`examples-pitchkit--creator-insights`).
- * One shell: SegmentedControl toggles Insights vs Coming soon so the
+ * Pattern — creator Insights Show code (`examples-pitchkit--creator-insights`)
+ * plus Pattern — owner PitchKit (`examples-pitchkit--owner-pitch-kit`).
+ * One shell: SegmentedControl toggles Insights vs the owner kit so the
  * selected-pill motion can play. No hard `/insights` ↔ `/k/…` nav.
  */
 export function OwnerWorkspace({
@@ -46,6 +47,11 @@ export function OwnerWorkspace({
   retrieving = false,
 }: OwnerWorkspaceProps) {
   const [view, setView] = useState<OwnerView>("insights");
+  const [posts, setPosts] = useState(ownerPosts);
+
+  useEffect(() => {
+    setPosts(ownerPosts);
+  }, [ownerPosts]);
 
   return (
     <main className={CREATOR_INSIGHTS_PAGE_CLASS}>
@@ -55,11 +61,12 @@ export function OwnerWorkspace({
       <div className={CREATOR_INSIGHTS_BODY_BAND_CLASS}>
         <div className={CREATOR_INSIGHTS_BODY_INNER_CLASS}>
           {view === "pitchkit" ? (
-            <PitchKitComingSoon />
+            <OwnerPitchKit user={user} posts={posts} onPostsChange={setPosts} />
           ) : (
             <OwnerChrome
               user={user}
-              posts={ownerPosts}
+              posts={posts}
+              onPostsChange={setPosts}
               engagementRate={engagementRate}
               typicalReach={typicalReach}
               typicalSaves={typicalSaves}

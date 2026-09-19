@@ -1,6 +1,6 @@
 /**
  * Interpolated Show code class strings from WMDS Examples/PitchKit at
- * `0718bdcb87975d3389ad11770bb479c293d33200`.
+ * `9b4a1798aff97322b4167519c14ec802a1878b97`.
  *
  * Stories:
  * - `examples-pitchkit--creator-insights` (Pattern — creator Insights)
@@ -10,6 +10,7 @@
  * - `examples-pitchkit--insufficient-reach-and-audience-data` (State — insufficient reach and audience data)
  * - `examples-pitchkit--graph-data-unavailable` (State — Graph data unavailable; omit optional regions)
  * - `examples-pitchkit--shareable-pitchkit` (Pattern — shareable PitchKit)
+ * - `examples-pitchkit--owner-pitch-kit` (Pattern — owner PitchKit)
  * - `examples-pitchkit--creator-identity-public` (Pattern — creator identity (public))
  * - `examples-pitchkit--creator-identity-owner-settings` (Pattern — creator identity (owner settings))
  * - `examples-pitchkit--creator-identity-loading` (State — creator identity loading)
@@ -70,7 +71,7 @@ export const PATTERN_AUDIENCE_EMPTY_WELL_CLASS = PATTERN_REACH_EMPTY_WELL_CLASS;
 
 export const PATTERN_EMPTY_COPY_CLASS = "flex max-w-lg flex-col gap-2";
 
-/** Centered Badge → title → body — same stack as Coming soon (`examples-pitchkit--insufficient-reach-data`). */
+/** Centered Badge → title → body — same stack as insufficient empty wells (`examples-pitchkit--insufficient-reach-data`). */
 export const PATTERN_REACH_EMPTY_COPY_CLASS =
   "flex max-w-lg flex-col items-center gap-3 text-center";
 
@@ -166,8 +167,8 @@ export const PATTERN_CONTACT_ROW_CLASS =
 export const PATTERN_BRAND_BODY_CLASS = "type-body text-fg text-muted py-[16px] px-3.5";
 
 /**
- * Owner PitchKit segment empty state — interpolated from WMDS `73277bab`
- * `pitchKitPlaceholder*` (`typographyClass` is not a package export).
+ * Centered empty-well stack (Reach / Audience No data). Coming soon retired
+ * for the owner PitchKit tab (`examples-pitchkit--owner-pitch-kit`).
  */
 export const PATTERN_PLACEHOLDER_CLASS =
   "col-span-full flex min-h-[60vh] flex-col items-center justify-center gap-3 text-center";
