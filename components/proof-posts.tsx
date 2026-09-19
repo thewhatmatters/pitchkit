@@ -67,10 +67,19 @@ function formatPostedAt(iso: string): string {
 type ProofPostsProps = {
   posts: Media[];
   hasInsights: boolean;
+  onPostsChange?: (posts: Media[] | ((current: Media[]) => Media[])) => void;
 };
 
-export function ProofPosts({ posts, hasInsights }: ProofPostsProps) {
+export function ProofPosts({ posts, hasInsights, onPostsChange }: ProofPostsProps) {
   const [ownerPosts, setOwnerPosts] = useState(posts);
+
+  function commitPosts(update: Media[] | ((current: Media[]) => Media[])) {
+    if (onPostsChange) {
+      onPostsChange(update);
+      return;
+    }
+    setOwnerPosts(update);
+  }
   const [proofMetric, setProofMetric] = useState<PostSortKey>(DEFAULT_POST_SORT);
   const [postNotice, setPostNotice] = useState<string | null>(null);
   const [pendingHidePostId, setPendingHidePostId] = useState<string | null>(null);
@@ -108,12 +117,12 @@ export function ProofPosts({ posts, hasInsights }: ProofPostsProps) {
     }
 
     const optimisticHiddenAt = new Date().toISOString();
-    setOwnerPosts((current) => stampHiddenFromKit(current, hiddenPost.id, optimisticHiddenAt));
+    commitPosts((current) => stampHiddenFromKit(current, hiddenPost.id, optimisticHiddenAt));
     setPendingHidePostId(null);
 
     const result = await hideFromKit(hiddenPost.id);
     if (!result.ok) {
-      setOwnerPosts((current) => clearHiddenFromKit(current, hiddenPost.id));
+      commitPosts((current) => clearHiddenFromKit(current, hiddenPost.id));
       toast.add({
         title: TOAST_HIDE_FAILED_TITLE,
         description: result.error,
@@ -122,7 +131,7 @@ export function ProofPosts({ posts, hasInsights }: ProofPostsProps) {
     }
 
     if (result.hiddenFromKitAt != null) {
-      setOwnerPosts((current) =>
+      commitPosts((current) =>
         current.map((post) =>
           post.id === hiddenPost.id ? { ...post, hidden_from_kit_at: result.hiddenFromKitAt } : post,
         ),
@@ -144,11 +153,11 @@ export function ProofPosts({ posts, hasInsights }: ProofPostsProps) {
 
   async function restoreHiddenPost(hiddenPost: Media) {
     const previousHiddenAt = hiddenPost.hidden_from_kit_at;
-    setOwnerPosts((current) => clearHiddenFromKit(current, hiddenPost.id));
+    commitPosts((current) => clearHiddenFromKit(current, hiddenPost.id));
     const result = await restoreToKit(hiddenPost.id);
     if (!result.ok) {
       if (previousHiddenAt != null) {
-        setOwnerPosts((current) => stampHiddenFromKit(current, hiddenPost.id, previousHiddenAt));
+        commitPosts((current) => stampHiddenFromKit(current, hiddenPost.id, previousHiddenAt));
       }
       toast.add({
         title: TOAST_RESTORE_FAILED_TITLE,

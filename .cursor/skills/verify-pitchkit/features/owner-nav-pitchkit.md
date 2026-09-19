@@ -1,11 +1,11 @@
 # Owner nav ↔ PitchKit
 
-Owner primary navigation is the Pattern — creator Insights three-column header: PitchKit label, a hug SegmentedControl — **Insights** / **PitchKit** — and Avatar. PitchKit is an in-page **Coming soon** placeholder on `/insights`. The shareable kit stays on `/k/demo`. Insights stays private. Do not expect `layout="stretch"`, a full-width control, or a hard navigation to `/k/demo`.
+Owner primary navigation is the Pattern — creator Insights three-column header: PitchKit label, a hug SegmentedControl — **Insights** / **PitchKit** — and Avatar. PitchKit is Pattern — owner PitchKit on `/insights` (shareable sections + hide/restore posts; Coming soon retired). The public kit stays on `/k/demo` without owner chrome. Insights stays private. Do not expect `layout="stretch"`, a full-width control, or a hard navigation to `/k/demo`.
 
 ## Sub-features
 
 - `nav-insights` keeps Insights selected on `/insights`.
-- `nav-pitchkit` switches the PitchKit segment in place and shows Coming soon (not the live kit).
+- `nav-pitchkit` switches the PitchKit segment in place and shows the owner kit (not Coming soon).
 - `nav-back` returns from PitchKit to Insights without leaving `/insights`.
 - `nav-grid` uses owner `--grid-max:1140px` and 8px gutters on both owner views (WHA-309).
 - `nav-absent-anon` hides this chrome on a brand `/k/demo`.
@@ -23,17 +23,17 @@ Preconditions:
 - Start on `/insights`.
 
 - **See nav.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /insights`. The header shows a **PitchKit** brand label, a hug control named **PitchKit primary navigation** (**Insights** / **PitchKit**), and an Avatar. Insights is the current view. Footer has a quiet **Account** link, not a third segment.
-- **Open PitchKit.** Choose PitchKit. Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs click --role radio --name "PitchKit"`. Path stays `/insights`. Body shows a **Coming soon** badge, heading **Shareable PitchKit**, and the public-profile placeholder copy. Demo Creator / `@demo` / Selected posts / Edit are absent. Insights PageHeader / Recent proof / Share kit are absent on this segment.
-- **Owner grid on placeholder.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs eval --js "getComputedStyle(document.querySelector('.grid-page')).getPropertyValue('--grid-max').trim()"`. `value` is `1140px`. `--grid-column-gap` is `8px` (Pattern Show code). Do not require `--grid-gutter:8px` on this shell.
+- **Open PitchKit.** Choose PitchKit. Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs click --role radio --name "PitchKit"`. Path stays `/insights`. Body shows the owner kit: **Demo Creator**, `@demo`, **Followers**, **Engagement rate**, **Selected posts**, and MoreMenu **Manage selected post N** / **Hide from kit**. No **Coming soon** badge. No bio / website / rates / Edit switch. Insights PageHeader / Recent proof / Share kit are absent on this segment.
+- **Owner grid on kit.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs eval --js "getComputedStyle(document.querySelector('.grid-page')).getPropertyValue('--grid-max').trim()"`. `value` is `1140px`. `--grid-column-gap` is `8px` (Pattern Show code). Do not require `--grid-gutter:8px` on this shell.
 - **Return to Insights.** Choose Insights. Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs click --role radio --name "Insights"`. Path is still `/insights`. PageHeader **Insights** returns.
-- **Anon has no nav.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /k/demo --fresh`. There is no **PitchKit primary navigation** and no **Edit** switch. The real kit (Demo Creator, Selected posts) is on this URL — not Coming soon.
+- **Anon has no nav.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /k/demo --fresh`. There is no **PitchKit primary navigation** and no **Edit** switch or **Manage selected post**. The public kit (Demo Creator, Selected posts) is on this URL — no owner hide chrome.
 - **Proof.** Capture both owner views. Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /insights` then `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs screenshot --path artifacts/owner-nav-pitchkit/insights.png` and `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs snapshot --aria --path artifacts/owner-nav-pitchkit/insights.aria.txt`. Repeat after `click --name "PitchKit"` into `artifacts/owner-nav-pitchkit/pitchkit.png` and `pitchkit.aria.txt`.
 
 ## Gotchas
 
 - SegmentedControl items expose as **radio** in radiogroup **PitchKit primary navigation** (observed on live). If `--role radio` misses after a WMDS change, retry `--name "PitchKit"` (auto roles).
 - Each harness command relaunches the browser. In-page PitchKit state does not survive a later `goto` / `screenshot` unless that command starts from Insights and clicks PitchKit in the same process. Prefer `click` then `screenshot` only when the harness keeps the page; otherwise `goto /insights` shows Insights again.
-- Share link / a brand opening `/k/demo` must stay the public freeze — do not treat Coming soon as the public kit.
+- Share link / a brand opening `/k/demo` must stay the public freeze — no MoreMenu / hide.
 - Settings is account only. Do not expect Insights / PitchKit on `/settings`.
 - Public `/k/demo` copies the shareable Pattern (`--grid-max:1140px`). Assert 1140 on owner Insights and the public kit.
 - `GridOverlay` is Storybook-only. Product chrome must not show grid-debug controls.
