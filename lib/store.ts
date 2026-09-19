@@ -10,16 +10,23 @@ import {
   seedUsers,
   seedWeeklyCounts,
   DEMO_HANDLE,
+  DEMO_USER_ID,
 } from "./seed";
 import { readSecrets, type PitchkitSecrets } from "./env";
 import {
   EMPTY_AUDIENCE,
   readGraphSnapshot,
   readGraphSnapshotByHandle,
+  snapshotKitProfile,
   writeGraphSnapshot,
   type AudienceMixes,
   type GraphSnapshot,
 } from "./graph-store";
+import {
+  SEED_INTRO,
+  SEED_PAST_BRANDS,
+  type KitProfile,
+} from "./kit-profile";
 import { encryptTokenIfPossible } from "./token-crypto";
 import { pollInsights, resolveAccessToken, shouldPollInsights } from "./poll";
 import { hasHyperdrive as hasHyperdriveFlag, resolveHasHyperdrive } from "./hyperdrive";
@@ -78,11 +85,20 @@ async function ownerFromSnapshot(
   const kit = assemblePublicKit(snapshot.user, media, now, {
     reach_series: snapshot.reach_series,
     audience: snapshot.audience,
+    ...snapshotKitProfile(snapshot),
   });
   if (!kit) {
     return null;
   }
   return { ...kit, posts: media, audience: snapshot.audience ?? EMPTY_AUDIENCE };
+}
+
+async function resolveDemoKitProfile(access: HiddenKitAccess = "page"): Promise<KitProfile> {
+  const snapshot = await readGraphSnapshot(DEMO_USER_ID, access);
+  if (!snapshot) {
+    return { intro: SEED_INTRO, past_brands: [...SEED_PAST_BRANDS] };
+  }
+  return snapshotKitProfile(snapshot);
 }
 
 export async function loadPublicKit(
@@ -101,7 +117,9 @@ export async function loadPublicKit(
       await hiddenOverlayForHandle(handle, overlay),
       user.id,
     );
-    return assemblePublicKit(user, excludeHiddenFromPublicKit(media), now);
+    return assemblePublicKit(user, excludeHiddenFromPublicKit(media), now, {
+      ...(await resolveDemoKitProfile()),
+    });
   }
 
   const snapshot = await readGraphSnapshotByHandle(handle);
@@ -115,7 +133,9 @@ export async function loadPublicKit(
         await hiddenOverlayForHandle(handle, overlay),
         snapshot.user.id,
       );
-  return assemblePublicKit(snapshot.user, excludeHiddenFromPublicKit(media), now);
+  return assemblePublicKit(snapshot.user, excludeHiddenFromPublicKit(media), now, {
+    ...snapshotKitProfile(snapshot),
+  });
 }
 
 /**
@@ -145,6 +165,7 @@ export async function loadOwnerKit(
     const kit = assemblePublicKit(seedUser, media, now, {
       reach_series: seedReachSeries,
       audience: EMPTY_AUDIENCE,
+      ...(await resolveDemoKitProfile(access)),
     });
     if (!kit) {
       return null;
@@ -200,6 +221,8 @@ export async function loadOwnerKit(
           handle: user.handle,
           token_encrypted: tokenEncrypted ?? polled.snapshot.user.token_encrypted,
         },
+        intro: polled.snapshot.intro ?? live?.intro ?? null,
+        past_brands: polled.snapshot.past_brands ?? live?.past_brands ?? [],
       };
       await writeGraphSnapshot(snapshot, access);
       const resolvedOverlay = await hiddenOverlayForHandle(handle, overlay);
@@ -224,6 +247,7 @@ export async function loadOwnerKit(
   const kit = assemblePublicKit(seedUser, media, now, {
     reach_series: seedReachSeries,
     audience: EMPTY_AUDIENCE,
+    ...(await resolveDemoKitProfile(access)),
   });
   if (!kit) {
     return null;

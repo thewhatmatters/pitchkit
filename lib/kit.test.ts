@@ -246,6 +246,8 @@ describe("seed schema", () => {
     assert.equal(demo.reach_series, undefined);
     assert.equal(demo.typicalReach, null);
     assert.equal(demo.typicalSaves, null);
+    assert.equal(typeof demo.intro, "string");
+    assert.ok(demo.past_brands.length > 0);
     assert.equal(await loadPublicKit("nope", NOW), null);
     assert.equal(assemblePublicKit(user({ disconnected_at: NOW.toISOString() }), seedMedia, NOW), null);
   });

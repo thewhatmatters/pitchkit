@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { EyeOff } from "lucide-react";
 import { CreatorIdentityStrip } from "@/components/creator-identity-strip";
 import { EngagementRateFormulaTooltip } from "@/components/engagement-rate-info";
+import { OwnerIntroEditor } from "@/components/kit-intro";
+import { OwnerPastBrands } from "@/components/past-brands";
 import { ShareKitButton } from "@/components/share-kit-button";
 import {
   PATTERN_CONTACT_CARD_CLASS,
@@ -11,6 +13,7 @@ import {
   PATTERN_CONTACT_ROW_CLASS,
   PATTERN_CONTACT_ROWS_CLASS,
   PATTERN_IDENTITY_SECTION_CLASS,
+  PATTERN_INTRO_STACK_CLASS,
   PATTERN_KIT_POST_METRICS_CLASS,
   PATTERN_KIT_STAT_CLASS,
   PATTERN_POST_CARD_CLASS,
@@ -38,6 +41,8 @@ import {
 } from "@/components/wmds";
 import {
   TOAST_HIDE_FAILED_TITLE,
+  TOAST_KIT_PROFILE_FAILED_DESCRIPTION,
+  TOAST_KIT_PROFILE_FAILED_TITLE,
   TOAST_POST_HIDDEN_DESCRIPTION,
   TOAST_POST_HIDDEN_TITLE,
   TOAST_POST_RESTORED_DESCRIPTION,
@@ -46,11 +51,9 @@ import {
 } from "@/lib/copy";
 import { creatorIdentityFromUser } from "@/lib/creator-identity";
 import { engagementRate, formatCount, formatEngagementRate } from "@/lib/engagement";
-import {
-  shouldShowPastBrands,
-  sourcedContactDetail,
-  visibleBrandNames,
-} from "@/lib/kit-chips";
+import { sourcedContactDetail } from "@/lib/kit-chips";
+import { saveKitProfile } from "@/lib/kit-profile-client";
+import { normalizeIntro, type KitProfile, type PastBrand } from "@/lib/kit-profile";
 import {
   clearHiddenFromKit,
   hideFromKit,
@@ -73,33 +76,85 @@ type OwnerPitchKitProps = {
   user: User;
   posts: Media[];
   onPostsChange: (posts: OwnerPostsUpdater) => void;
-  pastBrands?: readonly string[];
+  intro?: string | null;
+  pastBrands?: readonly PastBrand[];
   contact?: string | null;
 };
 
 /**
- * Pattern — owner PitchKit Show code (`examples-pitchkit--owner-pitch-kit`).
- * Same shareable sections as `/k/[handle]`, plus hide/restore on selected posts.
- * Identity is Graph read-only. Empty contact and brands stay hidden.
+ * Pattern — owner PitchKit Show code (`examples-pitchkit--owner-pitch-kit`)
+ * plus Pattern — intro (owner) (`examples-pitchkit--intro-owner`)
+ * and Pattern — past brands (owner) (`examples-pitchkit--past-brands-owner`).
+ * Hide/restore on selected posts. Intro and brands persist on the KV Graph snapshot.
  */
 export function OwnerPitchKit({
   user,
   posts,
   onPostsChange,
+  intro: introProp = null,
   pastBrands = [],
   contact = null,
 }: OwnerPitchKitProps) {
   const [postNotice, setPostNotice] = useState<string | null>(null);
   const [pendingHidePostId, setPendingHidePostId] = useState<string | null>(null);
+  const [intro, setIntro] = useState(introProp ?? "");
+  const [brands, setBrands] = useState<PastBrand[]>(() => [...pastBrands]);
+  const introSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    setIntro(introProp ?? "");
+  }, [introProp]);
+
+  useEffect(() => {
+    setBrands([...pastBrands]);
+  }, [pastBrands]);
+
+  useEffect(() => {
+    return () => {
+      if (introSaveTimer.current) {
+        clearTimeout(introSaveTimer.current);
+      }
+    };
+  }, []);
 
   const visiblePosts = useMemo(
     () => selectSixPosts(excludeHiddenFromPublicKit(posts)),
     [posts],
   );
   const contactDetail = sourcedContactDetail(contact);
-  const brands = visibleBrandNames(pastBrands);
   const identity = creatorIdentityFromUser(user);
   const rate = engagementRate(visiblePosts);
+
+  async function persistProfile(profile: KitProfile) {
+    const result = await saveKitProfile(profile);
+    if (!result.ok) {
+      toast.add({
+        title: TOAST_KIT_PROFILE_FAILED_TITLE,
+        description: result.error || TOAST_KIT_PROFILE_FAILED_DESCRIPTION,
+      });
+    }
+  }
+
+  function handleIntroChange(value: string) {
+    setIntro(value);
+    if (introSaveTimer.current) {
+      clearTimeout(introSaveTimer.current);
+    }
+    introSaveTimer.current = setTimeout(() => {
+      void persistProfile({
+        intro: normalizeIntro(value),
+        past_brands: brands,
+      });
+    }, 400);
+  }
+
+  function handleBrandsChange(next: PastBrand[]) {
+    setBrands(next);
+    void persistProfile({
+      intro: normalizeIntro(intro),
+      past_brands: next,
+    });
+  }
 
   function handlePostAction(postId: string, actionId: string) {
     if (actionId === "hide") {
@@ -192,7 +247,10 @@ export function OwnerPitchKit({
       </section>
 
       <section className={PATTERN_IDENTITY_SECTION_CLASS}>
-        <CreatorIdentityStrip identity={identity} nameAs="h1" showProfessionalChip />
+        <div className={PATTERN_INTRO_STACK_CLASS}>
+          <CreatorIdentityStrip identity={identity} nameAs="h1" showProfessionalChip />
+          <OwnerIntroEditor intro={intro} onIntroChange={handleIntroChange} />
+        </div>
       </section>
 
       <div
@@ -320,30 +378,7 @@ export function OwnerPitchKit({
         </section>
       ) : null}
 
-      {shouldShowPastBrands(brands) ? (
-        <section className={PATTERN_POSTS_SECTION_CLASS}>
-          <div className={PATTERN_POSTS_HEADER_CLASS}>
-            <div>
-              <h2 className={cardTitleClasses}>Past brands</h2>
-              <p className={PATTERN_SUPPORTING_CLASS}>
-                Campaigns already shipped with this creator.
-              </p>
-            </div>
-          </div>
-          <div className={PATTERN_POSTS_PANEL_CLASS}>
-            {brands.map((name) => (
-              <Card
-                key={name}
-                variant="outlined"
-                shape="rounded"
-                className={PATTERN_POST_CARD_CLASS}
-              >
-                <Card.Header start={<h3 className={cardTitleClasses}>{name}</h3>} />
-              </Card>
-            ))}
-          </div>
-        </section>
-      ) : null}
+      <OwnerPastBrands brands={brands} onBrandsChange={handleBrandsChange} />
 
       <AlertDialog
         open={pendingHidePostId != null}

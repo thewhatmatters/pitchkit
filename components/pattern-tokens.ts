@@ -1,6 +1,6 @@
 /**
  * Interpolated Show code class strings from WMDS Examples/PitchKit at
- * `61f8921ac037839da660740da23763813f77d2ee`.
+ * `96f44587b3b3ff1c44de9f1e5adba61a661d30e1`.
  *
  * Stories:
  * - `examples-pitchkit--account-settings-owner` (Pattern — account settings (owner))
@@ -18,6 +18,10 @@
  * - `examples-pitchkit--creator-identity-loading` (State — creator identity loading)
  * - `examples-pitchkit--creator-identity-missing-photo` (State — creator identity missing photo)
  * - `examples-pitchkit--creator-identity-missing-name` (State — creator identity missing name)
+ * - `examples-pitchkit--intro-owner` (Pattern — intro (owner))
+ * - `examples-pitchkit--intro-public` (Pattern — intro (public))
+ * - `examples-pitchkit--past-brands-owner` (Pattern — past brands (owner))
+ * - `examples-pitchkit--past-brands-public` (Pattern — past brands (public))
  * - `components-data-display-chart--cartesian-no-data-gaps` (in-series Reach hatch)
  *
  * Copy these literals. Do not import Storybook-only `pitchKitStyles`.
@@ -181,6 +185,22 @@ export const PATTERN_CONTACT_ROW_CLASS =
   "flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-3";
 
 export const PATTERN_BRAND_BODY_CLASS = "type-body text-fg text-muted py-[16px] px-3.5";
+
+/** Pitchkit-owned intro under the identity nameplate. */
+export const PATTERN_INTRO_STACK_CLASS = "flex min-w-0 flex-col gap-3";
+
+export const PATTERN_INTRO_CLASS = "type-body text-fg text-fg";
+
+/** Past brands — `{ id, name }` rows with letter Avatar. Not campaign KPI cards. */
+export const PATTERN_BRAND_LIST_CLASS = "flex col-span-full min-w-0 flex-col gap-3";
+
+export const PATTERN_BRAND_CARD_CLASS = "col-span-full min-w-0";
+
+export const PATTERN_BRAND_ROW_START_CLASS = "flex min-w-0 items-center gap-3";
+
+export const PATTERN_BRAND_NAME_CLASS = "type-label text-fg";
+
+export const PATTERN_BRAND_REORDER_CLASS = "flex shrink-0 items-center";
 
 /**
  * Centered empty-well stack (Reach / Audience No data). Coming soon retired

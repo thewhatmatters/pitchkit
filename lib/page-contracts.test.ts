@@ -116,7 +116,12 @@ describe("critical page contracts", () => {
     assert.match(kit, /Verified Instagram summary/);
     assert.match(kit, /Selected posts/);
     assert.match(kit, /TextLink/);
-    assert.match(kit, /Past brands/);
+    assert.match(kit, /PublicPastBrands/);
+    assert.match(kit, /PublicIntro/);
+    assert.match(kit, /examples-pitchkit--intro-public|PATTERN_INTRO_STACK_CLASS/);
+    assert.match(read("components/past-brands.tsx"), /examples-pitchkit--past-brands-public/);
+    assert.match(read("components/past-brands.tsx"), /Past brands/);
+    assert.match(read("components/kit-intro.tsx"), /examples-pitchkit--intro-public/);
     assert.match(kit, /CreatorIdentityStrip/);
     assert.match(kit, /PATTERN_IDENTITY_NAMEPLATE_CLASS/);
     assert.match(kit, /examples-pitchkit--shareable-pitch-kit/);
@@ -274,7 +279,7 @@ describe("critical page contracts", () => {
     const sources = [share, proof, ownerKit];
     const blocks = sources.flatMap(toastAddBlocks);
 
-    assert.equal(blocks.length, 10);
+    assert.equal(blocks.length, 11);
     for (const block of blocks) {
       assert.match(block, /\btitle:/);
       assert.match(block, /\bdescription:/);
@@ -289,6 +294,8 @@ describe("critical page contracts", () => {
     assert.match(copy, /TOAST_POST_RESTORED_DESCRIPTION = "It appears in the shareable PitchKit again."/);
     assert.match(copy, /TOAST_HIDE_FAILED_TITLE/);
     assert.match(copy, /TOAST_RESTORE_FAILED_TITLE/);
+    assert.match(copy, /TOAST_KIT_PROFILE_FAILED_TITLE/);
+    assert.match(copy, /TOAST_KIT_PROFILE_FAILED_DESCRIPTION/);
     assert.match(share, /TOAST_KIT_COPIED_TITLE/);
     assert.match(share, /TOAST_KIT_COPIED_DESCRIPTION/);
     assert.match(proof, /TOAST_POST_HIDDEN_TITLE/);
@@ -299,6 +306,12 @@ describe("critical page contracts", () => {
     assert.match(ownerKit, /TOAST_POST_HIDDEN_DESCRIPTION/);
     assert.match(ownerKit, /TOAST_POST_RESTORED_TITLE/);
     assert.match(ownerKit, /TOAST_POST_RESTORED_DESCRIPTION/);
+    assert.match(ownerKit, /TOAST_KIT_PROFILE_FAILED_TITLE/);
+    assert.match(ownerKit, /saveKitProfile/);
+    assert.match(ownerKit, /OwnerIntroEditor/);
+    assert.match(ownerKit, /OwnerPastBrands/);
+    assert.match(ownerKit, /examples-pitchkit--intro-owner/);
+    assert.match(ownerKit, /examples-pitchkit--past-brands-owner/);
     assert.match(layout, /@whatmatters\/wmds\/styles\.css/);
     assert.doesNotMatch(proof, /setPostNotice\("Post (hidden|restored)/);
   });
@@ -426,11 +439,19 @@ describe("critical page contracts", () => {
     assert.match(chart, /animate="none"/);
     assert.match(read("components/owner-chrome.tsx"), /typicalReach=\{typicalReach\}/);
     assert.match(read("components/wmds.ts"), /chartMaxTicksForWidth/);
-    assert.match(read("package.json"), /wmds#61f8921ac037839da660740da23763813f77d2ee/);
+    assert.match(read("package.json"), /wmds#96f44587b3b3ff1c44de9f1e5adba61a661d30e1/);
     assert.doesNotMatch(
       read("package.json"),
-      /368560cd22bee2c5320b0b0e8038c30affa4bdea|9b4a1798aff97322b4167519c14ec802a1878b97|0718bdcb87975d3389ad11770bb479c293d33200|14d50cda0302e263cb350409f2cea34de03c7c2e|cd18e7a29afd0c0d774552c1a3d665f480f51bd4|70da6a4c50d8efc1e687b20f231c6e4f1f6190c6|dc813326028c0fe1cc5f3719466a32607bab4504|55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab/,
+      /61f8921ac037839da660740da23763813f77d2ee|368560cd22bee2c5320b0b0e8038c30affa4bdea|9b4a1798aff97322b4167519c14ec802a1878b97|0718bdcb87975d3389ad11770bb479c293d33200|14d50cda0302e263cb350409f2cea34de03c7c2e|cd18e7a29afd0c0d774552c1a3d665f480f51bd4|70da6a4c50d8efc1e687b20f231c6e4f1f6190c6|dc813326028c0fe1cc5f3719466a32607bab4504|55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab/,
     );
+    assert.match(read("components/wmds.ts"), /TextArea/);
+    assert.match(read("components/wmds.ts"), /dialogFooterActionsClasses/);
+    assert.match(read("app/api/kit/profile/route.ts"), /persistOwnerKitProfile/);
+    assert.match(read("lib/graph-store.ts"), /persistOwnerKitProfile/);
+    assert.match(read("lib/kit-profile.ts"), /PITCHKIT_INTRO_HARD_LIMIT = 280/);
+    assert.match(read("lib/kit-profile.ts"), /PITCHKIT_BRANDS_MAX = 8/);
+    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--intro-owner/);
+    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--past-brands-owner/);
     assert.match(page, /OwnerWorkspace/);
     assert.match(read("components/owner-workspace.tsx"), /CREATOR_INSIGHTS_PAGE_CLASS/);
     assert.match(read("components/owner-workspace.tsx"), /CREATOR_INSIGHTS_HEADER_BAND_CLASS/);

@@ -113,7 +113,11 @@ Does the split match the customer?
 - Paint: what Meta returns (% of located sample). Don’t add buckets.
 - Graph: `follower_demographics` breakdown `gender`. Same count path.
 
-**Bio** — IG User `biography` (Public). Hide if empty. Not a Stat. Not a typed Later blurb.
+**Bio** — IG User `biography` (Public). Hide if empty. Not a Stat. Not a typed Later blurb. **Not on the Pitchkit kit this cut** — the nameplate intro is Pitchkit-owned (below).
+
+**Intro** — Pitchkit-owned kit sentence under the identity nameplate. Not Instagram `biography`. Soft 160 / hard 280. Owner empty = **Add an intro**. Public empty = omit the block. Persist `intro` on the KV Graph snapshot.
+
+**Past brands** — Creator-entered proof list. Ordered `{ id, name }` only (max 8). Letter Avatar from `name`. Owner add / edit / reorder. Public empty = omit. No logo, year, summary, or KPIs. Persist `past_brands` on the KV Graph snapshot.
 
 **Website** — IG User `website` (Public). Hide if empty. Not a Stat.
 

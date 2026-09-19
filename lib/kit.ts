@@ -1,5 +1,6 @@
 import type { RankedShare } from "./audience";
 import { engagementRate, typicalFromPosts } from "./engagement";
+import { EMPTY_KIT_PROFILE, type KitProfile, type PastBrand } from "./kit-profile";
 import { isUtcDay, shouldShowReachChart, type ReachPoint } from "./reach-series";
 import type { Media, User } from "./schema";
 
@@ -30,12 +31,18 @@ export type PublicKit = {
   typicalSaves: number | null;
   /** Owner Insights only. Live Graph or empty — never EXAMPLE percents. */
   audience?: KitAudience;
+  /** Pitchkit-owned intro. Empty → public omit. */
+  intro: string | null;
+  /** Ordered `{ id, name }`. Empty → public omit. */
+  past_brands: PastBrand[];
 };
 
 export type AssembleKitOptions = {
   /** Seed/example or poll-derived. Ignored when Insights are missing. */
   reach_series?: ReachPoint[];
   audience?: KitAudience;
+  intro?: string | null;
+  past_brands?: PastBrand[];
 };
 
 export function kitPath(handle: string) {
@@ -142,5 +149,15 @@ export function assemblePublicKit(
         }
       : {}),
     ...(options.audience ? { audience: options.audience } : {}),
+    intro: options.intro ?? EMPTY_KIT_PROFILE.intro,
+    past_brands: options.past_brands ?? EMPTY_KIT_PROFILE.past_brands,
+  };
+}
+
+export function attachKitProfile<T extends object>(kit: T, profile: KitProfile): T & KitProfile {
+  return {
+    ...kit,
+    intro: profile.intro,
+    past_brands: profile.past_brands,
   };
 }

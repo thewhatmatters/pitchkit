@@ -12,6 +12,7 @@ import { OwnerNav, type OwnerView } from "@/components/owner-nav";
 import { OwnerPitchKit } from "@/components/owner-pitchkit";
 import { SupportFooter } from "@/components/support-footer";
 import type { KitAudience } from "@/lib/kit";
+import type { PastBrand } from "@/lib/kit-profile";
 import type { ReachPoint } from "@/lib/reach-series";
 import type { Media, User } from "@/lib/schema";
 
@@ -24,6 +25,8 @@ type OwnerWorkspaceProps = {
   reachSeries?: ReachPoint[] | null;
   hasInsights: boolean;
   audience?: KitAudience | null;
+  intro?: string | null;
+  pastBrands?: readonly PastBrand[];
   gridReady: boolean;
   retrieving?: boolean;
 };
@@ -43,6 +46,8 @@ export function OwnerWorkspace({
   reachSeries,
   hasInsights,
   audience,
+  intro = null,
+  pastBrands = [],
   gridReady,
   retrieving = false,
 }: OwnerWorkspaceProps) {
@@ -61,7 +66,13 @@ export function OwnerWorkspace({
       <div className={CREATOR_INSIGHTS_BODY_BAND_CLASS}>
         <div className={CREATOR_INSIGHTS_BODY_INNER_CLASS}>
           {view === "pitchkit" ? (
-            <OwnerPitchKit user={user} posts={posts} onPostsChange={setPosts} />
+            <OwnerPitchKit
+              user={user}
+              posts={posts}
+              onPostsChange={setPosts}
+              intro={intro}
+              pastBrands={pastBrands}
+            />
           ) : (
             <OwnerChrome
               user={user}
