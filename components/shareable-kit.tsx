@@ -1,22 +1,12 @@
 "use client";
 
-import {
-  Avatar,
-  Card,
-  Chip,
-  Stat,
-  TextLink,
-  cardTitleClasses,
-} from "@/components/wmds";
+import { Card, Stat, TextLink, cardTitleClasses } from "@/components/wmds";
+import { CreatorIdentityStrip } from "@/components/creator-identity-strip";
 import {
   PATTERN_CONTACT_CARD_CLASS,
   PATTERN_CONTACT_ROW_CLASS,
   PATTERN_CONTACT_ROWS_CLASS,
-  PATTERN_IDENTITY_COPY_CLASS,
-  PATTERN_IDENTITY_NAME_CLASS,
-  PATTERN_IDENTITY_ROW_CLASS,
-  PATTERN_IDENTITY_SECTION_CLASS,
-  PATTERN_IDENTITY_TITLE_ROW_CLASS,
+  PATTERN_IDENTITY_NAMEPLATE_CLASS,
   PATTERN_KIT_POST_METRICS_CLASS,
   PATTERN_KIT_STAT_CLASS,
   PATTERN_POST_CARD_CLASS,
@@ -31,6 +21,7 @@ import {
   PATTERN_STATS_BAND_CLASS,
   PATTERN_SUPPORTING_CLASS,
 } from "@/components/pattern-tokens";
+import { creatorIdentityFromUser } from "@/lib/creator-identity";
 import { formatCount, formatEngagementRate } from "@/lib/engagement";
 import {
   shouldShowPastBrands,
@@ -54,9 +45,10 @@ type ShareableKitProps = {
 };
 
 /**
- * Pattern — shareable PitchKit Show code (`examples-pitchkit--shareable-pitchkit`).
- * Public freeze: identity, followers / Engagement rate, selected posts
- * (likes + comments), Contact TextLink, Past brands. No owner management.
+ * Pattern — shareable PitchKit Show code (`examples-pitchkit--shareable-pitchkit`)
+ * plus Pattern — creator identity (public) (`examples-pitchkit--creator-identity-public`)
+ * for the nameplate. Kit Stats / selected posts stay the shareable freeze.
+ * No owner management.
  */
 export function ShareableKit({
   user,
@@ -67,26 +59,12 @@ export function ShareableKit({
 }: ShareableKitProps) {
   const contactDetail = sourcedContactDetail(contact);
   const brands = visibleBrandNames(pastBrands);
+  const identity = creatorIdentityFromUser(user);
 
   return (
     <>
-      <section className={PATTERN_IDENTITY_SECTION_CLASS}>
-        <div className={PATTERN_IDENTITY_ROW_CLASS}>
-          <Avatar
-            name={user.name}
-            src={publicObjectUrl(user.avatar_r2_key) || undefined}
-            size="lg"
-          />
-          <div className={PATTERN_IDENTITY_COPY_CLASS}>
-            <div className={PATTERN_IDENTITY_TITLE_ROW_CLASS}>
-              <h1 className={PATTERN_IDENTITY_NAME_CLASS}>{user.name}</h1>
-              <Chip readOnly size="sm">
-                Instagram
-              </Chip>
-            </div>
-            <p className={PATTERN_SUPPORTING_CLASS}>@{user.handle}</p>
-          </div>
-        </div>
+      <section className={PATTERN_IDENTITY_NAMEPLATE_CLASS}>
+        <CreatorIdentityStrip identity={identity} nameAs="h1" showProfessionalChip />
       </section>
 
       <div

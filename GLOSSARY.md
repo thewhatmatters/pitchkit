@@ -27,7 +27,7 @@ Unique accounts that usually see a post. This is what a brand is buying — not 
 - Graph (live, Instagram Login): media insights `reach` (post kit). Typical = median of recent posts. Not account 30-day unique. Not `followers_count`. Different number from the account chart (user insights `reach` `time_series`).
 
 **Followers** — always, context.
-Accounts following this profile right now. Scale only. Not how many people saw the last post. Read next to typical reach: a big follow with tiny reach is a warning.
+Accounts following this profile right now. Scale only. Not how many people saw the last post. Read next to typical reach: a big follow with tiny reach is a warning. Pattern — creator identity shows the same count as supporting context on the nameplate (`@handle · 10K followers`), not a second Stat there.
 - Brand ~30s: scale context / sanity vs reach.
 - Hide: never.
 - Graph (v25, Instagram Login): user `followers_count` (store `followers`). Not who saw the last post.

@@ -14,17 +14,17 @@ export const OWNER_GRID_MAX = "1140px";
 export const OWNER_GRID_COLUMN_GAP = "8px";
 
 /**
- * AppFrame `grid-page` className SoT (settings / landing / legal).
- * Force both gap tokens (WHA-309). Not the creator Insights or shareable
- * PitchKit Pattern surface. Keep these Tailwind arbitrary props as literals
- * so the scanner sees them.
+ * AppFrame `grid-page` className SoT (landing / legal).
+ * Force both gap tokens (WHA-309). Not the creator Insights, shareable
+ * PitchKit, or Settings identity Pattern surface. Keep these Tailwind
+ * arbitrary props as literals so the scanner sees them.
  */
 export const OWNER_GRID_CLASS =
   "grid-page min-h-dvh bg-body py-6 [--grid-max:1140px] [--grid-column-gap:8px] [--grid-gutter:8px]";
 
 type AppFrameProps = {
   children: ReactNode;
-  /** Centered WMDS page max. Settings / AppFrame owner wraps pass `OWNER_GRID_MAX`. */
+  /** Centered WMDS page max. Landing / legal AppFrame wraps pass `OWNER_GRID_MAX`. */
   gridMax?: string;
 };
 
@@ -32,9 +32,9 @@ type AppFrameProps = {
  * Copy of WMDS `grid-page` + `band` from CONSUMING. Layout only — not a new atom.
  * Band children are grid items: place with `col-span-*`.
  *
- * Insights and the public kit compose Pattern `<main>` + bands
- * (`CREATOR_INSIGHTS_*` / shareable freeze) instead of this frame.
- * AppFrame stays for landing, settings, and legal pages.
+ * Insights, the public kit, and Settings compose Pattern `<main>` + bands
+ * (`CREATOR_INSIGHTS_*` / shareable freeze / creator identity owner settings)
+ * instead of this frame. AppFrame stays for landing and legal pages.
  *
  * AppFrame owner tokens are Tailwind arbitrary props in JSX (Randy SoT). Force
  * both `--grid-column-gap` and `--grid-gutter` on this surface until leftover

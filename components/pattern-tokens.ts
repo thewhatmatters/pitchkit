@@ -1,6 +1,6 @@
 /**
  * Interpolated Show code class strings from WMDS Examples/PitchKit at
- * `cd18e7a29afd0c0d774552c1a3d665f480f51bd4`.
+ * `14d50cda0302e263cb350409f2cea34de03c7c2e`.
  *
  * Stories:
  * - `examples-pitchkit--creator-insights` (Pattern — creator Insights)
@@ -10,6 +10,11 @@
  * - `examples-pitchkit--insufficient-reach-and-audience-data` (State — insufficient reach and audience data)
  * - `examples-pitchkit--graph-data-unavailable` (State — Graph data unavailable; omit optional regions)
  * - `examples-pitchkit--shareable-pitchkit` (Pattern — shareable PitchKit)
+ * - `examples-pitchkit--creator-identity-public` (Pattern — creator identity (public))
+ * - `examples-pitchkit--creator-identity-owner-settings` (Pattern — creator identity (owner settings))
+ * - `examples-pitchkit--creator-identity-loading` (State — creator identity loading)
+ * - `examples-pitchkit--creator-identity-missing-photo` (State — creator identity missing photo)
+ * - `examples-pitchkit--creator-identity-missing-name` (State — creator identity missing name)
  * - `components-data-display-chart--cartesian-no-data-gaps` (in-series Reach hatch)
  *
  * Copy these literals. Do not import Storybook-only `pitchKitStyles`.
@@ -128,6 +133,24 @@ export const PATTERN_IDENTITY_COPY_CLASS = "flex min-w-0 flex-col gap-1";
 export const PATTERN_IDENTITY_TITLE_ROW_CLASS = "flex flex-wrap items-center gap-2";
 
 export const PATTERN_IDENTITY_NAME_CLASS = "type-heading-2 text-fg";
+
+/** Public `/k/[handle]` surrounding chrome — same strip, nameplate band. */
+export const PATTERN_IDENTITY_NAMEPLATE_CLASS = "col-span-full border-b border-border pb-6";
+
+export const PATTERN_IDENTITY_SKELETON_COPY_CLASS = "flex min-w-0 flex-col gap-2";
+
+export const PATTERN_IDENTITY_AVATAR_SKELETON_PX = 48;
+
+/** Owner Settings surrounding chrome — same strip, connection card. */
+export const PATTERN_SETTINGS_CARD_CLASS = "col-span-full";
+
+export const PATTERN_SETTINGS_BODY_CLASS = "flex min-w-0 flex-col gap-4 px-3.5 py-[16px]";
+
+export const PATTERN_SHARE_KIT_STACK_CLASS = "flex min-w-0 flex-col gap-2";
+
+export const PATTERN_SHARE_KIT_ACTIONS_CLASS = "flex min-w-0 flex-wrap items-center gap-3";
+
+export const PATTERN_CONNECTION_META_CLASS = "type-supporting text-muted text-muted";
 
 export const PATTERN_KIT_STAT_CLASS = "col-span-2 md:col-span-4 lg:col-span-6";
 

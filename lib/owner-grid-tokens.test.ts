@@ -31,14 +31,17 @@ describe("fail-closed: owner grid gutter tokens (WHA-309)", () => {
     assert.match(OWNER_GRID_CLASS, /\bgrid-page\b/);
   });
 
-  it("AppFrame and settings keep the exported owner class / max SoT", () => {
+  it("AppFrame and landing keep the exported owner class / max SoT", () => {
     const frame = read("components/app-frame.tsx");
+    const landing = read("app/page.tsx");
     const settings = read("app/settings/page.tsx");
 
     assert.match(frame, /OWNER_GRID_CLASS/);
     assert.match(frame, /gridMax \? OWNER_GRID_CLASS/);
     assert.doesNotMatch(frame, /style=\{/);
-    assert.match(settings, /OWNER_GRID_MAX/);
+    assert.match(landing, /<AppFrame/);
+    assert.doesNotMatch(settings, /OWNER_GRID_MAX|<AppFrame/);
+    assert.match(read("components/account-settings.tsx"), /PATTERN_PAGE_CLASS/);
   });
 
   it("Insights and public kit copy the Pattern page shell", () => {
@@ -63,6 +66,8 @@ describe("fail-closed: owner grid gutter tokens (WHA-309)", () => {
     assert.match(kit, /CREATOR_INSIGHTS_HEADER_BAND_CLASS/);
     assert.match(kit, /CREATOR_INSIGHTS_BODY_BAND_CLASS/);
     assert.match(kit, /CREATOR_INSIGHTS_BODY_INNER_CLASS/);
+    assert.match(read("components/account-settings.tsx"), /PATTERN_PAGE_CLASS/);
+    assert.match(read("components/account-settings.tsx"), /PATTERN_TOPBAR_BAND_CLASS/);
     assert.doesNotMatch(insights, /<AppFrame|OWNER_GRID_MAX|layout="stretch"/);
     assert.match(read("app/layout.tsx"), /className="bg-body min-h-screen"/);
   });

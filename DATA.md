@@ -21,9 +21,9 @@ One row per creator.
 | `id` | our primary key | us | never |
 | `ig_user_id` | unique | Instagram Login | never (stable) |
 | `handle` | unique Pitchkit slug, frozen at first connect by default | from IG username (keep `.` `_`; `-2` if taken) | first connect; optional reconnect update (WHA-313) |
-| `name` | display name | Graph | login / refresh |
-| `avatar_r2_key` | file key; bytes in R2 | Graph profile photo URL → R2 | if photo URL changed |
-| `followers` | live count | Graph | login / refresh |
+| `name` | display name | Graph | login / refresh. Identity strip hides the heading when blank — never invent a name or bio |
+| `avatar_r2_key` | file key; bytes in R2 | Graph profile photo URL → R2 | if photo URL changed. Identity Avatar falls back when missing |
+| `followers` | live count | Graph | login / refresh. Identity strip uses this as context; kit Stat stays on the shareable freeze |
 | `media_count` | live count | Graph | login / refresh |
 | `token_encrypted` | Instagram access token | OAuth | on new token |
 | `refresh_encrypted` | Instagram refresh token | OAuth | on new token |
@@ -31,7 +31,7 @@ One row per creator.
 | `connected_at` | | us | once |
 | `disconnected_at` | null while live | us | on disconnect |
 | `consent_index` | bool, **default false** | us | when they opt into anonymized rollups. **Not** the connect-screen disclosure |
-| `ig_account_type` | e.g. Business / Media_Creator | Graph, if returned | login / refresh |
+| `ig_account_type` | e.g. Business / Media_Creator | Graph, if returned | login / refresh. Identity Professional chip labels Business or Creator; hide when missing |
 | `disclosure_version` | int, currently `1` | us | when connect-screen copy changes |
 
 ---
