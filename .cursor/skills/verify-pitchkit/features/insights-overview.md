@@ -40,8 +40,8 @@ Preconditions:
 
 - Brands never see this page. A `--fresh` `/insights` redirects to `/`.
 - Public `/k/demo` omits `reach_series`. Do not expect this chart on the public kit.
-- Insufficient reach keeps the Reach Card and shows **No reach data yet** / **Connect more Instagram activity to plot the last 30 days.** Omitting that Card when Insights exist is a fail. A title-only Card without that empty copy is a fail. Skeleton / Chart.Loading in that empty well is a fail. Partial holes in a plottable series may show a Chart.Cartesian **No data** hatch — that is not the full-card empty and not invented hatch chrome.
-- Empty audience keeps the Audience Card and shows **No audience data yet** / **Connect Instagram Insights demographics when available.** Omitting that Card, painting EXAMPLE mixes, or putting Skeleton / Chart.Loading in that empty well is a fail. Both empties together is valid.
+- Insufficient reach keeps the Reach Card and shows muted **Badge** **No data** → **No reach data yet** / **Connect more Instagram activity to plot the last 30 days.** Omitting that Card when Insights exist is a fail. A title-only Card without that Badge + empty copy is a fail. Skeleton / Chart.Loading in that empty well is a fail. Partial holes in a plottable series may show a Chart.Cartesian **No data** hatch — that is not the full-card empty and not invented hatch chrome.
+- Empty audience keeps the Audience Card and shows muted **Badge** **No data** → **No audience data yet** / **Connect Instagram Insights demographics when available.** Omitting that Card, painting EXAMPLE mixes, or putting Skeleton / Chart.Loading in that empty well is a fail. Both empties together is valid.
 - Graph-unavailable still omits the optional Reach region — do not invent the empty reach band when Insights never landed.
 - Spell **Engagement rate**. A label “ER” is a fail.
 - `/insights?grid=pulling` is the first-connect skeleton Pattern. `/insights?grid=retrieving` is Header + Chart.Loading. Default dry-run uses `/insights` with seed ready.

@@ -305,6 +305,9 @@ describe("critical page contracts", () => {
     assert.match(chart, /variant="outlined"/);
     assert.match(chart, /Reach over 30 days/);
     assert.match(chart, /REACH_INSUFFICIENT_TITLE/);
+    assert.match(chart, /<Badge variant="neutral" emphasis="muted">\{REACH_NO_DATA_LABEL\}<\/Badge>/);
+    assert.doesNotMatch(chart, /ExampleGridControls|pitchKitStyles|PitchKitExample/);
+    assert.doesNotMatch(audience, /ExampleGridControls|pitchKitStyles|PitchKitExample/);
     assert.match(chart, /reachChartSurface/);
     assert.match(chart, /hasInsights/);
     assert.match(chart, /retrieving/);
@@ -319,6 +322,7 @@ describe("critical page contracts", () => {
     assert.match(audience, /AUDIENCE_INSUFFICIENT_TITLE/);
     assert.match(audience, /PATTERN_AUDIENCE_EMPTY_WELL_CLASS/);
     assert.match(audience, /PATTERN_AUDIENCE_EMPTY_COPY_CLASS/);
+    assert.match(audience, /<Badge variant="neutral" emphasis="muted">\{REACH_NO_DATA_LABEL\}<\/Badge>/);
     assert.doesNotMatch(audience, /PATTERN_REACH_EMPTY_COPY_CLASS/);
     assert.match(audience, /audienceFitSurface/);
     assert.match(audience, /data-audience-slot=\{slot\}/);
@@ -341,10 +345,10 @@ describe("critical page contracts", () => {
     assert.match(chart, /animate="none"/);
     assert.match(read("components/owner-chrome.tsx"), /typicalReach=\{typicalReach\}/);
     assert.match(read("components/wmds.ts"), /chartMaxTicksForWidth/);
-    assert.match(read("package.json"), /wmds#14d50cda0302e263cb350409f2cea34de03c7c2e/);
+    assert.match(read("package.json"), /wmds#0718bdcb87975d3389ad11770bb479c293d33200/);
     assert.doesNotMatch(
       read("package.json"),
-      /cd18e7a29afd0c0d774552c1a3d665f480f51bd4|70da6a4c50d8efc1e687b20f231c6e4f1f6190c6|dc813326028c0fe1cc5f3719466a32607bab4504|55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab/,
+      /14d50cda0302e263cb350409f2cea34de03c7c2e|cd18e7a29afd0c0d774552c1a3d665f480f51bd4|70da6a4c50d8efc1e687b20f231c6e4f1f6190c6|dc813326028c0fe1cc5f3719466a32607bab4504|55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab/,
     );
     assert.match(page, /OwnerWorkspace/);
     assert.match(read("components/owner-workspace.tsx"), /CREATOR_INSIGHTS_PAGE_CLASS/);
@@ -389,9 +393,11 @@ describe("critical page contracts", () => {
     );
     assert.match(
       read("components/pattern-tokens.ts"),
-      /PATTERN_REACH_EMPTY_COPY_CLASS =\s*`\$\{PATTERN_EMPTY_COPY_CLASS\} items-center text-center`/,
+      /PATTERN_REACH_EMPTY_COPY_CLASS =\s*"flex max-w-lg flex-col items-center gap-3 text-center"/,
     );
     assert.match(read("components/reach-chart.tsx"), /PATTERN_REACH_EMPTY_COPY_CLASS/);
+    assert.match(read("components/reach-chart.tsx"), /<Badge variant="neutral" emphasis="muted">\{REACH_NO_DATA_LABEL\}<\/Badge>/);
+    assert.match(read("components/audience-fit.tsx"), /<Badge variant="neutral" emphasis="muted">\{REACH_NO_DATA_LABEL\}<\/Badge>/);
     assert.match(
       read("components/pattern-tokens.ts"),
       /PATTERN_AUDIENCE_EMPTY_COPY_CLASS = PATTERN_REACH_EMPTY_COPY_CLASS/,
