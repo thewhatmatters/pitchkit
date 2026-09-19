@@ -4,7 +4,7 @@ import { AppFrame } from "@/components/app-frame";
 import { ConnectButton } from "@/components/connect-button";
 import { PageCard, PageCopy } from "@/components/page-card";
 import { SupportFooter } from "@/components/support-footer";
-import { DEMO_SESSION_NOTE, DISCLOSURE, PERSIST_FAIL, PERSONAL_FAIL, PROFESSIONAL_NOTE } from "@/lib/copy";
+import { DEMO_SESSION_NOTE, DISCLOSURE, landingErrorCopy, PROFESSIONAL_NOTE } from "@/lib/copy";
 import { hasLiveAuthSecrets, readSecrets } from "@/lib/env";
 import { insightsGate, resolveSession, SESSION_COOKIE } from "@/lib/session";
 
@@ -20,8 +20,7 @@ export default async function LandingPage({ searchParams }: LandingProps) {
   }
 
   const { error } = await searchParams;
-  const personalFail = error === "personal";
-  const persistFail = error === "persist";
+  const failCopy = landingErrorCopy(error);
   const showDemoNote = !hasLiveAuthSecrets(await readSecrets("page"));
 
   return (
@@ -31,13 +30,9 @@ export default async function LandingPage({ searchParams }: LandingProps) {
           Sign in with Instagram, see your numbers, and send brands a link.
         </PageCopy>
         <PageCopy>{DISCLOSURE}</PageCopy>
-        {personalFail ? (
+        {failCopy ? (
           <PageCopy>
-            <span role="alert">{PERSONAL_FAIL}</span>
-          </PageCopy>
-        ) : persistFail ? (
-          <PageCopy>
-            <span role="alert">{PERSIST_FAIL}</span>
+            <span role="alert">{failCopy}</span>
           </PageCopy>
         ) : (
           <PageCopy>{PROFESSIONAL_NOTE}</PageCopy>
