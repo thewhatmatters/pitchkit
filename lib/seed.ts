@@ -6,6 +6,13 @@ export const DEMO_HANDLE = "demo";
 
 export const DEMO_USER_ID = "00000000-0000-4000-8000-000000000001";
 
+/** Seed demo session — never operator `IG_USER_TOKEN` or a Graph snapshot. */
+export function isSeedDemoUser(
+  user: { handle?: string | null; id?: string | null } | null | undefined,
+): boolean {
+  return user?.handle === DEMO_HANDLE || user?.id === DEMO_USER_ID;
+}
+
 const FETCHED_AT = "2026-09-02T12:00:00.000Z";
 
 /**

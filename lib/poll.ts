@@ -27,6 +27,7 @@ import {
   type AudienceMixes,
   type GraphSnapshot,
 } from "./graph-store";
+import { isSeedDemoUser } from "./seed";
 import { decryptToken } from "./token-crypto";
 import { shouldShowReachChart, type ReachPoint } from "./reach-series";
 import type { Media, User } from "./schema";
@@ -95,9 +96,12 @@ export function shouldPollInsights(input: {
 }
 
 export async function resolveAccessToken(
-  user: Pick<User, "token_encrypted"> | null | undefined,
+  user: Pick<User, "token_encrypted" | "handle" | "id"> | null | undefined,
   secrets: PitchkitSecrets,
 ): Promise<string | null> {
+  if (isSeedDemoUser(user)) {
+    return null;
+  }
   const stored = await decryptToken(user?.token_encrypted, secrets.TOKEN_KEY);
   if (stored) {
     return stored;

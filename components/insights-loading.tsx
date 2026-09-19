@@ -1,6 +1,6 @@
 "use client";
 
-import { Share2 } from "lucide-react";
+import { ShareKitButton } from "@/components/share-kit-button";
 import {
   PATTERN_AUDIENCE_CARD_CLASS,
   PATTERN_AUDIENCE_SKELETON_BARS_CLASS,
@@ -37,7 +37,8 @@ const audienceSkeletonSections = [
 ] as const;
 
 type InsightsLoadingProps = {
-  onShare: () => void;
+  handle: string;
+  onCopyFailed?: (url: string) => void;
 };
 
 /**
@@ -46,7 +47,7 @@ type InsightsLoadingProps = {
  * First Graph connect / `?grid=pulling` page freeze — Skeleton wells, not retrieving.
  * Do not mount a second toast host here.
  */
-export function InsightsLoading({ onShare }: InsightsLoadingProps) {
+export function InsightsLoading({ handle, onCopyFailed }: InsightsLoadingProps) {
   return (
     <>
       <section className={PATTERN_HEADER_SECTION_CLASS}>
@@ -61,9 +62,7 @@ export function InsightsLoading({ onShare }: InsightsLoadingProps) {
                   Refresh
                 </Button>
               </form>
-              <Button role="secondary" size="sm" icon={<Share2 />} onClick={onShare}>
-                Share kit
-              </Button>
+              <ShareKitButton handle={handle} onCopyFailed={onCopyFailed} />
             </span>
           }
         />

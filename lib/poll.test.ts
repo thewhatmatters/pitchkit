@@ -3,9 +3,10 @@ import { afterEach, describe, it } from "node:test";
 import { emptySecrets, setSecretsForTests } from "./env";
 import { GRAPH_HOST } from "./graph";
 import { createMemoryHiddenKit, setHiddenKitNamespaceForTests } from "./hidden-kit";
-import { pollInsights, shouldPollInsights } from "./poll";
+import { pollInsights, resolveAccessToken, shouldPollInsights } from "./poll";
 import { loadOwnerKit } from "./store";
-import { DEMO_HANDLE } from "./seed";
+import { DEMO_HANDLE, DEMO_USER_ID } from "./seed";
+import { encryptToken } from "./token-crypto";
 
 afterEach(() => {
   setSecretsForTests(undefined);
@@ -157,5 +158,43 @@ describe("Insights poll", () => {
       age: [],
       gender: [],
     });
+  });
+
+  it("never resolves IG_USER_TOKEN for the seed demo user", async () => {
+    const demo = await resolveAccessToken(
+      { handle: DEMO_HANDLE, id: DEMO_USER_ID, token_encrypted: null },
+      { ...emptySecrets(), IG_USER_TOKEN: "operator-token" },
+    );
+    assert.equal(demo, null);
+
+    const stored = await encryptToken("stored-oauth", "unit-test-token-key");
+    const liveStored = await resolveAccessToken(
+      { handle: "rxndy.dxniel", id: "live-1", token_encrypted: stored },
+      { ...emptySecrets(), TOKEN_KEY: "unit-test-token-key", IG_USER_TOKEN: "operator-token" },
+    );
+    assert.equal(liveStored, "stored-oauth");
+
+    const liveFallback = await resolveAccessToken(
+      { handle: "rxndy.dxniel", id: "live-1", token_encrypted: null },
+      { ...emptySecrets(), IG_USER_TOKEN: "operator-token" },
+    );
+    assert.equal(liveFallback, "operator-token");
+  });
+
+  it("loadOwnerKit never polls Graph for seed demo even with IG_USER_TOKEN", async () => {
+    setHiddenKitNamespaceForTests(createMemoryHiddenKit());
+    setSecretsForTests({ ...emptySecrets(), IG_USER_TOKEN: "operator-token" });
+    let fetched = 0;
+    const owner = await loadOwnerKit(DEMO_HANDLE, new Date("2026-09-02T12:00:00.000Z"), null, {
+      refresh: true,
+      fetch: async () => {
+        fetched += 1;
+        throw new Error("demo must not poll");
+      },
+    });
+    assert.ok(owner);
+    assert.equal(owner.user.handle, DEMO_HANDLE);
+    assert.equal(fetched, 0);
+    assert.ok(owner.reach_series && owner.reach_series.length === 30);
   });
 });

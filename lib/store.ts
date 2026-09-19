@@ -120,7 +120,8 @@ export async function loadPublicKit(
 /**
  * Owner Insights for the session handle.
  * Demo seed includes example Insights + `reach_series` when no token.
- * Live token → poll when stale (>6h) or Refresh; persist snapshot; hide empty.
+ * Never resolve operator `IG_USER_TOKEN` or a Graph snapshot for seed `demo`.
+ * Live OAuth token → poll when stale (>6h) or Refresh; persist snapshot; hide empty.
  * Includes every owner row (hidden posts keep `hidden_from_kit_at`).
  */
 export async function loadOwnerKit(
@@ -131,6 +132,24 @@ export async function loadOwnerKit(
 ): Promise<PublicKit | null> {
   const access = options.access ?? "page";
   const secrets = options.secrets ?? (await readSecrets(access));
+  if (handle === DEMO_HANDLE) {
+    const seedUser = seedUsers.find((row) => row.handle === handle);
+    if (!seedUser) {
+      return null;
+    }
+    const fetched = seedOwnerMedia.filter((row) => row.user_id === seedUser.id);
+    const media = (await sqlOwnsUser(seedUser.id, access))
+      ? fetched
+      : applyHiddenOverlay(fetched, await hiddenOverlayForHandle(handle, overlay), seedUser.id);
+    const kit = assemblePublicKit(seedUser, media, now, {
+      reach_series: seedReachSeries,
+      audience: EMPTY_AUDIENCE,
+    });
+    if (!kit) {
+      return null;
+    }
+    return { ...kit, posts: media, audience: EMPTY_AUDIENCE };
+  }
   const seedUser = seedUsers.find((row) => row.handle === handle);
   const live = seedUser
     ? await readGraphSnapshot(seedUser.id, access)
