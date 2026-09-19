@@ -1,6 +1,6 @@
 /**
  * Interpolated Show code class strings from WMDS Examples/PitchKit at
- * `96f44587b3b3ff1c44de9f1e5adba61a661d30e1`.
+ * `29bef582fd60bb2398014f1c797b34fcf30bc791`.
  *
  * Stories:
  * - `examples-pitchkit--account-settings-owner` (Pattern — account settings (owner))
@@ -11,6 +11,8 @@
  * - `examples-pitchkit--insufficient-reach-and-audience-data` (State — insufficient reach and audience data)
  * - `examples-pitchkit--graph-data-unavailable` (State — Graph data unavailable; omit optional regions)
  * - `examples-pitchkit--shareable-pitch-kit` (Pattern — shareable PitchKit)
+ * - `examples-pitchkit--shareable-insufficient-reach` (State — shareable insufficient reach)
+ * - `examples-pitchkit--theme-picker-owner` (Pattern — theme picker (owner))
  * - `examples-pitchkit--owner-pitch-kit` (Pattern — owner PitchKit)
  * Post dates in product include the year (`Dec 17, 2024`); stories may omit year.
  * - `examples-pitchkit--creator-identity-public` (Pattern — creator identity (public))
@@ -68,6 +70,9 @@ export const PATTERN_CARD_WELL_CLASS =
 
 /** Matches Chart.Cartesian `minHeight` on the Reach well — keep empty/skeleton bands the same. */
 export const PATTERN_REACH_CHART_MIN_HEIGHT = 344;
+
+/** Compact public-kit 30-day reach — same empty contract, shorter well. */
+export const PATTERN_PUBLIC_REACH_CHART_MIN_HEIGHT = 220;
 
 /** Pattern empty well + fill the terminal Card.Body so justify-center can act. */
 export const PATTERN_REACH_EMPTY_WELL_CLASS =
@@ -175,6 +180,11 @@ export const PATTERN_CALLOUT_ACTIONS_CLASS = "flex flex-wrap items-center gap-3"
 
 export const PATTERN_KIT_STAT_CLASS = "col-span-2 md:col-span-4 lg:col-span-6";
 
+/** Public kit 4-up Graph KPIs — same spine as Insights Stats. */
+export const PATTERN_PUBLIC_STAT_CLASS = PATTERN_STAT_CLASS;
+
+export const PATTERN_COUNTRIES_CARD_CLASS = PATTERN_AUDIENCE_CARD_CLASS;
+
 export const PATTERN_KIT_POST_METRICS_CLASS = "grid w-full grid-cols-2 gap-3";
 
 export const PATTERN_CONTACT_CARD_CLASS = "col-span-full";
@@ -201,6 +211,18 @@ export const PATTERN_BRAND_ROW_START_CLASS = "flex min-w-0 items-center gap-3";
 export const PATTERN_BRAND_NAME_CLASS = "type-label text-fg";
 
 export const PATTERN_BRAND_REORDER_CLASS = "flex shrink-0 items-center";
+
+/** Owner theme picker — draft SegmentedControl + explicit Save. */
+export const PATTERN_THEME_TOOLBAR_CLASS =
+  "col-span-full flex flex-wrap items-end justify-between gap-3";
+
+export const PATTERN_THEME_PREVIEW_LABEL_CLASS = PATTERN_SECTION_EYEBROW_CLASS;
+
+export const PATTERN_THEME_PREVIEW_CLASS =
+  "col-span-full overflow-hidden border border-border bg-body rounded-[var(--radius-card-body)]";
+
+export const PATTERN_THEME_PREVIEW_PAGE_CLASS =
+  "grid-page bg-body [--grid-column-gap:8px] [--grid-max:1140px]";
 
 /**
  * Centered empty-well stack (Reach / Audience No data). Coming soon retired

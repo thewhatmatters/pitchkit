@@ -12,7 +12,7 @@ import { OwnerNav, type OwnerView } from "@/components/owner-nav";
 import { OwnerPitchKit } from "@/components/owner-pitchkit";
 import { SupportFooter } from "@/components/support-footer";
 import type { KitAudience } from "@/lib/kit";
-import type { PastBrand } from "@/lib/kit-profile";
+import type { PastBrand, PitchKitTheme } from "@/lib/kit-profile";
 import type { ReachPoint } from "@/lib/reach-series";
 import type { Media, User } from "@/lib/schema";
 
@@ -27,6 +27,7 @@ type OwnerWorkspaceProps = {
   audience?: KitAudience | null;
   intro?: string | null;
   pastBrands?: readonly PastBrand[];
+  theme?: PitchKitTheme;
   gridReady: boolean;
   retrieving?: boolean;
 };
@@ -48,6 +49,7 @@ export function OwnerWorkspace({
   audience,
   intro = null,
   pastBrands = [],
+  theme,
   gridReady,
   retrieving = false,
 }: OwnerWorkspaceProps) {
@@ -70,8 +72,15 @@ export function OwnerWorkspace({
               user={user}
               posts={posts}
               onPostsChange={setPosts}
+              engagementRate={engagementRate}
+              typicalReach={typicalReach}
+              typicalSaves={typicalSaves}
+              reachSeries={reachSeries}
+              hasInsights={hasInsights}
+              countries={audience?.country}
               intro={intro}
               pastBrands={pastBrands}
+              theme={theme}
             />
           ) : (
             <OwnerChrome

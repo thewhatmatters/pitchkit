@@ -21,8 +21,10 @@ import {
   kitProfileFromUnknown,
   normalizeIntro,
   normalizePastBrands,
+  normalizeTheme,
   type KitProfile,
   type PastBrand,
+  type PitchKitTheme,
 } from "./kit-profile";
 import type { ReachPoint } from "./reach-series";
 import type { Media, User } from "./schema";
@@ -58,6 +60,8 @@ export type GraphSnapshot = {
   intro?: string | null;
   /** Ordered `{ id, name }`. Optional on disk — parse stays tolerant. */
   past_brands?: PastBrand[];
+  /** Public kit appearance. Optional on disk — parse stays tolerant. */
+  theme?: PitchKitTheme;
 };
 
 function snapshotKey(userId: string): string {
@@ -82,16 +86,18 @@ export type GraphPayloadExtras = {
   polled_at: string;
   intro?: string | null;
   past_brands?: PastBrand[];
+  theme?: PitchKitTheme;
 };
 
 function extrasFromSnapshot(snapshot: GraphSnapshot): GraphPayloadExtras {
-  const profile = kitProfileFromUnknown(snapshot.intro, snapshot.past_brands);
+  const profile = kitProfileFromUnknown(snapshot.intro, snapshot.past_brands, snapshot.theme);
   return {
     reach_series: snapshot.reach_series,
     audience: snapshot.audience,
     polled_at: snapshot.polled_at,
     intro: profile.intro,
     past_brands: profile.past_brands,
+    theme: profile.theme,
   };
 }
 
@@ -102,6 +108,7 @@ function emptyExtras(polledAt = ""): GraphPayloadExtras {
     polled_at: polledAt,
     intro: null,
     past_brands: [],
+    theme: EMPTY_KIT_PROFILE.theme,
   };
 }
 
@@ -162,7 +169,7 @@ function snapshotFromSql(
   media: Media[],
   extras: GraphPayloadExtras,
 ): GraphSnapshot {
-  const profile = kitProfileFromUnknown(extras.intro, extras.past_brands);
+  const profile = kitProfileFromUnknown(extras.intro, extras.past_brands, extras.theme);
   return {
     user,
     media,
@@ -171,6 +178,7 @@ function snapshotFromSql(
     polled_at: extras.polled_at,
     intro: profile.intro,
     past_brands: profile.past_brands,
+    theme: profile.theme,
   };
 }
 
@@ -262,11 +270,12 @@ function parseSnapshot(raw: string | null): GraphSnapshot | null {
     if (!isSnapshot(parsed)) {
       return null;
     }
-    const profile = kitProfileFromUnknown(parsed.intro, parsed.past_brands);
+    const profile = kitProfileFromUnknown(parsed.intro, parsed.past_brands, parsed.theme);
     return {
       ...parsed,
       intro: profile.intro,
       past_brands: profile.past_brands,
+      theme: profile.theme,
     };
   } catch {
     return null;
@@ -280,11 +289,13 @@ function mergeKitProfile(
   const profile = kitProfileFromUnknown(
     next.intro !== undefined ? next.intro : previous?.intro,
     next.past_brands !== undefined ? next.past_brands : previous?.past_brands,
+    next.theme !== undefined ? next.theme : previous?.theme,
   );
   return {
     ...next,
     intro: profile.intro,
     past_brands: profile.past_brands,
+    theme: profile.theme,
   };
 }
 
@@ -453,7 +464,7 @@ export function snapshotKitProfile(snapshot: GraphSnapshot | null | undefined): 
   if (!snapshot) {
     return { ...EMPTY_KIT_PROFILE };
   }
-  return kitProfileFromUnknown(snapshot.intro, snapshot.past_brands);
+  return kitProfileFromUnknown(snapshot.intro, snapshot.past_brands, snapshot.theme);
 }
 
 /**
@@ -467,6 +478,7 @@ export async function persistOwnerKitProfile(
 ): Promise<boolean> {
   const intro = normalizeIntro(profile.intro);
   const pastBrands = normalizePastBrands(profile.past_brands);
+  const theme = normalizeTheme(profile.theme);
   const existing =
     (await readGraphSnapshot(session.userId, access)) ??
     (await readGraphSnapshotByHandle(session.handle, access));
@@ -476,6 +488,7 @@ export async function persistOwnerKitProfile(
         ...existing,
         intro,
         past_brands: pastBrands,
+        theme,
       },
       access,
     );
@@ -496,6 +509,7 @@ export async function persistOwnerKitProfile(
       polled_at: "",
       intro,
       past_brands: pastBrands,
+      theme,
     },
     access,
   );

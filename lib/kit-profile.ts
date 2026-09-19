@@ -1,9 +1,10 @@
 /**
- * Pitchkit-owned kit intro + past brands.
+ * Pitchkit-owned kit intro + past brands + theme.
  * Not Instagram biography. Not SQL — staged on the KV Graph snapshot.
- * WMDS tip `96f44587b3b3ff1c44de9f1e5adba61a661d30e1`:
+ * WMDS tip `29bef582fd60bb2398014f1c797b34fcf30bc791`:
  * `examples-pitchkit--intro-owner` / `--intro-public`
  * `examples-pitchkit--past-brands-owner` / `--past-brands-public`
+ * `examples-pitchkit--theme-picker-owner`
  */
 
 export const PITCHKIT_INTRO_SOFT_LIMIT = 160;
@@ -18,14 +19,20 @@ export type PastBrand = {
   name: string;
 };
 
+export const PITCHKIT_THEMES = ["light", "dark", "soft"] as const;
+export type PitchKitTheme = (typeof PITCHKIT_THEMES)[number];
+export const PITCHKIT_THEME_DEFAULT: PitchKitTheme = "light";
+
 export type KitProfile = {
   intro: string | null;
   past_brands: PastBrand[];
+  theme: PitchKitTheme;
 };
 
 export const EMPTY_KIT_PROFILE: KitProfile = {
   intro: null,
   past_brands: [],
+  theme: PITCHKIT_THEME_DEFAULT,
 };
 
 /** Seed `/k/demo` frozen display — WMDS Pattern filled examples. Not live Graph. */
@@ -101,24 +108,35 @@ export function normalizePastBrands(value: unknown): PastBrand[] {
   return out;
 }
 
+export function isPitchKitTheme(value: unknown): value is PitchKitTheme {
+  return value === "light" || value === "dark" || value === "soft";
+}
+
+export function normalizeTheme(value: unknown): PitchKitTheme {
+  return isPitchKitTheme(value) ? value : PITCHKIT_THEME_DEFAULT;
+}
+
 export function normalizeKitProfile(value: unknown): KitProfile {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return { ...EMPTY_KIT_PROFILE };
   }
-  const row = value as { intro?: unknown; past_brands?: unknown };
+  const row = value as { intro?: unknown; past_brands?: unknown; theme?: unknown };
   return {
     intro: normalizeIntro(row.intro),
     past_brands: normalizePastBrands(row.past_brands),
+    theme: normalizeTheme(row.theme),
   };
 }
 
 export function kitProfileFromUnknown(
   intro: unknown,
   pastBrands: unknown,
+  theme?: unknown,
 ): KitProfile {
   return {
     intro: normalizeIntro(intro),
     past_brands: normalizePastBrands(pastBrands),
+    theme: normalizeTheme(theme),
   };
 }
 
@@ -192,12 +210,15 @@ export function parseKitProfileBody(body: unknown): ParseKitProfileBody {
   if (!body || typeof body !== "object" || Array.isArray(body)) {
     return { ok: false, error: "invalid_body" };
   }
-  const row = body as { intro?: unknown; past_brands?: unknown };
+  const row = body as { intro?: unknown; past_brands?: unknown; theme?: unknown };
   if (row.intro != null && typeof row.intro !== "string") {
     return { ok: false, error: "invalid_body" };
   }
   if (typeof row.intro === "string" && row.intro.length > PITCHKIT_INTRO_HARD_LIMIT) {
     return { ok: false, error: "intro_too_long" };
+  }
+  if (row.theme != null && !isPitchKitTheme(row.theme)) {
+    return { ok: false, error: "invalid_body" };
   }
   if (row.past_brands != null && !Array.isArray(row.past_brands)) {
     return { ok: false, error: "invalid_body" };
@@ -230,6 +251,7 @@ export function parseKitProfileBody(body: unknown): ParseKitProfileBody {
     profile: {
       intro: normalizeIntro(row.intro),
       past_brands: normalizePastBrands(row.past_brands ?? []),
+      theme: normalizeTheme(row.theme),
     },
   };
 }
@@ -267,6 +289,7 @@ export function kitProfileErrorMessage(code: KitProfileError): string {
 export function profileFromSnapshot(snapshot: {
   intro?: string | null;
   past_brands?: PastBrand[];
+  theme?: PitchKitTheme;
 } | null | undefined): KitProfile {
   if (!snapshot) {
     return { ...EMPTY_KIT_PROFILE };
@@ -274,6 +297,7 @@ export function profileFromSnapshot(snapshot: {
   return {
     intro: normalizeIntro(snapshot.intro),
     past_brands: normalizePastBrands(snapshot.past_brands),
+    theme: normalizeTheme(snapshot.theme),
   };
 }
 
@@ -285,5 +309,6 @@ export function withKitProfile<T extends object>(
     ...snapshot,
     intro: profile.intro,
     past_brands: profile.past_brands,
+    theme: profile.theme,
   };
 }

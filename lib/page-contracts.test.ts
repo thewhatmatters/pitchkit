@@ -113,7 +113,7 @@ describe("critical page contracts", () => {
     assert.match(page, /showCreateBand=\{session == null\}/);
     assert.doesNotMatch(page, /sessionOwnsHandle|KitEdit|OwnerNav|AppFrame/);
     assert.doesNotMatch(page, /MoreMenu|Hide from kit|label="Edit"|Coming soon|PitchKitComingSoon|OwnerPitchKit/);
-    assert.match(kit, /Verified Instagram summary/);
+    assert.match(kit, /Instagram performance summary/);
     assert.match(kit, /Selected posts/);
     assert.match(kit, /TextLink/);
     assert.match(kit, /PublicPastBrands/);
@@ -125,6 +125,12 @@ describe("critical page contracts", () => {
     assert.match(kit, /CreatorIdentityStrip/);
     assert.match(kit, /PATTERN_IDENTITY_NAMEPLATE_CLASS/);
     assert.match(kit, /examples-pitchkit--shareable-pitch-kit/);
+    assert.match(kit, /examples-pitchkit--shareable-insufficient-reach/);
+    assert.match(kit, /Typical reach/);
+    assert.match(kit, /Typical saves/);
+    assert.match(kit, /Reach over 30 days/);
+    assert.match(kit, /Top countries/);
+    assert.match(kit, /PATTERN_PUBLIC_STAT_CLASS|PATTERN_PUBLIC_REACH_CHART_MIN_HEIGHT/);
     assert.match(kit, /examples-pitchkit--creator-identity-public/);
     assert.match(kit, /showCreateBand/);
     assert.match(kit, /Create your Pitchkit/);
@@ -140,12 +146,14 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(workspace, /KitEdit|PitchKitComingSoon|Coming soon/);
     assert.match(workspace, /OwnerPitchKit/);
     assert.match(ownerKit, /examples-pitchkit--owner-pitch-kit/);
+    assert.match(ownerKit, /examples-pitchkit--theme-picker-owner/);
     assert.match(ownerKit, /ShareKitButton/);
-    assert.match(ownerKit, /title="PitchKit"/);
-    assert.match(ownerKit, /EngagementRateFormulaTooltip/);
+    assert.match(ownerKit, /title="Theme"/);
+    assert.match(ownerKit, /Save theme/);
+    assert.match(ownerKit, /ShareableKit/);
+    assert.match(ownerKit, /data-theme=\{draftTheme\}/);
     assert.match(ownerKit, /formatPostedAt/);
-    assert.match(ownerKit, /CreatorIdentityStrip/);
-    assert.match(ownerKit, /PATTERN_IDENTITY_SECTION_CLASS/);
+    assert.match(ownerKit, /PATTERN_THEME_PREVIEW_CLASS/);
     assert.match(ownerKit, /Manage selected post/);
     assert.match(ownerKit, /Hide from kit/);
     assert.match(
@@ -279,7 +287,7 @@ describe("critical page contracts", () => {
     const sources = [share, proof, ownerKit];
     const blocks = sources.flatMap(toastAddBlocks);
 
-    assert.equal(blocks.length, 11);
+    assert.equal(blocks.length, 12);
     for (const block of blocks) {
       assert.match(block, /\btitle:/);
       assert.match(block, /\bdescription:/);
@@ -307,6 +315,8 @@ describe("critical page contracts", () => {
     assert.match(ownerKit, /TOAST_POST_RESTORED_TITLE/);
     assert.match(ownerKit, /TOAST_POST_RESTORED_DESCRIPTION/);
     assert.match(ownerKit, /TOAST_KIT_PROFILE_FAILED_TITLE/);
+    assert.match(copy, /TOAST_THEME_SAVED_TITLE = "Theme saved"/);
+    assert.match(ownerKit, /TOAST_THEME_SAVED_TITLE/);
     assert.match(ownerKit, /saveKitProfile/);
     assert.match(ownerKit, /OwnerIntroEditor/);
     assert.match(ownerKit, /OwnerPastBrands/);
@@ -439,10 +449,10 @@ describe("critical page contracts", () => {
     assert.match(chart, /animate="none"/);
     assert.match(read("components/owner-chrome.tsx"), /typicalReach=\{typicalReach\}/);
     assert.match(read("components/wmds.ts"), /chartMaxTicksForWidth/);
-    assert.match(read("package.json"), /wmds#96f44587b3b3ff1c44de9f1e5adba61a661d30e1/);
+    assert.match(read("package.json"), /wmds#29bef582fd60bb2398014f1c797b34fcf30bc791/);
     assert.doesNotMatch(
       read("package.json"),
-      /61f8921ac037839da660740da23763813f77d2ee|368560cd22bee2c5320b0b0e8038c30affa4bdea|9b4a1798aff97322b4167519c14ec802a1878b97|0718bdcb87975d3389ad11770bb479c293d33200|14d50cda0302e263cb350409f2cea34de03c7c2e|cd18e7a29afd0c0d774552c1a3d665f480f51bd4|70da6a4c50d8efc1e687b20f231c6e4f1f6190c6|dc813326028c0fe1cc5f3719466a32607bab4504|55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab/,
+      /61f8921ac037839da660740da23763813f77d2ee|96f44587b3b3ff1c44de9f1e5adba61a661d30e1|368560cd22bee2c5320b0b0e8038c30affa4bdea|9b4a1798aff97322b4167519c14ec802a1878b97|0718bdcb87975d3389ad11770bb479c293d33200|14d50cda0302e263cb350409f2cea34de03c7c2e|cd18e7a29afd0c0d774552c1a3d665f480f51bd4|70da6a4c50d8efc1e687b20f231c6e4f1f6190c6|dc813326028c0fe1cc5f3719466a32607bab4504|55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab/,
     );
     assert.match(read("components/wmds.ts"), /TextArea/);
     assert.match(read("components/wmds.ts"), /dialogFooterActionsClasses/);
@@ -471,6 +481,9 @@ describe("critical page contracts", () => {
     );
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--graph-data-unavailable/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--shareable-pitch-kit/);
+    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--shareable-insufficient-reach/);
+    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--theme-picker-owner/);
+    assert.match(read("components/pattern-tokens.ts"), /PATTERN_PUBLIC_REACH_CHART_MIN_HEIGHT = 220/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--account-settings-owner/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--owner-pitch-kit/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--creator-identity-public/);
@@ -565,7 +578,7 @@ describe("critical page contracts", () => {
       /PATTERN_PLACEHOLDER_BODY_CLASS = "type-body text-fg max-w-md text-muted"/,
     );
     assert.match(read("components/owner-pitchkit.tsx"), /examples-pitchkit--owner-pitch-kit/);
-    assert.match(read("components/owner-pitchkit.tsx"), /PATTERN_IDENTITY_SECTION_CLASS/);
+    assert.match(read("components/owner-pitchkit.tsx"), /PATTERN_THEME_PREVIEW_CLASS/);
     assert.match(read("components/owner-workspace.tsx"), /OwnerPitchKit/);
     assert.doesNotMatch(read("components/owner-workspace.tsx"), /PitchKitComingSoon|Coming soon/);
     assert.doesNotMatch(read("lib/copy.ts"), /PITCHKIT_COMING_SOON|Coming soon/);

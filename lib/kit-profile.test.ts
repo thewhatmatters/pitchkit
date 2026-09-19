@@ -6,11 +6,14 @@ import {
   PITCHKIT_BRANDS_MAX,
   PITCHKIT_INTRO_HARD_LIMIT,
   PITCHKIT_INTRO_SOFT_LIMIT,
+  PITCHKIT_THEME_DEFAULT,
   SEED_INTRO,
   SEED_PAST_BRANDS,
+  isPitchKitTheme,
   movePastBrand,
   normalizeIntro,
   normalizePastBrands,
+  normalizeTheme,
   parseKitProfileBody,
   pastBrandIdFromName,
   pitchKitIntroIsEmpty,
@@ -20,7 +23,7 @@ import {
   shouldShowPublicIntro,
 } from "./kit-profile";
 import type { User } from "./schema";
-import { DEMO_HANDLE, DEMO_USER_ID, seedMedia } from "./seed";
+import { DEMO_HANDLE, DEMO_USER_ID, seedMedia, seedOwnerMedia, seedReachSeries } from "./seed";
 import { loadOwnerKit, loadPublicKit } from "./store";
 
 const NOW = new Date("2026-09-19T12:00:00.000Z");
@@ -120,7 +123,16 @@ describe("kit intro + past brands contract", () => {
     });
     assert.deepEqual(parsed, {
       ok: true,
-      profile: { intro: "Hello", past_brands: [{ id: "acme", name: "Acme" }] },
+      profile: {
+        intro: "Hello",
+        past_brands: [{ id: "acme", name: "Acme" }],
+        theme: PITCHKIT_THEME_DEFAULT,
+      },
+    });
+    assert.equal(parseKitProfileBody({ intro: "Hi", theme: "neon" }).ok, false);
+    assert.deepEqual(parseKitProfileBody({ intro: "Hi", theme: "dark" }), {
+      ok: true,
+      profile: { intro: "Hi", past_brands: [], theme: "dark" },
     });
   });
 
@@ -141,6 +153,7 @@ describe("kit intro + past brands contract", () => {
     assert.ok(stored);
     assert.equal(stored.intro, null);
     assert.deepEqual(stored.past_brands, []);
+    assert.equal(stored.theme, PITCHKIT_THEME_DEFAULT);
   });
 
   it("writes intro and past brands onto the KV Graph snapshot", async () => {
@@ -164,6 +177,7 @@ describe("kit intro + past brands contract", () => {
         { id: "hearth-home", name: "Hearth & Home" },
         { id: "studio-line", name: "Studio Line" },
       ],
+      theme: "soft" as const,
     };
     assert.equal(
       await persistOwnerKitProfile({ handle: user.handle, userId: user.id }, profile),
@@ -172,10 +186,12 @@ describe("kit intro + past brands contract", () => {
     const stored = await readGraphSnapshot(user.id);
     assert.deepEqual(stored?.intro, profile.intro);
     assert.deepEqual(stored?.past_brands, profile.past_brands);
+    assert.equal(stored?.theme, "soft");
 
     const kit = await loadPublicKit(user.handle, NOW);
     assert.equal(kit?.intro, profile.intro);
     assert.deepEqual(kit?.past_brands, profile.past_brands);
+    assert.equal(kit?.theme, "soft");
   });
 
   it("keeps intro/past_brands when a later snapshot omits them", async () => {
@@ -190,6 +206,7 @@ describe("kit intro + past brands contract", () => {
         polled_at: NOW.toISOString(),
         intro: "Keep me",
         past_brands: [{ id: "acme", name: "Acme" }],
+        theme: "dark",
       }),
       true,
     );
@@ -206,6 +223,7 @@ describe("kit intro + past brands contract", () => {
     const stored = await readGraphSnapshot(user.id);
     assert.equal(stored?.intro, "Keep me");
     assert.deepEqual(stored?.past_brands, [{ id: "acme", name: "Acme" }]);
+    assert.equal(stored?.theme, "dark");
   });
 
   it("seed /k/demo uses frozen Pattern display until a demo snapshot exists", async () => {
@@ -213,14 +231,16 @@ describe("kit intro + past brands contract", () => {
     const owner = await loadOwnerKit(DEMO_HANDLE, NOW);
     assert.equal(publicKit?.intro, SEED_INTRO);
     assert.deepEqual(publicKit?.past_brands, SEED_PAST_BRANDS);
+    assert.equal(publicKit?.theme, PITCHKIT_THEME_DEFAULT);
     assert.equal(owner?.intro, SEED_INTRO);
     assert.deepEqual(owner?.past_brands, SEED_PAST_BRANDS);
+    assert.equal(owner?.theme, PITCHKIT_THEME_DEFAULT);
 
     setHiddenKitNamespaceForTests(createMemoryHiddenKit());
     assert.equal(
       await persistOwnerKitProfile(
         { handle: DEMO_HANDLE, userId: DEMO_USER_ID },
-        { intro: null, past_brands: [] },
+        { intro: null, past_brands: [], theme: "dark" },
       ),
       true,
     );
@@ -229,5 +249,50 @@ describe("kit intro + past brands contract", () => {
     assert.deepEqual(omitted?.past_brands, []);
     assert.equal(shouldShowPublicIntro(omitted?.intro), false);
     assert.equal(shouldShowPastBrands(omitted?.past_brands), false);
+    assert.equal(omitted?.theme, "dark");
+  });
+
+  it("live public kit includes Graph KPIs from the snapshot", async () => {
+    setHiddenKitNamespaceForTests(createMemoryHiddenKit());
+    const user = liveUser();
+    assert.equal(
+      await writeGraphSnapshot({
+        user,
+        media: seedOwnerMedia.map((row) => ({ ...row, user_id: user.id })),
+        reach_series: seedReachSeries,
+        audience: {
+          country: [
+            { label: "United States", percent: 42 },
+            { label: "United Kingdom", percent: 16 },
+            { label: "Canada", percent: 11 },
+            { label: "Australia", percent: 8 },
+          ],
+          city: [],
+          age: [],
+          gender: [],
+        },
+        polled_at: NOW.toISOString(),
+        theme: "dark",
+      }),
+      true,
+    );
+    const kit = await loadPublicKit(user.handle, NOW);
+    assert.ok(kit);
+    assert.equal(kit.hasInsights, true);
+    assert.ok(kit.reach_series);
+    assert.equal(kit.reach_series.length, seedReachSeries.length);
+    assert.equal(kit.theme, "dark");
+    assert.equal(kit.audience?.country.length, 4);
+    assert.notEqual(kit.typicalReach, null);
+  });
+
+  it("defaults theme to light and rejects unknown values", () => {
+    assert.equal(isPitchKitTheme("light"), true);
+    assert.equal(isPitchKitTheme("dark"), true);
+    assert.equal(isPitchKitTheme("soft"), true);
+    assert.equal(isPitchKitTheme("neon"), false);
+    assert.equal(normalizeTheme(undefined), PITCHKIT_THEME_DEFAULT);
+    assert.equal(normalizeTheme("soft"), "soft");
+    assert.equal(normalizeTheme("neon"), PITCHKIT_THEME_DEFAULT);
   });
 });

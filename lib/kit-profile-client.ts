@@ -1,5 +1,5 @@
 /**
- * Owner PitchKit intro / past brands persist.
+ * Owner PitchKit intro / past brands / theme persist.
  * saveKitProfile(profile) → POST /api/kit/profile
  */
 
