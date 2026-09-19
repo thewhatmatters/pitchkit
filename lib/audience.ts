@@ -22,6 +22,22 @@ export type AudienceMixInput = {
   [K in keyof AudienceMixes]?: RankedShare[] | null;
 };
 
+/** Public kit — top 3 Graph countries only. Never invent example percentages. */
+export const PITCHKIT_PUBLIC_COUNTRIES_MAX = 3;
+
+export type PublicCountryBar = {
+  label: string;
+  value: number;
+};
+
+export function publicCountries(
+  rows: RankedShare[] | null | undefined,
+): PublicCountryBar[] {
+  return visibleAudienceMix(rows)
+    .slice(0, PITCHKIT_PUBLIC_COUNTRIES_MAX)
+    .map((row) => ({ label: row.label, value: row.percent }));
+}
+
 export function visibleAudienceMix(rows: RankedShare[] | null | undefined): RankedShare[] {
   if (!Array.isArray(rows) || rows.length === 0) {
     return [];

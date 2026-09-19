@@ -68,7 +68,7 @@ Row length follows the data: Followers always; Engagement rate when reach exists
 - Profile views + bio-link clicks in the overview
 - Average likes as a Stat
 - Stats as a prose paragraph
-- Look: gallery, themes, colors
+- Look: gallery, custom colors. Kit theme is unlocked: `light` | `dark` | `soft` (default `light`; persist on the KV Graph snapshot)
 - Impressions (deprecated)
 - Industry unless sourced (Later form field, not Graph)
 - Bio / creator location only if sourced from IG profile; hide if empty

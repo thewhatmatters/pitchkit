@@ -78,7 +78,11 @@ export const TOAST_HIDE_FAILED_TITLE = "Could not hide this post";
 export const TOAST_RESTORE_FAILED_TITLE = "Could not restore this post";
 export const TOAST_KIT_PROFILE_FAILED_TITLE = "Could not save kit profile";
 export const TOAST_KIT_PROFILE_FAILED_DESCRIPTION =
-  "Intro and past brands could not be stored. Try again.";
+  "Intro, past brands, or theme could not be stored. Try again.";
+export const TOAST_THEME_SAVED_TITLE = "Theme saved";
+export function toastThemeSavedDescription(theme: string): string {
+  return `Public kit appearance is ${theme}.`;
+}
 
 /** State — insufficient reach data (`examples-pitchkit--insufficient-reach-data`). */
 export const REACH_INSUFFICIENT_TITLE = "No reach data yet";

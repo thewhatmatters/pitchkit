@@ -43,6 +43,7 @@ export default async function InsightsPage({ searchParams }: InsightsProps) {
       audience={ownerKit.audience}
       intro={ownerKit.intro}
       pastBrands={ownerKit.past_brands}
+      theme={ownerKit.theme}
       gridReady={gridReady}
       retrieving={retrieving}
     />

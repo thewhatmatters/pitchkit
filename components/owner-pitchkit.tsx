@@ -2,43 +2,35 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { EyeOff } from "lucide-react";
-import { CreatorIdentityStrip } from "@/components/creator-identity-strip";
-import { EngagementRateFormulaTooltip } from "@/components/engagement-rate-info";
 import { OwnerIntroEditor } from "@/components/kit-intro";
 import { OwnerPastBrands } from "@/components/past-brands";
+import {
+  PATTERN_BRAND_CLASS,
+  PATTERN_CONTENT_BAND_CLASS,
+  PATTERN_CONTENT_CLASS,
+  PATTERN_HEADER_COPY_CLASS,
+  PATTERN_HEADER_SECTION_CLASS,
+  PATTERN_SUPPORTING_CLASS,
+  PATTERN_THEME_PREVIEW_CLASS,
+  PATTERN_THEME_PREVIEW_LABEL_CLASS,
+  PATTERN_THEME_PREVIEW_PAGE_CLASS,
+  PATTERN_THEME_TOOLBAR_CLASS,
+  PATTERN_TOPBAR_BAND_CLASS,
+  PATTERN_TOPBAR_CLASS,
+} from "@/components/pattern-tokens";
+import { ShareableKit } from "@/components/shareable-kit";
 import { ShareKitButton } from "@/components/share-kit-button";
 import {
-  PATTERN_CONTACT_CARD_CLASS,
-  PATTERN_HEADER_SECTION_CLASS,
-  PATTERN_CONTACT_ROW_CLASS,
-  PATTERN_CONTACT_ROWS_CLASS,
-  PATTERN_IDENTITY_SECTION_CLASS,
-  PATTERN_INTRO_STACK_CLASS,
-  PATTERN_KIT_POST_METRICS_CLASS,
-  PATTERN_KIT_STAT_CLASS,
-  PATTERN_POST_CARD_CLASS,
-  PATTERN_POST_IMAGE_CLASS,
-  PATTERN_POST_METRIC_CLASS,
-  PATTERN_POST_METRIC_LABEL_CLASS,
-  PATTERN_POST_METRIC_VALUE_CLASS,
-  PATTERN_POSTS_HEADER_CLASS,
-  PATTERN_POSTS_PANEL_CLASS,
-  PATTERN_POSTS_SECTION_CLASS,
-  PATTERN_SECTION_EYEBROW_CLASS,
-  PATTERN_STATS_BAND_CLASS,
-  PATTERN_SUPPORTING_CLASS,
-} from "@/components/pattern-tokens";
-import {
   AlertDialog,
+  Button,
   Card,
   MoreMenu,
   PageHeader,
-  Stat,
-  TextLink,
+  SegmentedControl,
   cardSubtitleClasses,
-  cardTitleClasses,
   toast,
 } from "@/components/wmds";
+import type { RankedShare } from "@/lib/audience";
 import {
   TOAST_HIDE_FAILED_TITLE,
   TOAST_KIT_PROFILE_FAILED_DESCRIPTION,
@@ -48,12 +40,18 @@ import {
   TOAST_POST_RESTORED_DESCRIPTION,
   TOAST_POST_RESTORED_TITLE,
   TOAST_RESTORE_FAILED_TITLE,
+  TOAST_THEME_SAVED_TITLE,
+  toastThemeSavedDescription,
 } from "@/lib/copy";
-import { creatorIdentityFromUser } from "@/lib/creator-identity";
-import { engagementRate, formatCount, formatEngagementRate } from "@/lib/engagement";
-import { sourcedContactDetail } from "@/lib/kit-chips";
 import { saveKitProfile } from "@/lib/kit-profile-client";
-import { normalizeIntro, type KitProfile, type PastBrand } from "@/lib/kit-profile";
+import {
+  PITCHKIT_THEME_DEFAULT,
+  PITCHKIT_THEMES,
+  normalizeIntro,
+  type KitProfile,
+  type PastBrand,
+  type PitchKitTheme,
+} from "@/lib/kit-profile";
 import {
   clearHiddenFromKit,
   hideFromKit,
@@ -62,13 +60,8 @@ import {
 } from "@/lib/kit-visibility";
 import { excludeHiddenFromPublicKit, selectSixPosts } from "@/lib/kit";
 import { formatPostedAt } from "@/lib/posted-at";
-import { publicObjectUrl } from "@/lib/r2";
+import type { ReachPoint } from "@/lib/reach-series";
 import type { Media, User } from "@/lib/schema";
-
-const compactNumber = new Intl.NumberFormat("en", {
-  notation: "compact",
-  maximumFractionDigits: 1,
-});
 
 export type OwnerPostsUpdater = Media[] | ((current: Media[]) => Media[]);
 
@@ -76,30 +69,49 @@ type OwnerPitchKitProps = {
   user: User;
   posts: Media[];
   onPostsChange: (posts: OwnerPostsUpdater) => void;
+  engagementRate: number | null;
+  typicalReach?: number | null;
+  typicalSaves?: number | null;
+  reachSeries?: ReachPoint[] | null;
+  hasInsights?: boolean;
+  countries?: readonly RankedShare[];
   intro?: string | null;
   pastBrands?: readonly PastBrand[];
+  theme?: PitchKitTheme;
   contact?: string | null;
 };
 
 /**
- * Pattern — owner PitchKit Show code (`examples-pitchkit--owner-pitch-kit`)
+ * Pattern — owner PitchKit (`examples-pitchkit--owner-pitch-kit`)
+ * plus Pattern — theme picker (owner) (`examples-pitchkit--theme-picker-owner`)
  * plus Pattern — intro (owner) (`examples-pitchkit--intro-owner`)
- * and Pattern — past brands (owner) (`examples-pitchkit--past-brands-owner`).
- * Hide/restore on selected posts. Intro and brands persist on the KV Graph snapshot.
+ * plus Pattern — past brands (owner) (`examples-pitchkit--past-brands-owner`).
+ * Theme pick updates preview only; Save theme commits to the KV Graph snapshot.
+ * Preview is the same shareable composition as `/k/[handle]`.
  */
 export function OwnerPitchKit({
   user,
   posts,
   onPostsChange,
+  engagementRate,
+  typicalReach = null,
+  typicalSaves = null,
+  reachSeries = null,
+  hasInsights = false,
+  countries = [],
   intro: introProp = null,
   pastBrands = [],
+  theme: themeProp = PITCHKIT_THEME_DEFAULT,
   contact = null,
 }: OwnerPitchKitProps) {
   const [postNotice, setPostNotice] = useState<string | null>(null);
   const [pendingHidePostId, setPendingHidePostId] = useState<string | null>(null);
   const [intro, setIntro] = useState(introProp ?? "");
   const [brands, setBrands] = useState<PastBrand[]>(() => [...pastBrands]);
+  const [draftTheme, setDraftTheme] = useState<PitchKitTheme>(themeProp);
+  const [savedTheme, setSavedTheme] = useState<PitchKitTheme>(themeProp);
   const introSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dirtyTheme = draftTheme !== savedTheme;
 
   useEffect(() => {
     setIntro(introProp ?? "");
@@ -108,6 +120,11 @@ export function OwnerPitchKit({
   useEffect(() => {
     setBrands([...pastBrands]);
   }, [pastBrands]);
+
+  useEffect(() => {
+    setDraftTheme(themeProp);
+    setSavedTheme(themeProp);
+  }, [themeProp]);
 
   useEffect(() => {
     return () => {
@@ -121,9 +138,6 @@ export function OwnerPitchKit({
     () => selectSixPosts(excludeHiddenFromPublicKit(posts)),
     [posts],
   );
-  const contactDetail = sourcedContactDetail(contact);
-  const identity = creatorIdentityFromUser(user);
-  const rate = engagementRate(visiblePosts);
 
   async function persistProfile(profile: KitProfile) {
     const result = await saveKitProfile(profile);
@@ -132,7 +146,18 @@ export function OwnerPitchKit({
         title: TOAST_KIT_PROFILE_FAILED_TITLE,
         description: result.error || TOAST_KIT_PROFILE_FAILED_DESCRIPTION,
       });
+      return false;
     }
+    return true;
+  }
+
+  function currentProfile(overrides: Partial<KitProfile> = {}): KitProfile {
+    return {
+      intro: normalizeIntro(intro),
+      past_brands: brands,
+      theme: savedTheme,
+      ...overrides,
+    };
   }
 
   function handleIntroChange(value: string) {
@@ -141,18 +166,27 @@ export function OwnerPitchKit({
       clearTimeout(introSaveTimer.current);
     }
     introSaveTimer.current = setTimeout(() => {
-      void persistProfile({
-        intro: normalizeIntro(value),
-        past_brands: brands,
-      });
+      void persistProfile(currentProfile({ intro: normalizeIntro(value) }));
     }, 400);
   }
 
   function handleBrandsChange(next: PastBrand[]) {
     setBrands(next);
-    void persistProfile({
-      intro: normalizeIntro(intro),
-      past_brands: next,
+    void persistProfile(currentProfile({ past_brands: next }));
+  }
+
+  async function saveTheme() {
+    if (!dirtyTheme) {
+      return;
+    }
+    const ok = await persistProfile(currentProfile({ theme: draftTheme }));
+    if (!ok) {
+      return;
+    }
+    setSavedTheme(draftTheme);
+    toast.add({
+      title: TOAST_THEME_SAVED_TITLE,
+      description: toastThemeSavedDescription(draftTheme),
     });
   }
 
@@ -241,144 +275,104 @@ export function OwnerPitchKit({
       <section className={PATTERN_HEADER_SECTION_CLASS}>
         <PageHeader
           variant="page"
-          title="PitchKit"
-          end={<ShareKitButton handle={user.handle} />}
+          title="Theme"
+          end={
+            <div className="flex flex-wrap items-center gap-3">
+              <ShareKitButton handle={user.handle} />
+              <Button
+                role="primary"
+                size="sm"
+                disabled={!dirtyTheme}
+                onClick={() => {
+                  void saveTheme();
+                }}
+              >
+                Save theme
+              </Button>
+            </div>
+          }
         />
-      </section>
-
-      <section className={PATTERN_IDENTITY_SECTION_CLASS}>
-        <div className={PATTERN_INTRO_STACK_CLASS}>
-          <CreatorIdentityStrip identity={identity} nameAs="h1" showProfessionalChip />
-          <OwnerIntroEditor intro={intro} onIntroChange={handleIntroChange} />
+        <div className={PATTERN_HEADER_COPY_CLASS}>
+          <p className={PATTERN_SUPPORTING_CLASS}>
+            Choose a look for your public Pitchkit. Changes apply when you save.
+          </p>
         </div>
       </section>
 
-      <div
-        role="group"
-        aria-label="Verified Instagram summary"
-        className={PATTERN_STATS_BAND_CLASS}
-      >
-        <Stat
-          className={PATTERN_KIT_STAT_CLASS}
-          label="Followers"
-          value={formatCount(user.followers)}
-        />
-        <Stat
-          className={PATTERN_KIT_STAT_CLASS}
-          label="Engagement rate"
-          value={formatEngagementRate(rate)}
-          end={<EngagementRateFormulaTooltip />}
-        />
+      <div className={PATTERN_THEME_TOOLBAR_CLASS}>
+        <SegmentedControl
+          aria-label="Kit theme"
+          size="sm"
+          value={draftTheme}
+          onValueChange={(value) => setDraftTheme(value as PitchKitTheme)}
+        >
+          {PITCHKIT_THEMES.map((theme) => (
+            <SegmentedControl.Item key={theme} value={theme}>
+              {theme === "light" ? "Light" : theme === "dark" ? "Dark" : "Soft"}
+            </SegmentedControl.Item>
+          ))}
+        </SegmentedControl>
       </div>
 
-      <section className={PATTERN_POSTS_SECTION_CLASS}>
-        <div className={PATTERN_POSTS_HEADER_CLASS}>
-          <div>
-            <h2 className={cardTitleClasses}>Selected posts</h2>
-            <p className={PATTERN_SUPPORTING_CLASS}>
-              {postNotice ?? "Proof from the current Instagram set."}
-            </p>
+      <div className={PATTERN_HEADER_SECTION_CLASS}>
+        <p className={PATTERN_THEME_PREVIEW_LABEL_CLASS}>Public kit preview</p>
+      </div>
+
+      <div
+        data-theme={draftTheme}
+        className={PATTERN_THEME_PREVIEW_CLASS}
+        aria-label="Public kit preview"
+      >
+        <div className={PATTERN_THEME_PREVIEW_PAGE_CLASS}>
+          <div className={PATTERN_TOPBAR_BAND_CLASS}>
+            <header className={PATTERN_TOPBAR_CLASS}>
+              <span className={PATTERN_BRAND_CLASS}>PitchKit</span>
+            </header>
           </div>
-        </div>
-        <div className={PATTERN_POSTS_PANEL_CLASS}>
-          {visiblePosts.map((post, index) => (
-            <Card
-              key={post.id}
-              variant="outlined"
-              shape="rounded"
-              className={PATTERN_POST_CARD_CLASS}
-            >
-              <Card.Header
-                start={
-                  <span className={cardSubtitleClasses}>{formatPostedAt(post.posted_at)}</span>
-                }
-                end={
-                  <MoreMenu
-                    aria-label={`Manage selected post ${index + 1}`}
-                    size="xs"
-                    items={[
-                      {
-                        id: "hide",
-                        label: "Hide from kit",
-                        start: <EyeOff />,
-                      },
-                    ]}
-                    onAction={(actionId) => handlePostAction(post.id, actionId)}
+          <div className={PATTERN_CONTENT_BAND_CLASS}>
+            <div className={PATTERN_CONTENT_CLASS}>
+              <ShareableKit
+                user={user}
+                posts={visiblePosts}
+                engagementRate={engagementRate}
+                typicalReach={typicalReach}
+                typicalSaves={typicalSaves}
+                reachSeries={reachSeries}
+                hasInsights={hasInsights}
+                countries={countries}
+                pastBrands={brands}
+                intro={intro}
+                contact={contact}
+                showCreateBand={false}
+                postNotice={postNotice}
+                introSlot={<OwnerIntroEditor intro={intro} onIntroChange={handleIntroChange} />}
+                brandsSlot={<OwnerPastBrands brands={brands} onBrandsChange={handleBrandsChange} />}
+                renderPostHeader={(post, index) => (
+                  <Card.Header
+                    start={
+                      <span className={cardSubtitleClasses}>{formatPostedAt(post.posted_at)}</span>
+                    }
+                    end={
+                      <MoreMenu
+                        aria-label={`Manage selected post ${index + 1}`}
+                        size="xs"
+                        items={[
+                          {
+                            id: "hide",
+                            label: "Hide from kit",
+                            start: <EyeOff />,
+                          },
+                        ]}
+                        onAction={(actionId) => handlePostAction(post.id, actionId)}
+                      />
+                    }
                   />
-                }
+                )}
               />
-              <Card.Body>
-                <img
-                  className={PATTERN_POST_IMAGE_CLASS}
-                  src={publicObjectUrl(post.r2_key)}
-                  alt=""
-                />
-              </Card.Body>
-              <Card.Footer>
-                <div className={PATTERN_KIT_POST_METRICS_CLASS}>
-                  {(
-                    [
-                      ["Likes", post.like_count],
-                      ["Comments", post.comments_count],
-                    ] as const
-                  ).map(([label, value]) => (
-                    <span key={label} className={PATTERN_POST_METRIC_CLASS}>
-                      <span className={PATTERN_POST_METRIC_LABEL_CLASS}>{label}</span>
-                      <span className={PATTERN_POST_METRIC_VALUE_CLASS}>
-                        {compactNumber.format(value)}
-                      </span>
-                    </span>
-                  ))}
-                </div>
-              </Card.Footer>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {contactDetail ? (
-        <section className={PATTERN_POSTS_SECTION_CLASS}>
-          <div className={PATTERN_POSTS_HEADER_CLASS}>
-            <div>
-              <h2 className={cardTitleClasses}>Contact</h2>
-              <p className={PATTERN_SUPPORTING_CLASS}>
-                Creator-entered details for brand outreach.
-              </p>
             </div>
           </div>
-          <Card
-            variant="outlined"
-            padding="md"
-            shape="rounded"
-            className={PATTERN_CONTACT_CARD_CLASS}
-          >
-            <div className={PATTERN_CONTACT_ROWS_CLASS}>
-              {contactDetail.kind === "email" ? (
-                <div className={PATTERN_CONTACT_ROW_CLASS}>
-                  <span className={PATTERN_SECTION_EYEBROW_CLASS}>Email</span>
-                  <TextLink href={contactDetail.href}>{contactDetail.value}</TextLink>
-                </div>
-              ) : null}
-              {contactDetail.kind === "website" ? (
-                <div className={PATTERN_CONTACT_ROW_CLASS}>
-                  <span className={PATTERN_SECTION_EYEBROW_CLASS}>Website</span>
-                  <TextLink href={contactDetail.href} external>
-                    {contactDetail.value}
-                  </TextLink>
-                </div>
-              ) : null}
-              {contactDetail.kind === "text" ? (
-                <div className={PATTERN_CONTACT_ROW_CLASS}>
-                  <span className={PATTERN_SECTION_EYEBROW_CLASS}>Contact</span>
-                  <span className={PATTERN_SUPPORTING_CLASS}>{contactDetail.value}</span>
-                </div>
-              ) : null}
-            </div>
-          </Card>
-        </section>
-      ) : null}
-
-      <OwnerPastBrands brands={brands} onBrandsChange={handleBrandsChange} />
+        </div>
+      </div>
 
       <AlertDialog
         open={pendingHidePostId != null}

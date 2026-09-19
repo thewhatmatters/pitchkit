@@ -168,6 +168,7 @@ export function snapshotFromMe(input: {
     polled_at: fetchedAt,
     intro: input.existing?.intro ?? null,
     past_brands: input.existing?.past_brands ?? [],
+    theme: input.existing?.theme,
   };
 }
 
@@ -321,6 +322,7 @@ export async function pollInsights(options: PollOptions): Promise<PollResult> {
       polled_at: fetchedAt,
       intro: existing?.intro ?? null,
       past_brands: existing?.past_brands ?? [],
+      theme: existing?.theme,
     },
   };
 }

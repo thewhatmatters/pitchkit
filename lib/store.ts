@@ -23,6 +23,7 @@ import {
   type GraphSnapshot,
 } from "./graph-store";
 import {
+  PITCHKIT_THEME_DEFAULT,
   SEED_INTRO,
   SEED_PAST_BRANDS,
   type KitProfile,
@@ -96,7 +97,7 @@ async function ownerFromSnapshot(
 async function resolveDemoKitProfile(access: HiddenKitAccess = "page"): Promise<KitProfile> {
   const snapshot = await readGraphSnapshot(DEMO_USER_ID, access);
   if (!snapshot) {
-    return { intro: SEED_INTRO, past_brands: [...SEED_PAST_BRANDS] };
+    return { intro: SEED_INTRO, past_brands: [...SEED_PAST_BRANDS], theme: PITCHKIT_THEME_DEFAULT };
   }
   return snapshotKitProfile(snapshot);
 }
@@ -134,6 +135,8 @@ export async function loadPublicKit(
         snapshot.user.id,
       );
   return assemblePublicKit(snapshot.user, excludeHiddenFromPublicKit(media), now, {
+    reach_series: snapshot.reach_series,
+    audience: snapshot.audience,
     ...snapshotKitProfile(snapshot),
   });
 }
@@ -223,6 +226,7 @@ export async function loadOwnerKit(
         },
         intro: polled.snapshot.intro ?? live?.intro ?? null,
         past_brands: polled.snapshot.past_brands ?? live?.past_brands ?? [],
+        theme: polled.snapshot.theme ?? live?.theme,
       };
       await writeGraphSnapshot(snapshot, access);
       const resolvedOverlay = await hiddenOverlayForHandle(handle, overlay);
