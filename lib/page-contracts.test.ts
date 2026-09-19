@@ -58,6 +58,8 @@ describe("critical page contracts", () => {
     assert.match(auth, /oauthFinishAbortCookies/);
     assert.doesNotMatch(auth, /resolveSession/);
     const finish = read("lib/oauth-finish.ts");
+    assert.match(finish, /liveOAuthHandle/);
+    assert.doesNotMatch(finish, /handleAfterReconnect/);
     assert.match(finish, /const persisted = await writeGraphSnapshot/);
     assert.match(finish, /sessionCookieAfterPersist/);
     assert.match(finish, /oauthSuccessSetCookies\(after\.cookie\)/);
