@@ -51,6 +51,13 @@ export const DISCONNECT_CONFIRM =
   "Disconnect deletes your kit and the copies we stored.";
 export const DISCONNECT_KEEP = "Keep connected";
 
+/** Account settings Delete confirm — RE memo, Pattern — account settings (owner). */
+export const DELETE_ACCOUNT_TITLE = "Delete your Pitchkit account?";
+export const DELETE_ACCOUNT_CONFIRM =
+  "This permanently deletes your kit, stored media copies, and connection. Your Instagram account is not deleted. This cannot be undone.";
+export const DELETE_ACCOUNT_CANCEL = "Cancel";
+export const DELETE_ACCOUNT_ACTION = "Delete account";
+
 /** Quiet demo honesty — under Continue, not in the hero. */
 export const DEMO_SESSION_NOTE = "Opens the demo Insights session.";
 

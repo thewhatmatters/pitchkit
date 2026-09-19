@@ -16,7 +16,6 @@ import { ProofPosts } from "@/components/proof-posts";
 import { ReachChart } from "@/components/reach-chart";
 import { ShareKitButton } from "@/components/share-kit-button";
 import { resolveOwnerAudience } from "@/lib/audience";
-import { DisconnectControl } from "@/components/disconnect-control";
 import { INSIGHTS_PRIVATE } from "@/lib/copy";
 import { inventoryLastUpdated } from "@/lib/inventory";
 import type { KitAudience } from "@/lib/kit";
@@ -151,12 +150,6 @@ function OwnerAccountActions({ notice }: { notice: string | null }) {
             Reconnect Instagram
           </Button>
         </form>
-        <form action="/auth/sign-out" method="post">
-          <Button type="submit" role="secondary">
-            Sign out
-          </Button>
-        </form>
-        <DisconnectControl />
       </div>
 
       {notice ? <p className="col-span-full">{notice}</p> : null}

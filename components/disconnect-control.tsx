@@ -10,7 +10,7 @@ export function DisconnectControl() {
 
   return (
     <>
-      <Button role="destructive" type="button" onClick={() => setOpen(true)}>
+      <Button role="secondary" size="sm" type="button" onClick={() => setOpen(true)}>
         Disconnect
       </Button>
       <AlertDialog

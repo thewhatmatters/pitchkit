@@ -9,6 +9,7 @@ export {
   Card,
   Chart,
   Chip,
+  Dialog,
   GridOverlay,
   IconButton,
   Input,
