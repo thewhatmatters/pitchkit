@@ -3,13 +3,7 @@ import {
   readSecrets,
 } from "@/lib/env";
 import {
-  handleAfterReconnect,
-  pitchkitHandleFromUsername,
-  uniqueHandle,
-} from "@/lib/handle";
-import {
   authorizeUrl,
-  exchangeCodeForTokens,
   newOAuthState,
   OAUTH_STATE_COOKIE,
   OAUTH_STATE_MAX_AGE,
@@ -17,26 +11,13 @@ import {
   resolveRedirectUri,
 } from "@/lib/instagram-oauth";
 import {
-  createGraphClient,
-  fetchMe,
-  igUserIdFromMe,
-  isPersonalAccount,
-  isProfessionalAccount,
-} from "@/lib/graph";
-import {
-  listTakenHandles,
-  readGraphSnapshotByIgUserId,
-  writeGraphSnapshot,
-} from "@/lib/graph-store";
-import { pollInsights } from "@/lib/poll";
-import { encryptTokenIfPossible } from "@/lib/token-crypto";
+  finishLiveOAuth,
+  oauthFinishAbortCookies,
+  oauthLandingPath,
+} from "@/lib/oauth-finish";
 import {
   isHttpsRequest,
-  resolveSession,
   serializeSessionCookie,
-  SESSION_COOKIE,
-  SESSION_MAX_AGE,
-  sessionClearCookieHeader,
   stubConnect,
 } from "@/lib/session";
 
@@ -59,29 +40,6 @@ function redirectWithCookies(request: Request, path: string, cookies: string[]):
     headers.append("Set-Cookie", cookie);
   }
   return new Response(null, { status: 303, headers });
-}
-
-function parseCookie(request: Request, name: string): string | null {
-  const header = request.headers.get("cookie");
-  if (!header) {
-    return null;
-  }
-  for (const part of header.split(";")) {
-    const [key, ...rest] = part.trim().split("=");
-    if (key === name) {
-      return rest.join("=");
-    }
-  }
-  return null;
-}
-
-/** Failed live OAuth finish: drop oauth state and any leftover seed `demo` session. */
-function oauthFinishAbortCookies(request: Request): string[] {
-  const secure = isHttpsRequest(request);
-  return [
-    cookieHeader(OAUTH_STATE_COOKIE, "", secure, 0),
-    sessionClearCookieHeader(secure),
-  ];
 }
 
 async function beginOAuth(request: Request): Promise<Response> {
@@ -108,115 +66,11 @@ async function beginOAuth(request: Request): Promise<Response> {
   });
 }
 
-async function finishOAuth(request: Request, code: string, state: string | null): Promise<Response> {
-  const secrets = await readSecrets("route");
-  const secure = isHttpsRequest(request);
-  const abortCookies = oauthFinishAbortCookies(request);
-  const clearState = cookieHeader(OAUTH_STATE_COOKIE, "", secure, 0);
-
-  if (state) {
-    const expected = parseCookie(request, OAUTH_STATE_COOKIE);
-    if (!expected || expected !== state) {
-      return redirectWithCookies(request, "/", abortCookies);
-    }
-  }
-
-  const redirectUri = resolveRedirectUri(request, secrets);
-  const exchanged = await exchangeCodeForTokens({
-    code,
-    secrets,
-    redirectUri,
-  });
-  if (!exchanged.ok) {
-    return redirectWithCookies(request, "/", abortCookies);
-  }
-
-  const client = createGraphClient({
-    token: exchanged.tokens.accessToken,
-    version: secrets.GRAPH_API_VERSION,
-  });
-  const me = await fetchMe(client);
-  if (!me.ok) {
-    return redirectWithCookies(request, "/", abortCookies);
-  }
-  if (isPersonalAccount(me.data.account_type) || (me.data.account_type != null && !isProfessionalAccount(me.data.account_type))) {
-    return redirectWithCookies(request, "/?error=personal", abortCookies);
-  }
-
-  const igUserId = igUserIdFromMe(me.data) ?? exchanged.tokens.userId;
-  if (!igUserId) {
-    return redirectWithCookies(request, "/", abortCookies);
-  }
-
-  const existing = await readGraphSnapshotByIgUserId(igUserId, "route");
-  const url = new URL(request.url);
-  const updateHandle = url.searchParams.get("update_handle") === "1";
-  const igUsername = me.data.username ?? igUserId;
-  const taken = await listTakenHandles("route");
-  const handle = existing
-    ? handleAfterReconnect({
-        existingHandle: existing.user.handle,
-        igUsername,
-        updateHandle,
-        taken,
-      })
-    : uniqueHandle(pitchkitHandleFromUsername(igUsername), taken);
-
-  const polled = await pollInsights({
-    token: exchanged.tokens.accessToken,
-    secrets,
-    existing,
-    handle,
-    userId: existing?.user.id,
-  });
-  if (!polled.ok) {
-    if (polled.reason === "personal") {
-      return redirectWithCookies(request, "/?error=personal", abortCookies);
-    }
-    return redirectWithCookies(request, "/", abortCookies);
-  }
-
-  const tokenEncrypted = await encryptTokenIfPossible(exchanged.tokens.accessToken, secrets.TOKEN_KEY);
-  const snapshot = {
-    ...polled.snapshot,
-    user: {
-      ...polled.snapshot.user,
-      handle,
-      token_encrypted: tokenEncrypted,
-      token_expires_at: exchanged.tokens.expiresAt,
-    },
-  };
-  const persisted = await writeGraphSnapshot(snapshot, "route");
-  if (!persisted) {
-    return redirectWithCookies(request, "/?error=persist", abortCookies);
-  }
-
-  let session = null;
-  try {
-    session = await resolveSession(snapshot.user.handle, "route");
-  } catch {
-    session = null;
-  }
-  if (!session) {
-    // Persist reported success but the app cannot resolve this handle —
-    // never set a cookie Insights will bounce back to Connect.
-    return redirectWithCookies(request, "/?error=persist", abortCookies);
-  }
-
-  const sessionCookie = cookieHeader(
-    SESSION_COOKIE,
-    snapshot.user.handle,
-    secure,
-    SESSION_MAX_AGE,
-  );
-  return redirectWithCookies(request, "/insights", [sessionCookie, clearState]);
-}
-
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const denied = oauthCallbackError(url.searchParams);
   if (denied === "personal") {
-    return redirectWithCookies(request, "/?error=personal", oauthFinishAbortCookies(request));
+    return redirectWithCookies(request, oauthLandingPath("personal"), oauthFinishAbortCookies(request));
   }
   if (denied === "denied") {
     return redirectWithCookies(request, "/", oauthFinishAbortCookies(request));
@@ -224,7 +78,13 @@ export async function GET(request: Request) {
 
   const code = url.searchParams.get("code");
   if (code) {
-    return finishOAuth(request, code, url.searchParams.get("state"));
+    const secrets = await readSecrets("route");
+    return finishLiveOAuth({
+      request,
+      code,
+      state: url.searchParams.get("state"),
+      secrets,
+    });
   }
 
   return beginOAuth(request);

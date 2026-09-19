@@ -11,6 +11,37 @@ export const PERSONAL_FAIL =
 export const PERSIST_FAIL =
   "We could not save your Instagram connection. Try Continue with Instagram again.";
 
+export const OAUTH_STATE_FAIL =
+  "That Instagram sign-in expired. Try Continue with Instagram again.";
+
+export const OAUTH_EXCHANGE_FAIL =
+  "Instagram did not finish signing you in. Try Continue with Instagram again.";
+
+export const OAUTH_ME_FAIL =
+  "We could not read your Instagram profile. Try Continue with Instagram again.";
+
+export const OAUTH_POLL_FAIL =
+  "We could not load Instagram Insights. Try Continue with Instagram again.";
+
+export function landingErrorCopy(error: string | undefined): string | null {
+  switch (error) {
+    case "personal":
+      return PERSONAL_FAIL;
+    case "persist":
+      return PERSIST_FAIL;
+    case "oauth_state":
+      return OAUTH_STATE_FAIL;
+    case "oauth_exchange":
+      return OAUTH_EXCHANGE_FAIL;
+    case "oauth_me":
+      return OAUTH_ME_FAIL;
+    case "oauth_poll":
+      return OAUTH_POLL_FAIL;
+    default:
+      return null;
+  }
+}
+
 export const SUPPORT_EMAIL = "randy@whatmatters.so";
 
 export const EMPTY_GRID = "Pulling your grid…";

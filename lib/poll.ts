@@ -109,7 +109,7 @@ export async function resolveAccessToken(
   return secrets.IG_USER_TOKEN;
 }
 
-function mapMeToUser(input: {
+export function mapMeToUser(input: {
   me: GraphMe;
   existing?: User | null;
   handle: string;
@@ -135,6 +135,37 @@ function mapMeToUser(input: {
     consent_index: input.existing?.consent_index ?? false,
     ig_account_type: input.me.account_type ?? input.existing?.ig_account_type ?? null,
     disclosure_version: input.existing?.disclosure_version ?? 1,
+  };
+}
+
+/** When Insights poll fails after `/me`, persist identity + empty wells and still log in. */
+export function snapshotFromMe(input: {
+  me: GraphMe;
+  existing?: GraphSnapshot | null;
+  handle: string;
+  userId?: string;
+  now?: Date;
+}): GraphSnapshot | null {
+  const handle = input.handle.trim();
+  if (!handle) {
+    return null;
+  }
+  const fetchedAt = (input.now ?? new Date()).toISOString();
+  const userId = input.userId ?? input.existing?.user.id ?? newId();
+  return {
+    user: mapMeToUser({
+      me: input.me,
+      existing: input.existing?.user ?? null,
+      handle,
+      userId,
+      now: input.existing?.user.connected_at ?? fetchedAt,
+      tokenEncrypted: input.existing?.user.token_encrypted ?? null,
+      tokenExpiresAt: input.existing?.user.token_expires_at ?? null,
+    }),
+    media: [],
+    reach_series: [],
+    audience: EMPTY_AUDIENCE,
+    polled_at: fetchedAt,
   };
 }
 
