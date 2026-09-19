@@ -127,9 +127,10 @@ export function OwnerPitchKit({
       return;
     }
 
-    if (result.hiddenFromKitAt != null) {
+    const hiddenFromKitAt = result.hiddenFromKitAt;
+    if (hiddenFromKitAt != null) {
       onPostsChange((current) =>
-        stampHiddenFromKit(current, hiddenPost.id, result.hiddenFromKitAt),
+        stampHiddenFromKit(current, hiddenPost.id, hiddenFromKitAt),
       );
     }
 
