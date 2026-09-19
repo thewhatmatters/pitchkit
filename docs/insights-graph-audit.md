@@ -17,7 +17,7 @@ Live dry-run facts (2026-09-18, @rxndy.dxniel) still apply: `MEDIA_CREATOR`, Ins
 | Redirect URI | `IG_REDIRECT_URI` or `https://pitchkit.app/auth/instagram` (exact dashboard match; slash-aware) |
 | WHA-313 | `update_handle=1` opts into a new slug; default keep; `demo` frozen |
 
-Operator dry-run: `IG_USER_TOKEN` on Insights poll when the user row has no encrypted token. Public `/k/demo` stays seed.
+Operator dry-run: `IG_USER_TOKEN` on Insights poll when a **live (non-demo)** user row has no encrypted token. Seed `demo` never resolves that fallback (Share stays `/k/demo` on the stub session; live OAuth keeps the frozen handle). Public `/k/demo` stays seed.
 
 ---
 

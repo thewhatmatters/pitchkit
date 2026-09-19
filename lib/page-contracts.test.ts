@@ -54,6 +54,8 @@ describe("critical page contracts", () => {
     assert.match(read("lib/graph.ts"), /graph\.instagram\.com/);
     assert.match(read("lib/graph.ts"), /GRAPH_API_VERSION|createGraphClient/);
     assert.match(read("lib/poll.ts"), /POLL_STALE_MS = 6/);
+    assert.match(read("lib/poll.ts"), /user\?\.handle === DEMO_HANDLE/);
+    assert.match(read("lib/store.ts"), /handle === DEMO_HANDLE/);
     assert.match(copy, /Opens the demo Insights session/);
     assert.doesNotMatch(page, /STUB_CONNECT|Stub connect|no Instagram token/);
     assert.doesNotMatch(copy, /STUB_CONNECT|Stub connect|no Instagram token/);
@@ -95,6 +97,10 @@ describe("critical page contracts", () => {
     assert.match(ownerKit, /examples-pitchkit--owner-pitch-kit/);
     assert.match(ownerKit, /CreatorIdentityStrip/);
     assert.match(ownerKit, /PATTERN_IDENTITY_SECTION_CLASS/);
+    assert.match(ownerKit, /PageHeader/);
+    assert.match(ownerKit, /title="PitchKit"/);
+    assert.match(ownerKit, /ShareKitButton/);
+    assert.match(ownerKit, /Share kit|handle=\{user\.handle\}/);
     assert.match(ownerKit, /Manage selected post/);
     assert.match(ownerKit, /Hide from kit/);
     assert.match(ownerKit, /hideFromKit/);
@@ -217,7 +223,8 @@ describe("critical page contracts", () => {
     const copy = read("lib/copy.ts");
     const layout = read("app/layout.tsx");
     const ownerKit = read("components/owner-pitchkit.tsx");
-    const sources = [chrome, proof, ownerKit];
+    const share = read("components/share-kit-button.tsx");
+    const sources = [share, proof, ownerKit];
     const blocks = sources.flatMap(toastAddBlocks);
 
     assert.equal(blocks.length, 10);
@@ -235,8 +242,11 @@ describe("critical page contracts", () => {
     assert.match(copy, /TOAST_POST_RESTORED_DESCRIPTION = "It appears in the shareable PitchKit again."/);
     assert.match(copy, /TOAST_HIDE_FAILED_TITLE/);
     assert.match(copy, /TOAST_RESTORE_FAILED_TITLE/);
-    assert.match(chrome, /TOAST_KIT_COPIED_TITLE/);
-    assert.match(chrome, /TOAST_KIT_COPIED_DESCRIPTION/);
+    assert.match(share, /TOAST_KIT_COPIED_TITLE/);
+    assert.match(share, /TOAST_KIT_COPIED_DESCRIPTION/);
+    assert.match(share, /kitShareUrl/);
+    assert.match(chrome, /ShareKitButton/);
+    assert.match(ownerKit, /ShareKitButton/);
     assert.match(proof, /TOAST_POST_HIDDEN_TITLE/);
     assert.match(proof, /TOAST_POST_HIDDEN_DESCRIPTION/);
     assert.match(proof, /TOAST_POST_RESTORED_TITLE/);
@@ -261,7 +271,11 @@ describe("critical page contracts", () => {
 
     assert.match(chrome, /PageHeader/);
     assert.match(chrome, /title="Insights"/);
-    assert.match(chrome, /Share kit/);
+    assert.match(chrome, /ShareKitButton/);
+    assert.match(read("components/owner-pitchkit.tsx"), /title="PitchKit"/);
+    assert.match(read("components/owner-pitchkit.tsx"), /ShareKitButton/);
+    assert.doesNotMatch(read("app/k/[handle]/page.tsx"), /ShareKitButton|Share kit/);
+    assert.doesNotMatch(read("components/shareable-kit.tsx"), /ShareKitButton|Share kit/);
     assert.match(copy, /Private to you/);
     assert.match(chrome, /INSIGHTS_PRIVATE/);
     assert.match(stats, /label="Engagement rate"/);
@@ -470,6 +484,7 @@ describe("critical page contracts", () => {
     );
     assert.match(read("components/owner-pitchkit.tsx"), /examples-pitchkit--owner-pitch-kit/);
     assert.match(read("components/owner-pitchkit.tsx"), /PATTERN_IDENTITY_SECTION_CLASS/);
+    assert.match(read("components/owner-pitchkit.tsx"), /ShareKitButton/);
     assert.match(read("components/owner-workspace.tsx"), /OwnerPitchKit/);
     assert.doesNotMatch(read("components/owner-workspace.tsx"), /PitchKitComingSoon|Coming soon/);
     assert.doesNotMatch(read("lib/copy.ts"), /PITCHKIT_COMING_SOON|Coming soon/);
@@ -546,6 +561,7 @@ describe("critical page contracts", () => {
     assert.match(settings, /Connected Instagram/);
     assert.match(settings, /Share kit/);
     assert.match(settings, /kitPath/);
+    assert.match(settings, /kitShareUrl/);
     assert.match(settings, />\s*Copy\s*</);
     assert.match(settings, /Last synced/);
     assert.match(settings, /title="Settings"/);

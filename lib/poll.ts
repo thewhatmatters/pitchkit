@@ -30,6 +30,7 @@ import {
 import { decryptToken } from "./token-crypto";
 import { shouldShowReachChart, type ReachPoint } from "./reach-series";
 import type { Media, User } from "./schema";
+import { DEMO_HANDLE } from "./seed";
 
 export const POLL_STALE_MS = 6 * 60 * 60 * 1000;
 
@@ -94,10 +95,20 @@ export function shouldPollInsights(input: {
   return isFetchedAtStale(input.polledAt, input.now ?? new Date());
 }
 
+/**
+ * Token for an Insights poll.
+ * Seed `demo` never polls — operator `IG_USER_TOKEN` must not bind a live
+ * Graph identity onto the frozen demo kit (Share would copy `/k/demo`).
+ * Live OAuth users use their encrypted token; operator token is fallback
+ * only for non-demo rows without `token_encrypted`.
+ */
 export async function resolveAccessToken(
-  user: Pick<User, "token_encrypted"> | null | undefined,
+  user: Pick<User, "token_encrypted" | "handle"> | null | undefined,
   secrets: PitchkitSecrets,
 ): Promise<string | null> {
+  if (user?.handle === DEMO_HANDLE) {
+    return null;
+  }
   const stored = await decryptToken(user?.token_encrypted, secrets.TOKEN_KEY);
   if (stored) {
     return stored;

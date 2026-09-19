@@ -32,7 +32,9 @@ export { hasHyperdriveFlag as hasHyperdrive, resolveHasHyperdrive };
 /**
  * Hyperdrive bound → SQL is SoT for live Graph users + hide/restore.
  * Else /k/[handle] and /insights read the in-repo seed unless a Graph
- * snapshot (OAuth or operator token poll) is present on KV `graph:` keys.
+ * snapshot (OAuth poll) is present on KV `graph:` keys.
+ * Seed `demo` never polls and never binds a Graph snapshot — operator
+ * `IG_USER_TOKEN` must not paint a live identity onto `/k/demo`.
  * Public `/k/demo` stays `lib/seed.ts`.
  * Hide/restore seed SoT: KV `HIDDEN_KIT` (`hidden:<userId>`) until Hyperdrive.
  */
@@ -119,8 +121,8 @@ export async function loadPublicKit(
 
 /**
  * Owner Insights for the session handle.
- * Demo seed includes example Insights + `reach_series` when no token.
- * Live token → poll when stale (>6h) or Refresh; persist snapshot; hide empty.
+ * Demo seed includes example Insights + `reach_series` (no Graph poll).
+ * Live OAuth token → poll when stale (>6h) or Refresh; persist snapshot.
  * Includes every owner row (hidden posts keep `hidden_from_kit_at`).
  */
 export async function loadOwnerKit(
@@ -132,9 +134,10 @@ export async function loadOwnerKit(
   const access = options.access ?? "page";
   const secrets = options.secrets ?? (await readSecrets(access));
   const seedUser = seedUsers.find((row) => row.handle === handle);
-  const live = seedUser
-    ? await readGraphSnapshot(seedUser.id, access)
-    : await readGraphSnapshotByHandle(handle, access);
+  const live =
+    handle === DEMO_HANDLE
+      ? null
+      : await readGraphSnapshotByHandle(handle, access);
   const existing = live ?? (seedUser
     ? {
         user: seedUser,
