@@ -32,12 +32,13 @@ describe("schema SQL one-shot apply", () => {
     }
   });
 
-  it("binds wrangler Hyperdrive to the live pitchkit config id", () => {
+  it("comments wrangler Hyperdrive until SQL persist is fixed, keeping the pitchkit config id", () => {
     const wrangler = readFileSync(join(process.cwd(), "wrangler.jsonc"), "utf8");
     assert.match(wrangler, /\/\/ Supabase Postgres via Hyperdrive/);
+    assert.match(wrangler, /TODO: uncomment when SQL persist is fixed/);
     assert.match(wrangler, /port 5432/);
-    assert.match(wrangler, /^\s+"hyperdrive":/m);
-    assert.doesNotMatch(wrangler, /\/\/\s+"hyperdrive":/);
+    assert.match(wrangler, /\/\/\s+"hyperdrive":/);
+    assert.doesNotMatch(wrangler, /^\s+"hyperdrive":/m);
     assert.match(wrangler, /"binding": "HYPERDRIVE"/);
     assert.match(wrangler, /"binding": "HYPERDRIVE_PREVIEW"/);
     assert.match(wrangler, /bf225442516d44f599e083b72df886cd/);

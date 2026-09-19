@@ -267,6 +267,7 @@ export function createSqlStore(executor: SqlExecutor): SqlStore {
         await executor.query(UPSERT_USER_SQL, userValues(user));
         return true;
       } catch {
+        // Never throw — writeGraphSnapshot falls back to KV on false.
         return false;
       }
     },
@@ -306,6 +307,7 @@ export function createSqlStore(executor: SqlExecutor): SqlStore {
         await executor.query(DELETE_STALE_MEDIA_SQL, [userId, keepIg]);
         return true;
       } catch {
+        // Never throw — writeGraphSnapshot falls back to KV on false.
         return false;
       }
     },
