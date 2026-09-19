@@ -1,15 +1,16 @@
 /**
  * Interpolated Show code class strings from WMDS Examples/PitchKit at
- * `368560cd22bee2c5320b0b0e8038c30affa4bdea`.
+ * `61f8921ac037839da660740da23763813f77d2ee`.
  *
  * Stories:
+ * - `examples-pitchkit--account-settings-owner` (Pattern — account settings (owner))
  * - `examples-pitchkit--creator-insights` (Pattern — creator Insights)
  * - `examples-pitchkit--creator-insights-loading` (Pattern — creator Insights (loading))
  * - `examples-pitchkit--insufficient-reach-data` (State — insufficient reach data)
  * - `examples-pitchkit--insufficient-audience-data` (State — insufficient audience data)
  * - `examples-pitchkit--insufficient-reach-and-audience-data` (State — insufficient reach and audience data)
  * - `examples-pitchkit--graph-data-unavailable` (State — Graph data unavailable; omit optional regions)
- * - `examples-pitchkit--shareable-pitchkit` (Pattern — shareable PitchKit)
+ * - `examples-pitchkit--shareable-pitch-kit` (Pattern — shareable PitchKit)
  * - `examples-pitchkit--owner-pitch-kit` (Pattern — owner PitchKit)
  * Post dates in product include the year (`Dec 17, 2024`); stories may omit year.
  * - `examples-pitchkit--creator-identity-public` (Pattern — creator identity (public))
@@ -154,6 +155,19 @@ export const PATTERN_SHARE_KIT_STACK_CLASS = "flex min-w-0 flex-col gap-2";
 export const PATTERN_SHARE_KIT_ACTIONS_CLASS = "flex min-w-0 flex-wrap items-center gap-3";
 
 export const PATTERN_CONNECTION_META_CLASS = "type-supporting text-muted text-muted";
+
+/** Account settings Dialog body — Connected Instagram → Share kit → account actions. */
+export const PATTERN_USER_SETTINGS_BODY_CLASS = "flex w-full min-w-0 flex-col gap-4";
+
+export const PATTERN_USER_SETTINGS_ACTIONS_CLASS = "flex flex-col items-start gap-2";
+
+/** Public kit unsigned CTA band — compose into shareable PitchKit only. */
+export const PATTERN_CALLOUT_CARD_CLASS = "col-span-full";
+
+export const PATTERN_CALLOUT_BODY_CLASS =
+  "flex min-w-0 flex-col gap-4 px-3.5 py-[16px]";
+
+export const PATTERN_CALLOUT_ACTIONS_CLASS = "flex flex-wrap items-center gap-3";
 
 export const PATTERN_KIT_STAT_CLASS = "col-span-2 md:col-span-4 lg:col-span-6";
 

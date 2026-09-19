@@ -13,7 +13,7 @@ Owner primary navigation is the Pattern — creator Insights three-column header
 ## How to get to it (user POV)
 
 - After connect, use the top SegmentedControl on Insights.
-- Account (`/settings`) is a footer link — not a third nav item.
+- Account settings opens from the header Avatar (Dialog) — not a third nav item or footer link.
 
 ## Driving it with control-pitchkit
 
@@ -22,7 +22,7 @@ Preconditions:
 - `control-pitchkit connect` and `doctor --require-session` succeeded.
 - Start on `/insights`.
 
-- **See nav.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /insights`. The header shows a **PitchKit** brand label, a hug control named **PitchKit primary navigation** (**Insights** / **PitchKit**), and an Avatar. Insights is the current view. Footer has a quiet **Account** link, not a third segment.
+- **See nav.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /insights`. The header shows a **PitchKit** brand label, a hug control named **PitchKit primary navigation** (**Insights** / **PitchKit**), and an Avatar that opens Account settings. Insights is the current view. No footer **Account** or **Delete** link.
 - **Open PitchKit.** Choose PitchKit. Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs click --role radio --name "PitchKit"`. Path stays `/insights`. Body shows the owner kit: PageHeader **PitchKit** + **Share kit**, **Demo Creator**, `@demo`, **Followers**, **Engagement rate**, **Selected posts**, and MoreMenu **Manage selected post N** / **Hide from kit**. No **Coming soon** badge. No bio / website / rates / Edit switch. Insights PageHeader / Recent proof stay on the Insights segment.
 - **Owner grid on kit.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs eval --js "getComputedStyle(document.querySelector('.grid-page')).getPropertyValue('--grid-max').trim()"`. `value` is `1140px`. `--grid-column-gap` is `8px` (Pattern Show code). Do not require `--grid-gutter:8px` on this shell.
 - **Return to Insights.** Choose Insights. Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs click --role radio --name "Insights"`. Path is still `/insights`. PageHeader **Insights** returns.

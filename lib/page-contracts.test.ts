@@ -109,6 +109,8 @@ describe("critical page contracts", () => {
     const workspace = read("components/owner-workspace.tsx");
     assert.match(page, /ShareableKit/);
     assert.match(page, /PATTERN_BRAND_CLASS/);
+    assert.match(page, /resolveSession/);
+    assert.match(page, /showCreateBand=\{session == null\}/);
     assert.doesNotMatch(page, /sessionOwnsHandle|KitEdit|OwnerNav|AppFrame/);
     assert.doesNotMatch(page, /MoreMenu|Hide from kit|label="Edit"|Coming soon|PitchKitComingSoon|OwnerPitchKit/);
     assert.match(kit, /Verified Instagram summary/);
@@ -117,7 +119,14 @@ describe("critical page contracts", () => {
     assert.match(kit, /Past brands/);
     assert.match(kit, /CreatorIdentityStrip/);
     assert.match(kit, /PATTERN_IDENTITY_NAMEPLATE_CLASS/);
+    assert.match(kit, /examples-pitchkit--shareable-pitch-kit/);
     assert.match(kit, /examples-pitchkit--creator-identity-public/);
+    assert.match(kit, /showCreateBand/);
+    assert.match(kit, /Create your Pitchkit/);
+    assert.match(kit, /Turn your Instagram into a shareable media kit\./);
+    assert.match(kit, /Continue with Instagram/);
+    assert.match(kit, new RegExp(AUTH_CONNECT_PATH));
+    assert.doesNotMatch(kit, /Get started|Create your PitchKit Profile/);
     assert.match(kit, /nameAs="h1"/);
     assert.match(kit, /showProfessionalChip/);
     assert.doesNotMatch(kit, /<Chip readOnly size="sm">\s*Instagram\s*<\/Chip>/);
@@ -157,6 +166,7 @@ describe("critical page contracts", () => {
     assert.match(barrel, /SegmentedControl/);
     assert.match(barrel, /PageHeader/);
     assert.match(barrel, /Avatar/);
+    assert.match(barrel, /Dialog/);
     assert.match(barrel, /TextLink/);
     assert.match(nav, /SegmentedControl/);
     assert.match(nav, />Insights</);
@@ -168,9 +178,12 @@ describe("critical page contracts", () => {
     assert.match(tokens, /grid-cols-\[1fr_auto_1fr\]/);
     assert.match(tokens, /PATTERN_BRAND_CLASS = "type-label text-fg text-fg"/);
     assert.match(tokens, /PATTERN_TOPBAR_END_CLASS = "justify-self-end"/);
-    assert.match(nav, /<Avatar/);
-    assert.match(nav, /size="sm"/);
+    assert.match(nav, /AccountSettingsAvatarButton/);
+    assert.match(nav, /AccountSettingsDialog/);
     assert.match(nav, /PATTERN_TOPBAR_END_CLASS/);
+    assert.match(read("components/account-settings.tsx"), /<Avatar/);
+    assert.match(read("components/account-settings.tsx"), /size="sm"/);
+    assert.match(read("components/account-settings.tsx"), /aria-label="Account settings"/);
     assert.doesNotMatch(nav, /^\s*layout="stretch"/m);
     assert.doesNotMatch(nav, /className="[^"]*w-full/);
     assert.match(frame, /OWNER_GRID_MAX = "1140px"/);
@@ -413,10 +426,10 @@ describe("critical page contracts", () => {
     assert.match(chart, /animate="none"/);
     assert.match(read("components/owner-chrome.tsx"), /typicalReach=\{typicalReach\}/);
     assert.match(read("components/wmds.ts"), /chartMaxTicksForWidth/);
-    assert.match(read("package.json"), /wmds#368560cd22bee2c5320b0b0e8038c30affa4bdea/);
+    assert.match(read("package.json"), /wmds#61f8921ac037839da660740da23763813f77d2ee/);
     assert.doesNotMatch(
       read("package.json"),
-      /9b4a1798aff97322b4167519c14ec802a1878b97|0718bdcb87975d3389ad11770bb479c293d33200|14d50cda0302e263cb350409f2cea34de03c7c2e|cd18e7a29afd0c0d774552c1a3d665f480f51bd4|70da6a4c50d8efc1e687b20f231c6e4f1f6190c6|dc813326028c0fe1cc5f3719466a32607bab4504|55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab/,
+      /368560cd22bee2c5320b0b0e8038c30affa4bdea|9b4a1798aff97322b4167519c14ec802a1878b97|0718bdcb87975d3389ad11770bb479c293d33200|14d50cda0302e263cb350409f2cea34de03c7c2e|cd18e7a29afd0c0d774552c1a3d665f480f51bd4|70da6a4c50d8efc1e687b20f231c6e4f1f6190c6|dc813326028c0fe1cc5f3719466a32607bab4504|55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab/,
     );
     assert.match(page, /OwnerWorkspace/);
     assert.match(read("components/owner-workspace.tsx"), /CREATOR_INSIGHTS_PAGE_CLASS/);
@@ -436,7 +449,8 @@ describe("critical page contracts", () => {
       /examples-pitchkit--insufficient-reach-and-audience-data/,
     );
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--graph-data-unavailable/);
-    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--shareable-pitchkit/);
+    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--shareable-pitch-kit/);
+    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--account-settings-owner/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--owner-pitch-kit/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--creator-identity-public/);
     assert.match(
@@ -599,36 +613,60 @@ describe("critical page contracts", () => {
   it("settings is account only", () => {
     const page = read("app/settings/page.tsx");
     const settings = read("components/account-settings.tsx");
+    const nav = read("components/owner-nav.tsx");
     const disconnect = read("components/disconnect-control.tsx");
     const chrome = read("components/owner-chrome.tsx");
+    const workspace = read("components/owner-workspace.tsx");
     const strip = read("components/creator-identity-strip.tsx");
+    const copy = read("lib/copy.ts");
     const identityBlocks = toastAddBlocks(settings);
     assert.match(page, /insightsGate/);
     assert.match(page, /resolveSession/);
     assert.match(page, /AccountSettings/);
     assert.match(page, /kit\.user/);
     assert.doesNotMatch(page, /<AppFrame|OWNER_GRID_MAX|OwnerNav/);
-    assert.match(settings, /examples-pitchkit--creator-identity-owner-settings/);
+    assert.match(settings, /examples-pitchkit--account-settings-owner/);
     assert.match(settings, /Connected Instagram/);
     assert.match(settings, /Share kit/);
     assert.match(settings, /kitPath/);
     assert.match(settings, />\s*Copy\s*</);
     assert.match(settings, /Last synced/);
-    assert.match(settings, /title="Settings"/);
+    assert.match(settings, /title="Account settings"/);
+    assert.match(settings, /aria-label="Account settings"/);
+    assert.match(settings, /<Dialog/);
+    assert.match(settings, /Dialog\.Content/);
     assert.match(settings, /CreatorIdentityStrip/);
     assert.match(settings, /nameAs="p"/);
     assert.match(settings, /showProfessionalChip/);
     assert.match(settings, /PATTERN_SETTINGS_CARD_CLASS/);
     assert.match(settings, /PATTERN_PAGE_CLASS/);
-    assert.match(settings, /Reconnect Instagram/);
+    assert.match(settings, /PATTERN_USER_SETTINGS_BODY_CLASS/);
+    assert.match(settings, /PATTERN_USER_SETTINGS_ACTIONS_CLASS/);
     assert.match(settings, new RegExp(AUTH_SIGNOUT_PATH));
     assert.match(settings, /DisconnectControl/);
+    assert.match(settings, /Delete account/);
+    assert.match(settings, /DELETE_ACCOUNT_TITLE/);
+    assert.match(settings, /DELETE_ACCOUNT_CONFIRM/);
+    assert.match(settings, /confirmRole="destructive"/);
+    assert.match(settings, new RegExp(`action="${AUTH_DISCONNECT_PATH}"`));
+    assert.match(copy, /Delete your Pitchkit account\?/);
+    assert.match(
+      copy,
+      /This permanently deletes your kit, stored media copies, and connection/,
+    );
+    assert.match(nav, /AccountSettingsAvatarButton/);
+    assert.match(nav, /AccountSettingsDialog/);
+    assert.doesNotMatch(workspace, /href="\/settings"|Account<\/a>/);
+    assert.doesNotMatch(settings, /href="\/delete"/);
+    assert.doesNotMatch(workspace, /href="\/delete"/);
     assert.match(disconnect, new RegExp(`action="${AUTH_DISCONNECT_PATH}"`));
     assert.match(disconnect, /method="post"/);
     assert.match(disconnect, /<AlertDialog/);
     assert.match(disconnect, /confirmLabel="Disconnect"/);
     assert.match(read("app/auth/disconnect/route.ts"), /disconnectOwner/);
-    assert.match(chrome, /DisconnectControl/);
+    assert.match(chrome, /Reconnect Instagram/);
+    assert.doesNotMatch(chrome, /DisconnectControl/);
+    assert.doesNotMatch(settings, /Reconnect Instagram/);
     assert.equal(identityBlocks.length, 2);
     for (const block of identityBlocks) {
       assert.match(block, /\btitle:/);
@@ -647,6 +685,6 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(settings, /Coming soon|KitEdit|ShareableKit|<Stat|Chart\./);
     assert.doesNotMatch(settings, /biography|heatmap|EXAMPLE %/);
     assert.doesNotMatch(page, /past brand|Past brand/i);
-    assert.doesNotMatch(read("components/owner-workspace.tsx"), /CreatorIdentityStrip|AccountSettings/);
+    assert.doesNotMatch(workspace, /CreatorIdentityStrip|AccountSettings/);
   });
 });

@@ -56,7 +56,7 @@ export function OwnerWorkspace({
   return (
     <main className={CREATOR_INSIGHTS_PAGE_CLASS}>
       <div className={CREATOR_INSIGHTS_HEADER_BAND_CLASS}>
-        <OwnerNav name={user.name} view={view} onViewChange={setView} />
+        <OwnerNav user={user} posts={posts} view={view} onViewChange={setView} />
       </div>
       <div className={CREATOR_INSIGHTS_BODY_BAND_CLASS}>
         <div className={CREATOR_INSIGHTS_BODY_INNER_CLASS}>
@@ -77,11 +77,7 @@ export function OwnerWorkspace({
               retrieving={retrieving}
             />
           )}
-          <SupportFooter>
-            <p>
-              <a href="/settings">Account</a>
-            </p>
-          </SupportFooter>
+          <SupportFooter />
         </div>
       </div>
     </main>

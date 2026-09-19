@@ -1,8 +1,11 @@
 "use client";
 
-import { Card, Stat, TextLink, cardTitleClasses } from "@/components/wmds";
+import { Button, Card, Stat, TextLink, cardTitleClasses } from "@/components/wmds";
 import { CreatorIdentityStrip } from "@/components/creator-identity-strip";
 import {
+  PATTERN_CALLOUT_ACTIONS_CLASS,
+  PATTERN_CALLOUT_BODY_CLASS,
+  PATTERN_CALLOUT_CARD_CLASS,
   PATTERN_CONTACT_CARD_CLASS,
   PATTERN_CONTACT_ROW_CLASS,
   PATTERN_CONTACT_ROWS_CLASS,
@@ -42,13 +45,47 @@ type ShareableKitProps = {
   engagementRate: number | null;
   pastBrands?: readonly string[];
   contact?: string | null;
+  /**
+   * Unsigned visitor who is not the kit owner.
+   * Omit for the kit owner and for signed-in viewers of someone else's kit.
+   */
+  showCreateBand?: boolean;
 };
 
+function PublicCreatePitchkitBand() {
+  return (
+    <Card
+      variant="outlined"
+      shape="rounded"
+      bodyTerminal
+      className={PATTERN_CALLOUT_CARD_CLASS}
+    >
+      <Card.Header
+        start={<h2 className={cardTitleClasses}>Create your Pitchkit</h2>}
+      />
+      <Card.Body>
+        <div className={PATTERN_CALLOUT_BODY_CLASS}>
+          <p className={PATTERN_SUPPORTING_CLASS}>
+            Turn your Instagram into a shareable media kit.
+          </p>
+          <div className={PATTERN_CALLOUT_ACTIONS_CLASS}>
+            <form action="/auth/instagram" method="post">
+              <Button type="submit" role="primary">
+                Continue with Instagram
+              </Button>
+            </form>
+          </div>
+        </div>
+      </Card.Body>
+    </Card>
+  );
+}
+
 /**
- * Pattern — shareable PitchKit Show code (`examples-pitchkit--shareable-pitchkit`)
+ * Pattern — shareable PitchKit Show code (`examples-pitchkit--shareable-pitch-kit`)
  * plus Pattern — creator identity (public) (`examples-pitchkit--creator-identity-public`)
  * for the nameplate. Kit Stats / selected posts stay the shareable freeze.
- * No owner management.
+ * No owner management. `showCreateBand` is the unsigned anon CTA.
  */
 export function ShareableKit({
   user,
@@ -56,6 +93,7 @@ export function ShareableKit({
   engagementRate,
   pastBrands = [],
   contact = null,
+  showCreateBand = false,
 }: ShareableKitProps) {
   const contactDetail = sourcedContactDetail(contact);
   const brands = visibleBrandNames(pastBrands);
@@ -194,6 +232,8 @@ export function ShareableKit({
           </div>
         </section>
       ) : null}
+
+      {showCreateBand ? <PublicCreatePitchkitBand /> : null}
     </>
   );
 }
