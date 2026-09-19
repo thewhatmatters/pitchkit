@@ -42,6 +42,11 @@ export function kitPath(handle: string) {
   return `/k/${handle}`;
 }
 
+/** Public kit URL for Share. Always the session owner's frozen handle. */
+export function kitShareUrl(origin: string, handle: string) {
+  return `${origin.replace(/\/$/, "")}${kitPath(handle)}`;
+}
+
 /** Missing Insights sort last, then saves, reach, likes (all descending). */
 export function compareMediaRank(a: Media, b: Media): number {
   const saves = compareNullableDesc(a.saves, b.saves);

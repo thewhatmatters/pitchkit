@@ -3,10 +3,12 @@
 import { useMemo, useState } from "react";
 import { EyeOff } from "lucide-react";
 import { CreatorIdentityStrip } from "@/components/creator-identity-strip";
+import { ShareKitButton } from "@/components/share-kit-button";
 import {
   PATTERN_CONTACT_CARD_CLASS,
   PATTERN_CONTACT_ROW_CLASS,
   PATTERN_CONTACT_ROWS_CLASS,
+  PATTERN_HEADER_SECTION_CLASS,
   PATTERN_IDENTITY_SECTION_CLASS,
   PATTERN_KIT_POST_METRICS_CLASS,
   PATTERN_KIT_STAT_CLASS,
@@ -26,6 +28,7 @@ import {
   AlertDialog,
   Card,
   MoreMenu,
+  PageHeader,
   Stat,
   TextLink,
   cardTitleClasses,
@@ -74,7 +77,9 @@ type OwnerPitchKitProps = {
 /**
  * Pattern — owner PitchKit Show code (`examples-pitchkit--owner-pitch-kit`).
  * Same shareable sections as `/k/[handle]`, plus hide/restore on selected posts.
- * Identity is Graph read-only. Empty contact and brands stay hidden.
+ * PageHeader Share kit is the primary copy action (Show code has no Share;
+ * Insights keeps the Pattern PageHeader Share). Identity is Graph read-only.
+ * Empty contact and brands stay hidden.
  */
 export function OwnerPitchKit({
   user,
@@ -177,6 +182,14 @@ export function OwnerPitchKit({
 
   return (
     <>
+      <section className={PATTERN_HEADER_SECTION_CLASS}>
+        <PageHeader
+          variant="page"
+          title="PitchKit"
+          end={<ShareKitButton handle={user.handle} />}
+        />
+      </section>
+
       <section className={PATTERN_IDENTITY_SECTION_CLASS}>
         <CreatorIdentityStrip identity={identity} nameAs="h1" showProfessionalChip />
       </section>

@@ -40,7 +40,7 @@ import {
 } from "@/lib/copy";
 import { creatorIdentityFromUser } from "@/lib/creator-identity";
 import { inventoryLastUpdated } from "@/lib/inventory";
-import { kitPath } from "@/lib/kit";
+import { kitPath, kitShareUrl } from "@/lib/kit";
 import type { Media, User } from "@/lib/schema";
 
 type AccountSettingsProps = {
@@ -61,7 +61,7 @@ export function AccountSettings({ user, posts }: AccountSettingsProps) {
   const avatarName = identity.displayName ?? identity.handle;
 
   async function copyShareKitUrl() {
-    const url = `${window.location.origin}${sharePath}`;
+    const url = kitShareUrl(window.location.origin, identity.handle);
     try {
       await navigator.clipboard.writeText(url);
       toast.add({

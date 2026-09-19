@@ -6,6 +6,8 @@ import {
   excludeHiddenFromPublicKit,
   isUtcDay,
   kitHasInsights,
+  kitPath,
+  kitShareUrl,
   selectSixPosts,
 } from "./kit";
 import type { Media, User } from "./schema";
@@ -73,6 +75,17 @@ function user(partial: Partial<User> = {}): User {
     ...partial,
   };
 }
+
+describe("kit share URL", () => {
+  it("uses the session owner handle, not a hardcoded demo path", () => {
+    assert.equal(kitPath("rxndy.dxniel"), "/k/rxndy.dxniel");
+    assert.equal(
+      kitShareUrl("https://pitchkit.app", "rxndy.dxniel"),
+      "https://pitchkit.app/k/rxndy.dxniel",
+    );
+    assert.equal(kitShareUrl("https://pitchkit.app/", DEMO_HANDLE), "https://pitchkit.app/k/demo");
+  });
+});
 
 describe("selectSixPosts", () => {
   it("ranks last-30-day posts by saves, then reach, then likes; missing Insights last", () => {
