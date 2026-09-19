@@ -30,7 +30,8 @@ export type { HiddenOverlay, HideRestoreResult } from "./hidden-kit";
 export { hasHyperdriveFlag as hasHyperdrive, resolveHasHyperdrive };
 
 /**
- * Hyperdrive bound → SQL is SoT for live Graph users + hide/restore.
+ * Hyperdrive bound → SQL is preferred SoT for live Graph users + hide/restore.
+ * `writeGraphSnapshot` still falls back to KV `graph:` if that SQL write fails.
  * Else /k/[handle] and /insights read the in-repo seed unless a Graph
  * snapshot (OAuth or operator token poll) is present on KV `graph:` keys.
  * Public `/k/demo` stays `lib/seed.ts`.

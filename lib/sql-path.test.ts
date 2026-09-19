@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
 import { afterEach, describe, it } from "node:test";
 import { EMPTY_AUDIENCE, persistOwnerDisconnect, readGraphSnapshot, writeGraphSnapshot } from "./graph-store";
-import { hideFromKit, restoreToKit } from "./hidden-kit";
+import { createMemoryHiddenKit, hideFromKit, restoreToKit, setHiddenKitNamespaceForTests } from "./hidden-kit";
 import { resetHyperdriveForTests, setHasHyperdriveForTests } from "./hyperdrive";
 import type { User } from "./schema";
 import { DEMO_HANDLE, DEMO_USER_ID, seedMedia } from "./seed";
 import { parseSessionValue } from "./session";
-import { createMemorySqlStore, resetSqlStoreForTests, setSqlStoreForTests } from "./sql-store";
+import { createMemorySqlStore, resetSqlStoreForTests, setSqlStoreForTests, type SqlStore } from "./sql-store";
 import { loadPublicKit } from "./store";
 
 const NOW = "2026-09-18T22:00:00.000Z";
@@ -36,6 +36,7 @@ function liveUser(partial: Partial<User> = {}): User {
 afterEach(() => {
   resetSqlStoreForTests();
   resetHyperdriveForTests();
+  setHiddenKitNamespaceForTests(undefined);
 });
 
 describe("Hyperdrive SQL path", () => {
@@ -135,9 +136,61 @@ describe("Hyperdrive SQL path", () => {
     assert.equal((await sql.findMediaById(top.id))?.hidden_from_kit_at, null);
   });
 
-  it("fails closed when Hyperdrive is on but the SQL client is missing", async () => {
+  it("falls back to KV when Hyperdrive SQL upsert fails", async () => {
+    const user = liveUser();
+    const media = seedMedia.map((row) => ({ ...row, user_id: user.id }));
+    const sql = createMemorySqlStore();
+    const failing: SqlStore = {
+      ...sql,
+      async upsertUser() {
+        return false;
+      },
+    };
+    setSqlStoreForTests(failing);
+    setHasHyperdriveForTests(true);
+    setHiddenKitNamespaceForTests(createMemoryHiddenKit());
+
+    assert.equal(
+      await writeGraphSnapshot({
+        user,
+        media,
+        reach_series: [],
+        audience: EMPTY_AUDIENCE,
+        polled_at: NOW,
+      }),
+      true,
+    );
+    assert.equal(await sql.findUserById(user.id), null);
+    const stored = await readGraphSnapshot(user.id);
+    assert.ok(stored);
+    assert.equal(stored.user.handle, user.handle);
+    assert.equal(stored.user.token_encrypted, "enc-token");
+  });
+
+  it("falls back to KV when Hyperdrive is bound but the SQL store is missing", async () => {
+    const user = liveUser();
     setHasHyperdriveForTests(true);
     setSqlStoreForTests(null);
+    setHiddenKitNamespaceForTests(createMemoryHiddenKit());
+
+    assert.equal(
+      await writeGraphSnapshot({
+        user,
+        media: [],
+        reach_series: [],
+        audience: EMPTY_AUDIENCE,
+        polled_at: NOW,
+      }),
+      true,
+    );
+    const stored = await readGraphSnapshot(user.id);
+    assert.equal(stored?.user.handle, user.handle);
+  });
+
+  it("returns false only when SQL is unavailable and KV is missing; hide still fail-closes", async () => {
+    setHasHyperdriveForTests(true);
+    setSqlStoreForTests(null);
+    setHiddenKitNamespaceForTests(null);
     assert.equal(
       await writeGraphSnapshot({
         user: liveUser(),
