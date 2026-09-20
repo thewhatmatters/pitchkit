@@ -70,9 +70,9 @@ export default async function KitPage({ params }: KitPageProps) {
             pastBrands={kit.past_brands}
             showCreateBand={session == null}
           />
-          <SupportFooter />
         </div>
       </div>
+      <SupportFooter />
     </main>
   );
 }

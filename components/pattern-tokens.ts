@@ -1,6 +1,6 @@
 /**
  * Interpolated Show code class strings from WMDS Examples/PitchKit at
- * `f188148c02347b56b1a1c549b06201cce1777945`.
+ * `9f06fb63eae885803b1e8abdc35edecbbe0870d9`.
  *
  * Stories:
  * - `examples-pitchkit--account-settings-owner` (Pattern — account settings (owner))
@@ -36,7 +36,7 @@ export const PATTERN_TOPBAR_BAND_CLASS = "band pb-4";
 export const PATTERN_TOPBAR_CLASS =
   "col-span-full grid grid-cols-[1fr_auto_1fr] items-center gap-3";
 
-export const PATTERN_BRAND_CLASS = "type-heading-3 text-fg";
+export const PATTERN_BRAND_CLASS = "type-heading-4 text-fg";
 
 export const PATTERN_TOPBAR_END_CLASS = "justify-self-end";
 
@@ -169,24 +169,26 @@ export const PATTERN_USER_SETTINGS_BODY_CLASS = "flex w-full min-w-0 flex-col ga
 
 export const PATTERN_USER_SETTINGS_ACTIONS_CLASS = "flex flex-col items-start gap-2";
 
-/** Owner avatar trigger — circular focus only, no pill offset ring. */
+/** Circular Avatar trigger — hug `size="md"` (36px), no offset ring. */
 export const PATTERN_ACCOUNT_MENU_TRIGGER_CLASS =
-  "inline-flex rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring";
+  "size-9 min-h-9 gap-0 px-0 py-0 focus-visible:ring-offset-0";
 
 export const PATTERN_ACCOUNT_MENU_CLASS = "relative";
 
-export const PATTERN_ACCOUNT_MENU_PANEL_CLASS = "absolute right-0 top-full mt-1 min-w-56 max-h-none";
+export const PATTERN_ACCOUNT_MENU_PANEL_CLASS =
+  "absolute end-0 top-full mt-1 min-w-56 max-h-none";
 
-export const PATTERN_ACCOUNT_MENU_HEADER_CLASS = "pointer-events-none";
+export const PATTERN_ACCOUNT_MENU_HEADER_CLASS =
+  "type-supporting font-medium uppercase tracking-wider text-muted px-3.5 py-2";
 
-export const PATTERN_ACCOUNT_MENU_GROUP_CLASS = "mt-0.5 border-t border-border";
+export const PATTERN_ACCOUNT_MENU_SEPARATOR_CLASS =
+  "mx-1.5 my-0.5 border-0 border-t border-border";
 
-/** Owner / legal footer — centered Privacy + Support. */
+/** Owner Insights / PitchKit page footer — Privacy + Support only. */
+export const PATTERN_FOOTER_BAND_CLASS = "band pb-6 pt-10";
+
 export const PATTERN_FOOTER_CLASS =
-  "col-span-full mt-4 border-t border-border pt-6";
-
-export const PATTERN_FOOTER_NAV_CLASS =
-  "flex flex-wrap items-center justify-center gap-x-4 gap-y-2";
+  "col-span-full flex items-center justify-center gap-4";
 
 /** Public kit unsigned CTA band — compose into shareable PitchKit only. */
 export const PATTERN_CALLOUT_CARD_CLASS = "col-span-full";
@@ -203,11 +205,10 @@ export const PATTERN_PUBLIC_STAT_CLASS = PATTERN_STAT_CLASS;
 
 export const PATTERN_COUNTRIES_CARD_CLASS = PATTERN_AUDIENCE_CARD_CLASS;
 
-/** Public / owner kit — Reach is full width; countries stay compact (no 6/6 dead column). */
-export const PATTERN_PUBLIC_STACK_CLASS = "band min-w-0 gap-y-6";
+/** Owner PitchKit tab — compact reach + countries stack full width. */
+export const PATTERN_PUBLIC_STACK_CLASS = PATTERN_DASHBOARD_GRID_CLASS;
 export const PATTERN_PUBLIC_REACH_CARD_CLASS = "col-span-full min-w-0";
-export const PATTERN_PUBLIC_COUNTRIES_CARD_CLASS =
-  "col-span-full min-w-0 md:col-span-6 lg:col-span-4";
+export const PATTERN_PUBLIC_COUNTRIES_CARD_CLASS = "col-span-full min-w-0";
 
 export const PATTERN_KIT_POST_METRICS_CLASS = "grid w-full grid-cols-2 gap-3";
 

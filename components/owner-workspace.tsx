@@ -97,9 +97,9 @@ export function OwnerWorkspace({
               retrieving={retrieving}
             />
           )}
-          <SupportFooter />
         </div>
       </div>
+      <SupportFooter />
     </main>
   );
 }

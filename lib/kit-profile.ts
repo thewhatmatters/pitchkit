@@ -1,7 +1,7 @@
 /**
  * Pitchkit-owned kit intro + past brands + theme.
  * Not Instagram biography. Not SQL — staged on the KV Graph snapshot.
- * WMDS tip `f188148c02347b56b1a1c549b06201cce1777945`:
+ * WMDS tip `9f06fb63eae885803b1e8abdc35edecbbe0870d9`:
  * `examples-pitchkit--intro-owner` / `--intro-public`
  * `examples-pitchkit--past-brands-owner` / `--past-brands-public`
  * Theme picker chrome is off; `theme` stays on the KV snapshot (default light).

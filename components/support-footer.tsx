@@ -1,17 +1,14 @@
-import { PATTERN_FOOTER_CLASS, PATTERN_FOOTER_NAV_CLASS } from "@/components/pattern-tokens";
+import { PATTERN_FOOTER_BAND_CLASS, PATTERN_FOOTER_CLASS } from "@/components/pattern-tokens";
+import { TextLink } from "@/components/wmds";
 import { SUPPORT_EMAIL } from "@/lib/copy";
 
 export function SupportFooter() {
   return (
-    <footer className={PATTERN_FOOTER_CLASS}>
-      <nav className={PATTERN_FOOTER_NAV_CLASS} aria-label="Site">
-        <a className="type-supporting text-muted" href="/privacy">
-          Privacy
-        </a>
-        <a className="type-supporting text-muted" href={`mailto:${SUPPORT_EMAIL}`}>
-          Support
-        </a>
-      </nav>
-    </footer>
+    <div className={PATTERN_FOOTER_BAND_CLASS}>
+      <footer className={PATTERN_FOOTER_CLASS}>
+        <TextLink href="/privacy">Privacy</TextLink>
+        <TextLink href={`mailto:${SUPPORT_EMAIL}`}>Support</TextLink>
+      </footer>
+    </div>
   );
 }

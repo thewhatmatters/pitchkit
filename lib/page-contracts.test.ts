@@ -203,7 +203,7 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(nav, /router\.push|kitPath|usePathname|useRouter/);
     assert.match(tokens, /PATTERN_TOPBAR_CLASS/);
     assert.match(tokens, /grid-cols-\[1fr_auto_1fr\]/);
-    assert.match(tokens, /PATTERN_BRAND_CLASS = "type-heading-3 text-fg"/);
+    assert.match(tokens, /PATTERN_BRAND_CLASS = "type-heading-4 text-fg"/);
     assert.match(tokens, /PATTERN_TOPBAR_END_CLASS = "justify-self-end"/);
     assert.match(nav, /AccountMenu/);
     assert.match(nav, /PATTERN_TOPBAR_END_CLASS/);
@@ -214,7 +214,7 @@ describe("critical page contracts", () => {
     assert.match(read("components/account-settings.tsx"), /Account settings/);
     assert.match(read("components/account-settings.tsx"), /Share kit/);
     assert.match(read("components/account-settings.tsx"), /DISCONNECT_INSTAGRAM_ACTION/);
-    assert.match(read("components/account-settings.tsx"), /Delete account/);
+    assert.match(read("components/account-settings.tsx"), /DELETE_ACCOUNT_ACTION/);
     assert.match(read("components/account-settings.tsx"), /Sign out/);
     assert.doesNotMatch(read("components/account-settings.tsx"), /Unlock Pro|Security|Integrations/);
     assert.match(read("components/account-settings.tsx"), /aria-label=\{ACCOUNT_MENU_LABEL\}/);
@@ -464,10 +464,10 @@ describe("critical page contracts", () => {
     assert.match(chart, /animate="none"/);
     assert.match(read("components/owner-chrome.tsx"), /typicalReach=\{typicalReach\}/);
     assert.match(read("components/wmds.ts"), /chartMaxTicksForWidth/);
-    assert.match(read("package.json"), /wmds#f188148c02347b56b1a1c549b06201cce1777945/);
+    assert.match(read("package.json"), /wmds#9f06fb63eae885803b1e8abdc35edecbbe0870d9/);
     assert.doesNotMatch(
       read("package.json"),
-      /29bef582fd60bb2398014f1c797b34fcf30bc791|61f8921ac037839da660740da23763813f77d2ee|96f44587b3b3ff1c44de9f1e5adba61a661d30e1|368560cd22bee2c5320b0b0e8038c30affa4bdea|9b4a1798aff97322b4167519c14ec802a1878b97|0718bdcb87975d3389ad11770bb479c293d33200|14d50cda0302e263cb350409f2cea34de03c7c2e|cd18e7a29afd0c0d774552c1a3d665f480f51bd4|70da6a4c50d8efc1e687b20f231c6e4f1f6190c6|dc813326028c0fe1cc5f3719466a32607bab4504|55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab/,
+      /29bef582fd60bb2398014f1c797b34fcf30bc791|61f8921ac037839da660740da23763813f77d2ee|96f44587b3b3ff1c44de9f1e5adba61a661d30e1|368560cd22bee2c5320b0b0e8038c30affa4bdea|9b4a1798aff97322b4167519c14ec802a1878b97|0718bdcb87975d3389ad11770bb479c293d33200|14d50cda0302e263cb350409f2cea34de03c7c2e|cd18e7a29afd0c0d774552c1a3d665f480f51bd4|70da6a4c50d8efc1e687b20f231c6e4f1f6190c6|dc813326028c0fe1cc5f3719466a32607bab4504|55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab|f188148c02347b56b1a1c549b06201cce1777945/,
     );
     assert.match(read("components/wmds.ts"), /TextArea/);
     assert.match(read("components/wmds.ts"), /dialogFooterActionsClasses/);
@@ -497,10 +497,10 @@ describe("critical page contracts", () => {
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--graph-data-unavailable/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--shareable-pitch-kit/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--shareable-insufficient-reach/);
-    assert.match(read("components/pattern-tokens.ts"), /f188148c02347b56b1a1c549b06201cce1777945/);
+    assert.match(read("components/pattern-tokens.ts"), /9f06fb63eae885803b1e8abdc35edecbbe0870d9/);
     assert.doesNotMatch(read("components/pattern-tokens.ts"), /examples-pitchkit--theme-picker-owner/);
     assert.match(read("components/pattern-tokens.ts"), /PATTERN_PUBLIC_REACH_CARD_CLASS = "col-span-full min-w-0"/);
-    assert.match(read("components/pattern-tokens.ts"), /PATTERN_PUBLIC_COUNTRIES_CARD_CLASS/);
+    assert.match(read("components/pattern-tokens.ts"), /PATTERN_PUBLIC_COUNTRIES_CARD_CLASS = "col-span-full min-w-0"/);
     assert.match(read("components/shareable-kit.tsx"), /PATTERN_PUBLIC_REACH_CARD_CLASS/);
     assert.match(read("components/shareable-kit.tsx"), /PATTERN_PUBLIC_STACK_CLASS/);
     assert.doesNotMatch(read("components/shareable-kit.tsx"), /PATTERN_DASHBOARD_GRID_CLASS|PATTERN_REACH_CARD_CLASS/);
@@ -688,8 +688,7 @@ describe("critical page contracts", () => {
     assert.match(settings, /examples-pitchkit--account-settings-owner/);
     assert.match(settings, /Connected Instagram/);
     assert.match(settings, /Share kit/);
-    assert.match(settings, /kitPath/);
-    assert.match(settings, />\s*Copy\s*</);
+    assert.doesNotMatch(settings, /kitPath|>\s*Copy\s*</);
     assert.match(settings, /Last synced/);
     assert.match(settings, /title="Account settings"/);
     assert.match(settings, /ACCOUNT_MENU_LABEL|My account/);
@@ -703,10 +702,10 @@ describe("critical page contracts", () => {
     assert.match(settings, /PATTERN_SETTINGS_CARD_CLASS/);
     assert.match(settings, /PATTERN_PAGE_CLASS/);
     assert.match(settings, /PATTERN_USER_SETTINGS_BODY_CLASS/);
-    assert.match(settings, /PATTERN_USER_SETTINGS_ACTIONS_CLASS/);
+    assert.match(settings, /PATTERN_ACCOUNT_MENU_SEPARATOR_CLASS/);
     assert.match(settings, new RegExp(AUTH_SIGNOUT_PATH));
-    assert.match(settings, /DisconnectControl/);
-    assert.match(settings, /Delete account/);
+    assert.match(settings, /DISCONNECT_TITLE/);
+    assert.match(settings, /DELETE_ACCOUNT_ACTION/);
     assert.match(settings, /DELETE_ACCOUNT_TITLE/);
     assert.match(settings, /DELETE_ACCOUNT_CONFIRM/);
     assert.match(settings, /confirmRole="destructive"/);
@@ -734,8 +733,10 @@ describe("critical page contracts", () => {
     assert.match(copy, /DISCONNECT_INSTAGRAM_ACTION = "Disconnect Instagram"/);
     assert.match(read("components/support-footer.tsx"), /\/privacy/);
     assert.match(read("components/support-footer.tsx"), /mailto:\$\{SUPPORT_EMAIL\}/);
-    assert.match(read("components/support-footer.tsx"), />\s*Privacy\s*</);
-    assert.match(read("components/support-footer.tsx"), />\s*Support\s*</);
+    assert.match(read("components/support-footer.tsx"), />Privacy</);
+    assert.match(read("components/support-footer.tsx"), />Support</);
+    assert.match(read("components/support-footer.tsx"), /PATTERN_FOOTER_BAND_CLASS/);
+    assert.match(read("components/support-footer.tsx"), /TextLink/);
     assert.doesNotMatch(read("components/support-footer.tsx"), /Reconnect Instagram|scroll-to-top|Vercel|Cloudflare/);
     assert.equal(identityBlocks.length, 2);
     for (const block of identityBlocks) {

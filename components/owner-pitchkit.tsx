@@ -86,7 +86,7 @@ type OwnerPitchKitProps = {
  * plus Pattern — past brands (owner) (`examples-pitchkit--past-brands-owner`).
  * Theme picker chrome is off; stored theme (default light) still paints `data-theme`.
  * Kit body is the same shareable composition as `/k/[handle]` — 4 KPIs, full-width
- * reach, compact top 3 countries — plus hide/restore and intro/brands editors.
+ * reach + countries — plus hide/restore and intro/brands editors.
  */
 export function OwnerPitchKit({
   user,
