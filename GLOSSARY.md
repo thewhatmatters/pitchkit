@@ -117,7 +117,7 @@ Does the split match the customer?
 
 **Intro** — Pitchkit-owned kit sentence under the identity nameplate. Not Instagram `biography`. Soft 160 / hard 280. Owner empty = **Add an intro**. Public empty = omit the block. Persist `intro` on the KV Graph snapshot.
 
-**Past brands** — Creator-entered proof list. Ordered `{ id, name }` only (max 8). Letter Avatar from `name`. Owner add / edit / reorder. Public empty = omit. No logo, year, summary, or KPIs. Persist `past_brands` on the KV Graph snapshot.
+**Past brands** — Creator-entered proof list. Ordered `{ id, name, logo_key?, result_label? }` (max 8). `logo_key` is a curated WMDS pack slug or omit — unknown/missing uses a letter Avatar from `name`. No creator uploads or scraped favicons. `result_label` is an optional phrase (trim; max 24) — omit the Chip when empty. Owner add / edit / reorder + optional add/clear result. Public is display only; static row when it fits, marquee only on overflow. Public empty = omit. No year, summary, or Graph KPIs. Persist `past_brands` on the KV Graph snapshot. Existing `{ id, name }` rows migrate with `logo_key` / `result_label` undefined.
 
 **Website** — IG User `website` (Public). Hide if empty. Not a Stat.
 

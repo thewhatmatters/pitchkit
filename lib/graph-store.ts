@@ -58,7 +58,7 @@ export type GraphSnapshot = {
   polled_at: string;
   /** Pitchkit-owned intro. Optional on disk — parse stays tolerant. */
   intro?: string | null;
-  /** Ordered `{ id, name }`. Optional on disk — parse stays tolerant. */
+  /** Ordered `{ id, name, logo_key?, result_label? }`. Optional on disk — parse stays tolerant. */
   past_brands?: PastBrand[];
   /** Public kit appearance. Optional on disk — parse stays tolerant. */
   theme?: PitchKitTheme;

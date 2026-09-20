@@ -1,9 +1,11 @@
 /**
  * Pitchkit-owned kit intro + past brands + theme.
  * Not Instagram biography. Not SQL — staged on the KV Graph snapshot.
- * WMDS tip `9f06fb63eae885803b1e8abdc35edecbbe0870d9`:
+ * WMDS tip `3b75f96e1ea78bffb1a533131502e44148a80c89`:
  * `examples-pitchkit--intro-owner` / `--intro-public`
  * `examples-pitchkit--past-brands-owner` / `--past-brands-public`
+ * (`--past-brands-owner-empty` / `--past-brands-owner-overflow`
+ * / `--past-brands-public-omit` / `--past-brands-public-overflow`)
  * Theme picker chrome is off; `theme` stays on the KV snapshot (default light).
  */
 
@@ -11,12 +13,58 @@ export const PITCHKIT_INTRO_SOFT_LIMIT = 160;
 export const PITCHKIT_INTRO_HARD_LIMIT = 280;
 export const PITCHKIT_BRANDS_MAX = 8;
 export const PITCHKIT_BRAND_NAME_MAX = 40;
+export const PITCHKIT_BRAND_RESULT_MAX = 24;
+export const PITCHKIT_BRAND_LOGO_LETTER = "letter";
+export const PITCHKIT_BRAND_RESULT_HINTS =
+  "+12% CTR · 3.2x ROAS · 1.4M views · Sold out in 48h · Series A launch";
 
 export const KIT_PROFILE_PATH = "/api/kit/profile";
+
+/** Curated WMDS pack slugs — not creator upload, not scraped favicons. */
+export const PITCHKIT_BRAND_LOGO_KEYS = [
+  "nike",
+  "adidas",
+  "apple",
+  "google",
+  "meta",
+  "amazon",
+  "spotify",
+  "netflix",
+  "sephora",
+  "glossier",
+  "nordstrom",
+  "target",
+  "walmart",
+  "starbucks",
+  "coca-cola",
+  "pepsi",
+  "samsung",
+  "microsoft",
+  "adobe",
+  "shopify",
+  "uber",
+  "airbnb",
+  "disney",
+  "lululemon",
+  "reebok",
+  "puma",
+  "dior",
+  "chanel",
+  "bmw",
+  "ford",
+  "chase",
+  "visa",
+] as const;
+
+export type PitchKitBrandLogoKey = (typeof PITCHKIT_BRAND_LOGO_KEYS)[number];
+
+const PITCHKIT_BRAND_LOGO_KEY_SET = new Set<string>(PITCHKIT_BRAND_LOGO_KEYS);
 
 export type PastBrand = {
   id: string;
   name: string;
+  logo_key?: string | null;
+  result_label?: string | null;
 };
 
 export const PITCHKIT_THEMES = ["light", "dark", "soft"] as const;
@@ -39,11 +87,96 @@ export const EMPTY_KIT_PROFILE: KitProfile = {
 export const SEED_INTRO =
   "I create sunlit home stories for people who host — tables, rooms, and weekend rituals.";
 
+/** Pattern — past brands (owner/public) filled example. Mixed chips + one curated mark. */
 export const SEED_PAST_BRANDS: PastBrand[] = [
-  { id: "hearth-home", name: "Hearth & Home" },
-  { id: "studio-line", name: "Studio Line" },
-  { id: "market-co", name: "Market Co." },
+  { id: "hearth-home", name: "Hearth & Home", result_label: "3.2x ROAS" },
+  { id: "studio-line", name: "Studio Line", logo_key: "adobe" },
+  { id: "market-co", name: "Market Co.", result_label: "+12% CTR" },
 ];
+
+export function isPitchKitBrandLogoKey(value: string): value is PitchKitBrandLogoKey {
+  return PITCHKIT_BRAND_LOGO_KEY_SET.has(value);
+}
+
+/** Unknown, empty, or `letter` → letter Avatar fallback. */
+export function resolvePastBrandLogoKey(
+  logoKey: string | null | undefined,
+): PitchKitBrandLogoKey | undefined {
+  if (logoKey == null || logoKey === "" || logoKey === PITCHKIT_BRAND_LOGO_LETTER) {
+    return undefined;
+  }
+  return isPitchKitBrandLogoKey(logoKey) ? logoKey : undefined;
+}
+
+export function pastBrandLogoKeyLabel(logoKey: PitchKitBrandLogoKey): string {
+  return logoKey
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join("-");
+}
+
+/** Knockout monogram for a curated key — not a scraped trademark. */
+export function pastBrandLogoMonogram(logoKey: PitchKitBrandLogoKey): string {
+  const parts = logoKey.split("-");
+  if (parts.length > 1) {
+    return parts
+      .map((part) => part.charAt(0).toUpperCase())
+      .join("")
+      .slice(0, 2);
+  }
+  return logoKey.slice(0, 1).toUpperCase();
+}
+
+export function normalizePastBrandResult(
+  value: string | null | undefined,
+): string | undefined {
+  const trimmed = value?.trim() ?? "";
+  if (trimmed.length === 0) {
+    return undefined;
+  }
+  return trimmed.slice(0, PITCHKIT_BRAND_RESULT_MAX);
+}
+
+const PAST_BRAND_RESULT_URL_PATTERN = /https?:\/\/|www\./i;
+const PAST_BRAND_RESULT_HANDLE_PATTERN = /(^|[\s])@[a-z0-9._]+/i;
+const PAST_BRAND_RESULT_EMOJI_PATTERN = /\p{Extended_Pictographic}/gu;
+
+export function pastBrandResultIssues(value: string): string | undefined {
+  if (/[\n\r]/.test(value)) {
+    return "Keep the result on one line.";
+  }
+  if (PAST_BRAND_RESULT_URL_PATTERN.test(value)) {
+    return "Links are not allowed in a result.";
+  }
+  if (PAST_BRAND_RESULT_HANDLE_PATTERN.test(value)) {
+    return "@handles are not allowed in a result.";
+  }
+  const emojiCount = value.match(PAST_BRAND_RESULT_EMOJI_PATTERN)?.length ?? 0;
+  if (emojiCount >= 3) {
+    return "Skip emoji spam — use a short phrase.";
+  }
+  return undefined;
+}
+
+export function pastBrandResultStatus(value: string): "error" | undefined {
+  return pastBrandResultIssues(value) == null ? undefined : "error";
+}
+
+function pastBrandFields(
+  name: string,
+  logoKey: unknown,
+  resultLabel: unknown,
+): Pick<PastBrand, "name" | "logo_key" | "result_label"> {
+  const logo_key = resolvePastBrandLogoKey(typeof logoKey === "string" ? logoKey : null);
+  const result_label = normalizePastBrandResult(
+    typeof resultLabel === "string" ? resultLabel : null,
+  );
+  return {
+    name,
+    ...(logo_key == null ? {} : { logo_key }),
+    ...(result_label == null ? {} : { result_label }),
+  };
+}
 
 export function pitchKitIntroIsEmpty(intro: string | null | undefined): boolean {
   return (intro?.trim().length ?? 0) === 0;
@@ -83,7 +216,12 @@ export function normalizePastBrands(value: unknown): PastBrand[] {
     if (!row || typeof row !== "object" || Array.isArray(row)) {
       continue;
     }
-    const raw = row as { id?: unknown; name?: unknown };
+    const raw = row as {
+      id?: unknown;
+      name?: unknown;
+      logo_key?: unknown;
+      result_label?: unknown;
+    };
     const name = typeof raw.name === "string" ? raw.name.trim() : "";
     if (name.length === 0) {
       continue;
@@ -100,7 +238,7 @@ export function normalizePastBrands(value: unknown): PastBrand[] {
       continue;
     }
     seen.add(id);
-    out.push({ id, name: clipped });
+    out.push({ id, ...pastBrandFields(clipped, raw.logo_key, raw.result_label) });
     if (out.length >= PITCHKIT_BRANDS_MAX) {
       break;
     }
@@ -231,7 +369,12 @@ export function parseKitProfileBody(body: unknown): ParseKitProfileBody {
       if (!item || typeof item !== "object" || Array.isArray(item)) {
         return { ok: false, error: "invalid_body" };
       }
-      const brand = item as { id?: unknown; name?: unknown };
+      const brand = item as {
+        id?: unknown;
+        name?: unknown;
+        logo_key?: unknown;
+        result_label?: unknown;
+      };
       if (typeof brand.id !== "string" || brand.id.trim().length === 0) {
         return { ok: false, error: "invalid_body" };
       }
@@ -242,6 +385,12 @@ export function parseKitProfileBody(body: unknown): ParseKitProfileBody {
         return { ok: false, error: "invalid_body" };
       }
       if (brand.name.length > PITCHKIT_BRAND_NAME_MAX) {
+        return { ok: false, error: "invalid_body" };
+      }
+      if (brand.logo_key != null && typeof brand.logo_key !== "string") {
+        return { ok: false, error: "invalid_body" };
+      }
+      if (brand.result_label != null && typeof brand.result_label !== "string") {
         return { ok: false, error: "invalid_body" };
       }
     }
