@@ -64,7 +64,10 @@ type AccountSettingsDialogProps = AccountSettingsProps & {
   onOpenChange: (open: boolean) => void;
 };
 
-type AccountMenuProps = AccountSettingsProps;
+type AccountMenuProps = AccountSettingsProps & {
+  /** `/settings` lands on the Dialog instead of a blank chrome page. */
+  defaultSettingsOpen?: boolean;
+};
 
 /**
  * Pattern — account settings (owner)
@@ -74,11 +77,15 @@ type AccountMenuProps = AccountSettingsProps;
  * Delete account last. Delete confirm is the RE memo copy.
  */
 
-export function AccountMenu({ user, posts }: AccountMenuProps) {
+export function AccountMenu({
+  user,
+  posts,
+  defaultSettingsOpen = false,
+}: AccountMenuProps) {
   const menuId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(defaultSettingsOpen);
   const [disconnectOpen, setDisconnectOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const signOutFormRef = useRef<HTMLFormElement>(null);
@@ -357,7 +364,7 @@ export function AccountSettings({ user, posts }: AccountSettingsProps) {
           <span className={PATTERN_BRAND_CLASS}>PitchKit</span>
           <span />
           <span className={PATTERN_TOPBAR_END_CLASS}>
-            <AccountMenu user={user} posts={posts} />
+            <AccountMenu user={user} posts={posts} defaultSettingsOpen />
           </span>
         </header>
       </div>

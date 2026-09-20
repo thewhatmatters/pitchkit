@@ -718,6 +718,7 @@ describe("critical page contracts", () => {
     );
     assert.match(nav, /AccountMenu/);
     assert.match(settings, /AccountSettingsDialog/);
+    assert.match(settings, /defaultSettingsOpen/);
     assert.doesNotMatch(workspace, /href="\/settings"|Account<\/a>/);
     assert.doesNotMatch(settings, /href="\/delete"/);
     assert.doesNotMatch(workspace, /href="\/delete"/);
