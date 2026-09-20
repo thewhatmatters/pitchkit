@@ -1,6 +1,6 @@
 /**
  * Interpolated Show code class strings from WMDS Examples/PitchKit at
- * `29bef582fd60bb2398014f1c797b34fcf30bc791`.
+ * `122ab5d1a8bf54f91a5a584ac6037f5f518e8a46`.
  *
  * Stories:
  * - `examples-pitchkit--account-settings-owner` (Pattern — account settings (owner))
@@ -212,14 +212,15 @@ export const PATTERN_BRAND_NAME_CLASS = "type-label text-fg";
 
 export const PATTERN_BRAND_REORDER_CLASS = "flex shrink-0 items-center";
 
-/** Owner theme picker — draft SegmentedControl + explicit Save. */
+/** Owner theme picker — draft SegmentedControl + explicit Save. Kit body is in-page. */
 export const PATTERN_THEME_TOOLBAR_CLASS =
   "col-span-full flex flex-wrap items-end justify-between gap-3";
 
 /**
- * Flush owner-tab kit surface (`data-theme` for draft Light/Dark/Soft).
- * No nested Public kit preview label, card frame, or brand topbar —
- * ShareableKit sits in the PitchKit page flow under Theme.
+ * In-page owner theme surface (`examples-pitchkit--theme-picker-owner`).
+ * Show code paints `data-theme={draftTheme}` on `<main>`; product scopes the
+ * same attribute to the PitchKit tab so Theme + Light/Dark/Soft + kit body
+ * sit in one band. No nested Public kit preview / second PitchKit wordmark.
  */
 export const PATTERN_THEME_KIT_CLASS = `col-span-full min-w-0 bg-body ${PATTERN_CONTENT_CLASS}`;
 

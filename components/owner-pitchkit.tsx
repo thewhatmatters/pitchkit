@@ -80,6 +80,9 @@ type OwnerPitchKitProps = {
  * plus Pattern — intro (owner) (`examples-pitchkit--intro-owner`)
  * plus Pattern — past brands (owner) (`examples-pitchkit--past-brands-owner`).
  * Theme pick restyles the in-page kit only; Save theme commits to the KV Graph snapshot.
+ * Show code (`122ab5d`) paints `data-theme={draftTheme}` on `<main>` and mounts
+ * ShareablePitchKit as a sibling of Theme + Light | Dark | Soft (`showCreateBand={false}`).
+ * Product scopes that attribute to the PitchKit tab so Insights stays on the page default.
  * Kit body is the same shareable composition as `/k/[handle]`, flush under Theme —
  * no nested Public kit preview / second PitchKit wordmark.
  */
@@ -265,7 +268,7 @@ export function OwnerPitchKit({
   }
 
   return (
-    <>
+    <div data-theme={draftTheme} className={PATTERN_THEME_KIT_CLASS}>
       <section className={PATTERN_HEADER_SECTION_CLASS}>
         <PageHeader
           variant="page"
@@ -308,46 +311,44 @@ export function OwnerPitchKit({
         </SegmentedControl>
       </div>
 
-      <div data-theme={draftTheme} className={PATTERN_THEME_KIT_CLASS}>
-        <ShareableKit
-          user={user}
-          posts={visiblePosts}
-          engagementRate={engagementRate}
-          typicalReach={typicalReach}
-          typicalSaves={typicalSaves}
-          reachSeries={reachSeries}
-          hasInsights={hasInsights}
-          countries={countries}
-          pastBrands={brands}
-          intro={intro}
-          contact={contact}
-          showCreateBand={false}
-          postNotice={postNotice}
-          introSlot={<OwnerIntroEditor intro={intro} onIntroChange={handleIntroChange} />}
-          brandsSlot={<OwnerPastBrands brands={brands} onBrandsChange={handleBrandsChange} />}
-          renderPostHeader={(post, index) => (
-            <Card.Header
-              start={
-                <span className={cardSubtitleClasses}>{formatPostedAt(post.posted_at)}</span>
-              }
-              end={
-                <MoreMenu
-                  aria-label={`Manage selected post ${index + 1}`}
-                  size="xs"
-                  items={[
-                    {
-                      id: "hide",
-                      label: "Hide from kit",
-                      start: <EyeOff />,
-                    },
-                  ]}
-                  onAction={(actionId) => handlePostAction(post.id, actionId)}
-                />
-              }
-            />
-          )}
-        />
-      </div>
+      <ShareableKit
+        user={user}
+        posts={visiblePosts}
+        engagementRate={engagementRate}
+        typicalReach={typicalReach}
+        typicalSaves={typicalSaves}
+        reachSeries={reachSeries}
+        hasInsights={hasInsights}
+        countries={countries}
+        pastBrands={brands}
+        intro={intro}
+        contact={contact}
+        showCreateBand={false}
+        postNotice={postNotice}
+        introSlot={<OwnerIntroEditor intro={intro} onIntroChange={handleIntroChange} />}
+        brandsSlot={<OwnerPastBrands brands={brands} onBrandsChange={handleBrandsChange} />}
+        renderPostHeader={(post, index) => (
+          <Card.Header
+            start={
+              <span className={cardSubtitleClasses}>{formatPostedAt(post.posted_at)}</span>
+            }
+            end={
+              <MoreMenu
+                aria-label={`Manage selected post ${index + 1}`}
+                size="xs"
+                items={[
+                  {
+                    id: "hide",
+                    label: "Hide from kit",
+                    start: <EyeOff />,
+                  },
+                ]}
+                onAction={(actionId) => handlePostAction(post.id, actionId)}
+              />
+            }
+          />
+        )}
+      />
 
       <AlertDialog
         open={pendingHidePostId != null}
@@ -364,6 +365,6 @@ export function OwnerPitchKit({
           void hidePendingPost();
         }}
       />
-    </>
+    </div>
   );
 }
