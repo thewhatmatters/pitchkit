@@ -5,18 +5,11 @@ import { EyeOff } from "lucide-react";
 import { OwnerIntroEditor } from "@/components/kit-intro";
 import { OwnerPastBrands } from "@/components/past-brands";
 import {
-  PATTERN_BRAND_CLASS,
-  PATTERN_CONTENT_BAND_CLASS,
-  PATTERN_CONTENT_CLASS,
   PATTERN_HEADER_COPY_CLASS,
   PATTERN_HEADER_SECTION_CLASS,
   PATTERN_SUPPORTING_CLASS,
-  PATTERN_THEME_PREVIEW_CLASS,
-  PATTERN_THEME_PREVIEW_LABEL_CLASS,
-  PATTERN_THEME_PREVIEW_PAGE_CLASS,
+  PATTERN_THEME_KIT_CLASS,
   PATTERN_THEME_TOOLBAR_CLASS,
-  PATTERN_TOPBAR_BAND_CLASS,
-  PATTERN_TOPBAR_CLASS,
 } from "@/components/pattern-tokens";
 import { ShareableKit } from "@/components/shareable-kit";
 import { ShareKitButton } from "@/components/share-kit-button";
@@ -86,8 +79,9 @@ type OwnerPitchKitProps = {
  * plus Pattern — theme picker (owner) (`examples-pitchkit--theme-picker-owner`)
  * plus Pattern — intro (owner) (`examples-pitchkit--intro-owner`)
  * plus Pattern — past brands (owner) (`examples-pitchkit--past-brands-owner`).
- * Theme pick updates preview only; Save theme commits to the KV Graph snapshot.
- * Preview is the same shareable composition as `/k/[handle]`.
+ * Theme pick restyles the in-page kit only; Save theme commits to the KV Graph snapshot.
+ * Kit body is the same shareable composition as `/k/[handle]`, flush under Theme —
+ * no nested Public kit preview / second PitchKit wordmark.
  */
 export function OwnerPitchKit({
   user,
@@ -314,64 +308,45 @@ export function OwnerPitchKit({
         </SegmentedControl>
       </div>
 
-      <div className={PATTERN_HEADER_SECTION_CLASS}>
-        <p className={PATTERN_THEME_PREVIEW_LABEL_CLASS}>Public kit preview</p>
-      </div>
-
-      <div
-        data-theme={draftTheme}
-        className={PATTERN_THEME_PREVIEW_CLASS}
-        aria-label="Public kit preview"
-      >
-        <div className={PATTERN_THEME_PREVIEW_PAGE_CLASS}>
-          <div className={PATTERN_TOPBAR_BAND_CLASS}>
-            <header className={PATTERN_TOPBAR_CLASS}>
-              <span className={PATTERN_BRAND_CLASS}>PitchKit</span>
-            </header>
-          </div>
-          <div className={PATTERN_CONTENT_BAND_CLASS}>
-            <div className={PATTERN_CONTENT_CLASS}>
-              <ShareableKit
-                user={user}
-                posts={visiblePosts}
-                engagementRate={engagementRate}
-                typicalReach={typicalReach}
-                typicalSaves={typicalSaves}
-                reachSeries={reachSeries}
-                hasInsights={hasInsights}
-                countries={countries}
-                pastBrands={brands}
-                intro={intro}
-                contact={contact}
-                showCreateBand={false}
-                postNotice={postNotice}
-                introSlot={<OwnerIntroEditor intro={intro} onIntroChange={handleIntroChange} />}
-                brandsSlot={<OwnerPastBrands brands={brands} onBrandsChange={handleBrandsChange} />}
-                renderPostHeader={(post, index) => (
-                  <Card.Header
-                    start={
-                      <span className={cardSubtitleClasses}>{formatPostedAt(post.posted_at)}</span>
-                    }
-                    end={
-                      <MoreMenu
-                        aria-label={`Manage selected post ${index + 1}`}
-                        size="xs"
-                        items={[
-                          {
-                            id: "hide",
-                            label: "Hide from kit",
-                            start: <EyeOff />,
-                          },
-                        ]}
-                        onAction={(actionId) => handlePostAction(post.id, actionId)}
-                      />
-                    }
-                  />
-                )}
-              />
-            </div>
-          </div>
-        </div>
+      <div data-theme={draftTheme} className={PATTERN_THEME_KIT_CLASS}>
+        <ShareableKit
+          user={user}
+          posts={visiblePosts}
+          engagementRate={engagementRate}
+          typicalReach={typicalReach}
+          typicalSaves={typicalSaves}
+          reachSeries={reachSeries}
+          hasInsights={hasInsights}
+          countries={countries}
+          pastBrands={brands}
+          intro={intro}
+          contact={contact}
+          showCreateBand={false}
+          postNotice={postNotice}
+          introSlot={<OwnerIntroEditor intro={intro} onIntroChange={handleIntroChange} />}
+          brandsSlot={<OwnerPastBrands brands={brands} onBrandsChange={handleBrandsChange} />}
+          renderPostHeader={(post, index) => (
+            <Card.Header
+              start={
+                <span className={cardSubtitleClasses}>{formatPostedAt(post.posted_at)}</span>
+              }
+              end={
+                <MoreMenu
+                  aria-label={`Manage selected post ${index + 1}`}
+                  size="xs"
+                  items={[
+                    {
+                      id: "hide",
+                      label: "Hide from kit",
+                      start: <EyeOff />,
+                    },
+                  ]}
+                  onAction={(actionId) => handlePostAction(post.id, actionId)}
+                />
+              }
+            />
+          )}
+        />
       </div>
 
       <AlertDialog

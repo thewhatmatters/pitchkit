@@ -153,7 +153,13 @@ describe("critical page contracts", () => {
     assert.match(ownerKit, /ShareableKit/);
     assert.match(ownerKit, /data-theme=\{draftTheme\}/);
     assert.match(ownerKit, /formatPostedAt/);
-    assert.match(ownerKit, /PATTERN_THEME_PREVIEW_CLASS/);
+    assert.match(ownerKit, /PATTERN_THEME_KIT_CLASS/);
+    assert.doesNotMatch(ownerKit, /Public kit preview/);
+    assert.doesNotMatch(
+      ownerKit,
+      /PATTERN_THEME_PREVIEW_CLASS|PATTERN_THEME_PREVIEW_LABEL_CLASS|PATTERN_THEME_PREVIEW_PAGE_CLASS/,
+    );
+    assert.doesNotMatch(ownerKit, /PATTERN_TOPBAR_BAND_CLASS|PATTERN_BRAND_CLASS/);
     assert.match(ownerKit, /Manage selected post/);
     assert.match(ownerKit, /Hide from kit/);
     assert.match(
@@ -578,7 +584,9 @@ describe("critical page contracts", () => {
       /PATTERN_PLACEHOLDER_BODY_CLASS = "type-body text-fg max-w-md text-muted"/,
     );
     assert.match(read("components/owner-pitchkit.tsx"), /examples-pitchkit--owner-pitch-kit/);
-    assert.match(read("components/owner-pitchkit.tsx"), /PATTERN_THEME_PREVIEW_CLASS/);
+    assert.match(read("components/owner-pitchkit.tsx"), /PATTERN_THEME_KIT_CLASS/);
+    assert.doesNotMatch(read("components/owner-pitchkit.tsx"), /Public kit preview/);
+    assert.doesNotMatch(read("components/owner-pitchkit.tsx"), /PATTERN_THEME_PREVIEW_CLASS/);
     assert.match(read("components/owner-workspace.tsx"), /OwnerPitchKit/);
     assert.doesNotMatch(read("components/owner-workspace.tsx"), /PitchKitComingSoon|Coming soon/);
     assert.doesNotMatch(read("lib/copy.ts"), /PITCHKIT_COMING_SOON|Coming soon/);
