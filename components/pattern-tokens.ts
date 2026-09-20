@@ -216,13 +216,12 @@ export const PATTERN_BRAND_REORDER_CLASS = "flex shrink-0 items-center";
 export const PATTERN_THEME_TOOLBAR_CLASS =
   "col-span-full flex flex-wrap items-end justify-between gap-3";
 
-export const PATTERN_THEME_PREVIEW_LABEL_CLASS = PATTERN_SECTION_EYEBROW_CLASS;
-
-export const PATTERN_THEME_PREVIEW_CLASS =
-  "col-span-full overflow-hidden border border-border bg-body rounded-[var(--radius-card-body)]";
-
-export const PATTERN_THEME_PREVIEW_PAGE_CLASS =
-  "grid-page bg-body [--grid-column-gap:8px] [--grid-max:1140px]";
+/**
+ * Flush owner-tab kit surface (`data-theme` for draft Light/Dark/Soft).
+ * No nested Public kit preview label, card frame, or brand topbar —
+ * ShareableKit sits in the PitchKit page flow under Theme.
+ */
+export const PATTERN_THEME_KIT_CLASS = `col-span-full min-w-0 bg-body ${PATTERN_CONTENT_CLASS}`;
 
 /**
  * Centered empty-well stack (Reach / Audience No data). Coming soon retired
