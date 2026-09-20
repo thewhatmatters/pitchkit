@@ -1,7 +1,7 @@
 /**
  * Pitchkit-owned kit intro + past brands + theme.
  * Not Instagram biography. Not SQL — staged on the KV Graph snapshot.
- * WMDS tip `29bef582fd60bb2398014f1c797b34fcf30bc791`:
+ * WMDS tip `122ab5d1a8bf54f91a5a584ac6037f5f518e8a46`:
  * `examples-pitchkit--intro-owner` / `--intro-public`
  * `examples-pitchkit--past-brands-owner` / `--past-brands-public`
  * `examples-pitchkit--theme-picker-owner`
