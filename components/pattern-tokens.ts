@@ -1,6 +1,6 @@
 /**
  * Interpolated Show code class strings from WMDS Examples/PitchKit at
- * `9f06fb63eae885803b1e8abdc35edecbbe0870d9`.
+ * `3b75f96e1ea78bffb1a533131502e44148a80c89`.
  *
  * Stories:
  * - `examples-pitchkit--account-settings-owner` (Pattern — account settings (owner))
@@ -22,7 +22,11 @@
  * - `examples-pitchkit--intro-owner` (Pattern — intro (owner))
  * - `examples-pitchkit--intro-public` (Pattern — intro (public))
  * - `examples-pitchkit--past-brands-owner` (Pattern — past brands (owner))
+ * - `examples-pitchkit--past-brands-owner-empty` (State — past brands owner empty)
+ * - `examples-pitchkit--past-brands-owner-overflow` (State — past brands owner overflow)
  * - `examples-pitchkit--past-brands-public` (Pattern — past brands (public))
+ * - `examples-pitchkit--past-brands-public-omit` (State — past brands public omit)
+ * - `examples-pitchkit--past-brands-public-overflow` (State — past brands public overflow)
  * - `components-data-display-chart--cartesian-no-data-gaps` (in-series Reach hatch)
  *
  * Copy these literals. Do not import Storybook-only `pitchKitStyles`.
@@ -226,7 +230,7 @@ export const PATTERN_INTRO_STACK_CLASS = "flex min-w-0 flex-col gap-3";
 
 export const PATTERN_INTRO_CLASS = "type-body text-fg text-fg";
 
-/** Past brands — `{ id, name }` rows with letter Avatar. Not campaign KPI cards. */
+/** Past brands — owner editor stack. Not campaign KPI cards. */
 export const PATTERN_BRAND_LIST_CLASS = "flex col-span-full min-w-0 flex-col gap-3";
 
 export const PATTERN_BRAND_CARD_CLASS = "col-span-full min-w-0";
@@ -236,6 +240,27 @@ export const PATTERN_BRAND_ROW_START_CLASS = "flex min-w-0 items-center gap-3";
 export const PATTERN_BRAND_NAME_CLASS = "type-label text-fg";
 
 export const PATTERN_BRAND_REORDER_CLASS = "flex shrink-0 items-center";
+
+/** Public rail — static row when items fit; wrap only for reduced motion. */
+export const PATTERN_BRAND_RAIL_HOST_CLASS = "relative col-span-full min-w-0";
+
+export const PATTERN_BRAND_RAIL_MEASURE_CLASS =
+  "pointer-events-none invisible absolute flex w-max items-center gap-3";
+
+export const PATTERN_BRAND_RAIL_ROW_CLASS = "flex min-w-0 items-center gap-3";
+
+export const PATTERN_BRAND_RAIL_WRAP_CLASS = "flex min-w-0 flex-wrap items-center gap-3";
+
+export const PATTERN_BRAND_RAIL_CARD_CLASS = "w-max max-w-full shrink-0";
+
+export const PATTERN_BRAND_MARQUEE_VIEWPORT_CLASS = "group overflow-hidden";
+
+export const PATTERN_BRAND_MARQUEE_TRACK_CLASS = "marquee-track flex w-max items-center";
+
+export const PATTERN_BRAND_MARK_CLASS =
+  "flex size-6 shrink-0 items-center justify-center rounded-full bg-fg type-supporting text-muted font-medium uppercase leading-none text-bg";
+
+export const PATTERN_BRAND_DIALOG_FIELDS_CLASS = "flex w-full min-w-0 flex-col gap-4";
 
 /** Owner theme picker — draft SegmentedControl + explicit Save. Kit body is in-page. */
 export const PATTERN_THEME_TOOLBAR_CLASS =

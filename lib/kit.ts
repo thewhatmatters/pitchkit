@@ -39,7 +39,7 @@ export type PublicKit = {
   audience?: KitAudience;
   /** Pitchkit-owned intro. Empty → public omit. */
   intro: string | null;
-  /** Ordered `{ id, name }`. Empty → public omit. */
+  /** Ordered `{ id, name, logo_key?, result_label? }`. Empty → public omit. */
   past_brands: PastBrand[];
   /** Public kit appearance. Default light. */
   theme: PitchKitTheme;

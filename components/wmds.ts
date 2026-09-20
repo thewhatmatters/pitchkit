@@ -17,6 +17,7 @@ export {
   MoreMenu,
   PageHeader,
   SegmentedControl,
+  Select,
   Skeleton,
   Stat,
   Status,

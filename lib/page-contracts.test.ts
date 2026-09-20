@@ -120,7 +120,12 @@ describe("critical page contracts", () => {
     assert.match(kit, /PublicIntro/);
     assert.match(kit, /examples-pitchkit--intro-public|PATTERN_INTRO_STACK_CLASS/);
     assert.match(read("components/past-brands.tsx"), /examples-pitchkit--past-brands-public/);
+    assert.match(read("components/past-brands.tsx"), /past-brands-public-overflow/);
+    assert.match(read("components/past-brands.tsx"), /PastBrandsRail|marquee-track/);
     assert.match(read("components/past-brands.tsx"), /Past brands/);
+    assert.match(read("components/past-brands.tsx"), /BrandResultChip|result_label/);
+    assert.match(read("lib/kit-profile.ts"), /logo_key\?: string \| null/);
+    assert.match(read("lib/kit-profile.ts"), /PITCHKIT_BRAND_RESULT_MAX = 24/);
     assert.match(read("components/kit-intro.tsx"), /examples-pitchkit--intro-public/);
     assert.match(kit, /CreatorIdentityStrip/);
     assert.match(kit, /PATTERN_IDENTITY_NAMEPLATE_CLASS/);
@@ -340,6 +345,9 @@ describe("critical page contracts", () => {
     assert.match(ownerKit, /OwnerPastBrands/);
     assert.match(ownerKit, /examples-pitchkit--intro-owner/);
     assert.match(ownerKit, /examples-pitchkit--past-brands-owner/);
+    assert.match(read("components/past-brands.tsx"), /past-brands-owner-empty/);
+    assert.match(read("components/past-brands.tsx"), /Add result|Clear result/);
+    assert.match(read("components/wmds.ts"), /Select/);
     assert.match(layout, /@whatmatters\/wmds\/styles\.css/);
     assert.doesNotMatch(proof, /setPostNotice\("Post (hidden|restored)/);
   });
@@ -464,10 +472,10 @@ describe("critical page contracts", () => {
     assert.match(chart, /animate="none"/);
     assert.match(read("components/owner-chrome.tsx"), /typicalReach=\{typicalReach\}/);
     assert.match(read("components/wmds.ts"), /chartMaxTicksForWidth/);
-    assert.match(read("package.json"), /wmds#9f06fb63eae885803b1e8abdc35edecbbe0870d9/);
+    assert.match(read("package.json"), /wmds#3b75f96e1ea78bffb1a533131502e44148a80c89/);
     assert.doesNotMatch(
       read("package.json"),
-      /29bef582fd60bb2398014f1c797b34fcf30bc791|61f8921ac037839da660740da23763813f77d2ee|96f44587b3b3ff1c44de9f1e5adba61a661d30e1|368560cd22bee2c5320b0b0e8038c30affa4bdea|9b4a1798aff97322b4167519c14ec802a1878b97|0718bdcb87975d3389ad11770bb479c293d33200|14d50cda0302e263cb350409f2cea34de03c7c2e|cd18e7a29afd0c0d774552c1a3d665f480f51bd4|70da6a4c50d8efc1e687b20f231c6e4f1f6190c6|dc813326028c0fe1cc5f3719466a32607bab4504|55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab|f188148c02347b56b1a1c549b06201cce1777945/,
+      /29bef582fd60bb2398014f1c797b34fcf30bc791|61f8921ac037839da660740da23763813f77d2ee|96f44587b3b3ff1c44de9f1e5adba61a661d30e1|368560cd22bee2c5320b0b0e8038c30affa4bdea|9b4a1798aff97322b4167519c14ec802a1878b97|0718bdcb87975d3389ad11770bb479c293d33200|14d50cda0302e263cb350409f2cea34de03c7c2e|cd18e7a29afd0c0d774552c1a3d665f480f51bd4|70da6a4c50d8efc1e687b20f231c6e4f1f6190c6|dc813326028c0fe1cc5f3719466a32607bab4504|55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab|f188148c02347b56b1a1c549b06201cce1777945|9f06fb63eae885803b1e8abdc35edecbbe0870d9|122ab5d1a8bf54f91a5a584ac6037f5f518e8a46/,
     );
     assert.match(read("components/wmds.ts"), /TextArea/);
     assert.match(read("components/wmds.ts"), /dialogFooterActionsClasses/);
@@ -475,6 +483,7 @@ describe("critical page contracts", () => {
     assert.match(read("lib/graph-store.ts"), /persistOwnerKitProfile/);
     assert.match(read("lib/kit-profile.ts"), /PITCHKIT_INTRO_HARD_LIMIT = 280/);
     assert.match(read("lib/kit-profile.ts"), /PITCHKIT_BRANDS_MAX = 8/);
+    assert.match(read("lib/kit-profile.ts"), /PITCHKIT_BRAND_LOGO_KEYS/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--intro-owner/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--past-brands-owner/);
     assert.match(page, /OwnerWorkspace/);
@@ -497,7 +506,7 @@ describe("critical page contracts", () => {
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--graph-data-unavailable/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--shareable-pitch-kit/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--shareable-insufficient-reach/);
-    assert.match(read("components/pattern-tokens.ts"), /9f06fb63eae885803b1e8abdc35edecbbe0870d9/);
+    assert.match(read("components/pattern-tokens.ts"), /3b75f96e1ea78bffb1a533131502e44148a80c89/);
     assert.doesNotMatch(read("components/pattern-tokens.ts"), /examples-pitchkit--theme-picker-owner/);
     assert.match(read("components/pattern-tokens.ts"), /PATTERN_PUBLIC_REACH_CARD_CLASS = "col-span-full min-w-0"/);
     assert.match(read("components/pattern-tokens.ts"), /PATTERN_PUBLIC_COUNTRIES_CARD_CLASS = "col-span-full min-w-0"/);

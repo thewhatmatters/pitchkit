@@ -4,6 +4,7 @@ import { EMPTY_AUDIENCE, persistOwnerKitProfile, readGraphSnapshot, writeGraphSn
 import { createMemoryHiddenKit, setHiddenKitNamespaceForTests } from "./hidden-kit";
 import {
   PITCHKIT_BRANDS_MAX,
+  PITCHKIT_BRAND_RESULT_MAX,
   PITCHKIT_INTRO_HARD_LIMIT,
   PITCHKIT_INTRO_SOFT_LIMIT,
   PITCHKIT_THEME_DEFAULT,
@@ -12,12 +13,14 @@ import {
   isPitchKitTheme,
   movePastBrand,
   normalizeIntro,
+  normalizePastBrandResult,
   normalizePastBrands,
   normalizeTheme,
   parseKitProfileBody,
   pastBrandIdFromName,
   pitchKitIntroIsEmpty,
   pitchKitIntroStatus,
+  resolvePastBrandLogoKey,
   reorderPastBrand,
   shouldShowPastBrands,
   shouldShowPublicIntro,
@@ -105,6 +108,54 @@ describe("kit intro + past brands contract", () => {
     );
   });
 
+  it("migrates { id, name } and keeps optional logo_key / result_label honest", () => {
+    assert.deepEqual(normalizePastBrands([{ id: "acme", name: "Acme" }]), [
+      { id: "acme", name: "Acme" },
+    ]);
+    assert.equal(
+      Object.prototype.hasOwnProperty.call(
+        normalizePastBrands([{ id: "acme", name: "Acme" }])[0],
+        "logo_key",
+      ),
+      false,
+    );
+    assert.equal(
+      Object.prototype.hasOwnProperty.call(
+        normalizePastBrands([{ id: "acme", name: "Acme" }])[0],
+        "result_label",
+      ),
+      false,
+    );
+    assert.deepEqual(
+      normalizePastBrands([
+        {
+          id: "nike",
+          name: "Nike",
+          logo_key: "nike",
+          result_label: "  +12% CTR  ",
+        },
+        { id: "mystery", name: "Mystery", logo_key: "not-a-pack", result_label: "   " },
+        {
+          id: "long",
+          name: "Long",
+          result_label: "x".repeat(PITCHKIT_BRAND_RESULT_MAX + 8),
+        },
+      ]),
+      [
+        { id: "nike", name: "Nike", logo_key: "nike", result_label: "+12% CTR" },
+        { id: "mystery", name: "Mystery" },
+        { id: "long", name: "Long", result_label: "x".repeat(PITCHKIT_BRAND_RESULT_MAX) },
+      ],
+    );
+    assert.equal(normalizePastBrandResult(""), undefined);
+    assert.equal(normalizePastBrandResult("   "), undefined);
+    assert.equal(normalizePastBrandResult("Sold out in 48h"), "Sold out in 48h");
+    assert.equal(resolvePastBrandLogoKey(null), undefined);
+    assert.equal(resolvePastBrandLogoKey("letter"), undefined);
+    assert.equal(resolvePastBrandLogoKey("unknown-brand"), undefined);
+    assert.equal(resolvePastBrandLogoKey("adobe"), "adobe");
+  });
+
   it("rejects over-limit owner POST bodies instead of clipping", () => {
     assert.equal(parseKitProfileBody(null).ok, false);
     assert.equal(parseKitProfileBody({ intro: 1 }).ok, false);
@@ -133,6 +184,31 @@ describe("kit intro + past brands contract", () => {
     assert.deepEqual(parseKitProfileBody({ intro: "Hi", theme: "dark" }), {
       ok: true,
       profile: { intro: "Hi", past_brands: [], theme: "dark" },
+    });
+    const v2 = parseKitProfileBody({
+      intro: "Hi",
+      past_brands: [
+        {
+          id: "nike",
+          name: "Nike",
+          logo_key: "not-a-pack",
+          result_label: `  ${"y".repeat(PITCHKIT_BRAND_RESULT_MAX + 4)}  `,
+        },
+      ],
+    });
+    assert.deepEqual(v2, {
+      ok: true,
+      profile: {
+        intro: "Hi",
+        past_brands: [
+          {
+            id: "nike",
+            name: "Nike",
+            result_label: "y".repeat(PITCHKIT_BRAND_RESULT_MAX),
+          },
+        ],
+        theme: PITCHKIT_THEME_DEFAULT,
+      },
     });
   });
 
@@ -174,8 +250,8 @@ describe("kit intro + past brands contract", () => {
     const profile = {
       intro: "I shoot tables for hosts.",
       past_brands: [
-        { id: "hearth-home", name: "Hearth & Home" },
-        { id: "studio-line", name: "Studio Line" },
+        { id: "hearth-home", name: "Hearth & Home", result_label: "3.2x ROAS" },
+        { id: "studio-line", name: "Studio Line", logo_key: "adobe" },
       ],
       theme: "soft" as const,
     };
