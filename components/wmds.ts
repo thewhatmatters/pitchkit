@@ -10,6 +10,7 @@ export {
   Chart,
   Chip,
   Dialog,
+  Dropdown,
   GridOverlay,
   IconButton,
   Input,

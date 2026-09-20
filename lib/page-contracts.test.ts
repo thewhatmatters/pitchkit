@@ -146,19 +146,18 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(workspace, /KitEdit|PitchKitComingSoon|Coming soon/);
     assert.match(workspace, /OwnerPitchKit/);
     assert.match(ownerKit, /examples-pitchkit--owner-pitch-kit/);
-    assert.match(ownerKit, /examples-pitchkit--theme-picker-owner/);
+    assert.doesNotMatch(ownerKit, /examples-pitchkit--theme-picker-owner/);
+    assert.doesNotMatch(ownerKit, /title="Theme"|Save theme|PITCHKIT_THEMES|draftTheme/);
     assert.match(ownerKit, /ShareKitButton/);
-    assert.match(ownerKit, /title="Theme"/);
-    assert.match(ownerKit, /Save theme/);
+    assert.match(ownerKit, /PITCHKIT_OWNER_TITLE|Your Pitchkit/);
+    assert.match(ownerKit, /PITCHKIT_OWNER_SUPPORTING|Edit what brands see on your public kit/);
     assert.match(ownerKit, /ShareableKit/);
-    assert.match(ownerKit, /data-theme=\{draftTheme\}/);
+    assert.match(ownerKit, /data-theme=\{savedTheme\}/);
     assert.match(ownerKit, /showCreateBand=\{false\}/);
     assert.match(ownerKit, /formatPostedAt/);
     assert.match(ownerKit, /PATTERN_THEME_KIT_CLASS/);
-    assert.match(
-      ownerKit,
-      /data-theme=\{draftTheme\}[\s\S]*title="Theme"[\s\S]*Save theme[\s\S]*<ShareableKit/,
-    );
+    assert.match(ownerKit, /Hidden from kit/);
+    assert.match(ownerKit, /Restore to kit/);
     assert.doesNotMatch(
       ownerKit,
       /aria-label="Public kit preview"|>Public kit preview</,
@@ -194,6 +193,7 @@ describe("critical page contracts", () => {
     assert.match(barrel, /PageHeader/);
     assert.match(barrel, /Avatar/);
     assert.match(barrel, /Dialog/);
+    assert.match(barrel, /Dropdown/);
     assert.match(barrel, /TextLink/);
     assert.match(nav, /SegmentedControl/);
     assert.match(nav, />Insights</);
@@ -203,14 +203,22 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(nav, /router\.push|kitPath|usePathname|useRouter/);
     assert.match(tokens, /PATTERN_TOPBAR_CLASS/);
     assert.match(tokens, /grid-cols-\[1fr_auto_1fr\]/);
-    assert.match(tokens, /PATTERN_BRAND_CLASS = "type-label text-fg text-fg"/);
+    assert.match(tokens, /PATTERN_BRAND_CLASS = "type-heading-3 text-fg"/);
     assert.match(tokens, /PATTERN_TOPBAR_END_CLASS = "justify-self-end"/);
-    assert.match(nav, /AccountSettingsAvatarButton/);
-    assert.match(nav, /AccountSettingsDialog/);
+    assert.match(nav, /AccountMenu/);
     assert.match(nav, /PATTERN_TOPBAR_END_CLASS/);
     assert.match(read("components/account-settings.tsx"), /<Avatar/);
-    assert.match(read("components/account-settings.tsx"), /size="sm"/);
-    assert.match(read("components/account-settings.tsx"), /aria-label="Account settings"/);
+    assert.match(read("components/account-settings.tsx"), /size="md"/);
+    assert.match(read("components/account-settings.tsx"), /ACCOUNT_MENU_LABEL|My account/);
+    assert.match(read("components/account-settings.tsx"), /Dropdown/);
+    assert.match(read("components/account-settings.tsx"), /Account settings/);
+    assert.match(read("components/account-settings.tsx"), /Share kit/);
+    assert.match(read("components/account-settings.tsx"), /DISCONNECT_INSTAGRAM_ACTION/);
+    assert.match(read("components/account-settings.tsx"), /Delete account/);
+    assert.match(read("components/account-settings.tsx"), /Sign out/);
+    assert.doesNotMatch(read("components/account-settings.tsx"), /Unlock Pro|Security|Integrations/);
+    assert.match(read("components/account-settings.tsx"), /aria-label=\{ACCOUNT_MENU_LABEL\}/);
+    assert.match(read("components/account-settings.tsx"), /PATTERN_ACCOUNT_MENU_TRIGGER_CLASS/);
     assert.doesNotMatch(nav, /^\s*layout="stretch"/m);
     assert.doesNotMatch(nav, /className="[^"]*w-full/);
     assert.match(frame, /OWNER_GRID_MAX = "1140px"/);
@@ -301,7 +309,7 @@ describe("critical page contracts", () => {
     const sources = [share, proof, ownerKit];
     const blocks = sources.flatMap(toastAddBlocks);
 
-    assert.equal(blocks.length, 12);
+    assert.equal(blocks.length, 7);
     for (const block of blocks) {
       assert.match(block, /\btitle:/);
       assert.match(block, /\bdescription:/);
@@ -320,17 +328,13 @@ describe("critical page contracts", () => {
     assert.match(copy, /TOAST_KIT_PROFILE_FAILED_DESCRIPTION/);
     assert.match(share, /TOAST_KIT_COPIED_TITLE/);
     assert.match(share, /TOAST_KIT_COPIED_DESCRIPTION/);
-    assert.match(proof, /TOAST_POST_HIDDEN_TITLE/);
-    assert.match(proof, /TOAST_POST_HIDDEN_DESCRIPTION/);
-    assert.match(proof, /TOAST_POST_RESTORED_TITLE/);
-    assert.match(proof, /TOAST_POST_RESTORED_DESCRIPTION/);
+    assert.doesNotMatch(proof, /TOAST_POST_HIDDEN_TITLE|hideFromKit|restoreToKit|MoreMenu/);
     assert.match(ownerKit, /TOAST_POST_HIDDEN_TITLE/);
     assert.match(ownerKit, /TOAST_POST_HIDDEN_DESCRIPTION/);
     assert.match(ownerKit, /TOAST_POST_RESTORED_TITLE/);
     assert.match(ownerKit, /TOAST_POST_RESTORED_DESCRIPTION/);
     assert.match(ownerKit, /TOAST_KIT_PROFILE_FAILED_TITLE/);
-    assert.match(copy, /TOAST_THEME_SAVED_TITLE = "Theme saved"/);
-    assert.match(ownerKit, /TOAST_THEME_SAVED_TITLE/);
+    assert.doesNotMatch(ownerKit, /TOAST_THEME_SAVED_TITLE/);
     assert.match(ownerKit, /saveKitProfile/);
     assert.match(ownerKit, /OwnerIntroEditor/);
     assert.match(ownerKit, /OwnerPastBrands/);
@@ -352,7 +356,8 @@ describe("critical page contracts", () => {
 
     assert.match(chrome, /PageHeader/);
     assert.match(chrome, /title="Insights"/);
-    assert.match(chrome, /ShareKitButton/);
+    assert.doesNotMatch(chrome, /ShareKitButton|Share kit/);
+    assert.doesNotMatch(read("components/insights-loading.tsx"), /ShareKitButton|Share kit/);
     assert.match(read("components/owner-pitchkit.tsx"), /ShareKitButton/);
     assert.match(read("components/share-kit-button.tsx"), /Share kit/);
     assert.match(copy, /Private to you/);
@@ -363,6 +368,9 @@ describe("critical page contracts", () => {
     assert.match(read("components/engagement-rate-info.tsx"), /ENGAGEMENT_FORMULA/);
     assert.match(read("components/engagement-rate-info.tsx"), /<Tooltip/);
     assert.match(read("components/engagement-rate-info.tsx"), /IconButton/);
+    assert.match(read("components/engagement-rate-info.tsx"), /onOpenChange/);
+    assert.match(read("components/engagement-rate-info.tsx"), /onClick/);
+    assert.match(read("components/engagement-rate-info.tsx"), /delay=\{0\}/);
     assert.match(read("components/wmds.ts"), /Tooltip/);
     assert.match(read("components/wmds.ts"), /IconButton/);
     assert.doesNotMatch(chrome, /ENGAGEMENT_FORMULA/);
@@ -374,7 +382,10 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(stats, /<Stat\.Group/);
     assert.doesNotMatch(stats, /trend=/);
     assert.match(stats, /PATTERN_STAT_CLASS/);
-    assert.match(read("components/pattern-tokens.ts"), /PATTERN_STAT_CLASS = "col-span-2 md:col-span-4 lg:col-span-3"/);
+    assert.match(stats, /label="Typical reach"/);
+    assert.match(stats, /label="Saves"/);
+    assert.doesNotMatch(stats, /showInsightsMetrics/);
+    assert.match(read("components/pattern-tokens.ts"), /PATTERN_STAT_CLASS = "col-span-2 md:col-span-4 lg:col-span-3 h-full"/);
     assert.match(read("lib/posted-at.ts"), /year: "numeric"/);
     assert.match(proof, /formatPostedAt/);
     assert.doesNotMatch(proof, /month: "short"/);
@@ -385,22 +396,12 @@ describe("critical page contracts", () => {
     assert.match(proof, /value="reach"/);
     assert.match(proof, /value="engagement"/);
     assert.match(proof, /value="saves"/);
-    assert.match(proof, /MoreMenu/);
-    assert.match(proof, /Hide from kit/);
-    assert.match(proof, /AlertDialog/);
-    assert.match(proof, /confirmLabel="Hide from kit"/);
-    assert.match(proof, /toast\.add\(/);
-    assert.match(proof, /label: "Undo"/);
-    assert.match(proof, /hideFromKit\(hiddenPost\.id\)/);
-    assert.match(proof, /restoreToKit\(hiddenPost\.id\)/);
+    assert.doesNotMatch(proof, /MoreMenu|Hide from kit|Swap post|AlertDialog|toast\.add/);
+    assert.doesNotMatch(proof, /hideFromKit|restoreToKit|Manage ranked post|Manage hidden post/);
     assert.match(proof, /partitionOwnerProofPosts/);
     assert.match(proof, /setOwnerPosts\(posts\)/);
     assert.match(proof, /shown\.length\} shown/);
-    assert.match(proof, /Restore to kit/);
     assert.match(proof, /Hidden/);
-    assert.match(proof, /stampHiddenFromKit/);
-    assert.match(proof, /clearHiddenFromKit/);
-    assert.match(proof, /result\.error/);
     assert.match(read("lib/kit-visibility.ts"), /POST \/api\/media\/hide/);
     assert.match(read("lib/kit-visibility.ts"), /POST \/api\/media\/restore/);
     assert.match(read("app/api/media/hide/route.ts"), /mediaVisibilityResponse\(request, "hide"\)/);
@@ -463,7 +464,7 @@ describe("critical page contracts", () => {
     assert.match(chart, /animate="none"/);
     assert.match(read("components/owner-chrome.tsx"), /typicalReach=\{typicalReach\}/);
     assert.match(read("components/wmds.ts"), /chartMaxTicksForWidth/);
-    assert.match(read("package.json"), /wmds#122ab5d1a8bf54f91a5a584ac6037f5f518e8a46/);
+    assert.match(read("package.json"), /wmds#f188148c02347b56b1a1c549b06201cce1777945/);
     assert.doesNotMatch(
       read("package.json"),
       /29bef582fd60bb2398014f1c797b34fcf30bc791|61f8921ac037839da660740da23763813f77d2ee|96f44587b3b3ff1c44de9f1e5adba61a661d30e1|368560cd22bee2c5320b0b0e8038c30affa4bdea|9b4a1798aff97322b4167519c14ec802a1878b97|0718bdcb87975d3389ad11770bb479c293d33200|14d50cda0302e263cb350409f2cea34de03c7c2e|cd18e7a29afd0c0d774552c1a3d665f480f51bd4|70da6a4c50d8efc1e687b20f231c6e4f1f6190c6|dc813326028c0fe1cc5f3719466a32607bab4504|55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab/,
@@ -496,8 +497,13 @@ describe("critical page contracts", () => {
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--graph-data-unavailable/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--shareable-pitch-kit/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--shareable-insufficient-reach/);
-    assert.match(read("components/pattern-tokens.ts"), /122ab5d1a8bf54f91a5a584ac6037f5f518e8a46/);
-    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--theme-picker-owner/);
+    assert.match(read("components/pattern-tokens.ts"), /f188148c02347b56b1a1c549b06201cce1777945/);
+    assert.doesNotMatch(read("components/pattern-tokens.ts"), /examples-pitchkit--theme-picker-owner/);
+    assert.match(read("components/pattern-tokens.ts"), /PATTERN_PUBLIC_REACH_CARD_CLASS = "col-span-full min-w-0"/);
+    assert.match(read("components/pattern-tokens.ts"), /PATTERN_PUBLIC_COUNTRIES_CARD_CLASS/);
+    assert.match(read("components/shareable-kit.tsx"), /PATTERN_PUBLIC_REACH_CARD_CLASS/);
+    assert.match(read("components/shareable-kit.tsx"), /PATTERN_PUBLIC_STACK_CLASS/);
+    assert.doesNotMatch(read("components/shareable-kit.tsx"), /PATTERN_DASHBOARD_GRID_CLASS|PATTERN_REACH_CARD_CLASS/);
     assert.match(read("components/pattern-tokens.ts"), /PATTERN_PUBLIC_REACH_CHART_MIN_HEIGHT = 220/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--account-settings-owner/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--owner-pitch-kit/);
@@ -673,7 +679,7 @@ describe("critical page contracts", () => {
     const workspace = read("components/owner-workspace.tsx");
     const strip = read("components/creator-identity-strip.tsx");
     const copy = read("lib/copy.ts");
-    const identityBlocks = toastAddBlocks(settings);
+    const identityBlocks = toastAddBlocks(read("components/share-kit-button.tsx"));
     assert.match(page, /insightsGate/);
     assert.match(page, /resolveSession/);
     assert.match(page, /AccountSettings/);
@@ -686,7 +692,9 @@ describe("critical page contracts", () => {
     assert.match(settings, />\s*Copy\s*</);
     assert.match(settings, /Last synced/);
     assert.match(settings, /title="Account settings"/);
-    assert.match(settings, /aria-label="Account settings"/);
+    assert.match(settings, /ACCOUNT_MENU_LABEL|My account/);
+    assert.match(settings, /size="md"/);
+    assert.match(settings, /Dropdown/);
     assert.match(settings, /<Dialog/);
     assert.match(settings, /Dialog\.Content/);
     assert.match(settings, /CreatorIdentityStrip/);
@@ -708,8 +716,8 @@ describe("critical page contracts", () => {
       copy,
       /This permanently deletes your kit, stored media copies, and connection/,
     );
-    assert.match(nav, /AccountSettingsAvatarButton/);
-    assert.match(nav, /AccountSettingsDialog/);
+    assert.match(nav, /AccountMenu/);
+    assert.match(settings, /AccountSettingsDialog/);
     assert.doesNotMatch(workspace, /href="\/settings"|Account<\/a>/);
     assert.doesNotMatch(settings, /href="\/delete"/);
     assert.doesNotMatch(workspace, /href="\/delete"/);
@@ -718,16 +726,24 @@ describe("critical page contracts", () => {
     assert.match(disconnect, /<AlertDialog/);
     assert.match(disconnect, /confirmLabel="Disconnect"/);
     assert.match(read("app/auth/disconnect/route.ts"), /disconnectOwner/);
-    assert.match(chrome, /Reconnect Instagram/);
+    assert.doesNotMatch(chrome, /Reconnect Instagram/);
     assert.doesNotMatch(chrome, /DisconnectControl/);
-    assert.doesNotMatch(settings, /Reconnect Instagram/);
+    assert.match(settings, /RECONNECT_INSTAGRAM_ACTION/);
+    assert.match(copy, /RECONNECT_INSTAGRAM_ACTION = "Reconnect Instagram"/);
+    assert.match(copy, /DISCONNECT_INSTAGRAM_ACTION = "Disconnect Instagram"/);
+    assert.match(read("components/support-footer.tsx"), /\/privacy/);
+    assert.match(read("components/support-footer.tsx"), /mailto:\$\{SUPPORT_EMAIL\}/);
+    assert.match(read("components/support-footer.tsx"), />\s*Privacy\s*</);
+    assert.match(read("components/support-footer.tsx"), />\s*Support\s*</);
+    assert.doesNotMatch(read("components/support-footer.tsx"), /Reconnect Instagram|scroll-to-top|Vercel|Cloudflare/);
     assert.equal(identityBlocks.length, 2);
     for (const block of identityBlocks) {
       assert.match(block, /\btitle:/);
       assert.match(block, /\bdescription:/);
     }
-    assert.match(settings, /TOAST_KIT_COPIED_TITLE/);
-    assert.match(settings, /TOAST_KIT_COPIED_DESCRIPTION/);
+    assert.match(settings, /copyKitLink/);
+    assert.match(read("components/share-kit-button.tsx"), /TOAST_KIT_COPIED_TITLE/);
+    assert.match(read("components/share-kit-button.tsx"), /TOAST_KIT_COPIED_DESCRIPTION/);
     assert.match(strip, /displayName != null/);
     assert.match(strip, /followersCount == null/);
     assert.match(strip, /CreatorIdentityStripSkeleton/);

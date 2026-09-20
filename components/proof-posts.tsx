@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { EyeOff, Repeat2, Undo2 } from "lucide-react";
 import {
   PATTERN_POST_CARD_CLASS,
   PATTERN_POST_HEADER_START_CLASS,
@@ -16,31 +15,8 @@ import {
   PATTERN_POSTS_TABS_CLASS,
   PATTERN_SUPPORTING_CLASS,
 } from "@/components/pattern-tokens";
-import {
-  AlertDialog,
-  Badge,
-  Card,
-  MoreMenu,
-  Tab,
-  cardSubtitleClasses,
-  cardTitleClasses,
-  toast,
-} from "@/components/wmds";
-import {
-  TOAST_HIDE_FAILED_TITLE,
-  TOAST_POST_HIDDEN_DESCRIPTION,
-  TOAST_POST_HIDDEN_TITLE,
-  TOAST_POST_RESTORED_DESCRIPTION,
-  TOAST_POST_RESTORED_TITLE,
-  TOAST_RESTORE_FAILED_TITLE,
-} from "@/lib/copy";
-import {
-  clearHiddenFromKit,
-  hideFromKit,
-  partitionOwnerProofPosts,
-  restoreToKit,
-  stampHiddenFromKit,
-} from "@/lib/kit-visibility";
+import { Badge, Card, Tab, cardSubtitleClasses, cardTitleClasses } from "@/components/wmds";
+import { partitionOwnerProofPosts } from "@/lib/kit-visibility";
 import { formatPostedAt } from "@/lib/posted-at";
 import { DEFAULT_POST_SORT, isPostSortKey, sortPosts, type PostSortKey } from "@/lib/post-sort";
 import { publicObjectUrl } from "@/lib/r2";
@@ -63,19 +39,9 @@ type ProofPostsProps = {
   onPostsChange?: (posts: Media[] | ((current: Media[]) => Media[])) => void;
 };
 
-export function ProofPosts({ posts, hasInsights, onPostsChange }: ProofPostsProps) {
+export function ProofPosts({ posts, hasInsights }: ProofPostsProps) {
   const [ownerPosts, setOwnerPosts] = useState(posts);
-
-  function commitPosts(update: Media[] | ((current: Media[]) => Media[])) {
-    if (onPostsChange) {
-      onPostsChange(update);
-      return;
-    }
-    setOwnerPosts(update);
-  }
   const [proofMetric, setProofMetric] = useState<PostSortKey>(DEFAULT_POST_SORT);
-  const [postNotice, setPostNotice] = useState<string | null>(null);
-  const [pendingHidePostId, setPendingHidePostId] = useState<string | null>(null);
 
   useEffect(() => {
     setOwnerPosts(posts);
@@ -84,93 +50,12 @@ export function ProofPosts({ posts, hasInsights, onPostsChange }: ProofPostsProp
   const { shown, hidden } = useMemo(() => partitionOwnerProofPosts(ownerPosts), [ownerPosts]);
   const rankedPosts = useMemo(() => sortPosts(shown, proofMetric), [proofMetric, shown]);
 
-  function handlePostAction(postId: string, actionId: string) {
-    if (actionId === "hide") {
-      setPendingHidePostId(postId);
-      return;
-    }
-    if (actionId === "restore") {
-      const hiddenPost = ownerPosts.find((post) => post.id === postId);
-      if (hiddenPost != null) {
-        void restoreHiddenPost(hiddenPost);
-      }
-      return;
-    }
-    setPostNotice("Swap is not wired. Backend will own replacement selection.");
-  }
-
-  async function handleConfirmHide() {
-    if (pendingHidePostId == null) {
-      return;
-    }
-    const hiddenPost = shown.find((post) => post.id === pendingHidePostId);
-    if (hiddenPost == null) {
-      setPendingHidePostId(null);
-      return;
-    }
-
-    const optimisticHiddenAt = new Date().toISOString();
-    commitPosts((current) => stampHiddenFromKit(current, hiddenPost.id, optimisticHiddenAt));
-    setPendingHidePostId(null);
-
-    const result = await hideFromKit(hiddenPost.id);
-    if (!result.ok) {
-      commitPosts((current) => clearHiddenFromKit(current, hiddenPost.id));
-      toast.add({
-        title: TOAST_HIDE_FAILED_TITLE,
-        description: result.error,
-      });
-      return;
-    }
-
-    if (result.hiddenFromKitAt != null) {
-      commitPosts((current) =>
-        current.map((post) =>
-          post.id === hiddenPost.id ? { ...post, hidden_from_kit_at: result.hiddenFromKitAt } : post,
-        ),
-      );
-    }
-
-    toast.add({
-      title: TOAST_POST_HIDDEN_TITLE,
-      description: TOAST_POST_HIDDEN_DESCRIPTION,
-      duration: 6000,
-      action: {
-        label: "Undo",
-        onClick: () => {
-          void restoreHiddenPost({ ...hiddenPost, hidden_from_kit_at: result.hiddenFromKitAt });
-        },
-      },
-    });
-  }
-
-  async function restoreHiddenPost(hiddenPost: Media) {
-    const previousHiddenAt = hiddenPost.hidden_from_kit_at;
-    commitPosts((current) => clearHiddenFromKit(current, hiddenPost.id));
-    const result = await restoreToKit(hiddenPost.id);
-    if (!result.ok) {
-      if (previousHiddenAt != null) {
-        commitPosts((current) => stampHiddenFromKit(current, hiddenPost.id, previousHiddenAt));
-      }
-      toast.add({
-        title: TOAST_RESTORE_FAILED_TITLE,
-        description: result.error,
-      });
-      return;
-    }
-
-    toast.add({
-      title: TOAST_POST_RESTORED_TITLE,
-      description: TOAST_POST_RESTORED_DESCRIPTION,
-    });
-  }
-
   return (
     <section className={PATTERN_POSTS_SECTION_CLASS}>
       <div className={PATTERN_POSTS_HEADER_CLASS}>
         <div>
           <h2 className={cardTitleClasses}>Recent proof</h2>
-          <p className={PATTERN_SUPPORTING_CLASS}>{postNotice ?? proofMetricNotices[proofMetric]}</p>
+          <p className={PATTERN_SUPPORTING_CLASS}>{proofMetricNotices[proofMetric]}</p>
         </div>
         <Badge variant="neutral" emphasis="muted" size="sm">
           {shown.length} shown
@@ -182,7 +67,6 @@ export function ProofPosts({ posts, hasInsights, onPostsChange }: ProofPostsProp
         onValueChange={(value) => {
           if (isPostSortKey(value)) {
             setProofMetric(value);
-            setPostNotice(null);
           }
         }}
         className={PATTERN_POSTS_TABS_CLASS}
@@ -205,7 +89,6 @@ export function ProofPosts({ posts, hasInsights, onPostsChange }: ProofPostsProp
             displayRank={index + 1}
             hidden={false}
             hasInsights={hasInsights}
-            onAction={handlePostAction}
           />
         ))}
         {hidden.map((post) => (
@@ -215,25 +98,9 @@ export function ProofPosts({ posts, hasInsights, onPostsChange }: ProofPostsProp
             displayRank={null}
             hidden
             hasInsights={hasInsights}
-            onAction={handlePostAction}
           />
         ))}
       </div>
-      <AlertDialog
-        open={pendingHidePostId != null}
-        onOpenChange={(open) => {
-          if (!open) {
-            setPendingHidePostId(null);
-          }
-        }}
-        title="Hide this post from PitchKit?"
-        description="It will no longer appear in the shareable PitchKit. You can add it back later."
-        cancelLabel="Keep post"
-        confirmLabel="Hide from kit"
-        onConfirm={() => {
-          void handleConfirmHide();
-        }}
-      />
     </section>
   );
 }
@@ -243,13 +110,11 @@ function ProofPostCard({
   displayRank,
   hidden,
   hasInsights,
-  onAction,
 }: {
   post: Media;
   displayRank: number | null;
   hidden: boolean;
   hasInsights: boolean;
-  onAction: (postId: string, actionId: string) => void;
 }) {
   const metrics: Array<[string, number | null]> = hasInsights
     ? [
@@ -280,35 +145,6 @@ function ProofPostCard({
             )}
             <span className={cardSubtitleClasses}>{formatPostedAt(post.posted_at)}</span>
           </span>
-        }
-        end={
-          <MoreMenu
-            aria-label={hidden ? "Manage hidden post" : `Manage ranked post ${displayRank}`}
-            size="xs"
-            items={
-              hidden
-                ? [
-                    {
-                      id: "restore",
-                      label: "Restore to kit",
-                      start: <Undo2 />,
-                    },
-                  ]
-                : [
-                    {
-                      id: "swap",
-                      label: "Swap post",
-                      start: <Repeat2 />,
-                    },
-                    {
-                      id: "hide",
-                      label: "Hide from kit",
-                      start: <EyeOff />,
-                    },
-                  ]
-            }
-            onAction={(actionId) => onAction(post.id, actionId)}
-          />
         }
       />
       <Card.Body>

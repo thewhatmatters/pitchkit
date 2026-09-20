@@ -58,6 +58,14 @@ export const DELETE_ACCOUNT_CONFIRM =
 export const DELETE_ACCOUNT_CANCEL = "Cancel";
 export const DELETE_ACCOUNT_ACTION = "Delete account";
 
+export const ACCOUNT_MENU_LABEL = "My account";
+export const ACCOUNT_SETTINGS_ACTION = "Account settings";
+export const DISCONNECT_INSTAGRAM_ACTION = "Disconnect Instagram";
+export const RECONNECT_INSTAGRAM_ACTION = "Reconnect Instagram";
+
+export const PITCHKIT_OWNER_TITLE = "Your Pitchkit";
+export const PITCHKIT_OWNER_SUPPORTING = "Edit what brands see on your public kit.";
+
 /** Quiet demo honesty — under Continue, not in the hero. */
 export const DEMO_SESSION_NOTE = "Opens the demo Insights session.";
 

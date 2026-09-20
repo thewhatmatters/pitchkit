@@ -150,7 +150,7 @@ Stamped contract. Not a Graph column.
 | Idempotent | hide-already-hidden keeps the first timestamp; restore-already-visible returns `null` |
 | Schema | `media.hidden_from_kit_at` |
 | Public kit | filter `hidden_from_kit_at != null` **before** `selectSixPosts` |
-| Owner Insights | keep the row (`hidden_from_kit_at` set). FE partitions: **"N shown"** + rank = `null` only; Hidden rows stay for MoreMenu **Restore to kit** / toast Undo. Hide, restore, and Share kit toasts pass title + description. `npm test` fail-closes this partition. |
+| Owner Insights | keep the row (`hidden_from_kit_at` set). FE partitions: **"N shown"** + rank = `null` only; Recent proof is read-only (no Manage kebab). Hide/restore MoreMenu lives on the PitchKit tab. Hide, restore, and Share kit toasts pass title + description. `npm test` fail-closes this partition. |
 
 **Seed path:** until Hyperdrive, seed SoT is KV `HIDDEN_KIT` (`hidden:<userId>` → JSON `Record<mediaId, ISO>`). httpOnly `pitchkit_hidden` (`{ userId, hidden }`) is the owner reload mirror. Public `/k/[handle]` reads KV for the kit owner, not the visitor cookie. **Hyperdrive path:** write `media.hidden_from_kit_at` on the SQL row. Binding detection is explicit (`lib/hyperdrive.ts`); missing / empty connection strings stay on KV. FE calls the routes only — no localStorage. Do not invent Graph columns.
 

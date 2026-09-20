@@ -16,6 +16,7 @@ type InsightsStatsProps = {
 /**
  * WMDS PitchKit creator Insights four-up on the page subgrid.
  * Spans match Examples/PitchKit: `col-span-2 md:col-span-4 lg:col-span-3`.
+ * Equal-height tiles (`h-full` on each Stat). Always four-up.
  * Do not lead with Engagement rate. Spell **Engagement rate** — never “ER”.
  * No period-over-period `trend` — seed/payload has no honest deltas.
  */
@@ -26,8 +27,6 @@ export function InsightsStats({
   typicalSaves,
   loading = false,
 }: InsightsStatsProps) {
-  const showInsightsMetrics = typicalReach != null || typicalSaves != null || loading;
-
   return (
     <div
       role="group"
@@ -47,22 +46,18 @@ export function InsightsStats({
         loading={loading}
         end={loading ? undefined : <EngagementRateFormulaTooltip />}
       />
-      {showInsightsMetrics ? (
-        <Stat
-          className={PATTERN_STAT_CLASS}
-          label="Typical reach"
-          value={typicalReach != null ? formatCount(typicalReach) : "—"}
-          loading={loading}
-        />
-      ) : null}
-      {showInsightsMetrics ? (
-        <Stat
-          className={PATTERN_STAT_CLASS}
-          label="Saves"
-          value={typicalSaves != null ? formatCount(typicalSaves) : "—"}
-          loading={loading}
-        />
-      ) : null}
+      <Stat
+        className={PATTERN_STAT_CLASS}
+        label="Typical reach"
+        value={typicalReach != null ? formatCount(typicalReach) : "—"}
+        loading={loading}
+      />
+      <Stat
+        className={PATTERN_STAT_CLASS}
+        label="Saves"
+        value={typicalSaves != null ? formatCount(typicalSaves) : "—"}
+        loading={loading}
+      />
     </div>
   );
 }

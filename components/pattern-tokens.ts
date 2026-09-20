@@ -1,6 +1,6 @@
 /**
  * Interpolated Show code class strings from WMDS Examples/PitchKit at
- * `122ab5d1a8bf54f91a5a584ac6037f5f518e8a46`.
+ * `f188148c02347b56b1a1c549b06201cce1777945`.
  *
  * Stories:
  * - `examples-pitchkit--account-settings-owner` (Pattern — account settings (owner))
@@ -12,7 +12,6 @@
  * - `examples-pitchkit--graph-data-unavailable` (State — Graph data unavailable; omit optional regions)
  * - `examples-pitchkit--shareable-pitch-kit` (Pattern — shareable PitchKit)
  * - `examples-pitchkit--shareable-insufficient-reach` (State — shareable insufficient reach)
- * - `examples-pitchkit--theme-picker-owner` (Pattern — theme picker (owner))
  * - `examples-pitchkit--owner-pitch-kit` (Pattern — owner PitchKit)
  * Post dates in product include the year (`Dec 17, 2024`); stories may omit year.
  * - `examples-pitchkit--creator-identity-public` (Pattern — creator identity (public))
@@ -37,7 +36,7 @@ export const PATTERN_TOPBAR_BAND_CLASS = "band pb-4";
 export const PATTERN_TOPBAR_CLASS =
   "col-span-full grid grid-cols-[1fr_auto_1fr] items-center gap-3";
 
-export const PATTERN_BRAND_CLASS = "type-label text-fg text-fg";
+export const PATTERN_BRAND_CLASS = "type-heading-3 text-fg";
 
 export const PATTERN_TOPBAR_END_CLASS = "justify-self-end";
 
@@ -55,7 +54,7 @@ export const PATTERN_FORMULA_CLASS = "type-supporting text-muted text-muted";
 
 export const PATTERN_STATS_BAND_CLASS = "band gap-y-4";
 
-export const PATTERN_STAT_CLASS = "col-span-2 md:col-span-4 lg:col-span-3";
+export const PATTERN_STAT_CLASS = "col-span-2 md:col-span-4 lg:col-span-3 h-full";
 
 export const PATTERN_METRICS_STACK_CLASS = "band gap-y-2";
 
@@ -170,6 +169,25 @@ export const PATTERN_USER_SETTINGS_BODY_CLASS = "flex w-full min-w-0 flex-col ga
 
 export const PATTERN_USER_SETTINGS_ACTIONS_CLASS = "flex flex-col items-start gap-2";
 
+/** Owner avatar trigger — circular focus only, no pill offset ring. */
+export const PATTERN_ACCOUNT_MENU_TRIGGER_CLASS =
+  "inline-flex rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring";
+
+export const PATTERN_ACCOUNT_MENU_CLASS = "relative";
+
+export const PATTERN_ACCOUNT_MENU_PANEL_CLASS = "absolute right-0 top-full mt-1 min-w-56 max-h-none";
+
+export const PATTERN_ACCOUNT_MENU_HEADER_CLASS = "pointer-events-none";
+
+export const PATTERN_ACCOUNT_MENU_GROUP_CLASS = "mt-0.5 border-t border-border";
+
+/** Owner / legal footer — centered Privacy + Support. */
+export const PATTERN_FOOTER_CLASS =
+  "col-span-full mt-4 border-t border-border pt-6";
+
+export const PATTERN_FOOTER_NAV_CLASS =
+  "flex flex-wrap items-center justify-center gap-x-4 gap-y-2";
+
 /** Public kit unsigned CTA band — compose into shareable PitchKit only. */
 export const PATTERN_CALLOUT_CARD_CLASS = "col-span-full";
 
@@ -184,6 +202,12 @@ export const PATTERN_KIT_STAT_CLASS = "col-span-2 md:col-span-4 lg:col-span-6";
 export const PATTERN_PUBLIC_STAT_CLASS = PATTERN_STAT_CLASS;
 
 export const PATTERN_COUNTRIES_CARD_CLASS = PATTERN_AUDIENCE_CARD_CLASS;
+
+/** Public / owner kit — Reach is full width; countries stay compact (no 6/6 dead column). */
+export const PATTERN_PUBLIC_STACK_CLASS = "band min-w-0 gap-y-6";
+export const PATTERN_PUBLIC_REACH_CARD_CLASS = "col-span-full min-w-0";
+export const PATTERN_PUBLIC_COUNTRIES_CARD_CLASS =
+  "col-span-full min-w-0 md:col-span-6 lg:col-span-4";
 
 export const PATTERN_KIT_POST_METRICS_CLASS = "grid w-full grid-cols-2 gap-3";
 
@@ -217,10 +241,8 @@ export const PATTERN_THEME_TOOLBAR_CLASS =
   "col-span-full flex flex-wrap items-end justify-between gap-3";
 
 /**
- * In-page owner theme surface (`examples-pitchkit--theme-picker-owner`).
- * Show code paints `data-theme={draftTheme}` on `<main>`; product scopes the
- * same attribute to the PitchKit tab so Theme + Light/Dark/Soft + kit body
- * sit in one band. No nested Public kit preview / second PitchKit wordmark.
+ * In-page owner PitchKit surface. Stored `theme` still paints `data-theme`
+ * here (default light). Theme picker chrome is off.
  */
 export const PATTERN_THEME_KIT_CLASS = `col-span-full min-w-0 bg-body ${PATTERN_CONTENT_CLASS}`;
 

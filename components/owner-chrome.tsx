@@ -14,7 +14,6 @@ import { Button, PageHeader } from "@/components/wmds";
 import { InsightsStats } from "@/components/insights-stats";
 import { ProofPosts } from "@/components/proof-posts";
 import { ReachChart } from "@/components/reach-chart";
-import { ShareKitButton } from "@/components/share-kit-button";
 import { resolveOwnerAudience } from "@/lib/audience";
 import { INSIGHTS_PRIVATE } from "@/lib/copy";
 import { inventoryLastUpdated } from "@/lib/inventory";
@@ -66,19 +65,13 @@ export function OwnerChrome({
   gridReady,
   retrieving: retrievingProp = false,
 }: OwnerChromeProps) {
-  const [notice, setNotice] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const retrieving = retrievingProp || refreshing;
   const refreshed = formatRefreshedAt(inventoryLastUpdated(posts));
   const mixes = resolveOwnerAudience(audience);
 
   if (!gridReady) {
-    return (
-      <>
-        <InsightsLoading handle={user.handle} onCopyFailed={setNotice} />
-        <OwnerAccountActions notice={notice} />
-      </>
-    );
+    return <InsightsLoading />;
   }
 
   return (
@@ -88,15 +81,12 @@ export function OwnerChrome({
           variant="page"
           title="Insights"
           end={
-            <span className="flex flex-wrap items-center gap-2">
-              <form action="/insights" method="get" onSubmit={() => setRefreshing(true)}>
-                <input type="hidden" name="refresh" value="1" />
-                <Button type="submit" role="secondary" size="sm">
-                  Refresh
-                </Button>
-              </form>
-              <ShareKitButton handle={user.handle} onCopyFailed={setNotice} />
-            </span>
+            <form action="/insights" method="get" onSubmit={() => setRefreshing(true)}>
+              <input type="hidden" name="refresh" value="1" />
+              <Button type="submit" role="secondary" size="sm">
+                Refresh
+              </Button>
+            </form>
           }
         />
         <div className={PATTERN_HEADER_COPY_CLASS}>
@@ -135,24 +125,6 @@ export function OwnerChrome({
       </div>
 
       <ProofPosts posts={posts} hasInsights={hasInsights} onPostsChange={onPostsChange} />
-
-      <OwnerAccountActions notice={notice} />
-    </>
-  );
-}
-
-function OwnerAccountActions({ notice }: { notice: string | null }) {
-  return (
-    <>
-      <div className="col-span-full flex flex-wrap gap-2">
-        <form action="/auth/instagram" method="post">
-          <Button type="submit" role="secondary">
-            Reconnect Instagram
-          </Button>
-        </form>
-      </div>
-
-      {notice ? <p className="col-span-full">{notice}</p> : null}
     </>
   );
 }

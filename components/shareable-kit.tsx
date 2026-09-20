@@ -12,8 +12,9 @@ import {
   PATTERN_CONTACT_CARD_CLASS,
   PATTERN_CONTACT_ROW_CLASS,
   PATTERN_CONTACT_ROWS_CLASS,
-  PATTERN_COUNTRIES_CARD_CLASS,
-  PATTERN_DASHBOARD_GRID_CLASS,
+  PATTERN_PUBLIC_COUNTRIES_CARD_CLASS,
+  PATTERN_PUBLIC_REACH_CARD_CLASS,
+  PATTERN_PUBLIC_STACK_CLASS,
   PATTERN_EMPTY_BODY_CLASS,
   PATTERN_EMPTY_TITLE_CLASS,
   PATTERN_IDENTITY_NAMEPLATE_CLASS,
@@ -29,7 +30,6 @@ import {
   PATTERN_POSTS_SECTION_CLASS,
   PATTERN_PUBLIC_REACH_CHART_MIN_HEIGHT,
   PATTERN_PUBLIC_STAT_CLASS,
-  PATTERN_REACH_CARD_CLASS,
   PATTERN_REACH_EMPTY_COPY_CLASS,
   PATTERN_SECTION_EYEBROW_CLASS,
   PATTERN_STATS_BAND_CLASS,
@@ -158,7 +158,7 @@ function PublicReachCard({
       variant="outlined"
       shape="rounded"
       bodyTerminal
-      className={PATTERN_REACH_CARD_CLASS}
+      className={PATTERN_PUBLIC_REACH_CARD_CLASS}
       data-chart-slot={showChart ? "reach" : "empty"}
     >
       <Card.Header
@@ -223,7 +223,7 @@ function PublicCountries({
       variant="outlined"
       shape="rounded"
       bodyTerminal
-      className={PATTERN_COUNTRIES_CARD_CLASS}
+      className={PATTERN_PUBLIC_COUNTRIES_CARD_CLASS}
     >
       <Card.Header
         start={
@@ -317,7 +317,7 @@ export function ShareableKit({
         />
       </div>
 
-      <div className={PATTERN_DASHBOARD_GRID_CLASS}>
+      <div className={PATTERN_PUBLIC_STACK_CLASS}>
         <PublicReachCard
           reachState={reachState}
           series={reachSeries}

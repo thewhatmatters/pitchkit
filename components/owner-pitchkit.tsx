@@ -1,30 +1,37 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { EyeOff } from "lucide-react";
+import { EyeOff, Undo2 } from "lucide-react";
 import { OwnerIntroEditor } from "@/components/kit-intro";
 import { OwnerPastBrands } from "@/components/past-brands";
 import {
   PATTERN_HEADER_COPY_CLASS,
   PATTERN_HEADER_SECTION_CLASS,
+  PATTERN_POST_CARD_CLASS,
+  PATTERN_POST_HEADER_START_CLASS,
+  PATTERN_POST_IMAGE_CLASS,
+  PATTERN_POSTS_HEADER_CLASS,
+  PATTERN_POSTS_PANEL_CLASS,
+  PATTERN_POSTS_SECTION_CLASS,
   PATTERN_SUPPORTING_CLASS,
   PATTERN_THEME_KIT_CLASS,
-  PATTERN_THEME_TOOLBAR_CLASS,
 } from "@/components/pattern-tokens";
 import { ShareableKit } from "@/components/shareable-kit";
 import { ShareKitButton } from "@/components/share-kit-button";
 import {
   AlertDialog,
-  Button,
+  Badge,
   Card,
   MoreMenu,
   PageHeader,
-  SegmentedControl,
   cardSubtitleClasses,
+  cardTitleClasses,
   toast,
 } from "@/components/wmds";
 import type { RankedShare } from "@/lib/audience";
 import {
+  PITCHKIT_OWNER_SUPPORTING,
+  PITCHKIT_OWNER_TITLE,
   TOAST_HIDE_FAILED_TITLE,
   TOAST_KIT_PROFILE_FAILED_DESCRIPTION,
   TOAST_KIT_PROFILE_FAILED_TITLE,
@@ -33,13 +40,10 @@ import {
   TOAST_POST_RESTORED_DESCRIPTION,
   TOAST_POST_RESTORED_TITLE,
   TOAST_RESTORE_FAILED_TITLE,
-  TOAST_THEME_SAVED_TITLE,
-  toastThemeSavedDescription,
 } from "@/lib/copy";
 import { saveKitProfile } from "@/lib/kit-profile-client";
 import {
   PITCHKIT_THEME_DEFAULT,
-  PITCHKIT_THEMES,
   normalizeIntro,
   type KitProfile,
   type PastBrand,
@@ -48,11 +52,13 @@ import {
 import {
   clearHiddenFromKit,
   hideFromKit,
+  partitionOwnerProofPosts,
   restoreToKit,
   stampHiddenFromKit,
 } from "@/lib/kit-visibility";
 import { excludeHiddenFromPublicKit, selectSixPosts } from "@/lib/kit";
 import { formatPostedAt } from "@/lib/posted-at";
+import { publicObjectUrl } from "@/lib/r2";
 import type { ReachPoint } from "@/lib/reach-series";
 import type { Media, User } from "@/lib/schema";
 
@@ -76,15 +82,11 @@ type OwnerPitchKitProps = {
 
 /**
  * Pattern — owner PitchKit (`examples-pitchkit--owner-pitch-kit`)
- * plus Pattern — theme picker (owner) (`examples-pitchkit--theme-picker-owner`)
  * plus Pattern — intro (owner) (`examples-pitchkit--intro-owner`)
  * plus Pattern — past brands (owner) (`examples-pitchkit--past-brands-owner`).
- * Theme pick restyles the in-page kit only; Save theme commits to the KV Graph snapshot.
- * Show code (`122ab5d`) paints `data-theme={draftTheme}` on `<main>` and mounts
- * ShareablePitchKit as a sibling of Theme + Light | Dark | Soft (`showCreateBand={false}`).
- * Product scopes that attribute to the PitchKit tab so Insights stays on the page default.
- * Kit body is the same shareable composition as `/k/[handle]`, flush under Theme —
- * no nested Public kit preview / second PitchKit wordmark.
+ * Theme picker chrome is off; stored theme (default light) still paints `data-theme`.
+ * Kit body is the same shareable composition as `/k/[handle]` — 4 KPIs, full-width
+ * reach, compact top 3 countries — plus hide/restore and intro/brands editors.
  */
 export function OwnerPitchKit({
   user,
@@ -105,10 +107,8 @@ export function OwnerPitchKit({
   const [pendingHidePostId, setPendingHidePostId] = useState<string | null>(null);
   const [intro, setIntro] = useState(introProp ?? "");
   const [brands, setBrands] = useState<PastBrand[]>(() => [...pastBrands]);
-  const [draftTheme, setDraftTheme] = useState<PitchKitTheme>(themeProp);
   const [savedTheme, setSavedTheme] = useState<PitchKitTheme>(themeProp);
   const introSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const dirtyTheme = draftTheme !== savedTheme;
 
   useEffect(() => {
     setIntro(introProp ?? "");
@@ -119,7 +119,6 @@ export function OwnerPitchKit({
   }, [pastBrands]);
 
   useEffect(() => {
-    setDraftTheme(themeProp);
     setSavedTheme(themeProp);
   }, [themeProp]);
 
@@ -135,6 +134,7 @@ export function OwnerPitchKit({
     () => selectSixPosts(excludeHiddenFromPublicKit(posts)),
     [posts],
   );
+  const { hidden } = useMemo(() => partitionOwnerProofPosts(posts), [posts]);
 
   async function persistProfile(profile: KitProfile) {
     const result = await saveKitProfile(profile);
@@ -172,24 +172,16 @@ export function OwnerPitchKit({
     void persistProfile(currentProfile({ past_brands: next }));
   }
 
-  async function saveTheme() {
-    if (!dirtyTheme) {
-      return;
-    }
-    const ok = await persistProfile(currentProfile({ theme: draftTheme }));
-    if (!ok) {
-      return;
-    }
-    setSavedTheme(draftTheme);
-    toast.add({
-      title: TOAST_THEME_SAVED_TITLE,
-      description: toastThemeSavedDescription(draftTheme),
-    });
-  }
-
   function handlePostAction(postId: string, actionId: string) {
     if (actionId === "hide") {
       setPendingHidePostId(postId);
+      return;
+    }
+    if (actionId === "restore") {
+      const hiddenPost = posts.find((post) => post.id === postId);
+      if (hiddenPost != null) {
+        void restoreHiddenPost(hiddenPost);
+      }
     }
   }
 
@@ -268,48 +260,17 @@ export function OwnerPitchKit({
   }
 
   return (
-    <div data-theme={draftTheme} className={PATTERN_THEME_KIT_CLASS}>
+    <div data-theme={savedTheme} className={PATTERN_THEME_KIT_CLASS}>
       <section className={PATTERN_HEADER_SECTION_CLASS}>
         <PageHeader
           variant="page"
-          title="Theme"
-          end={
-            <div className="flex flex-wrap items-center gap-3">
-              <ShareKitButton handle={user.handle} />
-              <Button
-                role="primary"
-                size="sm"
-                disabled={!dirtyTheme}
-                onClick={() => {
-                  void saveTheme();
-                }}
-              >
-                Save theme
-              </Button>
-            </div>
-          }
+          title={PITCHKIT_OWNER_TITLE}
+          end={<ShareKitButton handle={user.handle} />}
         />
         <div className={PATTERN_HEADER_COPY_CLASS}>
-          <p className={PATTERN_SUPPORTING_CLASS}>
-            Choose a look for your public Pitchkit. Changes apply when you save.
-          </p>
+          <p className={PATTERN_SUPPORTING_CLASS}>{PITCHKIT_OWNER_SUPPORTING}</p>
         </div>
       </section>
-
-      <div className={PATTERN_THEME_TOOLBAR_CLASS}>
-        <SegmentedControl
-          aria-label="Kit theme"
-          size="sm"
-          value={draftTheme}
-          onValueChange={(value) => setDraftTheme(value as PitchKitTheme)}
-        >
-          {PITCHKIT_THEMES.map((theme) => (
-            <SegmentedControl.Item key={theme} value={theme}>
-              {theme === "light" ? "Light" : theme === "dark" ? "Dark" : "Soft"}
-            </SegmentedControl.Item>
-          ))}
-        </SegmentedControl>
-      </div>
 
       <ShareableKit
         user={user}
@@ -349,6 +310,61 @@ export function OwnerPitchKit({
           />
         )}
       />
+
+      {hidden.length > 0 ? (
+        <section className={PATTERN_POSTS_SECTION_CLASS}>
+          <div className={PATTERN_POSTS_HEADER_CLASS}>
+            <div>
+              <h2 className={cardTitleClasses}>Hidden from kit</h2>
+              <p className={PATTERN_SUPPORTING_CLASS}>
+                Restore a post to show it on your public kit.
+              </p>
+            </div>
+          </div>
+          <div className={PATTERN_POSTS_PANEL_CLASS}>
+            {hidden.map((post) => (
+              <Card
+                key={post.id}
+                variant="outlined"
+                shape="rounded"
+                className={`${PATTERN_POST_CARD_CLASS} text-muted`}
+              >
+                <Card.Header
+                  start={
+                    <span className={PATTERN_POST_HEADER_START_CLASS}>
+                      <Badge variant="neutral" emphasis="muted" size="sm">
+                        Hidden
+                      </Badge>
+                      <span className={cardSubtitleClasses}>{formatPostedAt(post.posted_at)}</span>
+                    </span>
+                  }
+                  end={
+                    <MoreMenu
+                      aria-label="Manage hidden post"
+                      size="xs"
+                      items={[
+                        {
+                          id: "restore",
+                          label: "Restore to kit",
+                          start: <Undo2 />,
+                        },
+                      ]}
+                      onAction={(actionId) => handlePostAction(post.id, actionId)}
+                    />
+                  }
+                />
+                <Card.Body>
+                  <img
+                    className={PATTERN_POST_IMAGE_CLASS}
+                    src={publicObjectUrl(post.r2_key)}
+                    alt=""
+                  />
+                </Card.Body>
+              </Card>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <AlertDialog
         open={pendingHidePostId != null}
