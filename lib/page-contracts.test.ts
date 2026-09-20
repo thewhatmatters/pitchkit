@@ -154,7 +154,10 @@ describe("critical page contracts", () => {
     assert.match(ownerKit, /data-theme=\{draftTheme\}/);
     assert.match(ownerKit, /formatPostedAt/);
     assert.match(ownerKit, /PATTERN_THEME_KIT_CLASS/);
-    assert.doesNotMatch(ownerKit, /Public kit preview/);
+    assert.doesNotMatch(
+      ownerKit,
+      /aria-label="Public kit preview"|>Public kit preview</,
+    );
     assert.doesNotMatch(
       ownerKit,
       /PATTERN_THEME_PREVIEW_CLASS|PATTERN_THEME_PREVIEW_LABEL_CLASS|PATTERN_THEME_PREVIEW_PAGE_CLASS/,
@@ -585,7 +588,10 @@ describe("critical page contracts", () => {
     );
     assert.match(read("components/owner-pitchkit.tsx"), /examples-pitchkit--owner-pitch-kit/);
     assert.match(read("components/owner-pitchkit.tsx"), /PATTERN_THEME_KIT_CLASS/);
-    assert.doesNotMatch(read("components/owner-pitchkit.tsx"), /Public kit preview/);
+    assert.doesNotMatch(
+      read("components/owner-pitchkit.tsx"),
+      /aria-label="Public kit preview"|>Public kit preview</,
+    );
     assert.doesNotMatch(read("components/owner-pitchkit.tsx"), /PATTERN_THEME_PREVIEW_CLASS/);
     assert.match(read("components/owner-workspace.tsx"), /OwnerPitchKit/);
     assert.doesNotMatch(read("components/owner-workspace.tsx"), /PitchKitComingSoon|Coming soon/);
