@@ -13,7 +13,7 @@ Connect session lets a creator read the collection note, tap **Continue with Ins
 ## How to get to it (user POV)
 
 - Open https://pitchkit.app (or `/`) and choose **Continue with Instagram**.
-- Reconnect from Insights via **Reconnect Instagram** (same stub path).
+- Reconnect from Account settings via **Reconnect Instagram** (same stub path).
 - GET or POST `/auth/instagram` in a browser (same cookie + 303). Prefer the button.
 
 ## Driving it with control-pitchkit

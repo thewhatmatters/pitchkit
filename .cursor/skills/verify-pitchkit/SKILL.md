@@ -87,7 +87,8 @@ $H click --role radio --name "PitchKit"
 $H click --role radio --name "Insights"
 $H wait --selector '[aria-label="30-day account reach"]'
 $H wait --name "Instagram performance summary"
-$H click --name "Manage ranked post 1"
+$H click --role radio --name "PitchKit"
+$H click --name "Manage selected post 1"
 $H click --role menuitem --name "Hide from kit"
 $H click --role button --name "Hide from kit"
 $H click --name "Undo"
@@ -118,7 +119,7 @@ Stable handles already in product:
 | Stats | `aria-label="Instagram performance summary"` · Followers / **Engagement rate** / Typical reach / Saves |
 | Reach chart | `aria-label="30-day account reach"` · Card title **Reach over 30 days** · empty slot `data-chart-slot="empty"` + **No reach data yet** · loading `aria-label="Loading reach over 30 days"` |
 | Proof tabs | `aria-label="Rank recent proof posts by"` · Reach / Engagement / Saves |
-| MoreMenu | `Manage ranked post N` / `Manage hidden post` |
+| MoreMenu | PitchKit tab: `Manage selected post N` / `Manage hidden post` (Insights Recent proof is read-only) |
 | Hide confirm | AlertDialog **Hide from kit** (title: Hide this post from PitchKit?) |
 | Connect | button **Continue with Instagram** |
 
