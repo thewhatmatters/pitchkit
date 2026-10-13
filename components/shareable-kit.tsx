@@ -1,5 +1,6 @@
 "use client";
 
+import { BadgeCheck } from "lucide-react";
 import type { ComponentProps, CSSProperties, ReactNode } from "react";
 import { CreatorIdentityStrip } from "@/components/creator-identity-strip";
 import { PublicIntro } from "@/components/kit-intro";
@@ -13,6 +14,10 @@ import {
   PATTERN_CONTACT_ROW_CLASS,
   PATTERN_CONTACT_ROWS_CLASS,
   PATTERN_PUBLIC_COUNTRIES_CARD_CLASS,
+  PATTERN_PUBLIC_AUDIENCE_GRID_CLASS,
+  PATTERN_PUBLIC_AUDIENCE_SECTION_CLASS,
+  PATTERN_PROVENANCE_CLASS,
+  PATTERN_REACH_RATIO_CLASS,
   PATTERN_PUBLIC_REACH_CARD_CLASS,
   PATTERN_PUBLIC_STACK_CLASS,
   PATTERN_EMPTY_BODY_CLASS,
@@ -55,7 +60,14 @@ import {
 } from "@/lib/copy";
 import { formatCount, formatEngagementRate } from "@/lib/engagement";
 import { sourcedContactDetail } from "@/lib/kit-chips";
-import { publicReachState } from "@/lib/kit";
+import {
+  formatPolledAt,
+  publicAudience,
+  publicReachState,
+  reachToFollowerPercent,
+  type KitAudience,
+  type KitDataSource,
+} from "@/lib/kit";
 import type { PastBrand } from "@/lib/kit-profile";
 import {
   hasTypicalReachReference,
@@ -92,6 +104,10 @@ export type ShareableKitProps = {
   brandsSlot?: ReactNode;
   renderPostHeader?: (post: Media, index: number) => ReactNode;
   postNotice?: string | null;
+  /** Public kit only: the provenance stamp ("Verified from Instagram Insights, updated <time>"). */
+  provenance?: { source: KitDataSource; polledAt: string | null } | null;
+  /** Public kit only: full audience (age, gender, top countries and cities). Omit → top 3 countries. */
+  audience?: KitAudience | null;
 };
 
 function PublicCreatePitchkitBand() {
@@ -246,6 +262,79 @@ function PublicCountries({
   );
 }
 
+/** "Verified from Instagram Insights, updated <time>". Example (demo) data is labelled, never "Verified". */
+function ProvenanceStamp({ source, polledAt }: { source: KitDataSource; polledAt: string | null }) {
+  const when = formatPolledAt(polledAt);
+  if (source === "example") {
+    return (
+      <p className={PATTERN_PROVENANCE_CLASS} data-provenance="example">
+        <Badge variant="warning" emphasis="muted" size="sm">Example data</Badge>
+        <span className={PATTERN_SUPPORTING_CLASS}>Demo kit. A real kit shows numbers verified from Instagram Insights.</span>
+      </p>
+    );
+  }
+  if (!when) {
+    return null;
+  }
+  return (
+    <p className={PATTERN_PROVENANCE_CLASS} data-provenance="graph">
+      <Badge variant="info" emphasis="muted" size="sm" icon={<BadgeCheck />}>Verified from Instagram Insights</Badge>
+      <span className={PATTERN_SUPPORTING_CLASS}>Updated {when}</span>
+    </p>
+  );
+}
+
+const toBars = (rows: readonly RankedShare[]) => rows.map((row) => ({ label: row.label, value: row.percent }));
+
+/** Full audience: age, gender, top countries and cities from follower_demographics. */
+function PublicAudienceCard({ audience, followers }: { audience: KitAudience | null; followers: number }) {
+  const view = publicAudience(audience, followers);
+  if (view.state === "empty") {
+    return null;
+  }
+  return (
+    <Card variant="outlined" shape="rounded" bodyTerminal className={PATTERN_PUBLIC_COUNTRIES_CARD_CLASS} data-audience={view.state}>
+      <Card.Header
+        start={
+          <>
+            <h2 className={cardTitleClasses}>Audience</h2>
+            <p className={cardSubtitleClasses}>Followers, from Instagram Insights.</p>
+          </>
+        }
+      />
+      <Card.Body>
+        {view.state === "min-followers" ? (
+          <div className={`${PATTERN_CARD_WELL_CLASS} items-center justify-center text-center`}>
+            <div className={PATTERN_REACH_EMPTY_COPY_CLASS}>
+              <Badge variant="neutral" emphasis="muted">Not available yet</Badge>
+              <h3 className={PATTERN_EMPTY_TITLE_CLASS}>Audience appears at 100+ followers</h3>
+              <p className={PATTERN_EMPTY_BODY_CLASS}>Instagram shares follower demographics once an account has 100 followers.</p>
+            </div>
+          </div>
+        ) : (
+          <div className={PATTERN_PUBLIC_AUDIENCE_GRID_CLASS}>
+            {(
+              [
+                ["Age", view.age, "Audience by age"],
+                ["Gender", view.gender, "Audience by gender"],
+                ["Top countries", view.country, "Audience by country"],
+                ["Top cities", view.city, "Audience by city"],
+              ] as const
+            ).map(([title, rows, label]) =>
+              rows.length ? (
+                <section key={title} className={`${PATTERN_CARD_WELL_CLASS} ${PATTERN_PUBLIC_AUDIENCE_SECTION_CLASS}`}>
+                  <h3 className={PATTERN_SECTION_EYEBROW_CLASS}>{title}</h3>
+                  <Chart.RankedBars aria-label={label} items={toBars(rows)} animate="initial" />
+                </section>
+              ) : null,
+            )}
+          </div>
+        )}
+      </Card.Body>
+    </Card>
+  );
+}
+
 /**
  * Pattern — shareable PitchKit Show code (`examples-pitchkit--shareable-pitch-kit`)
  * plus State — shareable insufficient reach (`examples-pitchkit--shareable-insufficient-reach`)
@@ -272,18 +361,22 @@ export function ShareableKit({
   brandsSlot,
   renderPostHeader,
   postNotice = null,
+  provenance = null,
+  audience,
 }: ShareableKitProps) {
   const contactDetail = sourcedContactDetail(contact);
   const identity = creatorIdentityFromUser(user);
   const reachState = publicReachState(hasInsights, reachSeries);
   const shownEngagement = reachState === "resolved" ? engagementRate : null;
   const shownTypicalReach = reachState === "resolved" ? typicalReach : null;
+  const reachRatio = reachToFollowerPercent(shownTypicalReach, user.followers);
 
   return (
     <>
       <section className={PATTERN_IDENTITY_NAMEPLATE_CLASS}>
         <div className={PATTERN_INTRO_STACK_CLASS}>
           <CreatorIdentityStrip identity={identity} nameAs="h1" showProfessionalChip />
+          {provenance ? <ProvenanceStamp source={provenance.source} polledAt={provenance.polledAt} /> : null}
           {introSlot ?? <PublicIntro intro={intro} />}
         </div>
       </section>
@@ -317,13 +410,23 @@ export function ShareableKit({
         />
       </div>
 
+      {provenance && reachRatio != null ? (
+        <p className={PATTERN_REACH_RATIO_CLASS} data-reach-ratio>
+          Typical reach is {reachRatio}% of followers ({formatCount(shownTypicalReach!)} of {formatCount(user.followers)}).
+        </p>
+      ) : null}
+
       <div className={PATTERN_PUBLIC_STACK_CLASS}>
         <PublicReachCard
           reachState={reachState}
           series={reachSeries}
           typicalReach={shownTypicalReach}
         />
-        <PublicCountries countries={countries} />
+        {audience !== undefined ? (
+          <PublicAudienceCard audience={audience} followers={user.followers} />
+        ) : (
+          <PublicCountries countries={countries} />
+        )}
       </div>
 
       <section className={PATTERN_POSTS_SECTION_CLASS}>
@@ -366,6 +469,21 @@ export function ShareableKit({
                       </span>
                     </span>
                   ))}
+                  {provenance
+                    ? (
+                        [
+                          ["Reach", post.reach],
+                          ["Saves", post.saves],
+                        ] as const
+                      ).map(([label, value]) =>
+                        value != null ? (
+                          <span key={label} className={PATTERN_POST_METRIC_CLASS} data-post-metric={label.toLowerCase()}>
+                            <span className={PATTERN_POST_METRIC_LABEL_CLASS}>{label}</span>
+                            <span className={PATTERN_POST_METRIC_VALUE_CLASS}>{formatCount(value)}</span>
+                          </span>
+                        ) : null,
+                      )
+                    : null}
                 </div>
               </Card.Footer>
             </Card>

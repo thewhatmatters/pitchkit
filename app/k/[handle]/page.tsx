@@ -66,6 +66,8 @@ export default async function KitPage({ params }: KitPageProps) {
             reachSeries={kit.reach_series}
             hasInsights={kit.hasInsights}
             countries={kit.audience?.country}
+            audience={kit.audience ?? null}
+            provenance={{ source: kit.source, polledAt: kit.polled_at }}
             intro={kit.intro}
             pastBrands={kit.past_brands}
             showCreateBand={session == null}
