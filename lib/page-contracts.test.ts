@@ -368,6 +368,7 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(read("components/insights-loading.tsx"), /ShareKitButton|Share kit/);
     assert.match(read("components/owner-pitchkit.tsx"), /ShareKitButton/);
     assert.match(read("components/share-kit-button.tsx"), /Share kit/);
+    assert.match(read("components/share-kit-button.tsx"), /kitShareUrl\(window\.location\.origin, handle\)/);
     assert.match(copy, /Private to you/);
     assert.match(chrome, /INSIGHTS_PRIVATE/);
     assert.match(stats, /label="Engagement rate"/);
