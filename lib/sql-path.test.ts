@@ -7,6 +7,7 @@ import { resetHyperdriveForTests, setHasHyperdriveForTests } from "./hyperdrive"
 import type { User } from "./schema";
 import { DEMO_HANDLE, DEMO_USER_ID, seedMedia } from "./seed";
 import { parseSessionValue, resolveSession } from "./session";
+import { mintSessionToken } from "./session-test-helpers";
 import { createMemorySqlStore, resetSqlStoreForTests, setSqlStoreForTests, type SqlStore } from "./sql-store";
 import { loadPublicKit } from "./store";
 
@@ -209,7 +210,7 @@ describe("Hyperdrive SQL path", () => {
     const stored = await readGraphSnapshot(user.id);
     assert.ok(stored);
     assert.equal(stored.user.handle, user.handle);
-    assert.deepEqual(await resolveSession(user.handle, "route"), {
+    assert.deepEqual(await resolveSession(await mintSessionToken(user.handle, user.id), "route"), {
       handle: user.handle,
       userId: user.id,
     });
@@ -246,7 +247,7 @@ describe("Hyperdrive SQL path", () => {
     const stored = await readGraphSnapshot(user.id);
     assert.ok(stored);
     assert.equal(stored.user.handle, user.handle);
-    assert.deepEqual(await resolveSession(user.handle, "route"), {
+    assert.deepEqual(await resolveSession(await mintSessionToken(user.handle, user.id), "route"), {
       handle: user.handle,
       userId: user.id,
     });
@@ -282,7 +283,7 @@ describe("Hyperdrive SQL path", () => {
 
     const stored = await readGraphSnapshotByHandle(user.handle);
     assert.equal(stored?.user.handle, user.handle);
-    assert.deepEqual(await resolveSession(user.handle, "route"), {
+    assert.deepEqual(await resolveSession(await mintSessionToken(user.handle, user.id), "route"), {
       handle: user.handle,
       userId: user.id,
     });

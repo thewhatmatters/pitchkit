@@ -1,9 +1,13 @@
 import { hasLiveAuthSecrets, readSecrets } from "./env";
 import { persistOwnerDisconnect, readGraphSnapshotByHandle } from "./graph-store";
 import type { HiddenKitAccess } from "./hidden-kit-kv";
-import { DEMO_HANDLE, seedUsers } from "./seed";
+import { DEMO_HANDLE, DEMO_USER_ID, seedUsers } from "./seed";
+import { createServerSession, deleteServerSession, readServerSession } from "./session-store";
 
-/** Pitchkit session cookie — our login, not an Instagram token. */
+/**
+ * Pitchkit session cookie — our login, not an Instagram token. The value is a
+ * random opaque token; the handle lives server-side in KV (`session-store.ts`).
+ */
 export const SESSION_COOKIE = "pitchkit_session";
 
 /** httpOnly hide overlay — owner reload mirror. SQL writes `media.hidden_from_kit_at` when Hyperdrive is bound. */
@@ -73,13 +77,20 @@ export function serializeSessionCookie(
   return serializeCookie(name, value, secure, maxAge);
 }
 
-/** Sets the session for seed handle `demo`. Value is the handle, not a token. */
-export function sessionSetCookieHeader(secure: boolean): string {
-  return sessionSetCookieHeaderForHandle(DEMO_HANDLE, secure);
-}
-
-export function sessionSetCookieHeaderForHandle(handle: string, secure: boolean): string {
-  return serializeCookie(SESSION_COOKIE, handle, secure, SESSION_MAX_AGE);
+/**
+ * Creates a server-side session for `handle` and returns its `Set-Cookie`.
+ * Null when KV is unavailable — callers must fail closed (no signed-in cookie).
+ */
+export async function createSessionCookie(
+  input: { handle: string; userId: string },
+  secure: boolean,
+  access: HiddenKitAccess = "route",
+): Promise<string | null> {
+  const token = await createServerSession(input, SESSION_MAX_AGE, access);
+  if (!token) {
+    return null;
+  }
+  return serializeCookie(SESSION_COOKIE, token, secure, SESSION_MAX_AGE);
 }
 
 export function sessionClearCookieHeader(secure: boolean): string {
@@ -105,6 +116,7 @@ export function readRequestCookie(request: Request, name: string): string | null
   return null;
 }
 
+/** Seed row for a handle (stub path only). Not a cookie parser. */
 export function parseSessionValue(value: string | undefined | null): Session | null {
   if (!value) {
     return null;
@@ -118,13 +130,23 @@ export function parseSessionValue(value: string | undefined | null): Session | n
   return { handle: user.handle, userId: user.id };
 }
 
-/** Seed first (stub only), then a live Graph snapshot handle (Phase 2 OAuth). */
+/**
+ * Cookie token → KV session record → owner still connected.
+ * Username-only (legacy) or forged cookies have no KV record and resolve null.
+ */
 export async function resolveSession(
   value: string | undefined | null,
   access: HiddenKitAccess = "page",
 ): Promise<Session | null> {
-  const seed = parseSessionValue(value);
+  const record = await readServerSession(value, access);
+  if (!record) {
+    return null;
+  }
+  const seed = parseSessionValue(record.handle);
   if (seed) {
+    if (seed.userId !== record.userId) {
+      return null;
+    }
     const secrets = await readSecrets(access);
     // Live Instagram Login is configured — leftover seed `demo` is not signed in.
     // Public `/k/demo` stays; this gate is the owner cookie only.
@@ -133,11 +155,8 @@ export async function resolveSession(
     }
     return null;
   }
-  if (!value) {
-    return null;
-  }
-  const snapshot = await readGraphSnapshotByHandle(value, access);
-  if (!snapshot || snapshot.user.disconnected_at) {
+  const snapshot = await readGraphSnapshotByHandle(record.handle, access);
+  if (!snapshot || snapshot.user.disconnected_at || snapshot.user.id !== record.userId) {
     return null;
   }
   return { handle: snapshot.user.handle, userId: snapshot.user.id };
@@ -166,11 +185,18 @@ export function sessionRedirect(request: Request, path: string, setCookie: strin
 }
 
 /** Seed `demo` only. WHA-313 optional "Update kit URL to @{new}" waits on live OAuth. */
-export function stubConnect(request: Request): Response {
-  return sessionRedirect(request, "/insights", sessionSetCookieHeader(isHttpsRequest(request)));
+export async function stubConnect(request: Request): Promise<Response> {
+  const cookie = await createSessionCookie(
+    { handle: DEMO_HANDLE, userId: DEMO_USER_ID },
+    isHttpsRequest(request),
+  );
+  if (!cookie) {
+    return sessionRedirect(request, "/?error=persist", sessionClearCookieHeader(isHttpsRequest(request)));
+  }
+  return sessionRedirect(request, "/insights", cookie);
 }
 
-export function stubSignOut(request: Request): Response {
+function signOutResponse(request: Request): Response {
   const secure = isHttpsRequest(request);
   const headers = new Headers({
     Location: new URL("/", request.url).toString(),
@@ -181,10 +207,16 @@ export function stubSignOut(request: Request): Response {
   return new Response(null, { status: 303, headers });
 }
 
+/** Sign out = delete the server-side session + clear cookies (kit stays public). */
+export async function stubSignOut(request: Request): Promise<Response> {
+  await deleteServerSession(readRequestCookie(request, SESSION_COOKIE), "route");
+  return signOutResponse(request);
+}
+
 /**
  * Disconnect severs the Pitchkit↔Instagram connection for the signed-in owner.
- * Sign out = cookie clear only (kit stays public).
- * Disconnect = cookie clear + `disconnected_at` on the Graph snapshot + null tokens.
+ * Disconnect = delete server session + cookie clear + `disconnected_at` on the
+ * Graph snapshot + null tokens.
  */
 export async function disconnectOwner(request: Request): Promise<Response> {
   const value = readRequestCookie(request, SESSION_COOKIE);
@@ -192,5 +224,6 @@ export async function disconnectOwner(request: Request): Promise<Response> {
   if (session) {
     await persistOwnerDisconnect(session, "route");
   }
-  return stubSignOut(request);
+  await deleteServerSession(value, "route");
+  return signOutResponse(request);
 }

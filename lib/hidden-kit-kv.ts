@@ -8,7 +8,8 @@ export type HiddenRecord = Record<string, string>;
 /** Minimal Workers KV surface. Injectable for unit tests. */
 export type HiddenKitNamespace = {
   get(key: string): Promise<string | null>;
-  put(key: string, value: string): Promise<void>;
+  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
+  delete?(key: string): Promise<void>;
 };
 
 export type HiddenKitStore = {
@@ -65,6 +66,9 @@ export function createMemoryHiddenKit(
     },
     async put(key, value) {
       data.set(key, value);
+    },
+    async delete(key) {
+      data.delete(key);
     },
   };
 }

@@ -20,7 +20,8 @@ import {
 } from "./oauth-finish";
 import { snapshotFromMe } from "./poll";
 import { DEMO_HANDLE } from "./seed";
-import { SESSION_COOKIE, stubConnect } from "./session";
+import { resolveSession, SESSION_COOKIE, stubConnect } from "./session";
+import { sessionTokenFromSetCookie } from "./session-test-helpers";
 
 const STATE = "oauth-state-unit";
 const NOW = new Date("2026-09-19T18:00:00.000Z");
@@ -45,20 +46,20 @@ function finishRequest(
   });
 }
 
-function assertSessionOverwrite(response: Response, handle: string) {
+async function assertSessionOverwrite(response: Response, handle: string) {
   assert.equal(response.status, 303);
   assert.equal(response.headers.get("location"), "http://localhost/insights");
   const cookies = response.headers.getSetCookie();
   assert.equal(cookies.length, 1);
-  assert.match(cookies[0], new RegExp(`${SESSION_COOKIE}=${handle.replace(".", "\\.")}`));
+  const token = sessionTokenFromSetCookie(cookies[0]);
+  assert.ok(token, "session cookie carries an opaque token");
+  assert.ok(!cookies[0].includes(`${SESSION_COOKIE}=${handle}`), "cookie is not the handle");
   assert.doesNotMatch(cookies[0], new RegExp(OAUTH_STATE_COOKIE));
   // OpenNext/Workers may keep only Headers.get("set-cookie") or the last cookie.
-  assert.match(
-    response.headers.get("set-cookie") ?? "",
-    new RegExp(`${SESSION_COOKIE}=${handle.replace(".", "\\.")}`),
-  );
-  assert.match(lastWinsSetCookie(cookies) ?? "", new RegExp(`${SESSION_COOKIE}=${handle.replace(".", "\\.")}`));
+  assert.equal(sessionTokenFromSetCookie(response.headers.get("set-cookie")), token);
+  assert.equal(sessionTokenFromSetCookie(lastWinsSetCookie(cookies)), token);
   assert.deepEqual(oauthSuccessSetCookies(cookies[0]), cookies);
+  assert.equal((await resolveSession(token, "route"))?.handle, handle);
 }
 
 function graphFetch(overrides: { mediaOk?: boolean; meOk?: boolean } = {}): typeof fetch {
@@ -105,26 +106,32 @@ afterEach(() => {
 });
 
 describe("cookie after persist", () => {
-  it("sets the in-memory handle when write is true without resolveSession", () => {
+  it("mints a server session for the in-memory handle without resolveSession", async () => {
+    setHiddenKitNamespaceForTests(createMemoryHiddenKit());
+    setSecretsForTests(liveSecrets());
     const after = cookieHandleAfterPersist(true, "rxndy.dxniel");
     assert.deepEqual(after, { ok: true, handle: "rxndy.dxniel" });
-    const cookie = sessionCookieAfterPersist({
+    const cookie = await sessionCookieAfterPersist({
       persisted: true,
       handle: "rxndy.dxniel",
+      userId: "u-rxndy",
       secure: false,
     });
     assert.equal(cookie.ok, true);
     if (!cookie.ok) {
       return;
     }
-    assert.match(cookie.cookie, new RegExp(`${SESSION_COOKIE}=rxndy\\.dxniel`));
+    assert.ok(sessionTokenFromSetCookie(cookie.cookie));
+    assert.doesNotMatch(cookie.cookie, /rxndy/);
     assert.match(cookie.cookie, /HttpOnly/i);
   });
 
-  it("success Set-Cookie is only the session so a last-wins fold overwrites demo", () => {
-    const session = sessionCookieAfterPersist({
+  it("success Set-Cookie is only the session so a last-wins fold overwrites demo", async () => {
+    setHiddenKitNamespaceForTests(createMemoryHiddenKit());
+    const session = await sessionCookieAfterPersist({
       persisted: true,
       handle: "rxndy.dxniel",
+      userId: "u-rxndy",
       secure: true,
     });
     assert.equal(session.ok, true);
@@ -134,17 +141,24 @@ describe("cookie after persist", () => {
     const cookies = oauthSuccessSetCookies(session.cookie);
     assert.equal(cookies.length, 1);
     assert.equal(lastWinsSetCookie(cookies), session.cookie);
-    assert.match(cookies[0], new RegExp(`${SESSION_COOKIE}=rxndy\\.dxniel`));
+    assert.ok(sessionTokenFromSetCookie(cookies[0]));
+    assert.match(cookies[0], /Secure/);
     assert.doesNotMatch(cookies[0], /pitchkit_oauth_state/);
   });
 
-  it("does not set a cookie when write is false", () => {
+  it("does not set a cookie when write is false or KV is missing", async () => {
     assert.deepEqual(cookieHandleAfterPersist(false, "rxndy.dxniel"), {
       ok: false,
       error: "persist",
     });
+    setHiddenKitNamespaceForTests(createMemoryHiddenKit());
     assert.deepEqual(
-      sessionCookieAfterPersist({ persisted: false, handle: "rxndy.dxniel", secure: true }),
+      await sessionCookieAfterPersist({ persisted: false, handle: "rxndy.dxniel", userId: "u", secure: true }),
+      { ok: false, error: "persist" },
+    );
+    setHiddenKitNamespaceForTests(null);
+    assert.deepEqual(
+      await sessionCookieAfterPersist({ persisted: true, handle: "rxndy.dxniel", userId: "u", secure: true }),
       { ok: false, error: "persist" },
     );
   });
@@ -180,7 +194,7 @@ describe("finishLiveOAuth", () => {
       state: STATE,
       secrets: liveSecrets(),
     });
-    assertSessionOverwrite(response, "rxndy.dxniel");
+    await assertSessionOverwrite(response, "rxndy.dxniel");
   });
 
   it("escapes a Graph snapshot stuck on demo when /me username is not demo", async () => {
@@ -223,7 +237,7 @@ describe("finishLiveOAuth", () => {
       state: STATE,
       secrets: liveSecrets(),
     });
-    assertSessionOverwrite(response, "rxndy.dxniel");
+    await assertSessionOverwrite(response, "rxndy.dxniel");
     assert.doesNotMatch(
       response.headers.get("set-cookie") ?? "",
       new RegExp(`${SESSION_COOKIE}=${DEMO_HANDLE}(?:;|$)`),
@@ -248,7 +262,7 @@ describe("finishLiveOAuth", () => {
       state: STATE,
       secrets: liveSecrets(),
     });
-    assertSessionOverwrite(response, "rxndy.dxniel");
+    await assertSessionOverwrite(response, "rxndy.dxniel");
     assert.doesNotMatch(response.headers.get("set-cookie") ?? "", new RegExp(`${SESSION_COOKIE}=${DEMO_HANDLE}`));
   });
 
@@ -263,7 +277,7 @@ describe("finishLiveOAuth", () => {
       state: STATE,
       secrets: liveSecrets(),
     });
-    assertSessionOverwrite(response, "rxndy.dxniel");
+    await assertSessionOverwrite(response, "rxndy.dxniel");
   });
 
   it("surfaces persist without a session cookie when both writes fail", async () => {
@@ -349,13 +363,13 @@ describe("snapshotFromMe", () => {
 });
 
 describe("stub seed session", () => {
-  it("still sets pitchkit_session=demo when live secrets are absent", () => {
+  it("still signs in seed demo via a server session when live secrets are absent", async () => {
     setSecretsForTests(emptySecrets());
-    const response = stubConnect(new Request("http://localhost/auth/instagram"));
+    setHiddenKitNamespaceForTests(createMemoryHiddenKit());
+    const response = await stubConnect(new Request("http://localhost/auth/instagram"));
     assert.equal(response.status, 303);
-    assert.match(
-      response.headers.get("set-cookie") ?? "",
-      new RegExp(`${SESSION_COOKIE}=${DEMO_HANDLE}`),
-    );
+    const token = sessionTokenFromSetCookie(response.headers.get("set-cookie"));
+    assert.ok(token);
+    assert.equal((await resolveSession(token, "route"))?.handle, DEMO_HANDLE);
   });
 });

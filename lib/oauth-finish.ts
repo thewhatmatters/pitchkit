@@ -1,6 +1,6 @@
 /**
- * Live Instagram OAuth finish: persist the in-memory snapshot, then set
- * `pitchkit_session` to that handle on a single `Set-Cookie`. Do not re-read
+ * Live Instagram OAuth finish: persist the in-memory snapshot, then mint a server-side
+ * session for that handle and set its opaque `pitchkit_session` token on a single `Set-Cookie`. Do not re-read
  * the handle from storage — a KV/SQL miss after a true write recreates the
  * Connect loop. Do not pair oauth-state clear on the success 303: OpenNext
  * on Workers can fold multiple Set-Cookie and leave leftover seed `demo`.
@@ -29,11 +29,9 @@ import { pollInsights, snapshotFromMe } from "./poll";
 import { encryptTokenIfPossible } from "./token-crypto";
 import {
   isHttpsRequest,
+  createSessionCookie,
   readRequestCookie,
-  serializeSessionCookie,
   sessionClearCookieHeader,
-  SESSION_COOKIE,
-  SESSION_MAX_AGE,
 } from "./session";
 
 export const OAUTH_LANDING_ERRORS = [
@@ -69,20 +67,26 @@ export function cookieHandleAfterPersist(
   return { ok: true, handle };
 }
 
-export function sessionCookieAfterPersist(input: {
+/** After a true persist, mint a server-side session for the in-memory owner. */
+export async function sessionCookieAfterPersist(input: {
   persisted: boolean;
   handle: string;
+  userId: string;
   secure: boolean;
-}): { ok: true; cookie: string; handle: string } | { ok: false; error: "persist" } {
+}): Promise<{ ok: true; cookie: string; handle: string } | { ok: false; error: "persist" }> {
   const after = cookieHandleAfterPersist(input.persisted, input.handle);
   if (!after.ok) {
     return after;
   }
-  return {
-    ok: true,
-    handle: after.handle,
-    cookie: serializeSessionCookie(SESSION_COOKIE, after.handle, input.secure, SESSION_MAX_AGE),
-  };
+  const cookie = await createSessionCookie(
+    { handle: after.handle, userId: input.userId },
+    input.secure,
+    "route",
+  );
+  if (!cookie) {
+    return { ok: false, error: "persist" };
+  }
+  return { ok: true, handle: after.handle, cookie };
 }
 
 /**
@@ -227,9 +231,10 @@ export async function finishLiveOAuth(input: {
     },
   };
   const persisted = await writeGraphSnapshot(snapshot, "route");
-  const after = sessionCookieAfterPersist({
+  const after = await sessionCookieAfterPersist({
     persisted,
     handle: snapshot.user.handle,
+    userId: snapshot.user.id,
     secure,
   });
   if (!after.ok) {

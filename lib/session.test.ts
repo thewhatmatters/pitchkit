@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { afterEach, describe, it } from "node:test";
+import { afterEach, beforeEach, describe, it } from "node:test";
 import { emptySecrets, setSecretsForTests } from "./env";
 import { EMPTY_AUDIENCE, persistOwnerDisconnect, readGraphSnapshot, writeGraphSnapshot } from "./graph-store";
 import { createMemoryHiddenKit, setHiddenKitNamespaceForTests } from "./hidden-kit";
@@ -23,6 +23,9 @@ import {
   stubConnect,
   stubSignOut,
 } from "./session";
+import { mintSessionToken, sessionTokenFromSetCookie } from "./session-test-helpers";
+import { readServerSession, sessionKey, SESSION_TOKEN_BYTES } from "./session-store";
+import { SESSION_MAX_AGE } from "./session";
 
 const NOW = "2026-09-18T22:00:00.000Z";
 
@@ -47,18 +50,25 @@ function liveUser(partial: Partial<User> = {}): User {
   };
 }
 
+beforeEach(() => {
+  setHiddenKitNamespaceForTests(createMemoryHiddenKit());
+});
+
 afterEach(() => {
   setHiddenKitNamespaceForTests(undefined);
   setSecretsForTests(undefined);
 });
 
 describe("session cookie", () => {
-  it("sets an httpOnly Pitchkit session for seed handle demo, not a token", () => {
-    const header = stubConnect(new Request("http://localhost/auth/instagram")).headers.get(
+  it("sets an httpOnly opaque Pitchkit session for seed demo, not the handle or an IG token", async () => {
+    setSecretsForTests(emptySecrets());
+    const header = (await stubConnect(new Request("http://localhost/auth/instagram"))).headers.get(
       "set-cookie",
     );
     assert.ok(header);
-    assert.match(header, new RegExp(`${SESSION_COOKIE}=${DEMO_HANDLE}`));
+    assert.ok(sessionTokenFromSetCookie(header));
+    assert.doesNotMatch(header, new RegExp(`${SESSION_COOKIE}=${DEMO_HANDLE}(?:;|$)`));
+    assert.match(header, new RegExp(`Max-Age=${SESSION_MAX_AGE}`));
     assert.match(header, /HttpOnly/i);
     assert.match(header, /Path=\//);
     assert.match(header, /SameSite=Lax/i);
@@ -75,8 +85,8 @@ describe("session cookie", () => {
     assert.ok((options.maxAge ?? 0) > 0);
   });
 
-  it("clears the session cookie", () => {
-    const header = stubSignOut(new Request("http://localhost/auth/sign-out")).headers.get(
+  it("clears the session cookie", async () => {
+    const header = (await stubSignOut(new Request("http://localhost/auth/sign-out"))).headers.get(
       "set-cookie",
     );
     assert.ok(header);
@@ -116,23 +126,36 @@ describe("insights gate", () => {
     assert.equal(sessionOwnsHandle(null, DEMO_HANDLE), false);
   });
 
-  it("POST/GET stub connect sets the cookie and 303s to /insights; sign-out 303s home", () => {
+  it("POST/GET stub connect sets the cookie and 303s to /insights; sign-out 303s home", async () => {
+    setSecretsForTests(emptySecrets());
     for (const method of ["GET", "POST"] as const) {
-      const connect = stubConnect(
+      const connect = await stubConnect(
         new Request("http://localhost/auth/instagram", { method }),
       );
       assert.equal(connect.status, 303);
       assert.equal(connect.headers.get("location"), "http://localhost/insights");
-      assert.match(
-        connect.headers.get("set-cookie") ?? "",
-        new RegExp(`${SESSION_COOKIE}=${DEMO_HANDLE}`),
-      );
+      const token = sessionTokenFromSetCookie(connect.headers.get("set-cookie"));
+      assert.ok(token);
 
-      const signOut = stubSignOut(new Request("http://localhost/auth/sign-out", { method }));
+      const signOut = await stubSignOut(
+        new Request("http://localhost/auth/sign-out", {
+          method,
+          headers: { cookie: `${SESSION_COOKIE}=${token}` },
+        }),
+      );
       assert.equal(signOut.status, 303);
       assert.equal(signOut.headers.get("location"), "http://localhost/");
       assert.match(signOut.headers.get("set-cookie") ?? "", /Max-Age=0/);
+      assert.equal(await resolveSession(token, "route"), null, "sign-out deletes the server session");
     }
+  });
+
+  it("stub connect fails closed without KV (no signed-in cookie)", async () => {
+    setSecretsForTests(emptySecrets());
+    setHiddenKitNamespaceForTests(null);
+    const connect = await stubConnect(new Request("http://localhost/auth/instagram"));
+    assert.equal(connect.headers.get("location"), "http://localhost/?error=persist");
+    assert.equal(sessionTokenFromSetCookie(connect.headers.get("set-cookie")), null);
   });
 
   it("treats a resolvable session as signed-in so home can gate to Insights", () => {
@@ -142,14 +165,14 @@ describe("insights gate", () => {
 
   it("resolves seed demo when live auth secrets are absent (stub path)", async () => {
     setSecretsForTests(emptySecrets());
-    const session = await resolveSession(DEMO_HANDLE, "page");
+    const session = await resolveSession(await mintSessionToken(DEMO_HANDLE, DEMO_USER_ID), "page");
     assert.deepEqual(session, { handle: DEMO_HANDLE, userId: DEMO_USER_ID });
     assert.equal(insightsGate(session), true);
   });
 
   it("does not treat leftover seed demo as signed-in when live auth secrets exist", async () => {
     setSecretsForTests({ ...emptySecrets(), IG_APP_ID: "id", IG_APP_SECRET: "secret" });
-    const session = await resolveSession(DEMO_HANDLE, "page");
+    const session = await resolveSession(await mintSessionToken(DEMO_HANDLE, DEMO_USER_ID), "page");
     assert.equal(session, null);
     assert.equal(insightsGate(session), false);
   });
@@ -168,7 +191,7 @@ describe("insights gate", () => {
       }),
       true,
     );
-    const session = await resolveSession(user.handle, "route");
+    const session = await resolveSession(await mintSessionToken(user.handle, user.id), "route");
     assert.deepEqual(session, { handle: user.handle, userId: user.id });
     assert.equal(insightsGate(session), true);
   });
@@ -189,7 +212,7 @@ describe("disconnect vs sign out", () => {
       true,
     );
 
-    const signOut = stubSignOut(new Request("http://localhost/auth/sign-out", { method: "POST" }));
+    const signOut = await stubSignOut(new Request("http://localhost/auth/sign-out", { method: "POST" }));
     assert.equal(signOut.status, 303);
     const cookies = signOut.headers.getSetCookie();
     assert.ok(cookies.some((row) => row.includes(`${SESSION_COOKIE}=`) && row.includes("Max-Age=0")));
@@ -215,14 +238,15 @@ describe("disconnect vs sign out", () => {
       true,
     );
 
-    const session = await resolveSession(user.handle, "route");
+    const token = await mintSessionToken(user.handle, user.id);
+    const session = await resolveSession(token, "route");
     assert.deepEqual(session, { handle: user.handle, userId: user.id });
     assert.equal(insightsGate(session), true);
 
     const response = await disconnectOwner(
       new Request(`http://localhost${AUTH_DISCONNECT_PATH}`, {
         method: "POST",
-        headers: { cookie: `${SESSION_COOKIE}=${user.handle}` },
+        headers: { cookie: `${SESSION_COOKIE}=${token}` },
       }),
     );
     assert.equal(response.status, 303);
@@ -238,7 +262,8 @@ describe("disconnect vs sign out", () => {
     assert.equal(snapshot.user.refresh_encrypted, null);
     assert.equal(snapshot.user.token_expires_at, null);
 
-    assert.equal(await resolveSession(user.handle, "route"), null);
+    assert.equal(await resolveSession(token, "route"), null);
+    assert.equal(await readServerSession(token, "route"), null, "server-side session deleted");
     assert.equal(await loadPublicKit(user.handle, new Date(NOW)), null);
     assert.equal(assemblePublicKit(snapshot.user, snapshot.media, new Date(NOW)), null);
   });
@@ -260,5 +285,93 @@ describe("disconnect vs sign out", () => {
     assert.equal((await readGraphSnapshot(user.id))?.user.disconnected_at, NOW);
     assert.equal(await persistOwnerDisconnect({ handle: DEMO_HANDLE, userId: DEMO_USER_ID }), false);
     assert.equal(readRequestCookie(new Request("http://localhost/"), SESSION_COOKIE), null);
+  });
+});
+
+describe("session forgery (opaque server-side sessions)", () => {
+  function liveSnapshot(user: User) {
+    return writeGraphSnapshot({
+      user,
+      media: seedMedia,
+      reach_series: [],
+      audience: EMPTY_AUDIENCE,
+      polled_at: NOW,
+    });
+  }
+
+  it("rejects a legacy username-only cookie for a live creator", async () => {
+    setSecretsForTests({ ...emptySecrets(), IG_APP_ID: "id", IG_APP_SECRET: "secret" });
+    const user = liveUser();
+    assert.equal(await liveSnapshot(user), true);
+    assert.equal(await resolveSession(user.handle, "route"), null);
+    assert.equal(await resolveSession(DEMO_HANDLE, "route"), null);
+  });
+
+  it("rejects a username-only demo cookie on the stub path too", async () => {
+    setSecretsForTests(emptySecrets());
+    assert.equal(await resolveSession(DEMO_HANDLE, "page"), null);
+  });
+
+  it("rejects a well-formed but unknown token", async () => {
+    setSecretsForTests({ ...emptySecrets(), IG_APP_ID: "id", IG_APP_SECRET: "secret" });
+    const user = liveUser();
+    assert.equal(await liveSnapshot(user), true);
+    await mintSessionToken(user.handle, user.id);
+    assert.equal(await resolveSession("A".repeat(43), "route"), null);
+  });
+
+  it("forged cookie cannot disconnect another creator", async () => {
+    const user = liveUser();
+    assert.equal(await liveSnapshot(user), true);
+    const response = await disconnectOwner(
+      new Request(`http://localhost${AUTH_DISCONNECT_PATH}`, {
+        method: "POST",
+        headers: { cookie: `${SESSION_COOKIE}=${user.handle}` },
+      }),
+    );
+    assert.equal(response.status, 303);
+    const snapshot = await readGraphSnapshot(user.id);
+    assert.equal(snapshot?.user.disconnected_at, null);
+    assert.equal(snapshot?.user.token_encrypted, "enc-token");
+  });
+
+  it("a valid token resolves its owner; a session record whose userId mismatches is rejected", async () => {
+    const user = liveUser();
+    assert.equal(await liveSnapshot(user), true);
+    const token = await mintSessionToken(user.handle, user.id);
+    assert.deepEqual(await resolveSession(token, "route"), { handle: user.handle, userId: user.id });
+    const stale = await mintSessionToken(user.handle, "u-someone-else");
+    assert.equal(await resolveSession(stale, "route"), null);
+  });
+
+  it("stores only a SHA-256 key with a 30-day TTL; the raw token never hits KV", async () => {
+    const puts: { key: string; value: string; ttl?: number }[] = [];
+    const base = createMemoryHiddenKit();
+    setHiddenKitNamespaceForTests({
+      get: (key) => base.get(key),
+      delete: (key) => base.delete!(key),
+      async put(key, value, options) {
+        puts.push({ key, value, ttl: options?.expirationTtl });
+        await base.put(key, value);
+      },
+    });
+    const token = await mintSessionToken("rxndy.dxniel", "u-rxndy");
+    assert.equal(Buffer.from(token, "base64url").length, SESSION_TOKEN_BYTES);
+    assert.equal(puts.length, 1);
+    assert.equal(puts[0].key, await sessionKey(token));
+    assert.match(puts[0].key, /^session:[0-9a-f]{64}$/);
+    assert.ok(!puts[0].key.includes(token) && !puts[0].value.includes(token));
+    assert.equal(puts[0].ttl, SESSION_MAX_AGE);
+    assert.equal(SESSION_MAX_AGE, 60 * 60 * 24 * 30);
+  });
+
+  it("sets Secure on https", async () => {
+    setSecretsForTests(emptySecrets());
+    const header = (await stubConnect(new Request("https://pitchkit.example/auth/instagram"))).headers.get(
+      "set-cookie",
+    );
+    assert.match(header ?? "", /; Secure/);
+    assert.match(header ?? "", /HttpOnly/);
+    assert.match(header ?? "", /SameSite=Lax/);
   });
 });
