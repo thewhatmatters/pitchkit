@@ -476,6 +476,22 @@ export async function persistOwnerKitProfile(
   profile: KitProfile,
   access: HiddenKitAccess = "route",
 ): Promise<boolean> {
+  if (!(await writeOwnerKitProfile(session, profile, access))) {
+    return false;
+  }
+  // Read back so "Saved" means it survives a reload. The SQL path keeps intro in
+  // payload extras and swallows that write's failure, so trust the read, not the write.
+  const stored =
+    (await readGraphSnapshot(session.userId, access)) ??
+    (await readGraphSnapshotByHandle(session.handle, access));
+  return stored != null && normalizeIntro(stored.intro) === normalizeIntro(profile.intro);
+}
+
+async function writeOwnerKitProfile(
+  session: { handle: string; userId: string },
+  profile: KitProfile,
+  access: HiddenKitAccess = "route",
+): Promise<boolean> {
   const intro = normalizeIntro(profile.intro);
   const pastBrands = normalizePastBrands(profile.past_brands);
   const theme = normalizeTheme(profile.theme);

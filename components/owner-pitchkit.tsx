@@ -43,8 +43,10 @@ import {
 } from "@/lib/copy";
 import { saveKitProfile } from "@/lib/kit-profile-client";
 import {
+  PITCHKIT_INTRO_SAVE_DEBOUNCE_MS,
   PITCHKIT_THEME_DEFAULT,
   normalizeIntro,
+  type IntroSaveState,
   type KitProfile,
   type PastBrand,
   type PitchKitTheme,
@@ -109,6 +111,9 @@ export function OwnerPitchKit({
   const [brands, setBrands] = useState<PastBrand[]>(() => [...pastBrands]);
   const [savedTheme, setSavedTheme] = useState<PitchKitTheme>(themeProp);
   const introSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingIntro = useRef<string | null>(null);
+  const introSaveSeq = useRef(0);
+  const [introSaveState, setIntroSaveState] = useState<IntroSaveState>("idle");
 
   useEffect(() => {
     setIntro(introProp ?? "");
@@ -157,14 +162,35 @@ export function OwnerPitchKit({
     };
   }
 
+  async function flushIntroSave() {
+    if (introSaveTimer.current) {
+      clearTimeout(introSaveTimer.current);
+      introSaveTimer.current = null;
+    }
+    const value = pendingIntro.current;
+    if (value == null) {
+      return;
+    }
+    pendingIntro.current = null;
+    const seq = ++introSaveSeq.current;
+    setIntroSaveState("saving");
+    const ok = await persistProfile(currentProfile({ intro: normalizeIntro(value) }));
+    // A newer keystroke owns the state once it has started its own save.
+    if (seq === introSaveSeq.current && pendingIntro.current == null) {
+      setIntroSaveState(ok ? "saved" : "error");
+    }
+  }
+
   function handleIntroChange(value: string) {
     setIntro(value);
+    pendingIntro.current = value;
+    setIntroSaveState("saving");
     if (introSaveTimer.current) {
       clearTimeout(introSaveTimer.current);
     }
     introSaveTimer.current = setTimeout(() => {
-      void persistProfile(currentProfile({ intro: normalizeIntro(value) }));
-    }, 400);
+      void flushIntroSave();
+    }, PITCHKIT_INTRO_SAVE_DEBOUNCE_MS);
   }
 
   function handleBrandsChange(next: PastBrand[]) {
@@ -286,7 +312,14 @@ export function OwnerPitchKit({
         contact={contact}
         showCreateBand={false}
         postNotice={postNotice}
-        introSlot={<OwnerIntroEditor intro={intro} onIntroChange={handleIntroChange} />}
+        introSlot={(
+          <OwnerIntroEditor
+            intro={intro}
+            onIntroChange={handleIntroChange}
+            onIntroBlur={() => void flushIntroSave()}
+            saveState={introSaveState}
+          />
+        )}
         brandsSlot={<OwnerPastBrands brands={brands} onBrandsChange={handleBrandsChange} />}
         renderPostHeader={(post, index) => (
           <Card.Header

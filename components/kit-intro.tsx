@@ -5,6 +5,8 @@ import { Button, TextArea } from "@/components/wmds";
 import { PATTERN_INTRO_CLASS } from "@/components/pattern-tokens";
 import {
   PITCHKIT_INTRO_HARD_LIMIT,
+  introSaveDescription,
+  type IntroSaveState,
   pitchKitIntroIsEmpty,
   pitchKitIntroStatus,
 } from "@/lib/kit-profile";
@@ -12,13 +14,20 @@ import {
 type OwnerIntroEditorProps = {
   intro: string;
   onIntroChange: (value: string) => void;
+  onIntroBlur?: () => void;
+  saveState?: IntroSaveState;
 };
 
 /**
  * Pattern — intro (owner) Show code (`examples-pitchkit--intro-owner`).
  * Soft 160 / hard 280. Empty is ghost **Add an intro**, not Instagram biography.
  */
-export function OwnerIntroEditor({ intro, onIntroChange }: OwnerIntroEditorProps) {
+export function OwnerIntroEditor({
+  intro,
+  onIntroChange,
+  onIntroBlur,
+  saveState = "idle",
+}: OwnerIntroEditorProps) {
   const [editing, setEditing] = useState(() => !pitchKitIntroIsEmpty(intro));
 
   if (pitchKitIntroIsEmpty(intro) && !editing) {
@@ -32,13 +41,16 @@ export function OwnerIntroEditor({ intro, onIntroChange }: OwnerIntroEditorProps
   return (
     <TextArea
       label="Intro"
-      description="Shown on your Pitchkit. This is not your Instagram bio."
+      description={introSaveDescription(saveState)}
+      loading={saveState === "saving"}
+      data-intro-save={saveState}
       placeholder="What you create and who you create it for"
       value={intro}
       maxLength={PITCHKIT_INTRO_HARD_LIMIT}
       status={pitchKitIntroStatus(intro)}
       rows={4}
       onChange={(event) => onIntroChange(event.target.value)}
+      onBlur={onIntroBlur}
     />
   );
 }
