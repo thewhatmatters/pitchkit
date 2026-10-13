@@ -1,68 +1,66 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { EyeOff } from "lucide-react";
-import { CreatorIdentityStrip } from "@/components/creator-identity-strip";
-import { ShareKitButton } from "@/components/share-kit-button";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { EyeOff, Undo2 } from "lucide-react";
+import { OwnerIntroEditor } from "@/components/kit-intro";
+import { OwnerPastBrands } from "@/components/past-brands";
 import {
-  PATTERN_CONTACT_CARD_CLASS,
-  PATTERN_CONTACT_ROW_CLASS,
-  PATTERN_CONTACT_ROWS_CLASS,
+  PATTERN_HEADER_COPY_CLASS,
   PATTERN_HEADER_SECTION_CLASS,
-  PATTERN_IDENTITY_SECTION_CLASS,
-  PATTERN_KIT_POST_METRICS_CLASS,
-  PATTERN_KIT_STAT_CLASS,
   PATTERN_POST_CARD_CLASS,
+  PATTERN_POST_HEADER_START_CLASS,
   PATTERN_POST_IMAGE_CLASS,
-  PATTERN_POST_METRIC_CLASS,
-  PATTERN_POST_METRIC_LABEL_CLASS,
-  PATTERN_POST_METRIC_VALUE_CLASS,
   PATTERN_POSTS_HEADER_CLASS,
   PATTERN_POSTS_PANEL_CLASS,
   PATTERN_POSTS_SECTION_CLASS,
-  PATTERN_SECTION_EYEBROW_CLASS,
-  PATTERN_STATS_BAND_CLASS,
   PATTERN_SUPPORTING_CLASS,
+  PATTERN_THEME_KIT_CLASS,
 } from "@/components/pattern-tokens";
+import { ShareableKit } from "@/components/shareable-kit";
+import { ShareKitButton } from "@/components/share-kit-button";
 import {
   AlertDialog,
+  Badge,
   Card,
   MoreMenu,
   PageHeader,
-  Stat,
-  TextLink,
+  cardSubtitleClasses,
   cardTitleClasses,
   toast,
 } from "@/components/wmds";
+import type { RankedShare } from "@/lib/audience";
 import {
+  PITCHKIT_OWNER_SUPPORTING,
+  PITCHKIT_OWNER_TITLE,
   TOAST_HIDE_FAILED_TITLE,
+  TOAST_KIT_PROFILE_FAILED_DESCRIPTION,
+  TOAST_KIT_PROFILE_FAILED_TITLE,
   TOAST_POST_HIDDEN_DESCRIPTION,
   TOAST_POST_HIDDEN_TITLE,
   TOAST_POST_RESTORED_DESCRIPTION,
   TOAST_POST_RESTORED_TITLE,
   TOAST_RESTORE_FAILED_TITLE,
 } from "@/lib/copy";
-import { creatorIdentityFromUser } from "@/lib/creator-identity";
-import { engagementRate, formatCount, formatEngagementRate } from "@/lib/engagement";
+import { saveKitProfile } from "@/lib/kit-profile-client";
 import {
-  shouldShowPastBrands,
-  sourcedContactDetail,
-  visibleBrandNames,
-} from "@/lib/kit-chips";
+  PITCHKIT_THEME_DEFAULT,
+  normalizeIntro,
+  type KitProfile,
+  type PastBrand,
+  type PitchKitTheme,
+} from "@/lib/kit-profile";
 import {
   clearHiddenFromKit,
   hideFromKit,
+  partitionOwnerProofPosts,
   restoreToKit,
   stampHiddenFromKit,
 } from "@/lib/kit-visibility";
 import { excludeHiddenFromPublicKit, selectSixPosts } from "@/lib/kit";
+import { formatPostedAt } from "@/lib/posted-at";
 import { publicObjectUrl } from "@/lib/r2";
+import type { ReachPoint } from "@/lib/reach-series";
 import type { Media, User } from "@/lib/schema";
-
-const compactNumber = new Intl.NumberFormat("en", {
-  notation: "compact",
-  maximumFractionDigits: 1,
-});
 
 export type OwnerPostsUpdater = Media[] | ((current: Media[]) => Media[]);
 
@@ -70,39 +68,120 @@ type OwnerPitchKitProps = {
   user: User;
   posts: Media[];
   onPostsChange: (posts: OwnerPostsUpdater) => void;
-  pastBrands?: readonly string[];
+  engagementRate: number | null;
+  typicalReach?: number | null;
+  typicalSaves?: number | null;
+  reachSeries?: ReachPoint[] | null;
+  hasInsights?: boolean;
+  countries?: readonly RankedShare[];
+  intro?: string | null;
+  pastBrands?: readonly PastBrand[];
+  theme?: PitchKitTheme;
   contact?: string | null;
 };
 
 /**
- * Pattern — owner PitchKit Show code (`examples-pitchkit--owner-pitch-kit`).
- * Same shareable sections as `/k/[handle]`, plus hide/restore on selected posts.
- * PageHeader Share kit is the primary copy action (Show code has no Share;
- * Insights keeps the Pattern PageHeader Share). Identity is Graph read-only.
- * Empty contact and brands stay hidden.
+ * Pattern — owner PitchKit (`examples-pitchkit--owner-pitch-kit`)
+ * plus Pattern — intro (owner) (`examples-pitchkit--intro-owner`)
+ * plus Pattern — past brands (owner) (`examples-pitchkit--past-brands-owner`).
+ * Theme picker chrome is off; stored theme (default light) still paints `data-theme`.
+ * Kit body is the same shareable composition as `/k/[handle]` — 4 KPIs, full-width
+ * reach + countries — plus hide/restore and intro/brands editors.
  */
 export function OwnerPitchKit({
   user,
   posts,
   onPostsChange,
+  engagementRate,
+  typicalReach = null,
+  typicalSaves = null,
+  reachSeries = null,
+  hasInsights = false,
+  countries = [],
+  intro: introProp = null,
   pastBrands = [],
+  theme: themeProp = PITCHKIT_THEME_DEFAULT,
   contact = null,
 }: OwnerPitchKitProps) {
   const [postNotice, setPostNotice] = useState<string | null>(null);
   const [pendingHidePostId, setPendingHidePostId] = useState<string | null>(null);
+  const [intro, setIntro] = useState(introProp ?? "");
+  const [brands, setBrands] = useState<PastBrand[]>(() => [...pastBrands]);
+  const [savedTheme, setSavedTheme] = useState<PitchKitTheme>(themeProp);
+  const introSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    setIntro(introProp ?? "");
+  }, [introProp]);
+
+  useEffect(() => {
+    setBrands([...pastBrands]);
+  }, [pastBrands]);
+
+  useEffect(() => {
+    setSavedTheme(themeProp);
+  }, [themeProp]);
+
+  useEffect(() => {
+    return () => {
+      if (introSaveTimer.current) {
+        clearTimeout(introSaveTimer.current);
+      }
+    };
+  }, []);
 
   const visiblePosts = useMemo(
     () => selectSixPosts(excludeHiddenFromPublicKit(posts)),
     [posts],
   );
-  const contactDetail = sourcedContactDetail(contact);
-  const brands = visibleBrandNames(pastBrands);
-  const identity = creatorIdentityFromUser(user);
-  const rate = engagementRate(visiblePosts);
+  const { hidden } = useMemo(() => partitionOwnerProofPosts(posts), [posts]);
+
+  async function persistProfile(profile: KitProfile) {
+    const result = await saveKitProfile(profile);
+    if (!result.ok) {
+      toast.add({
+        title: TOAST_KIT_PROFILE_FAILED_TITLE,
+        description: result.error || TOAST_KIT_PROFILE_FAILED_DESCRIPTION,
+      });
+      return false;
+    }
+    return true;
+  }
+
+  function currentProfile(overrides: Partial<KitProfile> = {}): KitProfile {
+    return {
+      intro: normalizeIntro(intro),
+      past_brands: brands,
+      theme: savedTheme,
+      ...overrides,
+    };
+  }
+
+  function handleIntroChange(value: string) {
+    setIntro(value);
+    if (introSaveTimer.current) {
+      clearTimeout(introSaveTimer.current);
+    }
+    introSaveTimer.current = setTimeout(() => {
+      void persistProfile(currentProfile({ intro: normalizeIntro(value) }));
+    }, 400);
+  }
+
+  function handleBrandsChange(next: PastBrand[]) {
+    setBrands(next);
+    void persistProfile(currentProfile({ past_brands: next }));
+  }
 
   function handlePostAction(postId: string, actionId: string) {
     if (actionId === "hide") {
       setPendingHidePostId(postId);
+      return;
+    }
+    if (actionId === "restore") {
+      const hiddenPost = posts.find((post) => post.id === postId);
+      if (hiddenPost != null) {
+        void restoreHiddenPost(hiddenPost);
+      }
     }
   }
 
@@ -181,159 +260,106 @@ export function OwnerPitchKit({
   }
 
   return (
-    <>
+    <div data-theme={savedTheme} className={PATTERN_THEME_KIT_CLASS}>
       <section className={PATTERN_HEADER_SECTION_CLASS}>
         <PageHeader
           variant="page"
-          title="PitchKit"
+          title={PITCHKIT_OWNER_TITLE}
           end={<ShareKitButton handle={user.handle} />}
         />
-      </section>
-
-      <section className={PATTERN_IDENTITY_SECTION_CLASS}>
-        <CreatorIdentityStrip identity={identity} nameAs="h1" showProfessionalChip />
-      </section>
-
-      <div
-        role="group"
-        aria-label="Verified Instagram summary"
-        className={PATTERN_STATS_BAND_CLASS}
-      >
-        <Stat
-          className={PATTERN_KIT_STAT_CLASS}
-          label="Followers"
-          value={formatCount(user.followers)}
-        />
-        <Stat
-          className={PATTERN_KIT_STAT_CLASS}
-          label="Engagement rate"
-          value={formatEngagementRate(rate)}
-        />
-      </div>
-
-      <section className={PATTERN_POSTS_SECTION_CLASS}>
-        <div className={PATTERN_POSTS_HEADER_CLASS}>
-          <div>
-            <h2 className={cardTitleClasses}>Selected posts</h2>
-            <p className={PATTERN_SUPPORTING_CLASS}>
-              {postNotice ?? "Proof from the current Instagram set."}
-            </p>
-          </div>
+        <div className={PATTERN_HEADER_COPY_CLASS}>
+          <p className={PATTERN_SUPPORTING_CLASS}>{PITCHKIT_OWNER_SUPPORTING}</p>
         </div>
-        <div className={PATTERN_POSTS_PANEL_CLASS}>
-          {visiblePosts.map((post, index) => (
-            <Card
-              key={post.id}
-              variant="outlined"
-              shape="rounded"
-              className={PATTERN_POST_CARD_CLASS}
-            >
-              <Card.Header
-                end={
-                  <MoreMenu
-                    aria-label={`Manage selected post ${index + 1}`}
-                    size="xs"
-                    items={[
-                      {
-                        id: "hide",
-                        label: "Hide from kit",
-                        start: <EyeOff />,
-                      },
-                    ]}
-                    onAction={(actionId) => handlePostAction(post.id, actionId)}
-                  />
-                }
+      </section>
+
+      <ShareableKit
+        user={user}
+        posts={visiblePosts}
+        engagementRate={engagementRate}
+        typicalReach={typicalReach}
+        typicalSaves={typicalSaves}
+        reachSeries={reachSeries}
+        hasInsights={hasInsights}
+        countries={countries}
+        pastBrands={brands}
+        intro={intro}
+        contact={contact}
+        showCreateBand={false}
+        postNotice={postNotice}
+        introSlot={<OwnerIntroEditor intro={intro} onIntroChange={handleIntroChange} />}
+        brandsSlot={<OwnerPastBrands brands={brands} onBrandsChange={handleBrandsChange} />}
+        renderPostHeader={(post, index) => (
+          <Card.Header
+            start={
+              <span className={cardSubtitleClasses}>{formatPostedAt(post.posted_at)}</span>
+            }
+            end={
+              <MoreMenu
+                aria-label={`Manage selected post ${index + 1}`}
+                size="xs"
+                items={[
+                  {
+                    id: "hide",
+                    label: "Hide from kit",
+                    start: <EyeOff />,
+                  },
+                ]}
+                onAction={(actionId) => handlePostAction(post.id, actionId)}
               />
-              <Card.Body>
-                <img
-                  className={PATTERN_POST_IMAGE_CLASS}
-                  src={publicObjectUrl(post.r2_key)}
-                  alt=""
-                />
-              </Card.Body>
-              <Card.Footer>
-                <div className={PATTERN_KIT_POST_METRICS_CLASS}>
-                  {(
-                    [
-                      ["Likes", post.like_count],
-                      ["Comments", post.comments_count],
-                    ] as const
-                  ).map(([label, value]) => (
-                    <span key={label} className={PATTERN_POST_METRIC_CLASS}>
-                      <span className={PATTERN_POST_METRIC_LABEL_CLASS}>{label}</span>
-                      <span className={PATTERN_POST_METRIC_VALUE_CLASS}>
-                        {compactNumber.format(value)}
-                      </span>
-                    </span>
-                  ))}
-                </div>
-              </Card.Footer>
-            </Card>
-          ))}
-        </div>
-      </section>
+            }
+          />
+        )}
+      />
 
-      {contactDetail ? (
+      {hidden.length > 0 ? (
         <section className={PATTERN_POSTS_SECTION_CLASS}>
           <div className={PATTERN_POSTS_HEADER_CLASS}>
             <div>
-              <h2 className={cardTitleClasses}>Contact</h2>
+              <h2 className={cardTitleClasses}>Hidden from kit</h2>
               <p className={PATTERN_SUPPORTING_CLASS}>
-                Creator-entered details for brand outreach.
-              </p>
-            </div>
-          </div>
-          <Card
-            variant="outlined"
-            padding="md"
-            shape="rounded"
-            className={PATTERN_CONTACT_CARD_CLASS}
-          >
-            <div className={PATTERN_CONTACT_ROWS_CLASS}>
-              {contactDetail.kind === "email" ? (
-                <div className={PATTERN_CONTACT_ROW_CLASS}>
-                  <span className={PATTERN_SECTION_EYEBROW_CLASS}>Email</span>
-                  <TextLink href={contactDetail.href}>{contactDetail.value}</TextLink>
-                </div>
-              ) : null}
-              {contactDetail.kind === "website" ? (
-                <div className={PATTERN_CONTACT_ROW_CLASS}>
-                  <span className={PATTERN_SECTION_EYEBROW_CLASS}>Website</span>
-                  <TextLink href={contactDetail.href} external>
-                    {contactDetail.value}
-                  </TextLink>
-                </div>
-              ) : null}
-              {contactDetail.kind === "text" ? (
-                <div className={PATTERN_CONTACT_ROW_CLASS}>
-                  <span className={PATTERN_SECTION_EYEBROW_CLASS}>Contact</span>
-                  <span className={PATTERN_SUPPORTING_CLASS}>{contactDetail.value}</span>
-                </div>
-              ) : null}
-            </div>
-          </Card>
-        </section>
-      ) : null}
-
-      {shouldShowPastBrands(brands) ? (
-        <section className={PATTERN_POSTS_SECTION_CLASS}>
-          <div className={PATTERN_POSTS_HEADER_CLASS}>
-            <div>
-              <h2 className={cardTitleClasses}>Past brands</h2>
-              <p className={PATTERN_SUPPORTING_CLASS}>
-                Campaigns already shipped with this creator.
+                Restore a post to show it on your public kit.
               </p>
             </div>
           </div>
           <div className={PATTERN_POSTS_PANEL_CLASS}>
-            {brands.map((name) => (
+            {hidden.map((post) => (
               <Card
-                key={name}
+                key={post.id}
                 variant="outlined"
                 shape="rounded"
-                className={PATTERN_POST_CARD_CLASS}
+                className={`${PATTERN_POST_CARD_CLASS} text-muted`}
               >
-                <Card.Header start={<h3 className={cardTitleClasses}>{name}</h3>} />
+                <Card.Header
+                  start={
+                    <span className={PATTERN_POST_HEADER_START_CLASS}>
+                      <Badge variant="neutral" emphasis="muted" size="sm">
+                        Hidden
+                      </Badge>
+                      <span className={cardSubtitleClasses}>{formatPostedAt(post.posted_at)}</span>
+                    </span>
+                  }
+                  end={
+                    <MoreMenu
+                      aria-label="Manage hidden post"
+                      size="xs"
+                      items={[
+                        {
+                          id: "restore",
+                          label: "Restore to kit",
+                          start: <Undo2 />,
+                        },
+                      ]}
+                      onAction={(actionId) => handlePostAction(post.id, actionId)}
+                    />
+                  }
+                />
+                <Card.Body>
+                  <img
+                    className={PATTERN_POST_IMAGE_CLASS}
+                    src={publicObjectUrl(post.r2_key)}
+                    alt=""
+                  />
+                </Card.Body>
               </Card>
             ))}
           </div>
@@ -355,6 +381,6 @@ export function OwnerPitchKit({
           void hidePendingPost();
         }}
       />
-    </>
+    </div>
   );
 }

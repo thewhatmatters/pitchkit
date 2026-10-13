@@ -290,7 +290,7 @@ async function postMediaVisibility(
   }
 }
 
-/** Owner Insights MoreMenu → AlertDialog confirm. */
+/** Owner PitchKit MoreMenu → AlertDialog confirm. */
 export function hideFromKit(mediaId: string): Promise<MediaVisibilityResult> {
   return postMediaVisibility("hide", mediaId);
 }

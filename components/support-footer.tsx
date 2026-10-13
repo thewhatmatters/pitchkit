@@ -1,13 +1,14 @@
-import type { ReactNode } from "react";
+import { PATTERN_FOOTER_BAND_CLASS, PATTERN_FOOTER_CLASS } from "@/components/pattern-tokens";
+import { TextLink } from "@/components/wmds";
 import { SUPPORT_EMAIL } from "@/lib/copy";
 
-export function SupportFooter({ children }: { children?: ReactNode }) {
+export function SupportFooter() {
   return (
-    <footer className="col-span-full flex flex-col gap-2">
-      {children}
-      <p>
-        Support: <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
-      </p>
-    </footer>
+    <div className={PATTERN_FOOTER_BAND_CLASS}>
+      <footer className={PATTERN_FOOTER_CLASS}>
+        <TextLink href="/privacy">Privacy</TextLink>
+        <TextLink href={`mailto:${SUPPORT_EMAIL}`}>Support</TextLink>
+      </footer>
+    </div>
   );
 }

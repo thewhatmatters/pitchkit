@@ -45,17 +45,48 @@ describe("critical page contracts", () => {
     assert.match(page, /insightsGate/);
     assert.match(page, /redirect\("\/insights"\)/);
     assert.match(page, /DISCLOSURE/);
-    assert.match(page, /PERSONAL_FAIL/);
+    assert.match(page, /landingErrorCopy/);
     assert.match(page, /PROFESSIONAL_NOTE/);
     assert.match(page, /DEMO_SESSION_NOTE/);
     assert.match(page, /hasLiveAuthSecrets/);
-    assert.match(read("app/auth/instagram/route.ts"), /hasLiveAuthSecrets/);
-    assert.match(read("app/auth/instagram/route.ts"), /stubConnect/);
+    assert.match(read("lib/session.ts"), /hasLiveAuthSecrets/);
+    assert.match(read("lib/session.ts"), /leftover seed `demo` is not signed in/);
+    const auth = read("app/auth/instagram/route.ts");
+    assert.match(auth, /hasLiveAuthSecrets/);
+    assert.match(auth, /stubConnect/);
+    assert.match(auth, /finishLiveOAuth/);
+    assert.match(auth, /oauthFinishAbortCookies/);
+    assert.doesNotMatch(auth, /resolveSession/);
+    const finish = read("lib/oauth-finish.ts");
+    assert.match(finish, /liveOAuthHandle/);
+    assert.doesNotMatch(finish, /handleAfterReconnect/);
+    assert.match(finish, /const persisted = await writeGraphSnapshot/);
+    assert.match(finish, /sessionCookieAfterPersist/);
+    assert.match(finish, /oauthSuccessSetCookies\(after\.cookie\)/);
+    assert.doesNotMatch(finish, /\[after\.cookie, clearState\]/);
+    assert.match(finish, /oauthLandingPath\("persist"\)/);
+    assert.match(finish, /oauthLandingPath\("oauth_state"\)/);
+    assert.match(finish, /oauthLandingPath\("oauth_exchange"\)/);
+    assert.match(finish, /oauthLandingPath\("oauth_me"\)/);
+    assert.match(finish, /oauthLandingPath\("oauth_poll"\)/);
+    assert.match(finish, /snapshotFromMe/);
+    assert.doesNotMatch(finish, /await resolveSession|resolveSession\(/);
+    assert.match(copy, /We could not save your Instagram connection/);
+    assert.match(copy, /OAUTH_STATE_FAIL/);
+    assert.match(copy, /OAUTH_EXCHANGE_FAIL/);
+    assert.match(copy, /OAUTH_ME_FAIL/);
+    assert.match(copy, /OAUTH_POLL_FAIL/);
+    assert.match(copy, /landingErrorCopy/);
+    const graphStore = read("lib/graph-store.ts");
+    const writeStart = graphStore.indexOf("export async function writeGraphSnapshot");
+    const persistStart = graphStore.indexOf("export async function persistOwnerDisconnect");
+    const writeFn = graphStore.slice(writeStart, persistStart > writeStart ? persistStart : undefined);
+    assert.match(writeFn, /return await writeKvSnapshot\(snapshot, access\)/);
+    assert.doesNotMatch(writeFn, /if \(await resolveHasHyperdrive\(access\)\) \{\s*return false;/);
+    assert.match(read("lib/graph-store.ts"), /Thrown DB \/ overlay errors must not escape writeGraphSnapshot/);
     assert.match(read("lib/graph.ts"), /graph\.instagram\.com/);
     assert.match(read("lib/graph.ts"), /GRAPH_API_VERSION|createGraphClient/);
     assert.match(read("lib/poll.ts"), /POLL_STALE_MS = 6/);
-    assert.match(read("lib/poll.ts"), /user\?\.handle === DEMO_HANDLE/);
-    assert.match(read("lib/store.ts"), /handle === DEMO_HANDLE/);
     assert.match(copy, /Opens the demo Insights session/);
     assert.doesNotMatch(page, /STUB_CONNECT|Stub connect|no Instagram token/);
     assert.doesNotMatch(copy, /STUB_CONNECT|Stub connect|no Instagram token/);
@@ -78,15 +109,40 @@ describe("critical page contracts", () => {
     const workspace = read("components/owner-workspace.tsx");
     assert.match(page, /ShareableKit/);
     assert.match(page, /PATTERN_BRAND_CLASS/);
+    assert.match(page, /resolveSession/);
+    assert.match(page, /showCreateBand=\{session == null\}/);
     assert.doesNotMatch(page, /sessionOwnsHandle|KitEdit|OwnerNav|AppFrame/);
     assert.doesNotMatch(page, /MoreMenu|Hide from kit|label="Edit"|Coming soon|PitchKitComingSoon|OwnerPitchKit/);
-    assert.match(kit, /Verified Instagram summary/);
+    assert.match(kit, /Instagram performance summary/);
     assert.match(kit, /Selected posts/);
     assert.match(kit, /TextLink/);
-    assert.match(kit, /Past brands/);
+    assert.match(kit, /PublicPastBrands/);
+    assert.match(kit, /PublicIntro/);
+    assert.match(kit, /examples-pitchkit--intro-public|PATTERN_INTRO_STACK_CLASS/);
+    assert.match(read("components/past-brands.tsx"), /examples-pitchkit--past-brands-public/);
+    assert.match(read("components/past-brands.tsx"), /past-brands-public-overflow/);
+    assert.match(read("components/past-brands.tsx"), /PastBrandsRail|marquee-track/);
+    assert.match(read("components/past-brands.tsx"), /Past brands/);
+    assert.match(read("components/past-brands.tsx"), /BrandResultChip|result_label/);
+    assert.match(read("lib/kit-profile.ts"), /logo_key\?: string \| null/);
+    assert.match(read("lib/kit-profile.ts"), /PITCHKIT_BRAND_RESULT_MAX = 24/);
+    assert.match(read("components/kit-intro.tsx"), /examples-pitchkit--intro-public/);
     assert.match(kit, /CreatorIdentityStrip/);
     assert.match(kit, /PATTERN_IDENTITY_NAMEPLATE_CLASS/);
+    assert.match(kit, /examples-pitchkit--shareable-pitch-kit/);
+    assert.match(kit, /examples-pitchkit--shareable-insufficient-reach/);
+    assert.match(kit, /Typical reach/);
+    assert.match(kit, /Typical saves/);
+    assert.match(kit, /Reach over 30 days/);
+    assert.match(kit, /Top countries/);
+    assert.match(kit, /PATTERN_PUBLIC_STAT_CLASS|PATTERN_PUBLIC_REACH_CHART_MIN_HEIGHT/);
     assert.match(kit, /examples-pitchkit--creator-identity-public/);
+    assert.match(kit, /showCreateBand/);
+    assert.match(kit, /Create your Pitchkit/);
+    assert.match(kit, /Turn your Instagram into a shareable media kit\./);
+    assert.match(kit, /Continue with Instagram/);
+    assert.match(kit, new RegExp(AUTH_CONNECT_PATH));
+    assert.doesNotMatch(kit, /Get started|Create your PitchKit Profile/);
     assert.match(kit, /nameAs="h1"/);
     assert.match(kit, /showProfessionalChip/);
     assert.doesNotMatch(kit, /<Chip readOnly size="sm">\s*Instagram\s*<\/Chip>/);
@@ -95,14 +151,33 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(workspace, /KitEdit|PitchKitComingSoon|Coming soon/);
     assert.match(workspace, /OwnerPitchKit/);
     assert.match(ownerKit, /examples-pitchkit--owner-pitch-kit/);
-    assert.match(ownerKit, /CreatorIdentityStrip/);
-    assert.match(ownerKit, /PATTERN_IDENTITY_SECTION_CLASS/);
-    assert.match(ownerKit, /PageHeader/);
-    assert.match(ownerKit, /title="PitchKit"/);
+    assert.doesNotMatch(ownerKit, /examples-pitchkit--theme-picker-owner/);
+    assert.doesNotMatch(ownerKit, /title="Theme"|Save theme|PITCHKIT_THEMES|draftTheme/);
     assert.match(ownerKit, /ShareKitButton/);
-    assert.match(ownerKit, /Share kit|handle=\{user\.handle\}/);
+    assert.match(ownerKit, /PITCHKIT_OWNER_TITLE|Your Pitchkit/);
+    assert.match(ownerKit, /PITCHKIT_OWNER_SUPPORTING|Edit what brands see on your public kit/);
+    assert.match(ownerKit, /ShareableKit/);
+    assert.match(ownerKit, /data-theme=\{savedTheme\}/);
+    assert.match(ownerKit, /showCreateBand=\{false\}/);
+    assert.match(ownerKit, /formatPostedAt/);
+    assert.match(ownerKit, /PATTERN_THEME_KIT_CLASS/);
+    assert.match(ownerKit, /Hidden from kit/);
+    assert.match(ownerKit, /Restore to kit/);
+    assert.doesNotMatch(
+      ownerKit,
+      /aria-label="Public kit preview"|>Public kit preview</,
+    );
+    assert.doesNotMatch(
+      ownerKit,
+      /PATTERN_THEME_PREVIEW_CLASS|PATTERN_THEME_PREVIEW_LABEL_CLASS|PATTERN_THEME_PREVIEW_PAGE_CLASS/,
+    );
+    assert.doesNotMatch(ownerKit, /PATTERN_TOPBAR_BAND_CLASS|PATTERN_BRAND_CLASS/);
     assert.match(ownerKit, /Manage selected post/);
     assert.match(ownerKit, /Hide from kit/);
+    assert.match(
+      ownerKit,
+      /<Card\.Header\s+start=\{\s*<span className=\{cardSubtitleClasses\}>\{formatPostedAt\(post\.posted_at\)\}<\/span>\s*\}\s+end=\{\s*<MoreMenu/,
+    );
     assert.match(ownerKit, /hideFromKit/);
     assert.match(ownerKit, /restoreToKit/);
     assert.doesNotMatch(ownerKit, /Coming soon|label="Edit"|Swap post|bio|rates/);
@@ -122,6 +197,8 @@ describe("critical page contracts", () => {
     assert.match(barrel, /SegmentedControl/);
     assert.match(barrel, /PageHeader/);
     assert.match(barrel, /Avatar/);
+    assert.match(barrel, /Dialog/);
+    assert.match(barrel, /Dropdown/);
     assert.match(barrel, /TextLink/);
     assert.match(nav, /SegmentedControl/);
     assert.match(nav, />Insights</);
@@ -131,11 +208,22 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(nav, /router\.push|kitPath|usePathname|useRouter/);
     assert.match(tokens, /PATTERN_TOPBAR_CLASS/);
     assert.match(tokens, /grid-cols-\[1fr_auto_1fr\]/);
-    assert.match(tokens, /PATTERN_BRAND_CLASS = "type-label text-fg text-fg"/);
+    assert.match(tokens, /PATTERN_BRAND_CLASS = "type-heading-4 text-fg"/);
     assert.match(tokens, /PATTERN_TOPBAR_END_CLASS = "justify-self-end"/);
-    assert.match(nav, /<Avatar/);
-    assert.match(nav, /size="sm"/);
+    assert.match(nav, /AccountMenu/);
     assert.match(nav, /PATTERN_TOPBAR_END_CLASS/);
+    assert.match(read("components/account-settings.tsx"), /<Avatar/);
+    assert.match(read("components/account-settings.tsx"), /size="md"/);
+    assert.match(read("components/account-settings.tsx"), /ACCOUNT_MENU_LABEL|My account/);
+    assert.match(read("components/account-settings.tsx"), /Dropdown/);
+    assert.match(read("components/account-settings.tsx"), /Account settings/);
+    assert.match(read("components/account-settings.tsx"), /Share kit/);
+    assert.match(read("components/account-settings.tsx"), /DISCONNECT_INSTAGRAM_ACTION/);
+    assert.match(read("components/account-settings.tsx"), /DELETE_ACCOUNT_ACTION/);
+    assert.match(read("components/account-settings.tsx"), /Sign out/);
+    assert.doesNotMatch(read("components/account-settings.tsx"), /Unlock Pro|Security|Integrations/);
+    assert.match(read("components/account-settings.tsx"), /aria-label=\{ACCOUNT_MENU_LABEL\}/);
+    assert.match(read("components/account-settings.tsx"), /PATTERN_ACCOUNT_MENU_TRIGGER_CLASS/);
     assert.doesNotMatch(nav, /^\s*layout="stretch"/m);
     assert.doesNotMatch(nav, /className="[^"]*w-full/);
     assert.match(frame, /OWNER_GRID_MAX = "1140px"/);
@@ -218,16 +306,15 @@ describe("critical page contracts", () => {
   });
 
   it("Insights product toasts pass title and description", () => {
-    const chrome = read("components/owner-chrome.tsx");
+    const share = read("components/share-kit-button.tsx");
     const proof = read("components/proof-posts.tsx");
     const copy = read("lib/copy.ts");
     const layout = read("app/layout.tsx");
     const ownerKit = read("components/owner-pitchkit.tsx");
-    const share = read("components/share-kit-button.tsx");
     const sources = [share, proof, ownerKit];
     const blocks = sources.flatMap(toastAddBlocks);
 
-    assert.equal(blocks.length, 10);
+    assert.equal(blocks.length, 7);
     for (const block of blocks) {
       assert.match(block, /\btitle:/);
       assert.match(block, /\bdescription:/);
@@ -242,19 +329,25 @@ describe("critical page contracts", () => {
     assert.match(copy, /TOAST_POST_RESTORED_DESCRIPTION = "It appears in the shareable PitchKit again."/);
     assert.match(copy, /TOAST_HIDE_FAILED_TITLE/);
     assert.match(copy, /TOAST_RESTORE_FAILED_TITLE/);
+    assert.match(copy, /TOAST_KIT_PROFILE_FAILED_TITLE/);
+    assert.match(copy, /TOAST_KIT_PROFILE_FAILED_DESCRIPTION/);
     assert.match(share, /TOAST_KIT_COPIED_TITLE/);
     assert.match(share, /TOAST_KIT_COPIED_DESCRIPTION/);
-    assert.match(share, /kitShareUrl/);
-    assert.match(chrome, /ShareKitButton/);
-    assert.match(ownerKit, /ShareKitButton/);
-    assert.match(proof, /TOAST_POST_HIDDEN_TITLE/);
-    assert.match(proof, /TOAST_POST_HIDDEN_DESCRIPTION/);
-    assert.match(proof, /TOAST_POST_RESTORED_TITLE/);
-    assert.match(proof, /TOAST_POST_RESTORED_DESCRIPTION/);
+    assert.doesNotMatch(proof, /TOAST_POST_HIDDEN_TITLE|hideFromKit|restoreToKit|MoreMenu/);
     assert.match(ownerKit, /TOAST_POST_HIDDEN_TITLE/);
     assert.match(ownerKit, /TOAST_POST_HIDDEN_DESCRIPTION/);
     assert.match(ownerKit, /TOAST_POST_RESTORED_TITLE/);
     assert.match(ownerKit, /TOAST_POST_RESTORED_DESCRIPTION/);
+    assert.match(ownerKit, /TOAST_KIT_PROFILE_FAILED_TITLE/);
+    assert.doesNotMatch(ownerKit, /TOAST_THEME_SAVED_TITLE/);
+    assert.match(ownerKit, /saveKitProfile/);
+    assert.match(ownerKit, /OwnerIntroEditor/);
+    assert.match(ownerKit, /OwnerPastBrands/);
+    assert.match(ownerKit, /examples-pitchkit--intro-owner/);
+    assert.match(ownerKit, /examples-pitchkit--past-brands-owner/);
+    assert.match(read("components/past-brands.tsx"), /past-brands-owner-empty/);
+    assert.match(read("components/past-brands.tsx"), /Add result|Clear result/);
+    assert.match(read("components/wmds.ts"), /Select/);
     assert.match(layout, /@whatmatters\/wmds\/styles\.css/);
     assert.doesNotMatch(proof, /setPostNotice\("Post (hidden|restored)/);
   });
@@ -271,16 +364,26 @@ describe("critical page contracts", () => {
 
     assert.match(chrome, /PageHeader/);
     assert.match(chrome, /title="Insights"/);
-    assert.match(chrome, /ShareKitButton/);
-    assert.match(read("components/owner-pitchkit.tsx"), /title="PitchKit"/);
+    assert.doesNotMatch(chrome, /ShareKitButton|Share kit/);
+    assert.doesNotMatch(read("components/insights-loading.tsx"), /ShareKitButton|Share kit/);
     assert.match(read("components/owner-pitchkit.tsx"), /ShareKitButton/);
-    assert.doesNotMatch(read("app/k/[handle]/page.tsx"), /ShareKitButton|Share kit/);
-    assert.doesNotMatch(read("components/shareable-kit.tsx"), /ShareKitButton|Share kit/);
+    assert.match(read("components/share-kit-button.tsx"), /Share kit/);
+    assert.match(read("components/share-kit-button.tsx"), /kitShareUrl\(window\.location\.origin, handle\)/);
     assert.match(copy, /Private to you/);
     assert.match(chrome, /INSIGHTS_PRIVATE/);
     assert.match(stats, /label="Engagement rate"/);
     assert.doesNotMatch(stats, /label="ER"/);
-    assert.match(chrome, /ENGAGEMENT_FORMULA/);
+    assert.match(stats, /EngagementRateFormulaTooltip/);
+    assert.match(read("components/engagement-rate-info.tsx"), /ENGAGEMENT_FORMULA/);
+    assert.match(read("components/engagement-rate-info.tsx"), /<Tooltip/);
+    assert.match(read("components/engagement-rate-info.tsx"), /IconButton/);
+    assert.match(read("components/engagement-rate-info.tsx"), /onOpenChange/);
+    assert.match(read("components/engagement-rate-info.tsx"), /onClick/);
+    assert.match(read("components/engagement-rate-info.tsx"), /delay=\{0\}/);
+    assert.match(read("components/wmds.ts"), /Tooltip/);
+    assert.match(read("components/wmds.ts"), /IconButton/);
+    assert.doesNotMatch(chrome, /ENGAGEMENT_FORMULA/);
+    assert.doesNotMatch(chrome, /PATTERN_FORMULA_CLASS/);
     assert.match(read("lib/inventory.ts"), /\(likes \+ comments \+ saves \+ shares\) ÷ reach/);
     assert.doesNotMatch(chrome, /÷ followers/);
     assert.doesNotMatch(card, />ER</);
@@ -288,7 +391,13 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(stats, /<Stat\.Group/);
     assert.doesNotMatch(stats, /trend=/);
     assert.match(stats, /PATTERN_STAT_CLASS/);
-    assert.match(read("components/pattern-tokens.ts"), /PATTERN_STAT_CLASS = "col-span-2 md:col-span-4 lg:col-span-3"/);
+    assert.match(stats, /label="Typical reach"/);
+    assert.match(stats, /label="Saves"/);
+    assert.doesNotMatch(stats, /showInsightsMetrics/);
+    assert.match(read("components/pattern-tokens.ts"), /PATTERN_STAT_CLASS = "col-span-2 md:col-span-4 lg:col-span-3 h-full"/);
+    assert.match(read("lib/posted-at.ts"), /year: "numeric"/);
+    assert.match(proof, /formatPostedAt/);
+    assert.doesNotMatch(proof, /month: "short"/);
     assert.match(proof, /Recent proof/);
     assert.doesNotMatch(chrome, /Six posts|Top-performing posts/);
     assert.doesNotMatch(proof, /Six posts|Top-performing posts/);
@@ -296,22 +405,12 @@ describe("critical page contracts", () => {
     assert.match(proof, /value="reach"/);
     assert.match(proof, /value="engagement"/);
     assert.match(proof, /value="saves"/);
-    assert.match(proof, /MoreMenu/);
-    assert.match(proof, /Hide from kit/);
-    assert.match(proof, /AlertDialog/);
-    assert.match(proof, /confirmLabel="Hide from kit"/);
-    assert.match(proof, /toast\.add\(/);
-    assert.match(proof, /label: "Undo"/);
-    assert.match(proof, /hideFromKit\(hiddenPost\.id\)/);
-    assert.match(proof, /restoreToKit\(hiddenPost\.id\)/);
+    assert.doesNotMatch(proof, /MoreMenu|Hide from kit|Swap post|AlertDialog|toast\.add/);
+    assert.doesNotMatch(proof, /hideFromKit|restoreToKit|Manage ranked post|Manage hidden post/);
     assert.match(proof, /partitionOwnerProofPosts/);
     assert.match(proof, /setOwnerPosts\(posts\)/);
     assert.match(proof, /shown\.length\} shown/);
-    assert.match(proof, /Restore to kit/);
     assert.match(proof, /Hidden/);
-    assert.match(proof, /stampHiddenFromKit/);
-    assert.match(proof, /clearHiddenFromKit/);
-    assert.match(proof, /result\.error/);
     assert.match(read("lib/kit-visibility.ts"), /POST \/api\/media\/hide/);
     assert.match(read("lib/kit-visibility.ts"), /POST \/api\/media\/restore/);
     assert.match(read("app/api/media/hide/route.ts"), /mediaVisibilityResponse\(request, "hide"\)/);
@@ -374,11 +473,20 @@ describe("critical page contracts", () => {
     assert.match(chart, /animate="none"/);
     assert.match(read("components/owner-chrome.tsx"), /typicalReach=\{typicalReach\}/);
     assert.match(read("components/wmds.ts"), /chartMaxTicksForWidth/);
-    assert.match(read("package.json"), /wmds#9b4a1798aff97322b4167519c14ec802a1878b97/);
+    assert.match(read("package.json"), /wmds#3b75f96e1ea78bffb1a533131502e44148a80c89/);
     assert.doesNotMatch(
       read("package.json"),
-      /0718bdcb87975d3389ad11770bb479c293d33200|14d50cda0302e263cb350409f2cea34de03c7c2e|cd18e7a29afd0c0d774552c1a3d665f480f51bd4|70da6a4c50d8efc1e687b20f231c6e4f1f6190c6|dc813326028c0fe1cc5f3719466a32607bab4504|55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab/,
+      /29bef582fd60bb2398014f1c797b34fcf30bc791|61f8921ac037839da660740da23763813f77d2ee|96f44587b3b3ff1c44de9f1e5adba61a661d30e1|368560cd22bee2c5320b0b0e8038c30affa4bdea|9b4a1798aff97322b4167519c14ec802a1878b97|0718bdcb87975d3389ad11770bb479c293d33200|14d50cda0302e263cb350409f2cea34de03c7c2e|cd18e7a29afd0c0d774552c1a3d665f480f51bd4|70da6a4c50d8efc1e687b20f231c6e4f1f6190c6|dc813326028c0fe1cc5f3719466a32607bab4504|55944edfc8039b6682882c65d1a956b1e51fba21|75f8a41e8b131906378b340a4106a486ddd5173f|3f13630|73277bab|f188148c02347b56b1a1c549b06201cce1777945|9f06fb63eae885803b1e8abdc35edecbbe0870d9|122ab5d1a8bf54f91a5a584ac6037f5f518e8a46/,
     );
+    assert.match(read("components/wmds.ts"), /TextArea/);
+    assert.match(read("components/wmds.ts"), /dialogFooterActionsClasses/);
+    assert.match(read("app/api/kit/profile/route.ts"), /persistOwnerKitProfile/);
+    assert.match(read("lib/graph-store.ts"), /persistOwnerKitProfile/);
+    assert.match(read("lib/kit-profile.ts"), /PITCHKIT_INTRO_HARD_LIMIT = 280/);
+    assert.match(read("lib/kit-profile.ts"), /PITCHKIT_BRANDS_MAX = 8/);
+    assert.match(read("lib/kit-profile.ts"), /PITCHKIT_BRAND_LOGO_KEYS/);
+    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--intro-owner/);
+    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--past-brands-owner/);
     assert.match(page, /OwnerWorkspace/);
     assert.match(read("components/owner-workspace.tsx"), /CREATOR_INSIGHTS_PAGE_CLASS/);
     assert.match(read("components/owner-workspace.tsx"), /CREATOR_INSIGHTS_HEADER_BAND_CLASS/);
@@ -397,7 +505,17 @@ describe("critical page contracts", () => {
       /examples-pitchkit--insufficient-reach-and-audience-data/,
     );
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--graph-data-unavailable/);
-    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--shareable-pitchkit/);
+    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--shareable-pitch-kit/);
+    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--shareable-insufficient-reach/);
+    assert.match(read("components/pattern-tokens.ts"), /3b75f96e1ea78bffb1a533131502e44148a80c89/);
+    assert.doesNotMatch(read("components/pattern-tokens.ts"), /examples-pitchkit--theme-picker-owner/);
+    assert.match(read("components/pattern-tokens.ts"), /PATTERN_PUBLIC_REACH_CARD_CLASS = "col-span-full min-w-0"/);
+    assert.match(read("components/pattern-tokens.ts"), /PATTERN_PUBLIC_COUNTRIES_CARD_CLASS = "col-span-full min-w-0"/);
+    assert.match(read("components/shareable-kit.tsx"), /PATTERN_PUBLIC_REACH_CARD_CLASS/);
+    assert.match(read("components/shareable-kit.tsx"), /PATTERN_PUBLIC_STACK_CLASS/);
+    assert.doesNotMatch(read("components/shareable-kit.tsx"), /PATTERN_DASHBOARD_GRID_CLASS|PATTERN_REACH_CARD_CLASS/);
+    assert.match(read("components/pattern-tokens.ts"), /PATTERN_PUBLIC_REACH_CHART_MIN_HEIGHT = 220/);
+    assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--account-settings-owner/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--owner-pitch-kit/);
     assert.match(read("components/pattern-tokens.ts"), /examples-pitchkit--creator-identity-public/);
     assert.match(
@@ -419,11 +537,19 @@ describe("critical page contracts", () => {
     );
     assert.match(
       read("components/pattern-tokens.ts"),
-      /PATTERN_REACH_EMPTY_WELL_CLASS =\s*`\$\{PATTERN_CARD_WELL_CLASS\} items-center justify-center text-center`/,
+      /PATTERN_REACH_EMPTY_WELL_CLASS =\s*`\$\{PATTERN_CARD_WELL_CLASS\} h-full w-full items-center justify-center text-center`/,
     );
     assert.match(
       read("components/pattern-tokens.ts"),
-      /PATTERN_REACH_EMPTY_COPY_CLASS =\s*"flex max-w-lg flex-col items-center gap-3 text-center"/,
+      /PATTERN_REACH_EMPTY_COPY_CLASS =\s*`\$\{PATTERN_EMPTY_COPY_CLASS\} items-center text-center`/,
+    );
+    assert.match(
+      read("components/pattern-tokens.ts"),
+      /PATTERN_EMPTY_COPY_CLASS = "flex max-w-lg flex-col gap-2"/,
+    );
+    assert.doesNotMatch(
+      read("components/pattern-tokens.ts"),
+      /PATTERN_REACH_EMPTY_COPY_CLASS =\s*"[^"]*gap-3/,
     );
     assert.match(read("components/reach-chart.tsx"), /PATTERN_REACH_EMPTY_COPY_CLASS/);
     assert.match(read("components/reach-chart.tsx"), /<Badge variant="neutral" emphasis="muted">\{REACH_NO_DATA_LABEL\}<\/Badge>/);
@@ -483,8 +609,12 @@ describe("critical page contracts", () => {
       /PATTERN_PLACEHOLDER_BODY_CLASS = "type-body text-fg max-w-md text-muted"/,
     );
     assert.match(read("components/owner-pitchkit.tsx"), /examples-pitchkit--owner-pitch-kit/);
-    assert.match(read("components/owner-pitchkit.tsx"), /PATTERN_IDENTITY_SECTION_CLASS/);
-    assert.match(read("components/owner-pitchkit.tsx"), /ShareKitButton/);
+    assert.match(read("components/owner-pitchkit.tsx"), /PATTERN_THEME_KIT_CLASS/);
+    assert.doesNotMatch(
+      read("components/owner-pitchkit.tsx"),
+      /aria-label="Public kit preview"|>Public kit preview</,
+    );
+    assert.doesNotMatch(read("components/owner-pitchkit.tsx"), /PATTERN_THEME_PREVIEW_CLASS/);
     assert.match(read("components/owner-workspace.tsx"), /OwnerPitchKit/);
     assert.doesNotMatch(read("components/owner-workspace.tsx"), /PitchKitComingSoon|Coming soon/);
     assert.doesNotMatch(read("lib/copy.ts"), /PITCHKIT_COMING_SOON|Coming soon/);
@@ -521,6 +651,11 @@ describe("critical page contracts", () => {
     assert.match(read("lib/hidden-kit-kv.ts"), /async: true/);
     assert.match(read("wrangler.jsonc"), /"binding": "HIDDEN_KIT"/);
     assert.match(read("wrangler.jsonc"), /8a50f78eca5e4bf7bbabc96d9f9df63c/);
+    assert.match(read("wrangler.jsonc"), /\/\/\s+"hyperdrive":/);
+    assert.doesNotMatch(read("wrangler.jsonc"), /^\s+"hyperdrive":/m);
+    assert.match(read("wrangler.jsonc"), /"binding": "HYPERDRIVE"/);
+    assert.match(read("wrangler.jsonc"), /"binding": "HYPERDRIVE_PREVIEW"/);
+    assert.match(read("wrangler.jsonc"), /bf225442516d44f599e083b72df886cd/);
     assert.doesNotMatch(hidden, /__pitchkitHiddenFromKit/);
     assert.match(kit, /excludeHiddenFromPublicKit/);
     assert.match(publicKit, /hiddenOverlayForHandle/);
@@ -548,44 +683,79 @@ describe("critical page contracts", () => {
   it("settings is account only", () => {
     const page = read("app/settings/page.tsx");
     const settings = read("components/account-settings.tsx");
+    const nav = read("components/owner-nav.tsx");
     const disconnect = read("components/disconnect-control.tsx");
     const chrome = read("components/owner-chrome.tsx");
+    const workspace = read("components/owner-workspace.tsx");
     const strip = read("components/creator-identity-strip.tsx");
-    const identityBlocks = toastAddBlocks(settings);
+    const copy = read("lib/copy.ts");
+    const identityBlocks = toastAddBlocks(read("components/share-kit-button.tsx"));
     assert.match(page, /insightsGate/);
     assert.match(page, /resolveSession/);
     assert.match(page, /AccountSettings/);
     assert.match(page, /kit\.user/);
     assert.doesNotMatch(page, /<AppFrame|OWNER_GRID_MAX|OwnerNav/);
-    assert.match(settings, /examples-pitchkit--creator-identity-owner-settings/);
+    assert.match(settings, /examples-pitchkit--account-settings-owner/);
     assert.match(settings, /Connected Instagram/);
     assert.match(settings, /Share kit/);
-    assert.match(settings, /kitPath/);
-    assert.match(settings, /kitShareUrl/);
-    assert.match(settings, />\s*Copy\s*</);
+    assert.doesNotMatch(settings, /kitPath|>\s*Copy\s*</);
     assert.match(settings, /Last synced/);
-    assert.match(settings, /title="Settings"/);
+    assert.match(settings, /title="Account settings"/);
+    assert.match(settings, /ACCOUNT_MENU_LABEL|My account/);
+    assert.match(settings, /size="md"/);
+    assert.match(settings, /Dropdown/);
+    assert.match(settings, /<Dialog/);
+    assert.match(settings, /Dialog\.Content/);
     assert.match(settings, /CreatorIdentityStrip/);
     assert.match(settings, /nameAs="p"/);
     assert.match(settings, /showProfessionalChip/);
     assert.match(settings, /PATTERN_SETTINGS_CARD_CLASS/);
     assert.match(settings, /PATTERN_PAGE_CLASS/);
-    assert.match(settings, /Reconnect Instagram/);
+    assert.match(settings, /PATTERN_USER_SETTINGS_BODY_CLASS/);
+    assert.match(settings, /PATTERN_ACCOUNT_MENU_SEPARATOR_CLASS/);
     assert.match(settings, new RegExp(AUTH_SIGNOUT_PATH));
-    assert.match(settings, /DisconnectControl/);
+    assert.match(settings, /DISCONNECT_TITLE/);
+    assert.match(settings, /DELETE_ACCOUNT_ACTION/);
+    assert.match(settings, /DELETE_ACCOUNT_TITLE/);
+    assert.match(settings, /DELETE_ACCOUNT_CONFIRM/);
+    assert.match(settings, /confirmRole="destructive"/);
+    assert.match(settings, new RegExp(`action="${AUTH_DISCONNECT_PATH}"`));
+    assert.match(copy, /Delete your Pitchkit account\?/);
+    assert.match(
+      copy,
+      /This permanently deletes your kit, stored media copies, and connection/,
+    );
+    assert.match(nav, /AccountMenu/);
+    assert.match(settings, /AccountSettingsDialog/);
+    assert.match(settings, /defaultSettingsOpen/);
+    assert.doesNotMatch(workspace, /href="\/settings"|Account<\/a>/);
+    assert.doesNotMatch(settings, /href="\/delete"/);
+    assert.doesNotMatch(workspace, /href="\/delete"/);
     assert.match(disconnect, new RegExp(`action="${AUTH_DISCONNECT_PATH}"`));
     assert.match(disconnect, /method="post"/);
     assert.match(disconnect, /<AlertDialog/);
     assert.match(disconnect, /confirmLabel="Disconnect"/);
     assert.match(read("app/auth/disconnect/route.ts"), /disconnectOwner/);
-    assert.match(chrome, /DisconnectControl/);
+    assert.doesNotMatch(chrome, /Reconnect Instagram/);
+    assert.doesNotMatch(chrome, /DisconnectControl/);
+    assert.match(settings, /RECONNECT_INSTAGRAM_ACTION/);
+    assert.match(copy, /RECONNECT_INSTAGRAM_ACTION = "Reconnect Instagram"/);
+    assert.match(copy, /DISCONNECT_INSTAGRAM_ACTION = "Disconnect Instagram"/);
+    assert.match(read("components/support-footer.tsx"), /\/privacy/);
+    assert.match(read("components/support-footer.tsx"), /mailto:\$\{SUPPORT_EMAIL\}/);
+    assert.match(read("components/support-footer.tsx"), />Privacy</);
+    assert.match(read("components/support-footer.tsx"), />Support</);
+    assert.match(read("components/support-footer.tsx"), /PATTERN_FOOTER_BAND_CLASS/);
+    assert.match(read("components/support-footer.tsx"), /TextLink/);
+    assert.doesNotMatch(read("components/support-footer.tsx"), /Reconnect Instagram|scroll-to-top|Vercel|Cloudflare/);
     assert.equal(identityBlocks.length, 2);
     for (const block of identityBlocks) {
       assert.match(block, /\btitle:/);
       assert.match(block, /\bdescription:/);
     }
-    assert.match(settings, /TOAST_KIT_COPIED_TITLE/);
-    assert.match(settings, /TOAST_KIT_COPIED_DESCRIPTION/);
+    assert.match(settings, /copyKitLink/);
+    assert.match(read("components/share-kit-button.tsx"), /TOAST_KIT_COPIED_TITLE/);
+    assert.match(read("components/share-kit-button.tsx"), /TOAST_KIT_COPIED_DESCRIPTION/);
     assert.match(strip, /displayName != null/);
     assert.match(strip, /followersCount == null/);
     assert.match(strip, /CreatorIdentityStripSkeleton/);
@@ -597,6 +767,6 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(settings, /Coming soon|KitEdit|ShareableKit|<Stat|Chart\./);
     assert.doesNotMatch(settings, /biography|heatmap|EXAMPLE %/);
     assert.doesNotMatch(page, /past brand|Past brand/i);
-    assert.doesNotMatch(read("components/owner-workspace.tsx"), /CreatorIdentityStrip|AccountSettings/);
+    assert.doesNotMatch(workspace, /CreatorIdentityStrip|AccountSettings/);
   });
 });

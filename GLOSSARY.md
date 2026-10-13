@@ -9,7 +9,7 @@ Desk research, interviews unrun. Locked with Design 2026-09-02. User Research ow
 - If we ever label account-level saves: user insights `saves`, not `saved`.
 - `follower_demographics` breakdowns `country` / `city` / `age` / `gender` are live (v25/v26 Insights, Instagram Login). ≥100 followers or the metric is omitted — keep the owner Audience Card with State — insufficient audience data (`No audience data yet` / `Connect Instagram Insights demographics when available.`); don’t paint invented zeros or EXAMPLE %. Honest `0` only when Graph returned a zero count. Top 45 only. Graph returns integer counts in `total_value.breakdowns.results.value`, not percents. Our math: % of located sample = `value / sum(results)`. **Never** % of `followers_count` (sums can be less than followers because Meta only counts people with demo data). Empty dataset: keep the Card, hide the bars. Backend persists those counts as objects when Insights lands; no extra Graph columns.
 - IG User `biography` and `website` are Public. Hide if empty. No IG User location field. No industry. Impressions stay off.
-- Engagement rate unlocked 2026-09-18: `(likes + comments + saves + shares) ÷ reach`. Account = **sum÷sum** on posts with Insights `reach` > 0. Hide (or —) when reach is missing. Tooltip: **of reach**, likes + comments + saves + shares in the numerator. Do not fall back to ÷ followers (that was the 2026-09-02 lock; removed). Public kit and Insights use the same formula.
+- Engagement rate unlocked 2026-09-18: `(likes + comments + saves + shares) ÷ reach`. Account = **sum÷sum** on posts with Insights `reach` > 0. Hide (or —) when reach is missing. Tooltip: **of reach**, likes + comments + saves + shares in the numerator. Insights shows that lock on the Engagement rate Stat info `Tooltip` (`Engagement rate = {ENGAGEMENT_FORMULA}`) — not a PageHeader headline. Do not fall back to ÷ followers (that was the 2026-09-02 lock; removed). Public kit and Insights use the same formula.
 
 ## v1 Stat row (ordered)
 
@@ -17,7 +17,7 @@ Desk research, interviews unrun. Locked with Design 2026-09-02. User Research ow
 Share of reach who interact with a typical post (likes + comments + saves + shares). Brands use this first: is the audience real, or a quiet list? Account rate is sum of those interactions ÷ sum of reach on the six posts that have Insights `reach` > 0 — not an average of per-post rates, which overweight small posts. Unlocked 2026-09-18. Same formula on the public kit and Insights. A smaller account with a high Engagement rate often beats a big one that nobody talks to.
 - Brand ~30s: hire or pass — is the audience real?
 - Hide: when no post on the six has Insights `reach` > 0 (missing, null, or 0). Show — rather than 0. Public kit hides Engagement rate when Insights reach is unavailable. Do not fall back to ÷ followers. Do not invent zeros.
-- Formula (locked 2026-09-18): `(likes + comments + saves + shares) ÷ reach`. Per-post when that media has Insights `reach` > 0. Account/typical = **sum(interactions) ÷ sum(reach)** on those posts. Tooltip: **of reach**, likes + comments + saves + shares in the numerator. The 2026-09-02 lock was `(likes + comments) ÷ followers` — removed; do not teach it.
+- Formula (locked 2026-09-18): `(likes + comments + saves + shares) ÷ reach`. Per-post when that media has Insights `reach` > 0. Account/typical = **sum(interactions) ÷ sum(reach)** on those posts. Tooltip: **of reach**, likes + comments + saves + shares in the numerator. Owner Insights / owner PitchKit place that copy on the Engagement rate Stat (`end` + WMDS `Tooltip` + `Info` IconButton). The 2026-09-02 lock was `(likes + comments) ÷ followers` — removed; do not teach it.
 - Graph (v25, Instagram Login): computed. Likes/comments are media `like_count` / `comments_count`. Saves/shares are media insights `saved` / `shares` — not Facebook-only object fields `saved_count` / `shares_count`. Reach denominator is media insights `reach`.
 
 **Typical reach** — Insights only; hide if missing.
@@ -68,7 +68,7 @@ Row length follows the data: Followers always; Engagement rate when reach exists
 - Profile views + bio-link clicks in the overview
 - Average likes as a Stat
 - Stats as a prose paragraph
-- Look: gallery, themes, colors
+- Look: gallery, custom colors. Kit theme is unlocked: `light` | `dark` | `soft` (default `light`; persist on the KV Graph snapshot)
 - Impressions (deprecated)
 - Industry unless sourced (Later form field, not Graph)
 - Bio / creator location only if sourced from IG profile; hide if empty
@@ -113,7 +113,11 @@ Does the split match the customer?
 - Paint: what Meta returns (% of located sample). Don’t add buckets.
 - Graph: `follower_demographics` breakdown `gender`. Same count path.
 
-**Bio** — IG User `biography` (Public). Hide if empty. Not a Stat. Not a typed Later blurb.
+**Bio** — IG User `biography` (Public). Hide if empty. Not a Stat. Not a typed Later blurb. **Not on the Pitchkit kit this cut** — the nameplate intro is Pitchkit-owned (below).
+
+**Intro** — Pitchkit-owned kit sentence under the identity nameplate. Not Instagram `biography`. Soft 160 / hard 280. Owner empty = **Add an intro**. Public empty = omit the block. Persist `intro` on the KV Graph snapshot.
+
+**Past brands** — Creator-entered proof list. Ordered `{ id, name, logo_key?, result_label? }` (max 8). `logo_key` is a curated WMDS pack slug or omit — unknown/missing uses a letter Avatar from `name`. No creator uploads or scraped favicons. `result_label` is an optional phrase (trim; max 24) — omit the Chip when empty. Owner add / edit / reorder + optional add/clear result. Public is display only; static row when it fits, marquee only on overflow. Public empty = omit. No year, summary, or Graph KPIs. Persist `past_brands` on the KV Graph snapshot. Existing `{ id, name }` rows migrate with `logo_key` / `result_label` undefined.
 
 **Website** — IG User `website` (Public). Hide if empty. Not a Stat.
 

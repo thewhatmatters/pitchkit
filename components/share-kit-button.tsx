@@ -10,11 +10,13 @@ import {
 } from "@/lib/copy";
 import { kitShareUrl } from "@/lib/kit";
 
-type CopyShareKitOptions = {
+type ShareKitButtonProps = {
+  handle: string;
   onCopyFailed?: (url: string) => void;
 };
 
-export async function copyShareKitLink(handle: string, options: CopyShareKitOptions = {}) {
+/** Copy `/k/{handle}` — toast title + description. Owner PitchKit + account menu. */
+export async function copyKitLink(handle: string, onCopyFailed?: (url: string) => void) {
   const url = kitShareUrl(window.location.origin, handle);
   try {
     await navigator.clipboard.writeText(url);
@@ -27,27 +29,19 @@ export async function copyShareKitLink(handle: string, options: CopyShareKitOpti
       title: TOAST_KIT_COPY_FAILED_TITLE,
       description: TOAST_KIT_COPY_FAILED_DESCRIPTION,
     });
-    options.onCopyFailed?.(url);
+    onCopyFailed?.(url);
   }
 }
 
-type ShareKitButtonProps = {
-  handle: string;
-  onCopyFailed?: (url: string) => void;
-};
-
-/**
- * Owner Share kit — copies `kitShareUrl(origin, handle)`.
- * Same Button on Insights PageHeader (Pattern) and owner PitchKit (primary).
- * Public `/k/[handle]` must not mount this.
- */
 export function ShareKitButton({ handle, onCopyFailed }: ShareKitButtonProps) {
   return (
     <Button
       role="secondary"
       size="sm"
       icon={<Share2 />}
-      onClick={() => void copyShareKitLink(handle, { onCopyFailed })}
+      onClick={() => {
+        void copyKitLink(handle, onCopyFailed);
+      }}
     >
       Share kit
     </Button>

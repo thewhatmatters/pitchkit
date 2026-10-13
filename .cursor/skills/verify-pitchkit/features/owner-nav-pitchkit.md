@@ -1,6 +1,6 @@
 # Owner nav ↔ PitchKit
 
-Owner primary navigation is the Pattern — creator Insights three-column header: PitchKit label, a hug SegmentedControl — **Insights** / **PitchKit** — and Avatar. PitchKit is Pattern — owner PitchKit on `/insights` (shareable sections + hide/restore posts; Coming soon retired). The public kit stays on `/k/demo` without owner chrome. Insights stays private. Do not expect `layout="stretch"`, a full-width control, or a hard navigation to `/k/demo`.
+Owner primary navigation is the Pattern — creator Insights three-column header: PitchKit label, a hug SegmentedControl — **Insights** / **PitchKit** — and Avatar. PitchKit is Pattern — owner PitchKit on `/insights` (shareable sections + hide/restore posts + intro / past brands editors; Coming soon retired). The public kit stays on `/k/demo` without owner chrome. Insights stays private. Do not expect `layout="stretch"`, a full-width control, or a hard navigation to `/k/demo`.
 
 ## Sub-features
 
@@ -13,7 +13,7 @@ Owner primary navigation is the Pattern — creator Insights three-column header
 ## How to get to it (user POV)
 
 - After connect, use the top SegmentedControl on Insights.
-- Account (`/settings`) is a footer link — not a third nav item.
+- Account menu opens from the header Avatar (structured Dropdown) — not a third nav item or footer link.
 
 ## Driving it with control-pitchkit
 
@@ -22,8 +22,8 @@ Preconditions:
 - `control-pitchkit connect` and `doctor --require-session` succeeded.
 - Start on `/insights`.
 
-- **See nav.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /insights`. The header shows a **PitchKit** brand label, a hug control named **PitchKit primary navigation** (**Insights** / **PitchKit**), and an Avatar. Insights is the current view. Footer has a quiet **Account** link, not a third segment.
-- **Open PitchKit.** Choose PitchKit. Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs click --role radio --name "PitchKit"`. Path stays `/insights`. Body shows the owner kit: PageHeader **PitchKit** + primary **Share kit**, **Demo Creator**, `@demo`, **Followers**, **Engagement rate**, **Selected posts**, and MoreMenu **Manage selected post N** / **Hide from kit**. No **Coming soon** badge. No bio / website / rates / Edit switch. Insights PageHeader / Recent proof are absent on this segment. Share kit is the owner PitchKit primary copy action; Insights keeps Pattern Share kit.
+- **See nav.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /insights`. The header shows a **PitchKit** brand label, a hug control named **PitchKit primary navigation** (**Insights** / **PitchKit**), and an Avatar that opens **My account**. Insights is the current view. No footer **Account**, **Delete**, or **Reconnect Instagram** block.
+- **Open PitchKit.** Choose PitchKit. Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs click --role radio --name "PitchKit"`. Path stays `/insights`. Body shows **Your Pitchkit** / **Edit what brands see on your public kit.** + **Share kit**, then the kit itself (**Demo Creator**, `@demo`, Pitchkit-owned intro editor or **Add an intro**, **Followers**, **Engagement rate**, **Reach over 30 days** full width, compact **Top countries**, **Selected posts**, MoreMenu **Manage selected post N** / **Hide from kit**, Past brands add/edit/reorder or **Add brands you've worked with**). No Theme / Light / Dark / Soft / **Save theme**. No **Public kit preview** label, nested preview frame, or second **PitchKit** wordmark inside the kit body. No **Coming soon** badge. No Instagram biography / website / rates / Edit switch. Insights PageHeader / Recent proof stay on the Insights segment (no Share kit there).
 - **Owner grid on kit.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs eval --js "getComputedStyle(document.querySelector('.grid-page')).getPropertyValue('--grid-max').trim()"`. `value` is `1140px`. `--grid-column-gap` is `8px` (Pattern Show code). Do not require `--grid-gutter:8px` on this shell.
 - **Return to Insights.** Choose Insights. Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs click --role radio --name "Insights"`. Path is still `/insights`. PageHeader **Insights** returns.
 - **Anon has no nav.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /k/demo --fresh`. There is no **PitchKit primary navigation** and no **Edit** switch or **Manage selected post**. The public kit (Demo Creator, Selected posts) is on this URL — no owner hide chrome.

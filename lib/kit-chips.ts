@@ -1,6 +1,6 @@
 /**
  * Past-brand names on the shareable kit. Pattern freeze uses outlined Cards.
- * Hide empty. No marquee. No invented year or campaign summary.
+ * Hide empty. Marquee only when the public rail overflows. No invented year or campaign summary.
  */
 
 export type SourcedContactDetail =

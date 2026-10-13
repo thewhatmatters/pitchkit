@@ -1,5 +1,12 @@
 import type { RankedShare } from "./audience";
 import { engagementRate, typicalFromPosts } from "./engagement";
+import {
+  EMPTY_KIT_PROFILE,
+  PITCHKIT_THEME_DEFAULT,
+  type KitProfile,
+  type PastBrand,
+  type PitchKitTheme,
+} from "./kit-profile";
 import { isUtcDay, shouldShowReachChart, type ReachPoint } from "./reach-series";
 import type { Media, User } from "./schema";
 
@@ -30,13 +37,32 @@ export type PublicKit = {
   typicalSaves: number | null;
   /** Owner Insights only. Live Graph or empty — never EXAMPLE percents. */
   audience?: KitAudience;
+  /** Pitchkit-owned intro. Empty → public omit. */
+  intro: string | null;
+  /** Ordered `{ id, name, logo_key?, result_label? }`. Empty → public omit. */
+  past_brands: PastBrand[];
+  /** Public kit appearance. Default light. */
+  theme: PitchKitTheme;
 };
 
 export type AssembleKitOptions = {
   /** Seed/example or poll-derived. Ignored when Insights are missing. */
   reach_series?: ReachPoint[];
   audience?: KitAudience;
+  intro?: string | null;
+  past_brands?: PastBrand[];
+  theme?: PitchKitTheme;
 };
+
+/** Public kit reach well — always keep the Card. Chart only when plottable. */
+export type PublicReachState = "resolved" | "insufficient";
+
+export function publicReachState(
+  hasInsights: boolean,
+  series?: ReachPoint[] | null,
+): PublicReachState {
+  return hasInsights && shouldShowReachChart(series) ? "resolved" : "insufficient";
+}
 
 export function kitPath(handle: string) {
   return `/k/${handle}`;
@@ -147,5 +173,17 @@ export function assemblePublicKit(
         }
       : {}),
     ...(options.audience ? { audience: options.audience } : {}),
+    intro: options.intro ?? EMPTY_KIT_PROFILE.intro,
+    past_brands: options.past_brands ?? EMPTY_KIT_PROFILE.past_brands,
+    theme: options.theme ?? PITCHKIT_THEME_DEFAULT,
+  };
+}
+
+export function attachKitProfile<T extends object>(kit: T, profile: KitProfile): T & KitProfile {
+  return {
+    ...kit,
+    intro: profile.intro,
+    past_brands: profile.past_brands,
+    theme: profile.theme,
   };
 }

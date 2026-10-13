@@ -5,7 +5,6 @@ import { AudienceFit } from "@/components/audience-fit";
 import { InsightsLoading } from "@/components/insights-loading";
 import {
   PATTERN_DASHBOARD_GRID_CLASS,
-  PATTERN_FORMULA_CLASS,
   PATTERN_HEADER_COPY_CLASS,
   PATTERN_HEADER_SECTION_CLASS,
   PATTERN_METRICS_STACK_CLASS,
@@ -15,11 +14,9 @@ import { Button, PageHeader } from "@/components/wmds";
 import { InsightsStats } from "@/components/insights-stats";
 import { ProofPosts } from "@/components/proof-posts";
 import { ReachChart } from "@/components/reach-chart";
-import { copyShareKitLink, ShareKitButton } from "@/components/share-kit-button";
 import { resolveOwnerAudience } from "@/lib/audience";
-import { DisconnectControl } from "@/components/disconnect-control";
 import { INSIGHTS_PRIVATE } from "@/lib/copy";
-import { ENGAGEMENT_FORMULA, inventoryLastUpdated } from "@/lib/inventory";
+import { inventoryLastUpdated } from "@/lib/inventory";
 import type { KitAudience } from "@/lib/kit";
 import type { ReachPoint } from "@/lib/reach-series";
 import type { Media, User } from "@/lib/schema";
@@ -68,19 +65,13 @@ export function OwnerChrome({
   gridReady,
   retrieving: retrievingProp = false,
 }: OwnerChromeProps) {
-  const [notice, setNotice] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const retrieving = retrievingProp || refreshing;
   const refreshed = formatRefreshedAt(inventoryLastUpdated(posts));
   const mixes = resolveOwnerAudience(audience);
 
   if (!gridReady) {
-    return (
-      <>
-        <InsightsLoading onShare={() => void copyShareKitLink(user.handle, { onCopyFailed: setNotice })} />
-        <OwnerAccountActions notice={notice} />
-      </>
-    );
+    return <InsightsLoading />;
   }
 
   return (
@@ -90,15 +81,12 @@ export function OwnerChrome({
           variant="page"
           title="Insights"
           end={
-            <span className="flex flex-wrap items-center gap-2">
-              <form action="/insights" method="get" onSubmit={() => setRefreshing(true)}>
-                <input type="hidden" name="refresh" value="1" />
-                <Button type="submit" role="secondary" size="sm">
-                  Refresh
-                </Button>
-              </form>
-              <ShareKitButton handle={user.handle} onCopyFailed={setNotice} />
-            </span>
+            <form action="/insights" method="get" onSubmit={() => setRefreshing(true)}>
+              <input type="hidden" name="refresh" value="1" />
+              <Button type="submit" role="secondary" size="sm">
+                Refresh
+              </Button>
+            </form>
           }
         />
         <div className={PATTERN_HEADER_COPY_CLASS}>
@@ -106,9 +94,6 @@ export function OwnerChrome({
             {refreshed
               ? `Verified Instagram performance, refreshed ${refreshed}. ${INSIGHTS_PRIVATE}.`
               : `${INSIGHTS_PRIVATE}.`}
-          </p>
-          <p className={PATTERN_FORMULA_CLASS}>
-            Engagement rate = {ENGAGEMENT_FORMULA}.
           </p>
         </div>
       </section>
@@ -140,30 +125,6 @@ export function OwnerChrome({
       </div>
 
       <ProofPosts posts={posts} hasInsights={hasInsights} onPostsChange={onPostsChange} />
-
-      <OwnerAccountActions notice={notice} />
-    </>
-  );
-}
-
-function OwnerAccountActions({ notice }: { notice: string | null }) {
-  return (
-    <>
-      <div className="col-span-full flex flex-wrap gap-2">
-        <form action="/auth/instagram" method="post">
-          <Button type="submit" role="secondary">
-            Reconnect Instagram
-          </Button>
-        </form>
-        <form action="/auth/sign-out" method="post">
-          <Button type="submit" role="secondary">
-            Sign out
-          </Button>
-        </form>
-        <DisconnectControl />
-      </div>
-
-      {notice ? <p className="col-span-full">{notice}</p> : null}
     </>
   );
 }

@@ -13,7 +13,7 @@ Connect session lets a creator read the collection note, tap **Continue with Ins
 ## How to get to it (user POV)
 
 - Open https://pitchkit.app (or `/`) and choose **Continue with Instagram**.
-- Reconnect from Insights via **Reconnect Instagram** (same stub path).
+- Reconnect from Account settings via **Reconnect Instagram** (same stub path).
 - GET or POST `/auth/instagram` in a browser (same cookie + 303). Prefer the button.
 
 ## Driving it with control-pitchkit
@@ -34,7 +34,7 @@ Preconditions:
 
 ## Gotchas
 
-- Without `IG_APP_ID` / `IG_APP_SECRET` the path is still the seed stub (not an Instagram token). Seed tokens stay null. A live Meta dialog on production means those secrets are set — that is Phase 2 Auth, not a regression.
+- Without `IG_APP_ID` / `IG_APP_SECRET` the path is still the seed stub (not an Instagram token). Seed tokens stay null. A live Meta dialog on production means those secrets are set — that is Phase 2 Auth, not a regression. Leftover `pitchkit_session=demo` must not enter Insights when those secrets exist; landing stays **Continue with Instagram**. Live OAuth persist tries SQL first; if that write fails, KV `graph:` still saves so login does not loop on Connect. After a true write, set `pitchkit_session` to the in-memory handle on a single `Set-Cookie` — do not re-read via `resolveSession`. A paired oauth-state clear on that 303 can fold on OpenNext/Workers and leave leftover `demo`. Live finish must not write `pitchkit_session=demo` when `/me` username is not `demo` (a KV snapshot stuck on handle `demo` is contamination, not the seed kit). `/?error=persist` only if both writes fail. Distinct landing errors: `oauth_state`, `oauth_exchange`, `oauth_me`, `personal`, `oauth_poll`, `persist`.
 - `/insights` without `pitchkit_session` redirects home. Do not treat a landing screenshot as a connected session.
 - After connect, `goto /` must land on `/insights`, not the Continue gate.
 - Reconnect re-sets the same seed session. It does not create a second handle. WHA-313 optional URL update is live OAuth only.

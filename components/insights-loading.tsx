@@ -1,6 +1,5 @@
 "use client";
 
-import { Share2 } from "lucide-react";
 import {
   PATTERN_AUDIENCE_CARD_CLASS,
   PATTERN_AUDIENCE_SKELETON_BARS_CLASS,
@@ -36,17 +35,13 @@ const audienceSkeletonSections = [
   { titleWidth: 60, bars: [96, 68, 44] },
 ] as const;
 
-type InsightsLoadingProps = {
-  onShare: () => void;
-};
-
 /**
  * Pattern — creator Insights (loading) Show code
  * (`examples-pitchkit--creator-insights-loading`).
  * First Graph connect / `?grid=pulling` page freeze — Skeleton wells, not retrieving.
  * Do not mount a second toast host here.
  */
-export function InsightsLoading({ onShare }: InsightsLoadingProps) {
+export function InsightsLoading() {
   return (
     <>
       <section className={PATTERN_HEADER_SECTION_CLASS}>
@@ -54,17 +49,12 @@ export function InsightsLoading({ onShare }: InsightsLoadingProps) {
           variant="page"
           title="Insights"
           end={
-            <span className="flex flex-wrap items-center gap-2">
-              <form action="/insights" method="get">
-                <input type="hidden" name="refresh" value="1" />
-                <Button type="submit" role="secondary" size="sm">
-                  Refresh
-                </Button>
-              </form>
-              <Button role="secondary" size="sm" icon={<Share2 />} onClick={onShare}>
-                Share kit
+            <form action="/insights" method="get">
+              <input type="hidden" name="refresh" value="1" />
+              <Button type="submit" role="secondary" size="sm">
+                Refresh
               </Button>
-            </span>
+            </form>
           }
         />
         <div className={PATTERN_HEADER_SKELETON_COPY_CLASS}>

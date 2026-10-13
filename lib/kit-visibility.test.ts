@@ -147,10 +147,13 @@ describe("kit visibility overlay", () => {
     assert.equal(hidden[0]?.hidden_from_kit_at, "2026-09-09T01:30:00.000Z");
 
     const proof = readFileSync(join(process.cwd(), "components/proof-posts.tsx"), "utf8");
+    const ownerKit = readFileSync(join(process.cwd(), "components/owner-pitchkit.tsx"), "utf8");
     assert.match(proof, /partitionOwnerProofPosts\(ownerPosts\)/);
     assert.match(proof, /sortPosts\(shown,/);
     assert.match(proof, /shown\.length\} shown/);
-    assert.match(proof, /Restore to kit/);
+    assert.doesNotMatch(proof, /Restore to kit|MoreMenu/);
+    assert.match(ownerKit, /Restore to kit/);
+    assert.match(ownerKit, /partitionOwnerProofPosts/);
   });
 
   it("restore path clears hidden_from_kit_at so the row returns to shown", () => {

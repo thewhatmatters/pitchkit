@@ -1,14 +1,12 @@
 import assert from "node:assert/strict";
 import { afterEach, describe, it } from "node:test";
 import { emptySecrets, setSecretsForTests } from "./env";
-import { EMPTY_AUDIENCE, writeGraphSnapshot } from "./graph-store";
 import { GRAPH_HOST } from "./graph";
 import { createMemoryHiddenKit, setHiddenKitNamespaceForTests } from "./hidden-kit";
 import { pollInsights, resolveAccessToken, shouldPollInsights } from "./poll";
 import { loadOwnerKit } from "./store";
-import { DEMO_HANDLE, DEMO_USER_ID, seedMedia, seedUser } from "./seed";
+import { DEMO_HANDLE, DEMO_USER_ID } from "./seed";
 import { encryptToken } from "./token-crypto";
-import type { User } from "./schema";
 
 afterEach(() => {
   setSecretsForTests(undefined);
@@ -162,73 +160,41 @@ describe("Insights poll", () => {
     });
   });
 
-  it("never resolves IG_USER_TOKEN for the seed demo handle", async () => {
-    const operator = { ...emptySecrets(), IG_USER_TOKEN: "operator-live-token" };
-    assert.ok(seedUser);
-    assert.equal(await resolveAccessToken(seedUser, operator), null);
-    assert.equal(
-      await resolveAccessToken(
-        { handle: DEMO_HANDLE, token_encrypted: await encryptToken("stored", "unit-test-token-key") },
-        { ...operator, TOKEN_KEY: "unit-test-token-key" },
-      ),
-      null,
+  it("never resolves IG_USER_TOKEN for the seed demo user", async () => {
+    const demo = await resolveAccessToken(
+      { handle: DEMO_HANDLE, id: DEMO_USER_ID, token_encrypted: null },
+      { ...emptySecrets(), IG_USER_TOKEN: "operator-token" },
     );
+    assert.equal(demo, null);
 
-    const live: Pick<User, "handle" | "token_encrypted"> = {
-      handle: "rxndy.dxniel",
-      token_encrypted: null,
-    };
-    assert.equal(await resolveAccessToken(live, operator), "operator-live-token");
-    assert.equal(
-      await resolveAccessToken(
-        {
-          handle: "rxndy.dxniel",
-          token_encrypted: await encryptToken("oauth-stored", "unit-test-token-key"),
-        },
-        { ...operator, TOKEN_KEY: "unit-test-token-key" },
-      ),
-      "oauth-stored",
+    const stored = await encryptToken("stored-oauth", "unit-test-token-key");
+    const liveStored = await resolveAccessToken(
+      { handle: "rxndy.dxniel", id: "live-1", token_encrypted: stored },
+      { ...emptySecrets(), TOKEN_KEY: "unit-test-token-key", IG_USER_TOKEN: "operator-token" },
     );
+    assert.equal(liveStored, "stored-oauth");
+
+    const liveFallback = await resolveAccessToken(
+      { handle: "rxndy.dxniel", id: "live-1", token_encrypted: null },
+      { ...emptySecrets(), IG_USER_TOKEN: "operator-token" },
+    );
+    assert.equal(liveFallback, "operator-token");
   });
 
-  it("demo + IG_USER_TOKEN stays seed and does not poll Graph", async () => {
+  it("loadOwnerKit never polls Graph for seed demo even with IG_USER_TOKEN", async () => {
     setHiddenKitNamespaceForTests(createMemoryHiddenKit());
-    setSecretsForTests({ ...emptySecrets(), IG_USER_TOKEN: "operator-live-token" });
-    assert.ok(seedUser);
-    await writeGraphSnapshot({
-      user: {
-        ...seedUser,
-        name: "Randy",
-        handle: DEMO_HANDLE,
-        followers: 97,
-      },
-      media: [
-        {
-          ...seedMedia[0]!,
-          id: "live-confused",
-          user_id: DEMO_USER_ID,
-          ig_media_id: "live-confused",
-          permalink: "https://www.instagram.com/p/live/",
-          like_count: 1,
-        },
-      ],
-      reach_series: [],
-      audience: EMPTY_AUDIENCE,
-      polled_at: "2026-09-18T12:00:00.000Z",
-    });
-
+    setSecretsForTests({ ...emptySecrets(), IG_USER_TOKEN: "operator-token" });
     let fetched = 0;
     const owner = await loadOwnerKit(DEMO_HANDLE, new Date("2026-09-02T12:00:00.000Z"), null, {
       refresh: true,
       fetch: async () => {
         fetched += 1;
-        throw new Error("demo must not poll Graph");
+        throw new Error("demo must not poll");
       },
     });
     assert.ok(owner);
-    assert.equal(fetched, 0);
     assert.equal(owner.user.handle, DEMO_HANDLE);
-    assert.equal(owner.user.name, "Demo Creator");
-    assert.equal(owner.posts.some((row) => row.ig_media_id === "live-confused"), false);
+    assert.equal(fetched, 0);
+    assert.ok(owner.reach_series && owner.reach_series.length === 30);
   });
 });

@@ -74,12 +74,12 @@ describe("fail-closed: Hide-from-kit AlertDialog role=dialog", () => {
     installJsdom();
   });
 
-  it("ProofPosts mounts WMDS AlertDialog with confirmLabel Hide from kit", () => {
-    const proof = readFileSync(join(process.cwd(), "components/proof-posts.tsx"), "utf8");
-    assert.match(proof, /<AlertDialog/);
-    assert.match(proof, /confirmLabel="Hide from kit"/);
-    assert.match(proof, /title="Hide this post from PitchKit\?"/);
-    assert.match(proof, /from "@\/components\/wmds"/);
+  it("OwnerPitchKit mounts WMDS AlertDialog with confirmLabel Hide from kit", () => {
+    const ownerKit = readFileSync(join(process.cwd(), "components/owner-pitchkit.tsx"), "utf8");
+    assert.match(ownerKit, /<AlertDialog/);
+    assert.match(ownerKit, /confirmLabel="Hide from kit"/);
+    assert.match(ownerKit, /title="Hide this post from PitchKit\?"/);
+    assert.match(ownerKit, /from "@\/components\/wmds"/);
     assert.match(readFileSync(join(process.cwd(), "components/wmds.ts"), "utf8"), /AlertDialog/);
   });
 

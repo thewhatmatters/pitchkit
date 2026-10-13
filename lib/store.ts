@@ -10,16 +10,24 @@ import {
   seedUsers,
   seedWeeklyCounts,
   DEMO_HANDLE,
+  DEMO_USER_ID,
 } from "./seed";
 import { readSecrets, type PitchkitSecrets } from "./env";
 import {
   EMPTY_AUDIENCE,
   readGraphSnapshot,
   readGraphSnapshotByHandle,
+  snapshotKitProfile,
   writeGraphSnapshot,
   type AudienceMixes,
   type GraphSnapshot,
 } from "./graph-store";
+import {
+  PITCHKIT_THEME_DEFAULT,
+  SEED_INTRO,
+  SEED_PAST_BRANDS,
+  type KitProfile,
+} from "./kit-profile";
 import { encryptTokenIfPossible } from "./token-crypto";
 import { pollInsights, resolveAccessToken, shouldPollInsights } from "./poll";
 import { hasHyperdrive as hasHyperdriveFlag, resolveHasHyperdrive } from "./hyperdrive";
@@ -30,11 +38,10 @@ export type { HiddenOverlay, HideRestoreResult } from "./hidden-kit";
 export { hasHyperdriveFlag as hasHyperdrive, resolveHasHyperdrive };
 
 /**
- * Hyperdrive bound → SQL is SoT for live Graph users + hide/restore.
+ * Hyperdrive bound → SQL is preferred SoT for live Graph users + hide/restore.
+ * `writeGraphSnapshot` still falls back to KV `graph:` if that SQL write fails or throws.
  * Else /k/[handle] and /insights read the in-repo seed unless a Graph
- * snapshot (OAuth poll) is present on KV `graph:` keys.
- * Seed `demo` never polls and never binds a Graph snapshot — operator
- * `IG_USER_TOKEN` must not paint a live identity onto `/k/demo`.
+ * snapshot (OAuth or operator token poll) is present on KV `graph:` keys.
  * Public `/k/demo` stays `lib/seed.ts`.
  * Hide/restore seed SoT: KV `HIDDEN_KIT` (`hidden:<userId>`) until Hyperdrive.
  */
@@ -79,11 +86,20 @@ async function ownerFromSnapshot(
   const kit = assemblePublicKit(snapshot.user, media, now, {
     reach_series: snapshot.reach_series,
     audience: snapshot.audience,
+    ...snapshotKitProfile(snapshot),
   });
   if (!kit) {
     return null;
   }
   return { ...kit, posts: media, audience: snapshot.audience ?? EMPTY_AUDIENCE };
+}
+
+async function resolveDemoKitProfile(access: HiddenKitAccess = "page"): Promise<KitProfile> {
+  const snapshot = await readGraphSnapshot(DEMO_USER_ID, access);
+  if (!snapshot) {
+    return { intro: SEED_INTRO, past_brands: [...SEED_PAST_BRANDS], theme: PITCHKIT_THEME_DEFAULT };
+  }
+  return snapshotKitProfile(snapshot);
 }
 
 export async function loadPublicKit(
@@ -102,7 +118,9 @@ export async function loadPublicKit(
       await hiddenOverlayForHandle(handle, overlay),
       user.id,
     );
-    return assemblePublicKit(user, excludeHiddenFromPublicKit(media), now);
+    return assemblePublicKit(user, excludeHiddenFromPublicKit(media), now, {
+      ...(await resolveDemoKitProfile()),
+    });
   }
 
   const snapshot = await readGraphSnapshotByHandle(handle);
@@ -116,13 +134,18 @@ export async function loadPublicKit(
         await hiddenOverlayForHandle(handle, overlay),
         snapshot.user.id,
       );
-  return assemblePublicKit(snapshot.user, excludeHiddenFromPublicKit(media), now);
+  return assemblePublicKit(snapshot.user, excludeHiddenFromPublicKit(media), now, {
+    reach_series: snapshot.reach_series,
+    audience: snapshot.audience,
+    ...snapshotKitProfile(snapshot),
+  });
 }
 
 /**
  * Owner Insights for the session handle.
- * Demo seed includes example Insights + `reach_series` (no Graph poll).
- * Live OAuth token → poll when stale (>6h) or Refresh; persist snapshot.
+ * Demo seed includes example Insights + `reach_series` when no token.
+ * Never resolve operator `IG_USER_TOKEN` or a Graph snapshot for seed `demo`.
+ * Live OAuth token → poll when stale (>6h) or Refresh; persist snapshot; hide empty.
  * Includes every owner row (hidden posts keep `hidden_from_kit_at`).
  */
 export async function loadOwnerKit(
@@ -133,11 +156,29 @@ export async function loadOwnerKit(
 ): Promise<PublicKit | null> {
   const access = options.access ?? "page";
   const secrets = options.secrets ?? (await readSecrets(access));
+  if (handle === DEMO_HANDLE) {
+    const seedUser = seedUsers.find((row) => row.handle === handle);
+    if (!seedUser) {
+      return null;
+    }
+    const fetched = seedOwnerMedia.filter((row) => row.user_id === seedUser.id);
+    const media = (await sqlOwnsUser(seedUser.id, access))
+      ? fetched
+      : applyHiddenOverlay(fetched, await hiddenOverlayForHandle(handle, overlay), seedUser.id);
+    const kit = assemblePublicKit(seedUser, media, now, {
+      reach_series: seedReachSeries,
+      audience: EMPTY_AUDIENCE,
+      ...(await resolveDemoKitProfile(access)),
+    });
+    if (!kit) {
+      return null;
+    }
+    return { ...kit, posts: media, audience: EMPTY_AUDIENCE };
+  }
   const seedUser = seedUsers.find((row) => row.handle === handle);
-  const live =
-    handle === DEMO_HANDLE
-      ? null
-      : await readGraphSnapshotByHandle(handle, access);
+  const live = seedUser
+    ? await readGraphSnapshot(seedUser.id, access)
+    : await readGraphSnapshotByHandle(handle, access);
   const existing = live ?? (seedUser
     ? {
         user: seedUser,
@@ -183,6 +224,9 @@ export async function loadOwnerKit(
           handle: user.handle,
           token_encrypted: tokenEncrypted ?? polled.snapshot.user.token_encrypted,
         },
+        intro: polled.snapshot.intro ?? live?.intro ?? null,
+        past_brands: polled.snapshot.past_brands ?? live?.past_brands ?? [],
+        theme: polled.snapshot.theme ?? live?.theme,
       };
       await writeGraphSnapshot(snapshot, access);
       const resolvedOverlay = await hiddenOverlayForHandle(handle, overlay);
@@ -207,6 +251,7 @@ export async function loadOwnerKit(
   const kit = assemblePublicKit(seedUser, media, now, {
     reach_series: seedReachSeries,
     audience: EMPTY_AUDIENCE,
+    ...(await resolveDemoKitProfile(access)),
   });
   if (!kit) {
     return null;

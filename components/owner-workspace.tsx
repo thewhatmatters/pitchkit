@@ -12,6 +12,7 @@ import { OwnerNav, type OwnerView } from "@/components/owner-nav";
 import { OwnerPitchKit } from "@/components/owner-pitchkit";
 import { SupportFooter } from "@/components/support-footer";
 import type { KitAudience } from "@/lib/kit";
+import type { PastBrand, PitchKitTheme } from "@/lib/kit-profile";
 import type { ReachPoint } from "@/lib/reach-series";
 import type { Media, User } from "@/lib/schema";
 
@@ -24,6 +25,9 @@ type OwnerWorkspaceProps = {
   reachSeries?: ReachPoint[] | null;
   hasInsights: boolean;
   audience?: KitAudience | null;
+  intro?: string | null;
+  pastBrands?: readonly PastBrand[];
+  theme?: PitchKitTheme;
   gridReady: boolean;
   retrieving?: boolean;
 };
@@ -43,6 +47,9 @@ export function OwnerWorkspace({
   reachSeries,
   hasInsights,
   audience,
+  intro = null,
+  pastBrands = [],
+  theme,
   gridReady,
   retrieving = false,
 }: OwnerWorkspaceProps) {
@@ -56,12 +63,25 @@ export function OwnerWorkspace({
   return (
     <main className={CREATOR_INSIGHTS_PAGE_CLASS}>
       <div className={CREATOR_INSIGHTS_HEADER_BAND_CLASS}>
-        <OwnerNav name={user.name} view={view} onViewChange={setView} />
+        <OwnerNav user={user} posts={posts} view={view} onViewChange={setView} />
       </div>
       <div className={CREATOR_INSIGHTS_BODY_BAND_CLASS}>
         <div className={CREATOR_INSIGHTS_BODY_INNER_CLASS}>
           {view === "pitchkit" ? (
-            <OwnerPitchKit user={user} posts={posts} onPostsChange={setPosts} />
+            <OwnerPitchKit
+              user={user}
+              posts={posts}
+              onPostsChange={setPosts}
+              engagementRate={engagementRate}
+              typicalReach={typicalReach}
+              typicalSaves={typicalSaves}
+              reachSeries={reachSeries}
+              hasInsights={hasInsights}
+              countries={audience?.country}
+              intro={intro}
+              pastBrands={pastBrands}
+              theme={theme}
+            />
           ) : (
             <OwnerChrome
               user={user}
@@ -77,13 +97,9 @@ export function OwnerWorkspace({
               retrieving={retrieving}
             />
           )}
-          <SupportFooter>
-            <p>
-              <a href="/settings">Account</a>
-            </p>
-          </SupportFooter>
         </div>
       </div>
+      <SupportFooter />
     </main>
   );
 }

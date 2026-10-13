@@ -7,6 +7,9 @@ import {
   CREATOR_INSIGHTS_BODY_INNER_CLASS,
   CREATOR_INSIGHTS_HEADER_BAND_CLASS,
   CREATOR_INSIGHTS_PAGE_CLASS,
+  PATTERN_AUDIENCE_EMPTY_COPY_CLASS,
+  PATTERN_EMPTY_COPY_CLASS,
+  PATTERN_REACH_EMPTY_COPY_CLASS,
 } from "../components/pattern-tokens";
 import {
   OWNER_GRID_CLASS,
@@ -70,5 +73,16 @@ describe("fail-closed: owner grid gutter tokens (WHA-309)", () => {
     assert.match(read("components/account-settings.tsx"), /PATTERN_TOPBAR_BAND_CLASS/);
     assert.doesNotMatch(insights, /<AppFrame|OWNER_GRID_MAX|layout="stretch"/);
     assert.match(read("app/layout.tsx"), /className="bg-body min-h-screen"/);
+  });
+
+  it("insufficient empty wells use title↔subtext gap-2 (~0.5rem)", () => {
+    assert.equal(PATTERN_EMPTY_COPY_CLASS, "flex max-w-lg flex-col gap-2");
+    assert.equal(
+      PATTERN_REACH_EMPTY_COPY_CLASS,
+      `${PATTERN_EMPTY_COPY_CLASS} items-center text-center`,
+    );
+    assert.equal(PATTERN_AUDIENCE_EMPTY_COPY_CLASS, PATTERN_REACH_EMPTY_COPY_CLASS);
+    assert.match(PATTERN_REACH_EMPTY_COPY_CLASS, /gap-2/);
+    assert.doesNotMatch(PATTERN_REACH_EMPTY_COPY_CLASS, /gap-3/);
   });
 });

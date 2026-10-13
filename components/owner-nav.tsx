@@ -1,22 +1,25 @@
 "use client";
 
-import { Avatar, SegmentedControl } from "@/components/wmds";
+import { AccountMenu } from "@/components/account-settings";
+import { SegmentedControl } from "@/components/wmds";
 import {
   PATTERN_BRAND_CLASS,
   PATTERN_TOPBAR_CLASS,
   PATTERN_TOPBAR_END_CLASS,
 } from "@/components/pattern-tokens";
+import type { Media, User } from "@/lib/schema";
 
 export type OwnerView = "insights" | "pitchkit";
 
 type OwnerNavProps = {
-  name: string;
+  user: User;
+  posts: Media[];
   view: OwnerView;
   onViewChange: (view: OwnerView) => void;
 };
 
 /** WMDS Pattern — creator Insights three-column header. Hug control. In-page view. */
-export function OwnerNav({ name, view, onViewChange }: OwnerNavProps) {
+export function OwnerNav({ user, posts, view, onViewChange }: OwnerNavProps) {
   return (
     <header className={PATTERN_TOPBAR_CLASS}>
       <span className={PATTERN_BRAND_CLASS}>PitchKit</span>
@@ -34,7 +37,7 @@ export function OwnerNav({ name, view, onViewChange }: OwnerNavProps) {
         <SegmentedControl.Item value="pitchkit">PitchKit</SegmentedControl.Item>
       </SegmentedControl>
       <span className={PATTERN_TOPBAR_END_CLASS}>
-        <Avatar name={name} size="sm" />
+        <AccountMenu user={user} posts={posts} />
       </span>
     </header>
   );

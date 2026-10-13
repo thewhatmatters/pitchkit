@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import {
   CREATOR_INSIGHTS_BODY_BAND_CLASS,
@@ -11,6 +12,7 @@ import {
 import { ShareableKit } from "@/components/shareable-kit";
 import { SupportFooter } from "@/components/support-footer";
 import { kitPath } from "@/lib/kit";
+import { resolveSession, SESSION_COOKIE } from "@/lib/session";
 import { hiddenOverlayForHandle, loadPublicKit } from "@/lib/store";
 
 type KitPageProps = {
@@ -43,8 +45,11 @@ export default async function KitPage({ params }: KitPageProps) {
     notFound();
   }
 
+  const cookieStore = await cookies();
+  const session = await resolveSession(cookieStore.get(SESSION_COOKIE)?.value, "page");
+
   return (
-    <main className={CREATOR_INSIGHTS_PAGE_CLASS}>
+    <main data-theme={kit.theme} className={CREATOR_INSIGHTS_PAGE_CLASS}>
       <div className={CREATOR_INSIGHTS_HEADER_BAND_CLASS}>
         <header className={PATTERN_TOPBAR_CLASS}>
           <span className={PATTERN_BRAND_CLASS}>PitchKit</span>
@@ -56,10 +61,18 @@ export default async function KitPage({ params }: KitPageProps) {
             user={kit.user}
             posts={kit.posts}
             engagementRate={kit.engagementRate}
+            typicalReach={kit.typicalReach}
+            typicalSaves={kit.typicalSaves}
+            reachSeries={kit.reach_series}
+            hasInsights={kit.hasInsights}
+            countries={kit.audience?.country}
+            intro={kit.intro}
+            pastBrands={kit.past_brands}
+            showCreateBand={session == null}
           />
-          <SupportFooter />
         </div>
       </div>
+      <SupportFooter />
     </main>
   );
 }

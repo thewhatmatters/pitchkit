@@ -2,10 +2,12 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   audienceFitSurface,
+  publicCountries,
   resolveOwnerAudience,
   SEED_AUDIENCE,
   shouldShowAudienceMix,
   visibleAudienceMix,
+  type RankedShare,
 } from "./audience";
 import {
   EXAMPLE_AGE_MIX,
@@ -71,6 +73,28 @@ describe("audience mix hide-empty", () => {
       }),
       "bars",
     );
+  });
+
+  it("public kit keeps the top 3 countries only", () => {
+    const bars = publicCountries([
+      { label: "United States", percent: 42 },
+      { label: "United Kingdom", percent: 16 },
+      { label: "Canada", percent: 11 },
+      { label: "Australia", percent: 8 },
+      { label: "Zero", percent: 0 },
+    ]);
+    assert.deepEqual(bars, [
+      { label: "United States", value: 42 },
+      { label: "United Kingdom", value: 16 },
+      { label: "Canada", value: 11 },
+    ]);
+    assert.deepEqual(publicCountries([]), []);
+    const readonlyRows: readonly RankedShare[] = [
+      { label: "United States", percent: 42 },
+    ];
+    assert.deepEqual(publicCountries(readonlyRows), [
+      { label: "United States", value: 42 },
+    ]);
   });
 
   it("live/empty owner audience never resolves to EXAMPLE labels", () => {

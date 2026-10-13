@@ -4,7 +4,7 @@ interface CloudflareEnv {
     get(key: string): Promise<string | null>;
     put(key: string, value: string): Promise<void>;
   };
-  /** Present only after Randy binds Hyperdrive. Leave wrangler ids commented until then. */
+  /** Worker Hyperdrive binding (config `pitchkit`). */
   HYPERDRIVE?: {
     connectionString: string;
   };

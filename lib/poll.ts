@@ -27,10 +27,10 @@ import {
   type AudienceMixes,
   type GraphSnapshot,
 } from "./graph-store";
+import { isSeedDemoUser } from "./seed";
 import { decryptToken } from "./token-crypto";
 import { shouldShowReachChart, type ReachPoint } from "./reach-series";
 import type { Media, User } from "./schema";
-import { DEMO_HANDLE } from "./seed";
 
 export const POLL_STALE_MS = 6 * 60 * 60 * 1000;
 
@@ -95,18 +95,11 @@ export function shouldPollInsights(input: {
   return isFetchedAtStale(input.polledAt, input.now ?? new Date());
 }
 
-/**
- * Token for an Insights poll.
- * Seed `demo` never polls — operator `IG_USER_TOKEN` must not bind a live
- * Graph identity onto the frozen demo kit (Share would copy `/k/demo`).
- * Live OAuth users use their encrypted token; operator token is fallback
- * only for non-demo rows without `token_encrypted`.
- */
 export async function resolveAccessToken(
-  user: Pick<User, "token_encrypted" | "handle"> | null | undefined,
+  user: Pick<User, "token_encrypted" | "handle" | "id"> | null | undefined,
   secrets: PitchkitSecrets,
 ): Promise<string | null> {
-  if (user?.handle === DEMO_HANDLE) {
+  if (isSeedDemoUser(user)) {
     return null;
   }
   const stored = await decryptToken(user?.token_encrypted, secrets.TOKEN_KEY);
@@ -116,7 +109,7 @@ export async function resolveAccessToken(
   return secrets.IG_USER_TOKEN;
 }
 
-function mapMeToUser(input: {
+export function mapMeToUser(input: {
   me: GraphMe;
   existing?: User | null;
   handle: string;
@@ -142,6 +135,40 @@ function mapMeToUser(input: {
     consent_index: input.existing?.consent_index ?? false,
     ig_account_type: input.me.account_type ?? input.existing?.ig_account_type ?? null,
     disclosure_version: input.existing?.disclosure_version ?? 1,
+  };
+}
+
+/** When Insights poll fails after `/me`, persist identity + empty wells and still log in. */
+export function snapshotFromMe(input: {
+  me: GraphMe;
+  existing?: GraphSnapshot | null;
+  handle: string;
+  userId?: string;
+  now?: Date;
+}): GraphSnapshot | null {
+  const handle = input.handle.trim();
+  if (!handle) {
+    return null;
+  }
+  const fetchedAt = (input.now ?? new Date()).toISOString();
+  const userId = input.userId ?? input.existing?.user.id ?? newId();
+  return {
+    user: mapMeToUser({
+      me: input.me,
+      existing: input.existing?.user ?? null,
+      handle,
+      userId,
+      now: input.existing?.user.connected_at ?? fetchedAt,
+      tokenEncrypted: input.existing?.user.token_encrypted ?? null,
+      tokenExpiresAt: input.existing?.user.token_expires_at ?? null,
+    }),
+    media: [],
+    reach_series: [],
+    audience: EMPTY_AUDIENCE,
+    polled_at: fetchedAt,
+    intro: input.existing?.intro ?? null,
+    past_brands: input.existing?.past_brands ?? [],
+    theme: input.existing?.theme,
   };
 }
 
@@ -293,6 +320,9 @@ export async function pollInsights(options: PollOptions): Promise<PollResult> {
       reach_series: reachSeries,
       audience,
       polled_at: fetchedAt,
+      intro: existing?.intro ?? null,
+      past_brands: existing?.past_brands ?? [],
+      theme: existing?.theme,
     },
   };
 }

@@ -6,9 +6,10 @@ import {
   excludeHiddenFromPublicKit,
   isUtcDay,
   kitHasInsights,
+  publicReachState,
+  selectSixPosts,
   kitPath,
   kitShareUrl,
-  selectSixPosts,
 } from "./kit";
 import type { Media, User } from "./schema";
 import { MEDIA_COLUMNS, USER_COLUMNS } from "./schema";
@@ -75,17 +76,6 @@ function user(partial: Partial<User> = {}): User {
     ...partial,
   };
 }
-
-describe("kit share URL", () => {
-  it("uses the session owner handle, not a hardcoded demo path", () => {
-    assert.equal(kitPath("rxndy.dxniel"), "/k/rxndy.dxniel");
-    assert.equal(
-      kitShareUrl("https://pitchkit.app", "rxndy.dxniel"),
-      "https://pitchkit.app/k/rxndy.dxniel",
-    );
-    assert.equal(kitShareUrl("https://pitchkit.app/", DEMO_HANDLE), "https://pitchkit.app/k/demo");
-  });
-});
 
 describe("selectSixPosts", () => {
   it("ranks last-30-day posts by saves, then reach, then likes; missing Insights last", () => {
@@ -172,6 +162,7 @@ describe("ER hide-insights", () => {
     const kit = assemblePublicKit(user({ followers: 10_000 }), posts, NOW);
     assert.ok(kit);
     assert.equal(kit.hasInsights, false);
+    assert.equal(kit.theme, "light");
     assert.equal(kit.engagementRate, null);
     assert.equal("reach_series" in kit, false);
     assert.equal(kit.reach_series, undefined);
@@ -259,6 +250,9 @@ describe("seed schema", () => {
     assert.equal(demo.reach_series, undefined);
     assert.equal(demo.typicalReach, null);
     assert.equal(demo.typicalSaves, null);
+    assert.equal(typeof demo.intro, "string");
+    assert.ok(demo.past_brands.length > 0);
+    assert.equal(demo.theme, "light");
     assert.equal(await loadPublicKit("nope", NOW), null);
     assert.equal(assemblePublicKit(user({ disconnected_at: NOW.toISOString() }), seedMedia, NOW), null);
   });
@@ -333,5 +327,19 @@ describe("reach_series kit payload", () => {
     assert.ok(emptyInsights);
     assert.equal(emptyInsights.hasInsights, false);
     assert.equal(emptyInsights.reach_series, undefined);
+    assert.equal(publicReachState(false, seedReachSeries), "insufficient");
+    assert.equal(publicReachState(true, []), "insufficient");
+    assert.equal(publicReachState(true, seedReachSeries), "resolved");
+  });
+});
+
+describe("kit share URL", () => {
+  it("uses the session owner handle, not a hardcoded demo path", () => {
+    assert.equal(kitPath("rxndy.dxniel"), "/k/rxndy.dxniel");
+    assert.equal(
+      kitShareUrl("https://pitchkit.app", "rxndy.dxniel"),
+      "https://pitchkit.app/k/rxndy.dxniel",
+    );
+    assert.equal(kitShareUrl("https://pitchkit.app/", DEMO_HANDLE), "https://pitchkit.app/k/demo");
   });
 });
