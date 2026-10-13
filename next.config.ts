@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@whatmatters/wmds"],
+  transpilePackages: ["@thewhatmatters/wmds"],
   serverExternalPackages: ["postgres"],
   agentRules: false,
 };
