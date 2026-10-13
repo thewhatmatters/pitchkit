@@ -1,24 +1,22 @@
 import type { Metadata } from "next";
 import { AppFrame } from "@/components/app-frame";
-import { PageCard, PageCopy } from "@/components/page-card";
+import { DraftNotice } from "@/components/legal-page";
+import { PageTitle } from "@/components/page-card";
+import { PrivacyContent } from "@/components/privacy-content";
 import { SupportFooter } from "@/components/support-footer";
-import { DISCLOSURE } from "@/lib/copy";
 
 export const metadata: Metadata = {
-  title: "Privacy",
+  title: "Privacy policy",
 };
 
 export default function PrivacyPage() {
   return (
     <AppFrame>
-      <PageCard title="Privacy">
-        <PageCopy>{DISCLOSURE}</PageCopy>
-        <PageCopy>
-          Scopes: instagram_business_basic and instagram_business_manage_insights.
-          Public kit images are already public posts. Tokens are encrypted at rest.
-          Brands see the kit card only — never Insights.
-        </PageCopy>
-      </PageCard>
+      <div className="col-span-full flex flex-col gap-2">
+        <PageTitle>Privacy policy</PageTitle>
+      </div>
+      <DraftNotice />
+      <PrivacyContent />
       <SupportFooter />
     </AppFrame>
   );
