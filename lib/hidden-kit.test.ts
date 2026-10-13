@@ -21,6 +21,7 @@ import { excludeHiddenFromPublicKit } from "./kit";
 import type { Media } from "./schema";
 import { DEMO_HANDLE, DEMO_USER_ID, seedMedia } from "./seed";
 import { parseSessionValue, SESSION_COOKIE, stubSignOut } from "./session";
+import { mintSessionToken } from "./session-test-helpers";
 import { hideFromKit as storeHide, loadOwnerKit, loadPublicKit, restoreToKit as storeRestore } from "./store";
 
 const NOW = new Date("2026-09-02T12:00:00.000Z");
@@ -51,8 +52,10 @@ function media(
   };
 }
 
-function cookieHeader(sessionHandle: string, overlayValue?: string): string {
-  const parts = [`${SESSION_COOKIE}=${sessionHandle}`];
+async function cookieHeader(sessionHandle: string, overlayValue?: string): Promise<string> {
+  const seed = parseSessionValue(sessionHandle);
+  const token = seed ? await mintSessionToken(seed.handle, seed.userId) : sessionHandle;
+  const parts = [`${SESSION_COOKIE}=${token}`];
   if (overlayValue != null) {
     parts.push(`${HIDDEN_COOKIE}=${overlayValue}`);
   }
@@ -319,8 +322,8 @@ describe("pitchkit_hidden cookie overlay", () => {
     assert.equal(serializeHiddenOverlay(overlay), encodeURIComponent(JSON.stringify(overlay)));
   });
 
-  it("clears the overlay cookie on sign-out", () => {
-    const cookies = stubSignOut(new Request("http://localhost/auth/sign-out")).headers.getSetCookie();
+  it("clears the overlay cookie on sign-out", async () => {
+    const cookies = (await stubSignOut(new Request("http://localhost/auth/sign-out"))).headers.getSetCookie();
     assert.equal(
       cookies.some((row) => row.startsWith(`${HIDDEN_COOKIE}=`) && /Max-Age=0/.test(row)),
       true,
@@ -330,7 +333,7 @@ describe("pitchkit_hidden cookie overlay", () => {
 
 describe("POST /api/media/hide and /restore", () => {
   it("returns 200 + cookie overlay and is idempotent", async () => {
-    const hide = await postVisibility("/api/media/hide", { mediaId: TOP_ID }, cookieHeader(DEMO_HANDLE));
+    const hide = await postVisibility("/api/media/hide", { mediaId: TOP_ID }, await cookieHeader(DEMO_HANDLE));
     assert.equal(hide.status, 200);
     const hideBody = (await hide.json()) as { mediaId: string; hiddenFromKitAt: string | null };
     assert.equal(hideBody.mediaId, TOP_ID);
@@ -343,7 +346,7 @@ describe("POST /api/media/hide and /restore", () => {
     const hideAgain = await postVisibility(
       "/api/media/hide",
       { mediaId: TOP_ID },
-      cookieHeader(DEMO_HANDLE, overlayValue),
+      await cookieHeader(DEMO_HANDLE, overlayValue),
     );
     assert.equal(hideAgain.status, 200);
     const hideAgainBody = (await hideAgain.json()) as { hiddenFromKitAt: string | null };
@@ -352,7 +355,7 @@ describe("POST /api/media/hide and /restore", () => {
     const restore = await postVisibility(
       "/api/media/restore",
       { mediaId: TOP_ID },
-      cookieHeader(DEMO_HANDLE, overlayValue),
+      await cookieHeader(DEMO_HANDLE, overlayValue),
     );
     assert.equal(restore.status, 200);
     assert.deepEqual(await restore.json(), { mediaId: TOP_ID, hiddenFromKitAt: null });
@@ -366,7 +369,7 @@ describe("POST /api/media/hide and /restore", () => {
     const invalid = await postVisibility(
       "/api/media/restore",
       { mediaId: 1 },
-      cookieHeader(DEMO_HANDLE),
+      await cookieHeader(DEMO_HANDLE),
     );
     assert.equal(invalid.status, 400);
     assert.deepEqual(await invalid.json(), { error: "invalid_body" });
@@ -374,7 +377,7 @@ describe("POST /api/media/hide and /restore", () => {
     const missing = await postVisibility(
       "/api/media/hide",
       { mediaId: "nope" },
-      cookieHeader(DEMO_HANDLE),
+      await cookieHeader(DEMO_HANDLE),
     );
     assert.equal(missing.status, 404);
     assert.deepEqual(await missing.json(), { error: "not_found" });
@@ -386,7 +389,7 @@ describe("POST /api/media/hide and /restore", () => {
         method: "POST",
         headers: {
           "content-type": "application/json",
-          cookie: cookieHeader(DEMO_HANDLE),
+          cookie: await cookieHeader(DEMO_HANDLE),
         },
         body: JSON.stringify({ mediaId: TOP_ID }),
       }),
