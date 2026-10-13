@@ -86,7 +86,11 @@ describe("fail-closed: Hide-from-kit AlertDialog role=dialog", () => {
   it("WMDS AlertDialog confirm exposes accessible dialog semantics", async () => {
     const { createElement } = await import("react");
     const { createRoot } = await import("react-dom/client");
-    const { AlertDialog } = await import("@whatmatters/wmds");
+    // WMDS root barrel imports a named export from CJS @rive-app/react-canvas, which
+    // Node ESM can't link under tsx; bundlers are fine. Load the component module directly.
+    const { AlertDialog } = await import(
+      join(process.cwd(), "node_modules/@whatmatters/wmds/dist/components/organisms/Dialog/AlertDialog.js")
+    );
 
     const host = document.createElement("div");
     document.body.appendChild(host);
