@@ -461,3 +461,22 @@ export function withKitProfile<T extends object>(
     theme: profile.theme,
   };
 }
+
+/** Intro autosave state shown in the owner editor. */
+export type IntroSaveState = "idle" | "saving" | "saved" | "error";
+
+export const PITCHKIT_INTRO_HELP = "Shown on your Pitchkit. This is not your Instagram bio.";
+export const PITCHKIT_INTRO_SAVE_DEBOUNCE_MS = 600;
+
+const INTRO_SAVE_LABEL: Record<IntroSaveState, string | null> = {
+  idle: null,
+  saving: "Saving…",
+  saved: "Saved",
+  error: "Not saved. Edit to try again.",
+};
+
+/** TextArea `description`: save state first, then the neutral helper. */
+export function introSaveDescription(state: IntroSaveState): string {
+  const label = INTRO_SAVE_LABEL[state];
+  return label ? `${label} · ${PITCHKIT_INTRO_HELP}` : PITCHKIT_INTRO_HELP;
+}

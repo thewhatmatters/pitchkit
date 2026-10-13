@@ -6,11 +6,11 @@ import { insightsGate, resolveSession, SESSION_COOKIE } from "@/lib/session";
 import { hiddenOverlayForHandle, loadOwnerKit } from "@/lib/store";
 
 type InsightsProps = {
-  searchParams: Promise<{ grid?: string; refresh?: string }>;
+  searchParams: Promise<{ grid?: string; refresh?: string; view?: string }>;
 };
 
 export default async function InsightsPage({ searchParams }: InsightsProps) {
-  const { grid, refresh } = await searchParams;
+  const { grid, refresh, view } = await searchParams;
   const cookieStore = await cookies();
   const session = await resolveSession(cookieStore.get(SESSION_COOKIE)?.value, "page");
   if (!insightsGate(session)) {
@@ -33,6 +33,7 @@ export default async function InsightsPage({ searchParams }: InsightsProps) {
 
   return (
     <OwnerWorkspace
+      initialView={view === "pitchkit" ? "pitchkit" : "insights"}
       user={ownerKit.user}
       ownerPosts={ownerKit.posts}
       engagementRate={ownerKit.engagementRate}

@@ -17,6 +17,8 @@ import type { ReachPoint } from "@/lib/reach-series";
 import type { Media, User } from "@/lib/schema";
 
 type OwnerWorkspaceProps = {
+  /** `/insights?view=pitchkit` deep-links straight to the editor. */
+  initialView?: OwnerView;
   user: User;
   ownerPosts: Media[];
   engagementRate: number | null;
@@ -52,8 +54,9 @@ export function OwnerWorkspace({
   theme,
   gridReady,
   retrieving = false,
+  initialView = "insights",
 }: OwnerWorkspaceProps) {
-  const [view, setView] = useState<OwnerView>("insights");
+  const [view, setView] = useState<OwnerView>(initialView);
   const [posts, setPosts] = useState(ownerPosts);
 
   useEffect(() => {

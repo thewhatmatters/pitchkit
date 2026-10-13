@@ -253,7 +253,8 @@ describe("critical page contracts", () => {
     assert.match(workspace, /CREATOR_INSIGHTS_BODY_BAND_CLASS/);
     assert.match(workspace, /CREATOR_INSIGHTS_BODY_INNER_CLASS/);
     assert.match(workspace, /OwnerNav/);
-    assert.match(workspace, /useState<OwnerView>\("insights"\)/);
+    assert.match(workspace, /useState<OwnerView>\(initialView\)/);
+    assert.match(read("components/owner-workspace.tsx"), /initialView = "insights"/);
     assert.match(workspace, /<OwnerNav[\s\S]*\{view === "pitchkit"/);
     assert.match(workspace, /OwnerPitchKit/);
     assert.doesNotMatch(workspace, /KitEdit|ShareableKit|PitchKitComingSoon|Coming soon/);
