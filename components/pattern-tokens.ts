@@ -291,3 +291,9 @@ export const CREATOR_INSIGHTS_HEADER_BAND_CLASS = PATTERN_TOPBAR_BAND_CLASS;
 export const CREATOR_INSIGHTS_BODY_BAND_CLASS = PATTERN_CONTENT_BAND_CLASS;
 
 export const CREATOR_INSIGHTS_BODY_INNER_CLASS = PATTERN_CONTENT_CLASS;
+
+/** Public kit trust layer: provenance stamp, reach-to-follower line, full audience grid. */
+export const PATTERN_PROVENANCE_CLASS = "flex flex-wrap items-center gap-2";
+export const PATTERN_REACH_RATIO_CLASS = "col-span-full type-supporting text-muted";
+export const PATTERN_PUBLIC_AUDIENCE_GRID_CLASS = "grid min-w-0 grid-cols-1 gap-3 md:grid-cols-2";
+export const PATTERN_PUBLIC_AUDIENCE_SECTION_CLASS = "min-w-0";

@@ -13,7 +13,7 @@ export function isSeedDemoUser(
   return user?.handle === DEMO_HANDLE || user?.id === DEMO_USER_ID;
 }
 
-const FETCHED_AT = "2026-09-02T12:00:00.000Z";
+export const SEED_FETCHED_AT = "2026-09-02T12:00:00.000Z";
 
 /**
  * Seed user — same columns as live `users`. Tokens stay null so TOKEN_KEY is
@@ -56,7 +56,7 @@ function post(
     saves: null,
     shares: null,
     impressions: null,
-    fetched_at: FETCHED_AT,
+    fetched_at: SEED_FETCHED_AT,
     insights_fetched_at: null,
     hidden_from_kit_at: null,
     ...fields,
@@ -146,7 +146,7 @@ export const seedOwnerMedia: Media[] = seedMedia.map((row, index) => {
     reach: insights.reach,
     saves: insights.saves,
     shares: insights.shares,
-    insights_fetched_at: FETCHED_AT,
+    insights_fetched_at: SEED_FETCHED_AT,
   };
 });
 
@@ -172,7 +172,7 @@ function utcDaysEnding(endInclusive: string, count: number): string[] {
 export const SEED_REACH_SERIES_NOTE = "seed/example — not live Graph";
 
 export const seedReachSeries: ReachPoint[] = utcDaysEnding(
-  FETCHED_AT.slice(0, 10),
+  SEED_FETCHED_AT.slice(0, 10),
   SEED_REACH_VALUES.length,
 ).map((day, index) => ({
   day,
@@ -186,3 +186,36 @@ export const seedDetections: Detection[] = [];
 export const seedWeeklyCounts: WeeklyCount[] = [];
 
 export const seedUser = seedUsers[0];
+
+/**
+ * Seed/example audience for the demo kit only (Instagram follower_demographics shape). Not live Graph:
+ * the public demo labels it "Example data". Live kits only ever show polled Insights.
+ */
+export const SEED_EXAMPLE_AUDIENCE = {
+  country: [
+    { label: "United States", percent: 46 },
+    { label: "Canada", percent: 14 },
+    { label: "United Kingdom", percent: 11 },
+    { label: "Australia", percent: 7 },
+    { label: "Germany", percent: 4 },
+  ],
+  city: [
+    { label: "Los Angeles", percent: 9 },
+    { label: "New York", percent: 8 },
+    { label: "Toronto", percent: 6 },
+    { label: "London", percent: 5 },
+    { label: "Chicago", percent: 4 },
+  ],
+  age: [
+    { label: "18-24", percent: 21 },
+    { label: "25-34", percent: 44 },
+    { label: "35-44", percent: 22 },
+    { label: "45-54", percent: 9 },
+    { label: "55-64", percent: 4 },
+  ],
+  gender: [
+    { label: "Women", percent: 68 },
+    { label: "Men", percent: 30 },
+    { label: "Unknown", percent: 2 },
+  ],
+};

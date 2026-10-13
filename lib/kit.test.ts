@@ -8,6 +8,9 @@ import {
   kitHasInsights,
   publicReachState,
   selectSixPosts,
+  formatPolledAt,
+  publicAudience,
+  reachToFollowerPercent,
 } from "./kit";
 import type { Media, User } from "./schema";
 import { MEDIA_COLUMNS, USER_COLUMNS } from "./schema";
@@ -242,12 +245,15 @@ describe("seed schema", () => {
     assert.ok(demo);
     assert.equal(demo.user.handle, DEMO_HANDLE);
     assert.equal(demo.posts.length, 6);
-    assert.equal(demo.hasInsights, false);
-    assert.equal(demo.engagementRate, null);
-    assert.equal("reach_series" in demo, false);
-    assert.equal(demo.reach_series, undefined);
-    assert.equal(demo.typicalReach, null);
-    assert.equal(demo.typicalSaves, null);
+    // Demo shows labelled example Insights (no empty cells), never "Verified".
+    assert.equal(demo.hasInsights, true);
+    assert.equal(demo.source, "example");
+    assert.ok(demo.polled_at);
+    assert.ok(demo.engagementRate != null);
+    assert.equal(demo.reach_series?.length, 30);
+    assert.ok(demo.typicalReach != null);
+    assert.ok(demo.typicalSaves != null);
+    assert.ok(demo.audience && demo.audience.age.length > 0);
     assert.equal(typeof demo.intro, "string");
     assert.ok(demo.past_brands.length > 0);
     assert.equal(demo.theme, "light");
@@ -310,12 +316,6 @@ describe("reach_series kit payload", () => {
   });
 
   it("omits reach_series on the public /k/ kit without Insights", async () => {
-    const publicKit = await loadPublicKit(DEMO_HANDLE, NOW);
-    assert.ok(publicKit);
-    assert.equal(publicKit.hasInsights, false);
-    assert.equal("reach_series" in publicKit, false);
-    assert.equal(publicKit.reach_series, undefined);
-
     const emptyInsights = assemblePublicKit(
       user({ followers: 10_000 }),
       seedMedia,
@@ -328,5 +328,40 @@ describe("reach_series kit payload", () => {
     assert.equal(publicReachState(false, seedReachSeries), "insufficient");
     assert.equal(publicReachState(true, []), "insufficient");
     assert.equal(publicReachState(true, seedReachSeries), "resolved");
+  });
+});
+
+describe("public trust layer", () => {
+  it("full audience: sorted top 5 countries and cities; under 100 followers says so; nothing → empty", () => {
+    const audience = {
+      country: [6, 5, 4, 3, 2, 1].map((percent, i) => ({ label: `C${i}`, percent })),
+      city: [{ label: "B", percent: 2 }, { label: "A", percent: 9 }, { label: "Z", percent: 0 }],
+      age: [{ label: "25-34", percent: 40 }],
+      gender: [{ label: "Men", percent: 30 }, { label: "Women", percent: 70 }],
+    };
+    const ready = publicAudience(audience, 5_000);
+    assert.equal(ready.state, "ready");
+    if (ready.state === "ready") {
+      assert.equal(ready.country.length, 5);
+      assert.deepEqual(ready.city.map((r) => r.label), ["A", "B"]);
+      assert.deepEqual(ready.gender.map((r) => r.label), ["Women", "Men"]);
+    }
+    assert.equal(publicAudience(audience, 99).state, "min-followers");
+    assert.equal(publicAudience(null, 5_000).state, "empty");
+  });
+
+  it("reach-to-follower percent and a deterministic UTC stamp", () => {
+    assert.equal(reachToFollowerPercent(2_175, 10_000), 22);
+    assert.equal(reachToFollowerPercent(null, 10_000), null);
+    assert.equal(reachToFollowerPercent(100, 0), null);
+    assert.equal(formatPolledAt("2026-09-02T12:00:00.000Z"), "Sep 2, 2026, 12:00 PM UTC");
+    assert.equal(formatPolledAt(""), null);
+  });
+
+  it("live kits are graph-sourced with their poll time; default source is graph", () => {
+    const kit = assemblePublicKit(user({ followers: 10_000 }), seedMedia, NOW, { polled_at: "2026-09-02T12:00:00.000Z" });
+    assert.ok(kit);
+    assert.equal(kit.source, "graph");
+    assert.equal(kit.polled_at, "2026-09-02T12:00:00.000Z");
   });
 });

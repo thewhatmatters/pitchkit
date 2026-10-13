@@ -7,6 +7,8 @@ import {
   seedMedia,
   seedOwnerMedia,
   seedReachSeries,
+  SEED_EXAMPLE_AUDIENCE,
+  SEED_FETCHED_AT,
   seedUsers,
   seedWeeklyCounts,
   DEMO_HANDLE,
@@ -86,6 +88,8 @@ async function ownerFromSnapshot(
   const kit = assemblePublicKit(snapshot.user, media, now, {
     reach_series: snapshot.reach_series,
     audience: snapshot.audience,
+    polled_at: snapshot.polled_at || null,
+    source: "graph",
     ...snapshotKitProfile(snapshot),
   });
   if (!kit) {
@@ -112,13 +116,18 @@ export async function loadPublicKit(
     if (!user) {
       return null;
     }
-    const fetched = seedMedia.filter((row) => row.user_id === user.id);
+    const fetched = seedOwnerMedia.filter((row) => row.user_id === user.id);
     const media = applyHiddenOverlay(
       fetched,
       await hiddenOverlayForHandle(handle, overlay),
       user.id,
     );
+    // Demo = seed/example Insights (labelled "Example data" on the kit), never a live account.
     return assemblePublicKit(user, excludeHiddenFromPublicKit(media), now, {
+      reach_series: seedReachSeries,
+      audience: SEED_EXAMPLE_AUDIENCE,
+      polled_at: SEED_FETCHED_AT,
+      source: "example",
       ...(await resolveDemoKitProfile()),
     });
   }

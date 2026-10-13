@@ -43,7 +43,13 @@ export type PublicKit = {
   past_brands: PastBrand[];
   /** Public kit appearance. Default light. */
   theme: PitchKitTheme;
+  /** When the Insights shown were polled (ISO). null → no poll yet. */
+  polled_at: string | null;
+  /** graph = polled from Instagram Insights; example = seed demo data (labelled, never "Verified"). */
+  source: KitDataSource;
 };
+
+export type KitDataSource = "graph" | "example";
 
 export type AssembleKitOptions = {
   /** Seed/example or poll-derived. Ignored when Insights are missing. */
@@ -52,7 +58,67 @@ export type AssembleKitOptions = {
   intro?: string | null;
   past_brands?: PastBrand[];
   theme?: PitchKitTheme;
+  polled_at?: string | null;
+  source?: KitDataSource;
 };
+
+/** Instagram returns follower_demographics only for accounts with 100+ followers. */
+export const AUDIENCE_MIN_FOLLOWERS = 100;
+/** Public audience block: top N countries and cities (Modash baseline is 5). */
+export const PUBLIC_AUDIENCE_TOP = 5;
+
+export type PublicAudience =
+  | { state: "min-followers" }
+  | { state: "empty" }
+  | { state: "ready"; age: RankedShare[]; gender: RankedShare[]; country: RankedShare[]; city: RankedShare[] };
+
+const visible = (rows: readonly RankedShare[] | null | undefined) =>
+  (rows ?? []).filter((row) => Number.isFinite(row.percent) && row.percent > 0);
+
+/** Full audience for the public kit. Under 100 followers Instagram has none, so say so instead of empty cells. */
+export function publicAudience(audience: KitAudience | null | undefined, followers: number): PublicAudience {
+  if (followers < AUDIENCE_MIN_FOLLOWERS) {
+    return { state: "min-followers" };
+  }
+  const byPercent = (rows: readonly RankedShare[] | null | undefined) =>
+    [...visible(rows)].sort((a, b) => b.percent - a.percent);
+  const age = visible(audience?.age);
+  const gender = byPercent(audience?.gender);
+  const country = byPercent(audience?.country).slice(0, PUBLIC_AUDIENCE_TOP);
+  const city = byPercent(audience?.city).slice(0, PUBLIC_AUDIENCE_TOP);
+  if (!age.length && !gender.length && !country.length && !city.length) {
+    return { state: "empty" };
+  }
+  return { state: "ready", age, gender, country, city };
+}
+
+/** Typical reach as a whole percent of followers. null when either is missing or followers is 0. */
+export function reachToFollowerPercent(typicalReach: number | null, followers: number): number | null {
+  if (typicalReach == null || !Number.isFinite(typicalReach) || !(followers > 0)) {
+    return null;
+  }
+  return Math.round((typicalReach / followers) * 100);
+}
+
+/** Stamp time, deterministic on server and client: "Sep 2, 2026, 12:00 PM UTC". */
+export function formatPolledAt(iso: string | null | undefined): string | null {
+  if (!iso) {
+    return null;
+  }
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+  return date.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "UTC",
+    timeZoneName: "short",
+  });
+}
 
 /** Public kit reach well — always keep the Card. Chart only when plottable. */
 export type PublicReachState = "resolved" | "insufficient";
@@ -171,6 +237,8 @@ export function assemblePublicKit(
     intro: options.intro ?? EMPTY_KIT_PROFILE.intro,
     past_brands: options.past_brands ?? EMPTY_KIT_PROFILE.past_brands,
     theme: options.theme ?? PITCHKIT_THEME_DEFAULT,
+    polled_at: options.polled_at ?? null,
+    source: options.source ?? "graph",
   };
 }
 
