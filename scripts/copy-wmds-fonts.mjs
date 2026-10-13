@@ -3,7 +3,7 @@ import { createRequire } from "node:module";
 import path from "node:path";
 
 const require = createRequire(import.meta.url);
-const dest = path.join(process.cwd(), "node_modules/@whatmatters/wmds/dist/files");
+const dest = path.join(process.cwd(), "node_modules/@thewhatmatters/wmds/dist/files");
 
 if (!existsSync(path.dirname(dest))) {
   process.exit(0);

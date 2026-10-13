@@ -1,6 +1,6 @@
 /**
  * Interpolated Show code class strings from WMDS Examples/PitchKit at
- * `aededdebbe0776eaab00fdc3d53eedf55f3f274b`.
+ * `@thewhatmatters/wmds@0.4.9` (npm).
  *
  * Stories:
  * - `examples-pitchkit--account-settings-owner` (Pattern — account settings (owner))

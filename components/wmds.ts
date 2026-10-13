@@ -39,4 +39,4 @@ export {
   chartSeriesConfigFromTone,
   dialogFooterActionsClasses,
   toast,
-} from "@whatmatters/wmds";
+} from "@thewhatmatters/wmds";

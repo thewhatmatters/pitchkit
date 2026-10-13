@@ -1,7 +1,7 @@
 /**
  * Pitchkit-owned kit intro + past brands + theme.
  * Not Instagram biography. Not SQL — staged on the KV Graph snapshot.
- * WMDS tip `aededdebbe0776eaab00fdc3d53eedf55f3f274b`:
+ * WMDS tip `@thewhatmatters/wmds@0.4.9` (npm):
  * `examples-pitchkit--intro-owner` / `--intro-public`
  * `examples-pitchkit--past-brands-owner` / `--past-brands-public`
  * (`--past-brands-owner-empty` / `--past-brands-owner-overflow`

@@ -74,7 +74,7 @@ Disconnect severs the Pitchkit↔Instagram connection: session cookies clear, `d
 | Piece | Choice |
 |---|---|
 | App | Next.js App Router, TypeScript, Tailwind v4 |
-| UI | WMDS (`@whatmatters/wmds`). No shadcn. Storybook stays in the WMDS repo. |
+| UI | WMDS (`@thewhatmatters/wmds`). No shadcn. Storybook stays in the WMDS repo. |
 | Compute | Cloudflare Workers, official OpenNext (`@opennextjs/cloudflare`) |
 | DB | Supabase Postgres via Hyperdrive |
 | Files | R2 `pitchkit-media` |

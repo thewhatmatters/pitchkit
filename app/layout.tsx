@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { AppToaster } from "@/components/app-toaster";
-import "@whatmatters/wmds/styles.css";
+import "@thewhatmatters/wmds/styles.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
