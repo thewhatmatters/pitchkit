@@ -16,10 +16,11 @@ type OwnerNavProps = {
   posts: Media[];
   view: OwnerView;
   onViewChange: (view: OwnerView) => void;
+  defaultMenuOpen?: boolean;
 };
 
 /** WMDS Pattern — creator Insights three-column header. Hug control. In-page view. */
-export function OwnerNav({ user, posts, view, onViewChange }: OwnerNavProps) {
+export function OwnerNav({ user, posts, view, onViewChange, defaultMenuOpen = false }: OwnerNavProps) {
   return (
     <header className={PATTERN_TOPBAR_CLASS}>
       <span className={PATTERN_BRAND_CLASS}>Pitchkit</span>
@@ -37,7 +38,7 @@ export function OwnerNav({ user, posts, view, onViewChange }: OwnerNavProps) {
         <SegmentedControl.Item value="pitchkit">Pitchkit</SegmentedControl.Item>
       </SegmentedControl>
       <span className={PATTERN_TOPBAR_END_CLASS}>
-        <AccountMenu user={user} posts={posts} />
+        <AccountMenu user={user} posts={posts} defaultMenuOpen={defaultMenuOpen} />
       </span>
     </header>
   );

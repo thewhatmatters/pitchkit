@@ -679,6 +679,12 @@ describe("critical page contracts", () => {
     assert.match(pkg, /opennextjs-cloudflare build && opennextjs-cloudflare deploy/);
   });
 
+  it("preview deep links: ?menu=open is gated off when live Instagram secrets exist; #danger-zone anchor", () => {
+    const page = read("app/insights/page.tsx");
+    assert.match(page, /menu === "open" && !hasLiveAuthSecrets\(await readSecrets\("page"\)\)/);
+    assert.match(read("components/delete-account-control.tsx"), /id="danger-zone"/);
+  });
+
   it("settings is account only", () => {
     const page = read("app/settings/page.tsx");
     const settings = read("components/account-settings.tsx");

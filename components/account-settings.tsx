@@ -53,6 +53,8 @@ type AccountSettingsDialogProps = AccountSettingsProps & {
 type AccountMenuProps = AccountSettingsProps & {
   /** `/settings` lands on the Dialog instead of a blank chrome page. */
   defaultSettingsOpen?: boolean;
+  /** Preview/demo-only deep link (`/insights?menu=open`). Server gates it; never true in production. */
+  defaultMenuOpen?: boolean;
 };
 
 /**
@@ -67,6 +69,7 @@ export function AccountMenu({
   user,
   posts,
   defaultSettingsOpen = false,
+  defaultMenuOpen = false,
 }: AccountMenuProps) {
   const menuId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -83,6 +86,12 @@ export function AccountMenu({
       setSettingsOpen(true);
     }
   }, [defaultSettingsOpen]);
+
+  useEffect(() => {
+    if (defaultMenuOpen) {
+      setMenuOpen(true);
+    }
+  }, [defaultMenuOpen]);
 
   useEffect(() => {
     if (!menuOpen) {

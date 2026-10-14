@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import {
   PATTERN_DANGER_ZONE_CLASS,
   PATTERN_DANGER_ZONE_RULE_CLASS,
@@ -39,6 +39,16 @@ export function DeleteAccountControl({
   const inputId = useId();
   const matches = deleteConfirmMatches(typed, handle);
 
+  const sectionRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    // `/settings#danger-zone`: the settings Dialog mounts after load, so scroll once it exists.
+    if (window.location.hash === "#danger-zone") {
+      const id = window.setTimeout(() => sectionRef.current?.scrollIntoView({ block: "center" }), 150);
+      return () => window.clearTimeout(id);
+    }
+    return undefined;
+  }, []);
+
   function setDialogOpen(next: boolean) {
     setOpen(next);
     if (!next) setTyped("");
@@ -46,7 +56,7 @@ export function DeleteAccountControl({
   const formRef = useRef<HTMLFormElement>(null);
 
   return (
-    <section aria-labelledby="danger-zone-caption" className={PATTERN_DANGER_ZONE_CLASS}>
+    <section ref={sectionRef} id="danger-zone" aria-labelledby="danger-zone-caption" className={PATTERN_DANGER_ZONE_CLASS}>
       <hr className={PATTERN_DANGER_ZONE_RULE_CLASS} />
       <h2 id="danger-zone-caption" className={PATTERN_DANGER_ZONE_TITLE_CLASS}>
         {DANGER_ZONE_CAPTION}
