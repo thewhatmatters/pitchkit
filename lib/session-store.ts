@@ -4,6 +4,9 @@
  * `session:<sha256(token)>` → `{ handle, userId }` with a 30-day TTL, so a
  * leaked KV listing cannot be replayed as a cookie. Legacy cookies that held
  * an Instagram username fail the token shape check and never resolve.
+ *
+ * `session-index:<userId>` lists that owner's hashed session keys (never raw
+ * tokens) so disconnect / Meta data deletion can revoke every live session.
  */
 
 import { readHiddenKitBinding, type HiddenKitAccess } from "./hidden-kit-kv";
@@ -33,6 +36,26 @@ export function newSessionToken(): string {
 
 export function isSessionTokenShape(value: string | null | undefined): value is string {
   return typeof value === "string" && TOKEN_PATTERN.test(value);
+}
+
+export const SESSION_INDEX_PREFIX = "session-index:";
+
+export function sessionIndexKey(userId: string): string {
+  return `${SESSION_INDEX_PREFIX}${userId}`;
+}
+
+function parseIndex(raw: string | null): string[] {
+  if (!raw) {
+    return [];
+  }
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed)
+      ? parsed.filter((key): key is string => typeof key === "string" && key.startsWith("session:"))
+      : [];
+  } catch {
+    return [];
+  }
 }
 
 export async function sessionKey(token: string): Promise<string> {
@@ -77,7 +100,13 @@ export async function createServerSession(
     createdAt: new Date().toISOString(),
   };
   try {
-    await ns.put(await sessionKey(token), JSON.stringify(record), { expirationTtl: ttlSeconds });
+    const key = await sessionKey(token);
+    await ns.put(key, JSON.stringify(record), { expirationTtl: ttlSeconds });
+    const indexKey = sessionIndexKey(input.userId);
+    const index = parseIndex(await ns.get(indexKey)).filter((existing) => existing !== key);
+    index.push(key);
+    // Cap so a chatty owner cannot grow the index without bound; TTL matches sessions.
+    await ns.put(indexKey, JSON.stringify(index.slice(-50)), { expirationTtl: ttlSeconds });
     return token;
   } catch {
     return null;
@@ -117,5 +146,33 @@ export async function deleteServerSession(
     await ns.delete(await sessionKey(token));
   } catch {
     // Best effort; the TTL still expires it.
+  }
+}
+
+/**
+ * Revoke every indexed session for `userId` and drop the index. Idempotent.
+ * Returns false only when the binding is missing or a delete throws.
+ */
+export async function deleteAllServerSessionsForUser(
+  userId: string,
+  access: HiddenKitAccess = "route",
+): Promise<boolean> {
+  const ns = await readHiddenKitBinding(access);
+  if (!ns) {
+    return false;
+  }
+  const indexKey = sessionIndexKey(userId);
+  try {
+    const keys = parseIndex(await ns.get(indexKey));
+    for (const key of [...keys, indexKey]) {
+      if (ns.delete) {
+        await ns.delete(key);
+      } else {
+        await ns.put(key, "");
+      }
+    }
+    return true;
+  } catch {
+    return false;
   }
 }

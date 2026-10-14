@@ -291,3 +291,8 @@ export const CREATOR_INSIGHTS_HEADER_BAND_CLASS = PATTERN_TOPBAR_BAND_CLASS;
 export const CREATOR_INSIGHTS_BODY_BAND_CLASS = PATTERN_CONTENT_BAND_CLASS;
 
 export const CREATOR_INSIGHTS_BODY_INNER_CLASS = PATTERN_CONTENT_CLASS;
+
+/** Danger zone — WMDS has no Separator atom at 3b75f96; hairline uses the `border-border` token. */
+export const PATTERN_DANGER_ZONE_CLASS = "flex w-full flex-col items-start gap-2 pt-2";
+export const PATTERN_DANGER_ZONE_RULE_CLASS = "mb-4 w-full border-0 border-t border-border";
+export const PATTERN_DANGER_ZONE_TITLE_CLASS = "type-heading-4 text-fg";

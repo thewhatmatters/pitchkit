@@ -1,6 +1,6 @@
 /** disclosure_version = 1 — show before Continue with Instagram. */
 export const DISCLOSURE =
-  "We only use your public posts and Instagram Insights to build your media kit. We don’t read DMs, who you follow, or unfollowers. Disconnect deletes your kit and the copies we stored.";
+  "We only use your public posts and Instagram Insights to build your media kit. We don’t read DMs, who you follow, or unfollowers. Deleting your account erases your kit and the copies we\u00a0stored.";
 
 export const PROFESSIONAL_NOTE =
   "Pitchkit works with Instagram Professional accounts (Business or Creator).";
@@ -46,21 +46,30 @@ export const SUPPORT_EMAIL = "randy@whatmatters.so";
 
 export const EMPTY_GRID = "Pulling your grid…";
 
-export const DISCONNECT_TITLE = "Disconnect Instagram?";
-export const DISCONNECT_CONFIRM =
-  "Disconnect deletes your kit and the copies we stored.";
-export const DISCONNECT_KEEP = "Keep connected";
 
 /** Account settings Delete confirm — RE memo, Pattern — account settings (owner). */
 export const DELETE_ACCOUNT_TITLE = "Delete your Pitchkit account?";
 export const DELETE_ACCOUNT_CONFIRM =
-  "This permanently deletes your kit, stored media copies, and connection. Your Instagram account is not deleted. This cannot be undone.";
+  "Your kit link stops working right away, so anyone you've sent it to will see it's gone. We erase your account and all the Instagram data we stored. Your Instagram account itself isn't touched. This can't be\u00a0undone.";
+/** Field label is "Type @handle to confirm" with the handle in bold. */
+export const DELETE_ACCOUNT_TYPE_PREFIX = "Type ";
+export const DELETE_ACCOUNT_TYPE_SUFFIX = " to confirm";
 export const DELETE_ACCOUNT_CANCEL = "Cancel";
 export const DELETE_ACCOUNT_ACTION = "Delete account";
+export const DELETE_ACCOUNT_TRIGGER = "Delete account…";
+/** Trimmed, optional leading @, case-insensitive. */
+export function deleteConfirmMatches(typed: string, handle: string): boolean {
+  const norm = (v: string) => v.trim().replace(/^@/, "").toLowerCase();
+  return norm(handle) !== "" && norm(typed) === norm(handle);
+}
+
+export const DANGER_ZONE_CAPTION = "Danger zone";
+export const DANGER_ZONE_LINE = "Permanently delete your Pitchkit account and\u00a0kit.";
+export const ACCOUNT_DELETED_TOAST = "Your account was deleted.";
+export const SIGN_OUT_ACTION = "Sign out";
 
 export const ACCOUNT_MENU_LABEL = "My account";
 export const ACCOUNT_SETTINGS_ACTION = "Account settings";
-export const DISCONNECT_INSTAGRAM_ACTION = "Disconnect Instagram";
 export const RECONNECT_INSTAGRAM_ACTION = "Reconnect Instagram";
 
 export const PITCHKIT_OWNER_TITLE = "Your Pitchkit";
@@ -79,9 +88,9 @@ export const TOAST_KIT_COPY_FAILED_TITLE = "Could not copy the kit link";
 export const TOAST_KIT_COPY_FAILED_DESCRIPTION =
   "Copy the URL from the page, or try Share kit again.";
 export const TOAST_POST_HIDDEN_TITLE = "Post hidden from kit";
-export const TOAST_POST_HIDDEN_DESCRIPTION = "It no longer appears in the shareable PitchKit.";
+export const TOAST_POST_HIDDEN_DESCRIPTION = "It no longer appears in the shareable Pitchkit.";
 export const TOAST_POST_RESTORED_TITLE = "Post restored to kit";
-export const TOAST_POST_RESTORED_DESCRIPTION = "It appears in the shareable PitchKit again.";
+export const TOAST_POST_RESTORED_DESCRIPTION = "It appears in the shareable Pitchkit again.";
 export const TOAST_HIDE_FAILED_TITLE = "Could not hide this post";
 export const TOAST_RESTORE_FAILED_TITLE = "Could not restore this post";
 export const TOAST_KIT_PROFILE_FAILED_TITLE = "Could not save kit profile";

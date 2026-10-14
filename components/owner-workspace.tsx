@@ -17,6 +17,7 @@ import type { ReachPoint } from "@/lib/reach-series";
 import type { Media, User } from "@/lib/schema";
 
 type OwnerWorkspaceProps = {
+  defaultMenuOpen?: boolean;
   user: User;
   ownerPosts: Media[];
   engagementRate: number | null;
@@ -52,6 +53,7 @@ export function OwnerWorkspace({
   theme,
   gridReady,
   retrieving = false,
+  defaultMenuOpen = false,
 }: OwnerWorkspaceProps) {
   const [view, setView] = useState<OwnerView>("insights");
   const [posts, setPosts] = useState(ownerPosts);
@@ -63,7 +65,7 @@ export function OwnerWorkspace({
   return (
     <main className={CREATOR_INSIGHTS_PAGE_CLASS}>
       <div className={CREATOR_INSIGHTS_HEADER_BAND_CLASS}>
-        <OwnerNav user={user} posts={posts} view={view} onViewChange={setView} />
+        <OwnerNav user={user} posts={posts} view={view} onViewChange={setView} defaultMenuOpen={defaultMenuOpen} />
       </div>
       <div className={CREATOR_INSIGHTS_BODY_BAND_CLASS}>
         <div className={CREATOR_INSIGHTS_BODY_INNER_CLASS}>

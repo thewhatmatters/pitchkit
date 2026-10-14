@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AppFrame } from "@/components/app-frame";
 import { ConnectButton } from "@/components/connect-button";
+import { DeletedToast } from "@/components/deleted-toast";
 import { PageCard, PageCopy } from "@/components/page-card";
 import { SupportFooter } from "@/components/support-footer";
 import { DEMO_SESSION_NOTE, DISCLOSURE, landingErrorCopy, PROFESSIONAL_NOTE } from "@/lib/copy";
@@ -9,7 +10,7 @@ import { hasLiveAuthSecrets, readSecrets } from "@/lib/env";
 import { insightsGate, resolveSession, SESSION_COOKIE } from "@/lib/session";
 
 type LandingProps = {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; deleted?: string }>;
 };
 
 export default async function LandingPage({ searchParams }: LandingProps) {
@@ -19,12 +20,13 @@ export default async function LandingPage({ searchParams }: LandingProps) {
     redirect("/insights");
   }
 
-  const { error } = await searchParams;
+  const { error, deleted } = await searchParams;
   const failCopy = landingErrorCopy(error);
   const showDemoNote = !hasLiveAuthSecrets(await readSecrets("page"));
 
   return (
     <AppFrame>
+      {deleted === "1" ? <DeletedToast /> : null}
       <PageCard title="Pitchkit">
         <PageCopy>
           Sign in with Instagram, see your numbers, and send brands a link.

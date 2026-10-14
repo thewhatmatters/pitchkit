@@ -1,5 +1,6 @@
 import { hasLiveAuthSecrets, readSecrets } from "./env";
-import { persistOwnerDisconnect, readGraphSnapshotByHandle } from "./graph-store";
+import { eraseCreatorData } from "./creator-erase";
+import { readGraphSnapshotByHandle } from "./graph-store";
 import type { HiddenKitAccess } from "./hidden-kit-kv";
 import { DEMO_HANDLE, DEMO_USER_ID, seedUsers } from "./seed";
 import { createServerSession, deleteServerSession, readServerSession } from "./session-store";
@@ -196,10 +197,10 @@ export async function stubConnect(request: Request): Promise<Response> {
   return sessionRedirect(request, "/insights", cookie);
 }
 
-function signOutResponse(request: Request): Response {
+function signOutResponse(request: Request, path = "/"): Response {
   const secure = isHttpsRequest(request);
   const headers = new Headers({
-    Location: new URL("/", request.url).toString(),
+    Location: new URL(path, request.url).toString(),
     "Cache-Control": "no-store",
   });
   headers.append("Set-Cookie", sessionClearCookieHeader(secure));
@@ -214,16 +215,17 @@ export async function stubSignOut(request: Request): Promise<Response> {
 }
 
 /**
- * Disconnect severs the Pitchkit↔Instagram connection for the signed-in owner.
- * Disconnect = delete server session + cookie clear + `disconnected_at` on the
- * Graph snapshot + null tokens.
+ * Delete account (route `/auth/disconnect`) = real data delete for the signed-in owner (`lib/creator-erase.ts`):
+ * SQL `users` + `media`, every KV key for the creator (`graph:*`, `hidden:`,
+ * all indexed `session:` records), then both cookies clear. The kit URL 404s.
+ * Idempotent; reconnecting starts from an empty kit.
  */
 export async function disconnectOwner(request: Request): Promise<Response> {
   const value = readRequestCookie(request, SESSION_COOKIE);
   const session = await resolveSession(value, "route");
   if (session) {
-    await persistOwnerDisconnect(session, "route");
+    await eraseCreatorData({ userId: session.userId, handle: session.handle }, "route");
   }
   await deleteServerSession(value, "route");
-  return signOutResponse(request);
+  return signOutResponse(request, "/?deleted=1");
 }
