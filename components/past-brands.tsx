@@ -167,13 +167,15 @@ function PastBrandsRail({
       className={PATTERN_BRAND_RAIL_HOST_CLASS}
       data-overflow={showMarquee ? "true" : "false"}
     >
-      <ul ref={measureRef} className={PATTERN_BRAND_RAIL_MEASURE_CLASS} aria-hidden>
-        {brands.map((brand) => (
-          <li key={`${brand.id}-measure`}>
-            <PastBrandCard brand={brand} className={PATTERN_BRAND_RAIL_CARD_CLASS} />
-          </li>
-        ))}
-      </ul>
+      {wrap ? null : (
+        <ul ref={measureRef} className={PATTERN_BRAND_RAIL_MEASURE_CLASS} aria-hidden>
+          {brands.map((brand) => (
+            <li key={`${brand.id}-measure`}>
+              <PastBrandCard brand={brand} className={PATTERN_BRAND_RAIL_CARD_CLASS} />
+            </li>
+          ))}
+        </ul>
+      )}
       {wrapRow ? (
         <ul className={PATTERN_BRAND_RAIL_WRAP_CLASS} aria-label="Past brands">
           {brands.map((brand) => (

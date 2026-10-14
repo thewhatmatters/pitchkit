@@ -64,6 +64,12 @@ describe("public kit hides empty sections from brands", () => {
     assert.match(kit, /PATTERN_PUBLIC_POST_CARD_CLASS/);
     assert.match(kit, /<PublicPastBrands brands=\{pastBrands\} wrap=\{hideEmpty\} \/>/);
     assert.match(read("components/past-brands.tsx"), /const wrapRow = wrap \|\| reduceMotion/);
+    // The off-screen measure row would widen the page at 390; skip it when wrapping.
+    assert.match(read("components/past-brands.tsx"), /\{wrap \? null : \(\n\s+<ul ref=\{measureRef\}/);
+  });
+
+  it("wrapped brands skip the off-screen measure row (no sideways scroll at 390)", () => {
+    assert.match(read("components/past-brands.tsx"), /\{wrap \? null : \(/);
   });
 
   it("public posts are 2-up on mobile", () => {

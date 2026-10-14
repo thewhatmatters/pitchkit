@@ -226,7 +226,7 @@ export const PATTERN_PUBLIC_STACK_CLASS = PATTERN_DASHBOARD_GRID_CLASS;
 export const PATTERN_PUBLIC_REACH_CARD_CLASS = "col-span-full min-w-0";
 export const PATTERN_PUBLIC_COUNTRIES_CARD_CLASS = "col-span-full min-w-0";
 
-export const PATTERN_KIT_POST_METRICS_CLASS = "grid w-full grid-cols-2 gap-3";
+export const PATTERN_KIT_POST_METRICS_CLASS = "flex w-full justify-between gap-2";
 
 export const PATTERN_CONTACT_CARD_CLASS = "col-span-full";
 

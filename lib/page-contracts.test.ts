@@ -202,8 +202,8 @@ describe("critical page contracts", () => {
     assert.match(barrel, /TextLink/);
     assert.match(nav, /SegmentedControl/);
     assert.match(nav, />Insights</);
-    assert.match(nav, />PitchKit</);
-    assert.match(nav, /aria-label="PitchKit primary navigation"/);
+    assert.match(nav, />Pitchkit</);
+    assert.match(nav, /aria-label="Pitchkit primary navigation"/);
     assert.match(nav, /onViewChange/);
     assert.doesNotMatch(nav, /router\.push|kitPath|usePathname|useRouter/);
     assert.match(tokens, /PATTERN_TOPBAR_CLASS/);
@@ -324,9 +324,9 @@ describe("critical page contracts", () => {
     assert.match(copy, /TOAST_KIT_COPIED_DESCRIPTION = "The public kit URL is ready to paste."/);
     assert.match(copy, /TOAST_KIT_COPY_FAILED_TITLE/);
     assert.match(copy, /TOAST_POST_HIDDEN_TITLE = "Post hidden from kit"/);
-    assert.match(copy, /TOAST_POST_HIDDEN_DESCRIPTION = "It no longer appears in the shareable PitchKit."/);
+    assert.match(copy, /TOAST_POST_HIDDEN_DESCRIPTION = "It no longer appears in the shareable Pitchkit."/);
     assert.match(copy, /TOAST_POST_RESTORED_TITLE = "Post restored to kit"/);
-    assert.match(copy, /TOAST_POST_RESTORED_DESCRIPTION = "It appears in the shareable PitchKit again."/);
+    assert.match(copy, /TOAST_POST_RESTORED_DESCRIPTION = "It appears in the shareable Pitchkit again."/);
     assert.match(copy, /TOAST_HIDE_FAILED_TITLE/);
     assert.match(copy, /TOAST_RESTORE_FAILED_TITLE/);
     assert.match(copy, /TOAST_KIT_PROFILE_FAILED_TITLE/);
