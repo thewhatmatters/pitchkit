@@ -252,7 +252,7 @@ export function AccountSettings({ user, posts }: AccountSettingsProps) {
     <main className={PATTERN_PAGE_CLASS}>
       <div className={PATTERN_TOPBAR_BAND_CLASS}>
         <header className={PATTERN_TOPBAR_CLASS}>
-          <span className={PATTERN_BRAND_CLASS}>PitchKit</span>
+          <span className={PATTERN_BRAND_CLASS}>Pitchkit</span>
           <span />
           <span className={PATTERN_TOPBAR_END_CLASS}>
             <AccountMenu user={user} posts={posts} defaultSettingsOpen />

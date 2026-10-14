@@ -88,9 +88,9 @@ export const TOAST_KIT_COPY_FAILED_TITLE = "Could not copy the kit link";
 export const TOAST_KIT_COPY_FAILED_DESCRIPTION =
   "Copy the URL from the page, or try Share kit again.";
 export const TOAST_POST_HIDDEN_TITLE = "Post hidden from kit";
-export const TOAST_POST_HIDDEN_DESCRIPTION = "It no longer appears in the shareable PitchKit.";
+export const TOAST_POST_HIDDEN_DESCRIPTION = "It no longer appears in the shareable Pitchkit.";
 export const TOAST_POST_RESTORED_TITLE = "Post restored to kit";
-export const TOAST_POST_RESTORED_DESCRIPTION = "It appears in the shareable PitchKit again.";
+export const TOAST_POST_RESTORED_DESCRIPTION = "It appears in the shareable Pitchkit again.";
 export const TOAST_HIDE_FAILED_TITLE = "Could not hide this post";
 export const TOAST_RESTORE_FAILED_TITLE = "Could not restore this post";
 export const TOAST_KIT_PROFILE_FAILED_TITLE = "Could not save kit profile";

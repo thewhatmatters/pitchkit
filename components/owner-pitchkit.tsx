@@ -373,8 +373,8 @@ export function OwnerPitchKit({
             setPendingHidePostId(null);
           }
         }}
-        title="Hide this post from PitchKit?"
-        description="It will no longer appear in the shareable PitchKit. You can add it back later."
+        title="Hide this post from Pitchkit?"
+        description="It will no longer appear in the shareable Pitchkit. You can add it back later."
         cancelLabel="Keep post"
         confirmLabel="Hide from kit"
         onConfirm={() => {

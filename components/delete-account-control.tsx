@@ -1,7 +1,12 @@
 "use client";
 
 import { useId, useRef, useState } from "react";
-import { AlertDialog, Button, Input, cardBodyTextClasses, cardTitleClasses } from "@/components/wmds";
+import {
+  PATTERN_DANGER_ZONE_CLASS,
+  PATTERN_DANGER_ZONE_RULE_CLASS,
+  PATTERN_DANGER_ZONE_TITLE_CLASS,
+} from "@/components/pattern-tokens";
+import { AlertDialog, Button, Input, cardBodyTextClasses } from "@/components/wmds";
 import {
   DANGER_ZONE_CAPTION,
   DANGER_ZONE_LINE,
@@ -41,8 +46,9 @@ export function DeleteAccountControl({
   const formRef = useRef<HTMLFormElement>(null);
 
   return (
-    <section aria-labelledby="danger-zone-caption" className="flex flex-col items-start gap-2">
-      <h2 id="danger-zone-caption" className={cardTitleClasses}>
+    <section aria-labelledby="danger-zone-caption" className={PATTERN_DANGER_ZONE_CLASS}>
+      <hr className={PATTERN_DANGER_ZONE_RULE_CLASS} />
+      <h2 id="danger-zone-caption" className={PATTERN_DANGER_ZONE_TITLE_CLASS}>
         {DANGER_ZONE_CAPTION}
       </h2>
       <p className={cardBodyTextClasses}>{DANGER_ZONE_LINE}</p>
