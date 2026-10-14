@@ -24,7 +24,7 @@ export default function PrivacyPage() {
           token. The sign-in lasts up to 30 days and ends when you sign out.
         </PageCopy>
         <PageCopy>
-          Disconnect erases everything we stored right away: profile, posts and
+          Deleting your account erases everything we stored right away: profile, posts and
           metrics, Insights, audience breakdowns, intro, past brands, hidden&#8209;post
           settings, tokens and sign-ins. Removing Pitchkit on Instagram does the
           same. See{" "}

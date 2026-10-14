@@ -8,7 +8,7 @@ export default function NotFound() {
   return (
     <AppFrame>
       <PageCard title="Not found">
-        <PageCopy>This kit is missing or disconnected.</PageCopy>
+        <PageCopy>This kit doesn’t exist or was deleted.</PageCopy>
         <form action="/">
           <PageButton>Back to Pitchkit</PageButton>
         </form>

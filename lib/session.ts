@@ -197,10 +197,10 @@ export async function stubConnect(request: Request): Promise<Response> {
   return sessionRedirect(request, "/insights", cookie);
 }
 
-function signOutResponse(request: Request): Response {
+function signOutResponse(request: Request, path = "/"): Response {
   const secure = isHttpsRequest(request);
   const headers = new Headers({
-    Location: new URL("/", request.url).toString(),
+    Location: new URL(path, request.url).toString(),
     "Cache-Control": "no-store",
   });
   headers.append("Set-Cookie", sessionClearCookieHeader(secure));
@@ -215,7 +215,7 @@ export async function stubSignOut(request: Request): Promise<Response> {
 }
 
 /**
- * Disconnect = real data delete for the signed-in owner (`lib/creator-erase.ts`):
+ * Delete account (route `/auth/disconnect`) = real data delete for the signed-in owner (`lib/creator-erase.ts`):
  * SQL `users` + `media`, every KV key for the creator (`graph:*`, `hidden:`,
  * all indexed `session:` records), then both cookies clear. The kit URL 404s.
  * Idempotent; reconnecting starts from an empty kit.
@@ -227,5 +227,5 @@ export async function disconnectOwner(request: Request): Promise<Response> {
     await eraseCreatorData({ userId: session.userId, handle: session.handle }, "route");
   }
   await deleteServerSession(value, "route");
-  return signOutResponse(request);
+  return signOutResponse(request, "/?deleted=1");
 }

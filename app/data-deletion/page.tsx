@@ -13,8 +13,8 @@ export default function DataDeletionPage() {
     <AppFrame>
       <PageCard title="Data deletion">
         <PageCopy>
-          There are two ways to delete your Pitchkit data. In Pitchkit, choose
-          Disconnect or Delete account in Account settings. On Instagram, remove
+          There are two ways to delete your Pitchkit data. In Pitchkit, open
+          Account settings and choose Delete account. On Instagram, remove
           Pitchkit from your connected apps, and Meta tells us to delete it.
         </PageCopy>
         <PageCopy>

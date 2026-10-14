@@ -65,7 +65,7 @@ Login: **Continue with Instagram** POST/GET `/auth/instagram`. With `IG_APP_ID` 
 
 Postgres holds creator rows and the posts we fetched. Photos go in file storage, not in SQL. We only store what Instagram Login and Insights already give us. Full column list: [DATA.md](./DATA.md).
 
-Disconnect severs the Pitchkit↔Instagram connection and deletes everything we stored about the creator right away (SQL rows + every KV key + all sessions); the kit URL 404s and reconnecting starts fresh. No R2 copies are written yet. Sign out is cookie-only. Anonymous weekly totals stay only if they cannot identify anyone.
+Delete account (Danger zone in Account settings; route `/auth/disconnect`) deletes everything we stored about the creator right away (SQL rows + every KV key + all sessions); the kit URL 404s and reconnecting starts fresh. No R2 copies are written yet. Sign out is cookie-only. Anonymous weekly totals stay only if they cannot identify anyone.
 
 ---
 

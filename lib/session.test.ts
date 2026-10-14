@@ -249,7 +249,7 @@ describe("disconnect vs sign out", () => {
       }),
     );
     assert.equal(response.status, 303);
-    assert.equal(response.headers.get("location"), "http://localhost/");
+    assert.equal(response.headers.get("location"), "http://localhost/?deleted=1");
     const cookies = response.headers.getSetCookie();
     assert.ok(cookies.some((row) => row.includes(`${SESSION_COOKIE}=`) && row.includes("Max-Age=0")));
     assert.ok(cookies.some((row) => row.includes(`${HIDDEN_COOKIE}=`) && row.includes("Max-Age=0")));

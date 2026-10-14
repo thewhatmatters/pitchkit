@@ -13,8 +13,8 @@ export default function DeletePage() {
     <AppFrame>
       <PageCard title="Delete your data">
         <PageCopy>
-          Disconnect deletes your data. Open Account settings from your avatar on
-          Insights and choose Disconnect or Delete account. Both do the same thing.
+          Open Account settings from your avatar on Insights. At the bottom,
+          under Danger zone, choose Delete account.
         </PageCopy>
         <PageCopy>
           We erase your stored profile, posts and their metrics, Insights,
@@ -23,7 +23,7 @@ export default function DeletePage() {
           kit link stops working, and it can&rsquo;t be undone.
         </PageCopy>
         <PageCopy>
-          If you connect again later, you start with an empty kit. Removing
+          If you sign in again later, you start with an empty kit. Removing
           Pitchkit from your Instagram settings also deletes your data. See{" "}
           <TextLink href="/data-deletion">data deletion</TextLink>
           .

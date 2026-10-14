@@ -1,6 +1,6 @@
 /** disclosure_version = 1 — show before Continue with Instagram. */
 export const DISCLOSURE =
-  "We only use your public posts and Instagram Insights to build your media kit. We don’t read DMs, who you follow, or unfollowers. Disconnect deletes your kit and the copies we stored.";
+  "We only use your public posts and Instagram Insights to build your media kit. We don’t read DMs, who you follow, or unfollowers. Deleting your account erases your kit and the copies we\u00a0stored.";
 
 export const PROFESSIONAL_NOTE =
   "Pitchkit works with Instagram Professional accounts (Business or Creator).";
@@ -46,22 +46,21 @@ export const SUPPORT_EMAIL = "randy@whatmatters.so";
 
 export const EMPTY_GRID = "Pulling your grid…";
 
-export const DISCONNECT_TITLE = "Disconnect and delete your kit data?";
-export const DISCONNECT_CONFIRM =
-  "Your kit goes offline and your stored Instagram data is erased. This can't be undone.";
-export const DISCONNECT_ACTION = "Delete and disconnect";
-export const DISCONNECT_KEEP = "Keep connected";
 
 /** Account settings Delete confirm — RE memo, Pattern — account settings (owner). */
 export const DELETE_ACCOUNT_TITLE = "Delete your Pitchkit account?";
 export const DELETE_ACCOUNT_CONFIRM =
-  "This permanently deletes your kit, stored media copies, and connection. Your Instagram account is not deleted. This cannot be undone.";
+  "Your kit page goes offline right away, and we erase your account and every bit of Instagram data we stored. Your Instagram account itself isn't touched. This can't be\u00a0undone.";
 export const DELETE_ACCOUNT_CANCEL = "Cancel";
 export const DELETE_ACCOUNT_ACTION = "Delete account";
+export const DELETE_ACCOUNT_TRIGGER = "Delete account…";
+export const DANGER_ZONE_CAPTION = "Danger zone";
+export const DANGER_ZONE_LINE = "Permanently delete your Pitchkit account and\u00a0kit.";
+export const ACCOUNT_DELETED_TOAST = "Your account was deleted.";
+export const SIGN_OUT_ACTION = "Sign out";
 
 export const ACCOUNT_MENU_LABEL = "My account";
 export const ACCOUNT_SETTINGS_ACTION = "Account settings";
-export const DISCONNECT_INSTAGRAM_ACTION = "Disconnect Instagram";
 export const RECONNECT_INSTAGRAM_ACTION = "Reconnect Instagram";
 
 export const PITCHKIT_OWNER_TITLE = "Your Pitchkit";

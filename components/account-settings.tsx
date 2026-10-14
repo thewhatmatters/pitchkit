@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { DeleteAccountControl } from "@/components/delete-account-control";
 import { CreatorIdentityStrip } from "@/components/creator-identity-strip";
 import { SupportFooter } from "@/components/support-footer";
 import {
@@ -21,7 +22,6 @@ import {
 } from "@/components/pattern-tokens";
 import { copyKitLink } from "@/components/share-kit-button";
 import {
-  AlertDialog,
   Avatar,
   Badge,
   Button,
@@ -33,16 +33,8 @@ import {
 import {
   ACCOUNT_MENU_LABEL,
   ACCOUNT_SETTINGS_ACTION,
-  DELETE_ACCOUNT_ACTION,
-  DELETE_ACCOUNT_CANCEL,
-  DELETE_ACCOUNT_CONFIRM,
-  DELETE_ACCOUNT_TITLE,
-  DISCONNECT_ACTION,
-  DISCONNECT_CONFIRM,
-  DISCONNECT_INSTAGRAM_ACTION,
-  DISCONNECT_KEEP,
-  DISCONNECT_TITLE,
   RECONNECT_INSTAGRAM_ACTION,
+  SIGN_OUT_ACTION,
 } from "@/lib/copy";
 import { creatorIdentityFromUser } from "@/lib/creator-identity";
 import { inventoryLastUpdated } from "@/lib/inventory";
@@ -67,8 +59,8 @@ type AccountMenuProps = AccountSettingsProps & {
  * Pattern — account settings (owner)
  * (`examples-pitchkit--account-settings-owner` at 9f06fb6).
  * Header Avatar opens a structured Dropdown. Dialog is Connected Instagram
- * plus Reconnect. Account actions live on the menu. Delete confirm is the
- * RE memo copy.
+ * plus Reconnect. Sign out lives on the menu (no confirm). Delete account lives
+ * only in the Danger zone at the bottom of settings.
  */
 
 export function AccountMenu({
@@ -80,11 +72,7 @@ export function AccountMenu({
   const rootRef = useRef<HTMLDivElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [disconnectOpen, setDisconnectOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
   const signOutFormRef = useRef<HTMLFormElement>(null);
-  const disconnectFormRef = useRef<HTMLFormElement>(null);
-  const deleteFormRef = useRef<HTMLFormElement>(null);
   const identity = creatorIdentityFromUser(user, {
     lastSyncedAt: inventoryLastUpdated(posts),
   });
@@ -185,31 +173,7 @@ export function AccountMenu({
                   signOutFormRef.current?.requestSubmit();
                 }}
               >
-                Sign out
-              </Dropdown.Item>
-            </li>
-            <li role="presentation">
-              <Dropdown.Item
-                role="menuitem"
-                truncate={false}
-                onClick={() => {
-                  closeMenu();
-                  setDisconnectOpen(true);
-                }}
-              >
-                {DISCONNECT_INSTAGRAM_ACTION}
-              </Dropdown.Item>
-            </li>
-            <li role="presentation">
-              <Dropdown.Item
-                role="menuitem"
-                truncate={false}
-                onClick={() => {
-                  closeMenu();
-                  setDeleteOpen(true);
-                }}
-              >
-                {DELETE_ACCOUNT_ACTION}
+                {SIGN_OUT_ACTION}
               </Dropdown.Item>
             </li>
           </Dropdown.Menu>
@@ -221,35 +185,7 @@ export function AccountMenu({
         open={settingsOpen}
         onOpenChange={setSettingsOpen}
       />
-      <AlertDialog
-        open={disconnectOpen}
-        onOpenChange={setDisconnectOpen}
-        title={DISCONNECT_TITLE}
-        description={DISCONNECT_CONFIRM}
-        cancelLabel={DISCONNECT_KEEP}
-        confirmLabel={DISCONNECT_ACTION}
-        confirmRole="destructive"
-        onConfirm={() => {
-          disconnectFormRef.current?.requestSubmit();
-        }}
-      />
-      <AlertDialog
-        open={deleteOpen}
-        onOpenChange={setDeleteOpen}
-        title={DELETE_ACCOUNT_TITLE}
-        description={DELETE_ACCOUNT_CONFIRM}
-        cancelLabel={DELETE_ACCOUNT_CANCEL}
-        confirmLabel={DELETE_ACCOUNT_ACTION}
-        confirmRole="destructive"
-        onConfirm={() => {
-          setDeleteOpen(false);
-          setSettingsOpen(false);
-          deleteFormRef.current?.requestSubmit();
-        }}
-      />
       <form ref={signOutFormRef} action="/auth/sign-out" method="post" hidden />
-      <form ref={disconnectFormRef} action="/auth/disconnect" method="post" hidden />
-      <form ref={deleteFormRef} action="/auth/disconnect" method="post" hidden />
     </>
   );
 }
@@ -304,6 +240,7 @@ export function AccountSettingsDialog({
               </div>
             </Card.Body>
           </Card>
+          <DeleteAccountControl onBeforeDelete={() => onOpenChange(false)} />
         </div>
       </Dialog.Content>
     </Dialog>

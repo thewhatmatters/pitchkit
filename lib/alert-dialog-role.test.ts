@@ -119,28 +119,34 @@ describe("fail-closed: Hide-from-kit AlertDialog role=dialog", () => {
   });
 });
 
-describe("fail-closed: disconnect AlertDialog initial focus lands on Keep connected", () => {
+describe("fail-closed: Delete account AlertDialog initial focus lands on Cancel", () => {
   before(() => {
     installJsdom();
   });
 
   const settle = () => new Promise((resolve) => setTimeout(resolve, 120));
 
-  function assertFocusOnKeep(where: string) {
+  function assertFocusOnCancel(where: string) {
     const active = document.activeElement as HTMLElement | null;
     assert.ok(active?.closest('[role="dialog"], [role="alertdialog"]'), `${where}: focus must be inside the dialog`);
-    assert.equal(active?.textContent?.trim(), "Keep connected", `${where}: initial focus must be Keep connected`);
-    assert.notEqual(active?.textContent?.trim(), "Delete and disconnect", `${where}: never the destructive button`);
+    assert.equal(active?.textContent?.trim(), "Cancel", `${where}: initial focus must be Cancel`);
+    assert.notEqual(active?.textContent?.trim(), "Delete account", `${where}: never the destructive button`);
   }
 
-  it("Disconnect control: opening from its trigger focuses Keep connected, not Delete and disconnect", async () => {
-    const control = readFileSync(join(process.cwd(), "components/disconnect-control.tsx"), "utf8");
-    assert.match(control, /cancelLabel=\{DISCONNECT_KEEP\}/);
-    assert.match(control, /confirmLabel=\{DISCONNECT_ACTION\}/);
+  it("Danger zone control wires the WMDS AlertDialog with destructive confirm and no focus override", () => {
+    const control = readFileSync(join(process.cwd(), "components/delete-account-control.tsx"), "utf8");
+    assert.match(control, /cancelLabel=\{DELETE_ACCOUNT_CANCEL\}/);
+    assert.match(control, /confirmLabel=\{DELETE_ACCOUNT_ACTION\}/);
     assert.match(control, /confirmRole="destructive"/);
+    assert.match(control, /role="destructive"/);
+    assert.match(control, /action="\/auth\/disconnect"/, "keeps the full-erase path");
     assert.doesNotMatch(control, /autoFocus|initialFocus/, "do not override WMDS initial focus");
+    const settings = readFileSync(join(process.cwd(), "components/account-settings.tsx"), "utf8");
+    assert.match(settings, /<DeleteAccountControl/);
+    assert.doesNotMatch(settings, /DISCONNECT_|setDeleteOpen|<AlertDialog/, "menu has Sign out only; delete lives in the Danger zone");
+  });
 
-    // Same trigger → open flow as DisconnectControl (the .tsx cannot be loaded under node:test CJS).
+  it("opening Delete account… focuses Cancel, not Delete account", async () => {
     const { createElement, act, useState } = await import("react");
     const { createRoot } = await import("react-dom/client");
     const { AlertDialog, Button } = await import("@whatmatters/wmds");
@@ -151,14 +157,14 @@ describe("fail-closed: disconnect AlertDialog initial focus lands on Keep connec
       return createElement(
         "div",
         null,
-        createElement(Button, { role: "secondary", size: "sm", type: "button", onClick: () => setOpen(true), children: "Disconnect" }),
+        createElement(Button, { role: "destructive", size: "sm", type: "button", onClick: () => setOpen(true), children: copy.DELETE_ACCOUNT_TRIGGER }),
         createElement(AlertDialog, {
           open,
           onOpenChange: setOpen,
-          title: copy.DISCONNECT_TITLE,
-          description: copy.DISCONNECT_CONFIRM,
-          cancelLabel: copy.DISCONNECT_KEEP,
-          confirmLabel: copy.DISCONNECT_ACTION,
+          title: copy.DELETE_ACCOUNT_TITLE,
+          description: copy.DELETE_ACCOUNT_CONFIRM,
+          cancelLabel: copy.DELETE_ACCOUNT_CANCEL,
+          confirmLabel: copy.DELETE_ACCOUNT_ACTION,
           confirmRole: "destructive",
           onConfirm: () => {},
         }),
@@ -168,50 +174,23 @@ describe("fail-closed: disconnect AlertDialog initial focus lands on Keep connec
     document.body.appendChild(host);
     const root = createRoot(host);
     await act(async () => root.render(createElement(Harness)));
-    const trigger = [...host.querySelectorAll("button")].find((el) => el.textContent?.trim() === "Disconnect");
-    assert.ok(trigger, "Disconnect trigger");
+    const trigger = [...host.querySelectorAll("button")].find((el) => el.textContent?.trim() === copy.DELETE_ACCOUNT_TRIGGER);
+    assert.ok(trigger, "Delete account… trigger");
     await act(async () => {
       trigger.focus();
       trigger.click();
     });
     await act(settle);
-    assertFocusOnKeep("DisconnectControl");
+    assertFocusOnCancel("Danger zone");
     await act(async () => root.unmount());
     host.remove();
   });
 
-  it("Account settings: the same WMDS AlertDialog props focus Keep connected", async () => {
-    const settings = readFileSync(join(process.cwd(), "components/account-settings.tsx"), "utf8");
-    const block = settings.slice(settings.indexOf("open={disconnectOpen}") - 40, settings.indexOf("open={deleteOpen}"));
-    assert.match(block, /cancelLabel=\{DISCONNECT_KEEP\}/);
-    assert.match(block, /confirmLabel=\{DISCONNECT_ACTION\}/);
-    assert.match(block, /confirmRole="destructive"/);
-    assert.doesNotMatch(block, /autoFocus|initialFocus/, "do not override WMDS initial focus");
-
-    const { createElement, act } = await import("react");
-    const { createRoot } = await import("react-dom/client");
-    const { AlertDialog } = await import("@whatmatters/wmds");
-    const copy = await import("./copy");
-    const host = document.createElement("div");
-    document.body.appendChild(host);
-    const root = createRoot(host);
-    await act(async () =>
-      root.render(
-        createElement(AlertDialog, {
-          open: true,
-          onOpenChange: () => {},
-          title: copy.DISCONNECT_TITLE,
-          description: copy.DISCONNECT_CONFIRM,
-          cancelLabel: copy.DISCONNECT_KEEP,
-          confirmLabel: copy.DISCONNECT_ACTION,
-          confirmRole: "destructive",
-          onConfirm: () => {},
-        }),
-      ),
-    );
-    await act(settle);
-    assertFocusOnKeep("Account settings AlertDialog");
-    await act(async () => root.unmount());
-    host.remove();
+  it("user-facing copy never says disconnect", () => {
+    const files = ["lib/copy.ts", "app/privacy/page.tsx", "app/delete/page.tsx", "app/data-deletion/page.tsx", "app/data-deletion/status/page.tsx", "app/not-found.tsx", "components/account-settings.tsx", "components/delete-account-control.tsx"];
+    for (const f of files) {
+      const text = readFileSync(join(process.cwd(), f), "utf8").replace(/\/auth\/disconnect/g, "");
+      assert.doesNotMatch(text, /disconnect/i, f);
+    }
   });
 });

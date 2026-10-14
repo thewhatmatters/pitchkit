@@ -218,9 +218,9 @@ describe("critical page contracts", () => {
     assert.match(read("components/account-settings.tsx"), /Dropdown/);
     assert.match(read("components/account-settings.tsx"), /Account settings/);
     assert.match(read("components/account-settings.tsx"), /Share kit/);
-    assert.match(read("components/account-settings.tsx"), /DISCONNECT_INSTAGRAM_ACTION/);
-    assert.match(read("components/account-settings.tsx"), /DELETE_ACCOUNT_ACTION/);
-    assert.match(read("components/account-settings.tsx"), /Sign out/);
+    assert.doesNotMatch(read("components/account-settings.tsx"), /DISCONNECT_INSTAGRAM_ACTION/);
+    assert.match(read("components/account-settings.tsx"), /SIGN_OUT_ACTION/);
+    assert.match(read("lib/copy.ts"), /SIGN_OUT_ACTION = "Sign out"/);
     assert.doesNotMatch(read("components/account-settings.tsx"), /Unlock Pro|Security|Integrations/);
     assert.match(read("components/account-settings.tsx"), /aria-label=\{ACCOUNT_MENU_LABEL\}/);
     assert.match(read("components/account-settings.tsx"), /PATTERN_ACCOUNT_MENU_TRIGGER_CLASS/);
@@ -683,7 +683,7 @@ describe("critical page contracts", () => {
     const page = read("app/settings/page.tsx");
     const settings = read("components/account-settings.tsx");
     const nav = read("components/owner-nav.tsx");
-    const disconnect = read("components/disconnect-control.tsx");
+    const disconnect = read("components/delete-account-control.tsx");
     const chrome = read("components/owner-chrome.tsx");
     const workspace = read("components/owner-workspace.tsx");
     const strip = read("components/creator-identity-strip.tsx");
@@ -713,17 +713,13 @@ describe("critical page contracts", () => {
     assert.match(settings, /PATTERN_USER_SETTINGS_BODY_CLASS/);
     assert.match(settings, /PATTERN_ACCOUNT_MENU_SEPARATOR_CLASS/);
     assert.match(settings, new RegExp(AUTH_SIGNOUT_PATH));
-    assert.match(settings, /DISCONNECT_TITLE/);
-    assert.match(settings, /DELETE_ACCOUNT_ACTION/);
-    assert.match(settings, /DELETE_ACCOUNT_TITLE/);
-    assert.match(settings, /DELETE_ACCOUNT_CONFIRM/);
-    assert.match(settings, /confirmRole="destructive"/);
-    assert.match(settings, new RegExp(`action="${AUTH_DISCONNECT_PATH}"`));
+    assert.match(settings, /<DeleteAccountControl/);
+    assert.match(disconnect, /DELETE_ACCOUNT_TITLE/);
+    assert.match(disconnect, /DELETE_ACCOUNT_CONFIRM/);
+    assert.match(disconnect, /DANGER_ZONE_CAPTION/);
     assert.match(copy, /Delete your Pitchkit account\?/);
-    assert.match(
-      copy,
-      /This permanently deletes your kit, stored media copies, and connection/,
-    );
+    assert.match(copy, /DANGER_ZONE_CAPTION = "Danger zone"/);
+    assert.match(copy, /Your Instagram account itself isn.t touched\. This can.t be\\u00a0undone\./);
     assert.match(nav, /AccountMenu/);
     assert.match(settings, /AccountSettingsDialog/);
     assert.match(settings, /defaultSettingsOpen/);
@@ -733,14 +729,14 @@ describe("critical page contracts", () => {
     assert.match(disconnect, new RegExp(`action="${AUTH_DISCONNECT_PATH}"`));
     assert.match(disconnect, /method="post"/);
     assert.match(disconnect, /<AlertDialog/);
-    assert.match(disconnect, /confirmLabel=\{DISCONNECT_ACTION\}/);
+    assert.match(disconnect, /confirmLabel=\{DELETE_ACCOUNT_ACTION\}/);
     assert.match(disconnect, /confirmRole="destructive"/);
     assert.match(read("app/auth/disconnect/route.ts"), /disconnectOwner/);
     assert.doesNotMatch(chrome, /Reconnect Instagram/);
     assert.doesNotMatch(chrome, /DisconnectControl/);
     assert.match(settings, /RECONNECT_INSTAGRAM_ACTION/);
     assert.match(copy, /RECONNECT_INSTAGRAM_ACTION = "Reconnect Instagram"/);
-    assert.match(copy, /DISCONNECT_INSTAGRAM_ACTION = "Disconnect Instagram"/);
+    assert.doesNotMatch(copy, /DISCONNECT_INSTAGRAM_ACTION/);
     assert.match(read("components/support-footer.tsx"), /\/privacy/);
     assert.match(read("components/support-footer.tsx"), /mailto:\$\{SUPPORT_EMAIL\}/);
     assert.match(read("components/support-footer.tsx"), />Privacy</);
