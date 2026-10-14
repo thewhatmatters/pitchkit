@@ -78,7 +78,7 @@ describe("fail-closed: Hide-from-kit AlertDialog role=dialog", () => {
     const ownerKit = readFileSync(join(process.cwd(), "components/owner-pitchkit.tsx"), "utf8");
     assert.match(ownerKit, /<AlertDialog/);
     assert.match(ownerKit, /confirmLabel="Hide from kit"/);
-    assert.match(ownerKit, /title="Hide this post from PitchKit\?"/);
+    assert.match(ownerKit, /title="Hide this post from Pitchkit\?"/);
     assert.match(ownerKit, /from "@\/components\/wmds"/);
     assert.match(readFileSync(join(process.cwd(), "components/wmds.ts"), "utf8"), /AlertDialog/);
   });
@@ -94,8 +94,8 @@ describe("fail-closed: Hide-from-kit AlertDialog role=dialog", () => {
       createElement(AlertDialog, {
         open: true,
         onOpenChange: () => {},
-        title: "Hide this post from PitchKit?",
-        description: "It will no longer appear in the shareable PitchKit. You can add it back later.",
+        title: "Hide this post from Pitchkit?",
+        description: "It will no longer appear in the shareable Pitchkit. You can add it back later.",
         cancelLabel: "Keep post",
         confirmLabel: "Hide from kit",
         onConfirm: () => {},
@@ -115,6 +115,6 @@ describe("fail-closed: Hide-from-kit AlertDialog role=dialog", () => {
       `expected role=dialog (ARIA dialog family); got ${role ?? "null"}`,
     );
     assert.match(dialog.textContent ?? "", /Hide from kit/);
-    assert.match(dialog.textContent ?? "", /Hide this post from PitchKit\?/);
+    assert.match(dialog.textContent ?? "", /Hide this post from Pitchkit\?/);
   });
 });

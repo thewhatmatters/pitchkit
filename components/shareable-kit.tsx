@@ -9,9 +9,6 @@ import {
   PATTERN_CALLOUT_BODY_CLASS,
   PATTERN_CALLOUT_CARD_CLASS,
   PATTERN_CARD_WELL_CLASS,
-  PATTERN_CONTACT_CARD_CLASS,
-  PATTERN_CONTACT_ROW_CLASS,
-  PATTERN_CONTACT_ROWS_CLASS,
   PATTERN_PUBLIC_COUNTRIES_CARD_CLASS,
   PATTERN_PUBLIC_REACH_CARD_CLASS,
   PATTERN_PUBLIC_STACK_CLASS,
@@ -30,8 +27,9 @@ import {
   PATTERN_POSTS_SECTION_CLASS,
   PATTERN_PUBLIC_REACH_CHART_MIN_HEIGHT,
   PATTERN_PUBLIC_STAT_CLASS,
+  PATTERN_PUBLIC_POST_CARD_CLASS,
+  publicStatClass,
   PATTERN_REACH_EMPTY_COPY_CLASS,
-  PATTERN_SECTION_EYEBROW_CLASS,
   PATTERN_STATS_BAND_CLASS,
   PATTERN_SUPPORTING_CLASS,
 } from "@/components/pattern-tokens";
@@ -41,7 +39,6 @@ import {
   Card,
   Chart,
   Stat,
-  TextLink,
   cardSubtitleClasses,
   cardTitleClasses,
   chartSeriesConfigFromKeys,
@@ -53,8 +50,7 @@ import {
   REACH_INSUFFICIENT_TITLE,
   REACH_NO_DATA_LABEL,
 } from "@/lib/copy";
-import { formatCount, formatEngagementRate } from "@/lib/engagement";
-import { sourcedContactDetail } from "@/lib/kit-chips";
+import { publicStats } from "@/lib/public-stats";
 import { publicReachState } from "@/lib/kit";
 import type { PastBrand } from "@/lib/kit-profile";
 import {
@@ -72,6 +68,11 @@ const compactNumber = new Intl.NumberFormat("en", {
 });
 
 export type ShareableKitProps = {
+  /**
+   * Public /k/<handle>: brands never see an empty section or a dash.
+   * Hides empty stats, the empty reach card and a zero-post grid. Owner views keep them.
+   */
+  hideEmpty?: boolean;
   user: User;
   posts: Media[];
   engagementRate: number | null;
@@ -82,7 +83,6 @@ export type ShareableKitProps = {
   countries?: readonly RankedShare[];
   pastBrands?: readonly PastBrand[];
   intro?: string | null;
-  contact?: string | null;
   /**
    * Unsigned visitor who is not the kit owner.
    * Omit for the kit owner and for signed-in viewers of someone else's kit.
@@ -266,18 +266,28 @@ export function ShareableKit({
   countries = [],
   pastBrands = [],
   intro = null,
-  contact = null,
   showCreateBand = false,
   introSlot,
   brandsSlot,
   renderPostHeader,
   postNotice = null,
+  hideEmpty = false,
 }: ShareableKitProps) {
-  const contactDetail = sourcedContactDetail(contact);
   const identity = creatorIdentityFromUser(user);
   const reachState = publicReachState(hasInsights, reachSeries);
   const shownEngagement = reachState === "resolved" ? engagementRate : null;
   const shownTypicalReach = reachState === "resolved" ? typicalReach : null;
+  const stats = publicStats({
+    followers: user.followers,
+    engagement: shownEngagement,
+    typicalReach: shownTypicalReach,
+    typicalSaves,
+    hideEmpty,
+  });
+  const reachHasChart = reachState === "resolved" && shouldShowReachChart(reachSeries);
+  const showReach = !hideEmpty || reachHasChart;
+  const showStack = showReach || publicCountries(countries).length > 0;
+  const showPosts = !hideEmpty || posts.length > 0;
 
   return (
     <>
@@ -293,129 +303,79 @@ export function ShareableKit({
         aria-label="Instagram performance summary"
         className={PATTERN_STATS_BAND_CLASS}
       >
-        <Stat
-          className={PATTERN_PUBLIC_STAT_CLASS}
-          label="Followers"
-          value={formatCount(user.followers)}
-        />
-        {shownEngagement != null ? (
+        {stats.map((stat, index) => (
           <Stat
-            className={PATTERN_PUBLIC_STAT_CLASS}
-            label="Engagement rate"
-            value={formatEngagementRate(shownEngagement)}
+            key={stat.label}
+            className={hideEmpty ? publicStatClass(index, stats.length) : PATTERN_PUBLIC_STAT_CLASS}
+            label={stat.label}
+            value={stat.value}
           />
-        ) : null}
-        <Stat
-          className={PATTERN_PUBLIC_STAT_CLASS}
-          label="Typical reach"
-          value={shownTypicalReach != null ? formatCount(shownTypicalReach) : "—"}
-        />
-        <Stat
-          className={PATTERN_PUBLIC_STAT_CLASS}
-          label="Typical saves"
-          value={typicalSaves != null ? formatCount(typicalSaves) : "—"}
-        />
+        ))}
       </div>
 
-      <div className={PATTERN_PUBLIC_STACK_CLASS}>
-        <PublicReachCard
-          reachState={reachState}
-          series={reachSeries}
-          typicalReach={shownTypicalReach}
-        />
-        <PublicCountries countries={countries} />
-      </div>
-
-      <section className={PATTERN_POSTS_SECTION_CLASS}>
-        <div className={PATTERN_POSTS_HEADER_CLASS}>
-          <div>
-            <h2 className={cardTitleClasses}>Selected posts</h2>
-            <p className={PATTERN_SUPPORTING_CLASS}>
-              {postNotice ?? "Proof from the current Instagram set."}
-            </p>
-          </div>
+      {showStack ? (
+        <div className={PATTERN_PUBLIC_STACK_CLASS}>
+          {showReach ? (
+            <PublicReachCard
+              reachState={reachState}
+              series={reachSeries}
+              typicalReach={shownTypicalReach}
+            />
+          ) : null}
+          <PublicCountries countries={countries} />
         </div>
-        <div className={PATTERN_POSTS_PANEL_CLASS}>
-          {posts.map((post, index) => (
-            <Card
-              key={post.id}
-              variant="outlined"
-              shape="rounded"
-              className={PATTERN_POST_CARD_CLASS}
-            >
-              {renderPostHeader ? renderPostHeader(post, index) : null}
-              <Card.Body>
-                <img
-                  className={PATTERN_POST_IMAGE_CLASS}
-                  src={publicObjectUrl(post.r2_key)}
-                  alt=""
-                />
-              </Card.Body>
-              <Card.Footer>
-                <div className={PATTERN_KIT_POST_METRICS_CLASS}>
-                  {(
-                    [
-                      ["Likes", post.like_count],
-                      ["Comments", post.comments_count],
-                    ] as const
-                  ).map(([label, value]) => (
-                    <span key={label} className={PATTERN_POST_METRIC_CLASS}>
-                      <span className={PATTERN_POST_METRIC_LABEL_CLASS}>{label}</span>
-                      <span className={PATTERN_POST_METRIC_VALUE_CLASS}>
-                        {compactNumber.format(value)}
-                      </span>
-                    </span>
-                  ))}
-                </div>
-              </Card.Footer>
-            </Card>
-          ))}
-        </div>
-      </section>
+      ) : null}
 
-      {contactDetail ? (
+      {showPosts ? (
         <section className={PATTERN_POSTS_SECTION_CLASS}>
           <div className={PATTERN_POSTS_HEADER_CLASS}>
             <div>
-              <h2 className={cardTitleClasses}>Contact</h2>
+              <h2 className={cardTitleClasses}>Selected posts</h2>
               <p className={PATTERN_SUPPORTING_CLASS}>
-                Creator-entered details for brand outreach.
+                {postNotice ?? "Proof from the current Instagram set."}
               </p>
             </div>
           </div>
-          <Card
-            variant="outlined"
-            padding="md"
-            shape="rounded"
-            className={PATTERN_CONTACT_CARD_CLASS}
-          >
-            <div className={PATTERN_CONTACT_ROWS_CLASS}>
-              {contactDetail.kind === "email" ? (
-                <div className={PATTERN_CONTACT_ROW_CLASS}>
-                  <span className={PATTERN_SECTION_EYEBROW_CLASS}>Email</span>
-                  <TextLink href={contactDetail.href}>{contactDetail.value}</TextLink>
-                </div>
-              ) : null}
-              {contactDetail.kind === "website" ? (
-                <div className={PATTERN_CONTACT_ROW_CLASS}>
-                  <span className={PATTERN_SECTION_EYEBROW_CLASS}>Website</span>
-                  <TextLink href={contactDetail.href} external>
-                    {contactDetail.value}
-                  </TextLink>
-                </div>
-              ) : null}
-              {contactDetail.kind === "text" ? (
-                <div className={PATTERN_CONTACT_ROW_CLASS}>
-                  <span className={PATTERN_SECTION_EYEBROW_CLASS}>Contact</span>
-                  <span className={PATTERN_SUPPORTING_CLASS}>{contactDetail.value}</span>
-                </div>
-              ) : null}
-            </div>
-          </Card>
+          <div className={PATTERN_POSTS_PANEL_CLASS}>
+            {posts.map((post, index) => (
+              <Card
+                key={post.id}
+                variant="outlined"
+                shape="rounded"
+                className={hideEmpty ? PATTERN_PUBLIC_POST_CARD_CLASS : PATTERN_POST_CARD_CLASS}
+              >
+                {renderPostHeader ? renderPostHeader(post, index) : null}
+                <Card.Body>
+                  <img
+                    className={PATTERN_POST_IMAGE_CLASS}
+                    src={publicObjectUrl(post.r2_key)}
+                    alt=""
+                  />
+                </Card.Body>
+                <Card.Footer>
+                  <div className={PATTERN_KIT_POST_METRICS_CLASS}>
+                    {(
+                      [
+                        ["Likes", post.like_count],
+                        ["Comments", post.comments_count],
+                      ] as const
+                    ).map(([label, value]) => (
+                      <span key={label} className={PATTERN_POST_METRIC_CLASS}>
+                        <span className={PATTERN_POST_METRIC_LABEL_CLASS}>{label}</span>
+                        <span className={PATTERN_POST_METRIC_VALUE_CLASS}>
+                          {compactNumber.format(value)}
+                        </span>
+                      </span>
+                    ))}
+                  </div>
+                </Card.Footer>
+              </Card>
+            ))}
+          </div>
         </section>
       ) : null}
 
-      {brandsSlot ?? <PublicPastBrands brands={pastBrands} />}
+      {brandsSlot ?? <PublicPastBrands brands={pastBrands} wrap={hideEmpty} />}
 
       {showCreateBand ? <PublicCreatePitchkitBand /> : null}
     </>

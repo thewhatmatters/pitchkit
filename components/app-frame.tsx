@@ -49,7 +49,7 @@ export function AppFrame({ children, gridMax }: AppFrameProps) {
         gridMax ? OWNER_GRID_CLASS : "grid-page min-h-dvh py-6"
       }
     >
-      <div className="band">{children}</div>
+      <div className="band content-start">{children}</div>
     </div>
   );
 }

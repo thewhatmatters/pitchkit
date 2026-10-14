@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <AppFrame>
-      <PageCard title="Privacy">
+      <PageCard title="Privacy" reading>
         <PageCopy>{DISCLOSURE}</PageCopy>
         <PageCopy>
           Scopes: instagram_business_basic and instagram_business_manage_insights.

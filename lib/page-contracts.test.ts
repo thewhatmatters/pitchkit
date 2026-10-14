@@ -115,7 +115,7 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(page, /MoreMenu|Hide from kit|label="Edit"|Coming soon|PitchKitComingSoon|OwnerPitchKit/);
     assert.match(kit, /Instagram performance summary/);
     assert.match(kit, /Selected posts/);
-    assert.match(kit, /TextLink/);
+    assert.doesNotMatch(kit, /TextLink|mailto:/);
     assert.match(kit, /PublicPastBrands/);
     assert.match(kit, /PublicIntro/);
     assert.match(kit, /examples-pitchkit--intro-public|PATTERN_INTRO_STACK_CLASS/);
@@ -132,7 +132,7 @@ describe("critical page contracts", () => {
     assert.match(kit, /examples-pitchkit--shareable-pitch-kit/);
     assert.match(kit, /examples-pitchkit--shareable-insufficient-reach/);
     assert.match(kit, /Typical reach/);
-    assert.match(kit, /Typical saves/);
+    assert.match(read("lib/public-stats.ts"), /Typical saves/);
     assert.match(kit, /Reach over 30 days/);
     assert.match(kit, /Top countries/);
     assert.match(kit, /PATTERN_PUBLIC_STAT_CLASS|PATTERN_PUBLIC_REACH_CHART_MIN_HEIGHT/);
@@ -202,8 +202,8 @@ describe("critical page contracts", () => {
     assert.match(barrel, /TextLink/);
     assert.match(nav, /SegmentedControl/);
     assert.match(nav, />Insights</);
-    assert.match(nav, />PitchKit</);
-    assert.match(nav, /aria-label="PitchKit primary navigation"/);
+    assert.match(nav, />Pitchkit</);
+    assert.match(nav, /aria-label="Pitchkit primary navigation"/);
     assert.match(nav, /onViewChange/);
     assert.doesNotMatch(nav, /router\.push|kitPath|usePathname|useRouter/);
     assert.match(tokens, /PATTERN_TOPBAR_CLASS/);
@@ -246,7 +246,7 @@ describe("critical page contracts", () => {
     assert.match(frame, /band/);
     assert.doesNotMatch(frame, /<OwnerGridOverlay|<GridOverlay|ExampleGridControls/);
     assert.doesNotMatch(frame, /col-span-full flex flex-col/);
-    assert.match(frame, /<div className="band">\{children\}<\/div>/);
+    assert.match(frame, /<div className="band content-start">\{children\}<\/div>/);
     assert.doesNotMatch(frame, /["']use client["']/);
     assert.match(workspace, /CREATOR_INSIGHTS_PAGE_CLASS/);
     assert.match(workspace, /CREATOR_INSIGHTS_HEADER_BAND_CLASS/);
@@ -324,9 +324,9 @@ describe("critical page contracts", () => {
     assert.match(copy, /TOAST_KIT_COPIED_DESCRIPTION = "The public kit URL is ready to paste."/);
     assert.match(copy, /TOAST_KIT_COPY_FAILED_TITLE/);
     assert.match(copy, /TOAST_POST_HIDDEN_TITLE = "Post hidden from kit"/);
-    assert.match(copy, /TOAST_POST_HIDDEN_DESCRIPTION = "It no longer appears in the shareable PitchKit."/);
+    assert.match(copy, /TOAST_POST_HIDDEN_DESCRIPTION = "It no longer appears in the shareable Pitchkit."/);
     assert.match(copy, /TOAST_POST_RESTORED_TITLE = "Post restored to kit"/);
-    assert.match(copy, /TOAST_POST_RESTORED_DESCRIPTION = "It appears in the shareable PitchKit again."/);
+    assert.match(copy, /TOAST_POST_RESTORED_DESCRIPTION = "It appears in the shareable Pitchkit again."/);
     assert.match(copy, /TOAST_HIDE_FAILED_TITLE/);
     assert.match(copy, /TOAST_RESTORE_FAILED_TITLE/);
     assert.match(copy, /TOAST_KIT_PROFILE_FAILED_TITLE/);
@@ -386,7 +386,7 @@ describe("critical page contracts", () => {
     assert.match(read("lib/inventory.ts"), /\(likes \+ comments \+ saves \+ shares\) ÷ reach/);
     assert.doesNotMatch(chrome, /÷ followers/);
     assert.doesNotMatch(card, />ER</);
-    assert.match(card, /Engagement rate/);
+    assert.match(card + read("lib/public-stats.ts"), /Engagement rate/);
     assert.doesNotMatch(stats, /<Stat\.Group/);
     assert.doesNotMatch(stats, /trend=/);
     assert.match(stats, /PATTERN_STAT_CLASS/);
@@ -741,9 +741,9 @@ describe("critical page contracts", () => {
     assert.match(copy, /RECONNECT_INSTAGRAM_ACTION = "Reconnect Instagram"/);
     assert.match(copy, /DISCONNECT_INSTAGRAM_ACTION = "Disconnect Instagram"/);
     assert.match(read("components/support-footer.tsx"), /\/privacy/);
-    assert.match(read("components/support-footer.tsx"), /mailto:\$\{SUPPORT_EMAIL\}/);
+    assert.match(read("components/support-footer.tsx"), /href="\/help"/);
     assert.match(read("components/support-footer.tsx"), />Privacy</);
-    assert.match(read("components/support-footer.tsx"), />Support</);
+    assert.match(read("components/support-footer.tsx"), />Help</);
     assert.match(read("components/support-footer.tsx"), /PATTERN_FOOTER_BAND_CLASS/);
     assert.match(read("components/support-footer.tsx"), /TextLink/);
     assert.doesNotMatch(read("components/support-footer.tsx"), /Reconnect Instagram|scroll-to-top|Vercel|Cloudflare/);

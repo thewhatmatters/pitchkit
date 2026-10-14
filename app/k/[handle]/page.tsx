@@ -52,7 +52,7 @@ export default async function KitPage({ params }: KitPageProps) {
     <main data-theme={kit.theme} className={CREATOR_INSIGHTS_PAGE_CLASS}>
       <div className={CREATOR_INSIGHTS_HEADER_BAND_CLASS}>
         <header className={PATTERN_TOPBAR_CLASS}>
-          <span className={PATTERN_BRAND_CLASS}>PitchKit</span>
+          <span className={PATTERN_BRAND_CLASS}>Pitchkit</span>
         </header>
       </div>
       <div className={CREATOR_INSIGHTS_BODY_BAND_CLASS}>
@@ -69,6 +69,7 @@ export default async function KitPage({ params }: KitPageProps) {
             intro={kit.intro}
             pastBrands={kit.past_brands}
             showCreateBand={session == null}
+            hideEmpty
           />
         </div>
       </div>

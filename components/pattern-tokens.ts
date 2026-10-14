@@ -207,6 +207,18 @@ export const PATTERN_KIT_STAT_CLASS = "col-span-2 md:col-span-4 lg:col-span-6";
 /** Public kit 4-up Graph KPIs — same spine as Insights Stats. */
 export const PATTERN_PUBLIC_STAT_CLASS = PATTERN_STAT_CLASS;
 
+/** Public kit stat spans by how many stats have data. No lone half card. */
+export const PATTERN_PUBLIC_STAT_SOLO_CLASS = "col-span-full h-full";
+export const PATTERN_PUBLIC_STAT_HALF_CLASS = "col-span-2 md:col-span-4 lg:col-span-6 h-full";
+export const PATTERN_PUBLIC_STAT_LEAD_CLASS = "col-span-full lg:col-span-4 h-full";
+export const PATTERN_PUBLIC_STAT_THIRD_CLASS = "col-span-2 md:col-span-4 lg:col-span-4 h-full";
+
+/** Public kit posts: 2-up at 390, 3-up at desktop. */
+export const PATTERN_PUBLIC_POST_CARD_CLASS = "col-span-2 min-w-0 md:col-span-4 lg:col-span-4";
+
+/** Legal / help reading column: about 65 characters a line, centered. */
+export const PATTERN_READING_COLUMN_CLASS = "col-span-full mx-auto w-full max-w-2xl";
+
 export const PATTERN_COUNTRIES_CARD_CLASS = PATTERN_AUDIENCE_CARD_CLASS;
 
 /** Owner PitchKit tab — compact reach + countries stack full width. */
@@ -214,7 +226,7 @@ export const PATTERN_PUBLIC_STACK_CLASS = PATTERN_DASHBOARD_GRID_CLASS;
 export const PATTERN_PUBLIC_REACH_CARD_CLASS = "col-span-full min-w-0";
 export const PATTERN_PUBLIC_COUNTRIES_CARD_CLASS = "col-span-full min-w-0";
 
-export const PATTERN_KIT_POST_METRICS_CLASS = "grid w-full grid-cols-2 gap-3";
+export const PATTERN_KIT_POST_METRICS_CLASS = "flex w-full justify-between gap-2";
 
 export const PATTERN_CONTACT_CARD_CLASS = "col-span-full";
 
@@ -291,3 +303,11 @@ export const CREATOR_INSIGHTS_HEADER_BAND_CLASS = PATTERN_TOPBAR_BAND_CLASS;
 export const CREATOR_INSIGHTS_BODY_BAND_CLASS = PATTERN_CONTENT_BAND_CLASS;
 
 export const CREATOR_INSIGHTS_BODY_INNER_CLASS = PATTERN_CONTENT_CLASS;
+
+/** Public stat span for the i-th of n shown stats. */
+export function publicStatClass(index: number, count: number): string {
+  if (count <= 1) return PATTERN_PUBLIC_STAT_SOLO_CLASS;
+  if (count === 2) return PATTERN_PUBLIC_STAT_HALF_CLASS;
+  if (count === 3) return index === 0 ? PATTERN_PUBLIC_STAT_LEAD_CLASS : PATTERN_PUBLIC_STAT_THIRD_CLASS;
+  return PATTERN_PUBLIC_STAT_CLASS;
+}

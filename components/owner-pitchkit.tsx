@@ -77,7 +77,6 @@ type OwnerPitchKitProps = {
   intro?: string | null;
   pastBrands?: readonly PastBrand[];
   theme?: PitchKitTheme;
-  contact?: string | null;
 };
 
 /**
@@ -101,7 +100,6 @@ export function OwnerPitchKit({
   intro: introProp = null,
   pastBrands = [],
   theme: themeProp = PITCHKIT_THEME_DEFAULT,
-  contact = null,
 }: OwnerPitchKitProps) {
   const [postNotice, setPostNotice] = useState<string | null>(null);
   const [pendingHidePostId, setPendingHidePostId] = useState<string | null>(null);
@@ -283,7 +281,6 @@ export function OwnerPitchKit({
         countries={countries}
         pastBrands={brands}
         intro={intro}
-        contact={contact}
         showCreateBand={false}
         postNotice={postNotice}
         introSlot={<OwnerIntroEditor intro={intro} onIntroChange={handleIntroChange} />}
@@ -373,8 +370,8 @@ export function OwnerPitchKit({
             setPendingHidePostId(null);
           }
         }}
-        title="Hide this post from PitchKit?"
-        description="It will no longer appear in the shareable PitchKit. You can add it back later."
+        title="Hide this post from Pitchkit?"
+        description="It will no longer appear in the shareable Pitchkit. You can add it back later."
         cancelLabel="Keep post"
         confirmLabel="Hide from kit"
         onConfirm={() => {
