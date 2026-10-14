@@ -1,19 +1,23 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { PATTERN_READING_COLUMN_CLASS } from "@/components/pattern-tokens";
 import { Button, Card, cardBodyTextClasses, cardTitleClasses } from "@/components/wmds";
 
 export function PageCard({
   title,
   children,
   footer,
+  reading = false,
 }: {
   title: string;
   children: ReactNode;
   footer?: ReactNode;
+  /** Cap at a readable column (help / legal). */
+  reading?: boolean;
 }) {
   return (
-    <Card variant="outlined" shape="rounded" padding="none" className="col-span-full">
+    <Card variant="outlined" shape="rounded" padding="none" className={reading ? PATTERN_READING_COLUMN_CLASS : "col-span-full"}>
       <Card.Header>
         <h1 className={cardTitleClasses}>{title}</h1>
       </Card.Header>

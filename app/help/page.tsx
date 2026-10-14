@@ -10,18 +10,19 @@ export const metadata: Metadata = {
 export default function HelpPage() {
   return (
     <AppFrame>
-      <PageCard title="Help">
+      <PageCard title="Help" reading>
         <PageCopy>
           Pitchkit turns your Instagram Professional account into a media kit brands can trust.
           Sign in with Instagram to create yours.
         </PageCopy>
         <PageCopy>
-          Your numbers come straight from Instagram. New posts show up after you open Insights
-          in Pitchkit. To pull them in right away, tap Refresh on Insights.
+          Your numbers come straight from Instagram. Brands see only your public kit, never your
+          private Insights. New posts show up after you open Insights in Pitchkit. To pull them
+          in right away, tap Refresh on Insights.
         </PageCopy>
         <PageCopy>
-          To take your kit down, open Settings and remove Instagram from Pitchkit. Your public
-          kit comes down right away. Brands see only your public kit, never your private Insights.
+          To take your kit down, open Settings and choose Delete account under Danger zone. Your
+          kit link stops working right away.
         </PageCopy>
       </PageCard>
       <SupportFooter />

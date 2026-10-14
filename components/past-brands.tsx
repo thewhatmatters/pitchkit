@@ -117,7 +117,13 @@ function PastBrandCard({
   );
 }
 
-function PastBrandsRail({ brands }: { brands: readonly PastBrand[] }) {
+function PastBrandsRail({
+  brands,
+  wrap = false,
+}: {
+  brands: readonly PastBrand[];
+  wrap?: boolean;
+}) {
   const hostRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLUListElement>(null);
   const [overflows, setOverflows] = useState(false);
@@ -152,7 +158,8 @@ function PastBrandsRail({ brands }: { brands: readonly PastBrand[] }) {
   }, [brands]);
 
   const duration = Math.max(16, brands.length * 4);
-  const showMarquee = overflows && !reduceMotion;
+  const wrapRow = wrap || reduceMotion;
+  const showMarquee = overflows && !wrapRow;
 
   return (
     <div
@@ -167,7 +174,7 @@ function PastBrandsRail({ brands }: { brands: readonly PastBrand[] }) {
           </li>
         ))}
       </ul>
-      {reduceMotion ? (
+      {wrapRow ? (
         <ul className={PATTERN_BRAND_RAIL_WRAP_CLASS} aria-label="Past brands">
           {brands.map((brand) => (
             <li key={brand.id}>
@@ -224,6 +231,8 @@ function PastBrandsRail({ brands }: { brands: readonly PastBrand[] }) {
 
 type PublicPastBrandsProps = {
   brands: readonly PastBrand[];
+  /** Wrap chips onto new lines instead of a marquee (public /k/). */
+  wrap?: boolean;
 };
 
 /**
@@ -233,7 +242,7 @@ type PublicPastBrandsProps = {
  * is missing or unknown. Chip only when result_label is non-empty after trim.
  * Static row when the set fits; marquee only on overflow. Reduced motion wraps.
  */
-export function PublicPastBrands({ brands }: PublicPastBrandsProps) {
+export function PublicPastBrands({ brands, wrap = false }: PublicPastBrandsProps) {
   if (!shouldShowPastBrands(brands)) {
     return null;
   }
@@ -243,7 +252,7 @@ export function PublicPastBrands({ brands }: PublicPastBrandsProps) {
       <div className={PATTERN_POSTS_HEADER_CLASS}>
         <h2 className={cardTitleClasses}>Past brands</h2>
       </div>
-      <PastBrandsRail brands={brands} />
+      <PastBrandsRail brands={brands} wrap={wrap} />
     </section>
   );
 }

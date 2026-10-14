@@ -69,6 +69,7 @@ export default async function KitPage({ params }: KitPageProps) {
             intro={kit.intro}
             pastBrands={kit.past_brands}
             showCreateBand={session == null}
+            hideEmpty
           />
         </div>
       </div>

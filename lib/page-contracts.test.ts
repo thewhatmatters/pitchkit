@@ -132,7 +132,7 @@ describe("critical page contracts", () => {
     assert.match(kit, /examples-pitchkit--shareable-pitch-kit/);
     assert.match(kit, /examples-pitchkit--shareable-insufficient-reach/);
     assert.match(kit, /Typical reach/);
-    assert.match(kit, /Typical saves/);
+    assert.match(read("lib/public-stats.ts"), /Typical saves/);
     assert.match(kit, /Reach over 30 days/);
     assert.match(kit, /Top countries/);
     assert.match(kit, /PATTERN_PUBLIC_STAT_CLASS|PATTERN_PUBLIC_REACH_CHART_MIN_HEIGHT/);
@@ -246,7 +246,7 @@ describe("critical page contracts", () => {
     assert.match(frame, /band/);
     assert.doesNotMatch(frame, /<OwnerGridOverlay|<GridOverlay|ExampleGridControls/);
     assert.doesNotMatch(frame, /col-span-full flex flex-col/);
-    assert.match(frame, /<div className="band">\{children\}<\/div>/);
+    assert.match(frame, /<div className="band content-start">\{children\}<\/div>/);
     assert.doesNotMatch(frame, /["']use client["']/);
     assert.match(workspace, /CREATOR_INSIGHTS_PAGE_CLASS/);
     assert.match(workspace, /CREATOR_INSIGHTS_HEADER_BAND_CLASS/);
@@ -386,7 +386,7 @@ describe("critical page contracts", () => {
     assert.match(read("lib/inventory.ts"), /\(likes \+ comments \+ saves \+ shares\) ÷ reach/);
     assert.doesNotMatch(chrome, /÷ followers/);
     assert.doesNotMatch(card, />ER</);
-    assert.match(card, /Engagement rate/);
+    assert.match(card + read("lib/public-stats.ts"), /Engagement rate/);
     assert.doesNotMatch(stats, /<Stat\.Group/);
     assert.doesNotMatch(stats, /trend=/);
     assert.match(stats, /PATTERN_STAT_CLASS/);
