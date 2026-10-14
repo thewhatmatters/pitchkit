@@ -118,3 +118,100 @@ describe("fail-closed: Hide-from-kit AlertDialog role=dialog", () => {
     assert.match(dialog.textContent ?? "", /Hide this post from PitchKit\?/);
   });
 });
+
+describe("fail-closed: disconnect AlertDialog initial focus lands on Keep connected", () => {
+  before(() => {
+    installJsdom();
+  });
+
+  const settle = () => new Promise((resolve) => setTimeout(resolve, 120));
+
+  function assertFocusOnKeep(where: string) {
+    const active = document.activeElement as HTMLElement | null;
+    assert.ok(active?.closest('[role="dialog"], [role="alertdialog"]'), `${where}: focus must be inside the dialog`);
+    assert.equal(active?.textContent?.trim(), "Keep connected", `${where}: initial focus must be Keep connected`);
+    assert.notEqual(active?.textContent?.trim(), "Delete and disconnect", `${where}: never the destructive button`);
+  }
+
+  it("Disconnect control: opening from its trigger focuses Keep connected, not Delete and disconnect", async () => {
+    const control = readFileSync(join(process.cwd(), "components/disconnect-control.tsx"), "utf8");
+    assert.match(control, /cancelLabel=\{DISCONNECT_KEEP\}/);
+    assert.match(control, /confirmLabel=\{DISCONNECT_ACTION\}/);
+    assert.match(control, /confirmRole="destructive"/);
+    assert.doesNotMatch(control, /autoFocus|initialFocus/, "do not override WMDS initial focus");
+
+    // Same trigger → open flow as DisconnectControl (the .tsx cannot be loaded under node:test CJS).
+    const { createElement, act, useState } = await import("react");
+    const { createRoot } = await import("react-dom/client");
+    const { AlertDialog, Button } = await import("@whatmatters/wmds");
+    const copy = await import("./copy");
+    (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+    function Harness() {
+      const [open, setOpen] = useState(false);
+      return createElement(
+        "div",
+        null,
+        createElement(Button, { role: "secondary", size: "sm", type: "button", onClick: () => setOpen(true), children: "Disconnect" }),
+        createElement(AlertDialog, {
+          open,
+          onOpenChange: setOpen,
+          title: copy.DISCONNECT_TITLE,
+          description: copy.DISCONNECT_CONFIRM,
+          cancelLabel: copy.DISCONNECT_KEEP,
+          confirmLabel: copy.DISCONNECT_ACTION,
+          confirmRole: "destructive",
+          onConfirm: () => {},
+        }),
+      );
+    }
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const root = createRoot(host);
+    await act(async () => root.render(createElement(Harness)));
+    const trigger = [...host.querySelectorAll("button")].find((el) => el.textContent?.trim() === "Disconnect");
+    assert.ok(trigger, "Disconnect trigger");
+    await act(async () => {
+      trigger.focus();
+      trigger.click();
+    });
+    await act(settle);
+    assertFocusOnKeep("DisconnectControl");
+    await act(async () => root.unmount());
+    host.remove();
+  });
+
+  it("Account settings: the same WMDS AlertDialog props focus Keep connected", async () => {
+    const settings = readFileSync(join(process.cwd(), "components/account-settings.tsx"), "utf8");
+    const block = settings.slice(settings.indexOf("open={disconnectOpen}") - 40, settings.indexOf("open={deleteOpen}"));
+    assert.match(block, /cancelLabel=\{DISCONNECT_KEEP\}/);
+    assert.match(block, /confirmLabel=\{DISCONNECT_ACTION\}/);
+    assert.match(block, /confirmRole="destructive"/);
+    assert.doesNotMatch(block, /autoFocus|initialFocus/, "do not override WMDS initial focus");
+
+    const { createElement, act } = await import("react");
+    const { createRoot } = await import("react-dom/client");
+    const { AlertDialog } = await import("@whatmatters/wmds");
+    const copy = await import("./copy");
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const root = createRoot(host);
+    await act(async () =>
+      root.render(
+        createElement(AlertDialog, {
+          open: true,
+          onOpenChange: () => {},
+          title: copy.DISCONNECT_TITLE,
+          description: copy.DISCONNECT_CONFIRM,
+          cancelLabel: copy.DISCONNECT_KEEP,
+          confirmLabel: copy.DISCONNECT_ACTION,
+          confirmRole: "destructive",
+          onConfirm: () => {},
+        }),
+      ),
+    );
+    await act(settle);
+    assertFocusOnKeep("Account settings AlertDialog");
+    await act(async () => root.unmount());
+    host.remove();
+  });
+});
