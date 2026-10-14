@@ -46,9 +46,10 @@ export const SUPPORT_EMAIL = "randy@whatmatters.so";
 
 export const EMPTY_GRID = "Pulling your grid…";
 
-export const DISCONNECT_TITLE = "Disconnect Instagram?";
+export const DISCONNECT_TITLE = "Disconnect and delete your kit data?";
 export const DISCONNECT_CONFIRM =
-  "Disconnect deletes your kit and the copies we stored.";
+  "Your kit goes offline and your stored Instagram data is erased. This can't be undone.";
+export const DISCONNECT_ACTION = "Delete and disconnect";
 export const DISCONNECT_KEEP = "Keep connected";
 
 /** Account settings Delete confirm — RE memo, Pattern — account settings (owner). */

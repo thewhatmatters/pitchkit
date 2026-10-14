@@ -28,6 +28,8 @@ export type SqlStore = {
   /** Hide: first timestamp wins. Restore: `at` is null. `false` = write failed. */
   setHiddenFromKitAt(mediaId: string, at: string | null): Promise<string | null | false>;
   disconnectUser(userId: string, at: string): Promise<boolean>;
+  /** Hard delete: `users` row; `media` (and `detections`) cascade. Missing row = true (idempotent). */
+  deleteUser(userId: string): Promise<boolean>;
 };
 
 let injectedStore: SqlStore | null | undefined;
@@ -217,6 +219,16 @@ WHERE id = $2
 RETURNING id
 `.trim();
 
+export const DELETE_USER_MEDIA_SQL = `
+DELETE FROM media
+WHERE user_id = $1
+`.trim();
+
+export const DELETE_USER_SQL = `
+DELETE FROM users
+WHERE id = $1
+`.trim();
+
 function userValues(user: User): unknown[] {
   return [
     user.id,
@@ -343,6 +355,17 @@ export function createSqlStore(executor: SqlExecutor): SqlStore {
         return false;
       }
     },
+
+    async deleteUser(userId) {
+      try {
+        // Explicit media delete first so we do not rely on the FK cascade alone.
+        await executor.query(DELETE_USER_MEDIA_SQL, [userId]);
+        await executor.query(DELETE_USER_SQL, [userId]);
+        return true;
+      } catch {
+        return false;
+      }
+    },
   };
 }
 
@@ -442,6 +465,16 @@ export function createMemorySqlStore(seed: { users?: User[]; media?: Media[] } =
         refresh_encrypted: null,
         token_expires_at: null,
       });
+      return true;
+    },
+
+    async deleteUser(userId) {
+      users.delete(userId);
+      for (const row of [...media.values()]) {
+        if (row.user_id === userId) {
+          media.delete(row.id);
+        }
+      }
       return true;
     },
   };

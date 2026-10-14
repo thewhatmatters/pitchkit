@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, it } from "node:test";
 import { emptySecrets, setSecretsForTests } from "./env";
 import { EMPTY_AUDIENCE, persistOwnerDisconnect, readGraphSnapshot, writeGraphSnapshot } from "./graph-store";
 import { createMemoryHiddenKit, setHiddenKitNamespaceForTests } from "./hidden-kit";
-import { assemblePublicKit } from "./kit";
 import type { User } from "./schema";
 import { DEMO_HANDLE, DEMO_USER_ID, seedMedia, seedUser } from "./seed";
 import { loadPublicKit } from "./store";
@@ -224,7 +223,7 @@ describe("disconnect vs sign out", () => {
     assert.equal((await readGraphSnapshot(user.id))?.user.token_encrypted, "enc-token");
   });
 
-  it("disconnect persists disconnected_at, clears tokens and session, and 404s the public kit", async () => {
+  it("disconnect erases the snapshot, revokes the session, and 404s the public kit", async () => {
     setHiddenKitNamespaceForTests(createMemoryHiddenKit());
     const user = liveUser();
     assert.equal(
@@ -255,17 +254,10 @@ describe("disconnect vs sign out", () => {
     assert.ok(cookies.some((row) => row.includes(`${SESSION_COOKIE}=`) && row.includes("Max-Age=0")));
     assert.ok(cookies.some((row) => row.includes(`${HIDDEN_COOKIE}=`) && row.includes("Max-Age=0")));
 
-    const snapshot = await readGraphSnapshot(user.id);
-    assert.ok(snapshot);
-    assert.ok(snapshot.user.disconnected_at);
-    assert.equal(snapshot.user.token_encrypted, null);
-    assert.equal(snapshot.user.refresh_encrypted, null);
-    assert.equal(snapshot.user.token_expires_at, null);
-
+    assert.equal(await readGraphSnapshot(user.id), null, "snapshot erased");
     assert.equal(await resolveSession(token, "route"), null);
     assert.equal(await readServerSession(token, "route"), null, "server-side session deleted");
     assert.equal(await loadPublicKit(user.handle, new Date(NOW)), null);
-    assert.equal(assemblePublicKit(snapshot.user, snapshot.media, new Date(NOW)), null);
   });
 
   it("persistOwnerDisconnect stamps an existing snapshot without inventing a seed row", async () => {
@@ -357,8 +349,11 @@ describe("session forgery (opaque server-side sessions)", () => {
     });
     const token = await mintSessionToken("rxndy.dxniel", "u-rxndy");
     assert.equal(Buffer.from(token, "base64url").length, SESSION_TOKEN_BYTES);
-    assert.equal(puts.length, 1);
+    assert.equal(puts.length, 2, "session record + per-user index");
     assert.equal(puts[0].key, await sessionKey(token));
+    assert.equal(puts[1].key, "session-index:u-rxndy");
+    assert.ok(!puts[1].value.includes(token), "index holds hashed keys only");
+    assert.equal(puts[1].ttl, SESSION_MAX_AGE);
     assert.match(puts[0].key, /^session:[0-9a-f]{64}$/);
     assert.ok(!puts[0].key.includes(token) && !puts[0].value.includes(token));
     assert.equal(puts[0].ttl, SESSION_MAX_AGE);

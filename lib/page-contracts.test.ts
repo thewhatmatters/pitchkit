@@ -733,7 +733,8 @@ describe("critical page contracts", () => {
     assert.match(disconnect, new RegExp(`action="${AUTH_DISCONNECT_PATH}"`));
     assert.match(disconnect, /method="post"/);
     assert.match(disconnect, /<AlertDialog/);
-    assert.match(disconnect, /confirmLabel="Disconnect"/);
+    assert.match(disconnect, /confirmLabel=\{DISCONNECT_ACTION\}/);
+    assert.match(disconnect, /confirmRole="destructive"/);
     assert.match(read("app/auth/disconnect/route.ts"), /disconnectOwner/);
     assert.doesNotMatch(chrome, /Reconnect Instagram/);
     assert.doesNotMatch(chrome, /DisconnectControl/);

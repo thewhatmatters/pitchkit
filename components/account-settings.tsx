@@ -37,6 +37,7 @@ import {
   DELETE_ACCOUNT_CANCEL,
   DELETE_ACCOUNT_CONFIRM,
   DELETE_ACCOUNT_TITLE,
+  DISCONNECT_ACTION,
   DISCONNECT_CONFIRM,
   DISCONNECT_INSTAGRAM_ACTION,
   DISCONNECT_KEEP,
@@ -226,7 +227,8 @@ export function AccountMenu({
         title={DISCONNECT_TITLE}
         description={DISCONNECT_CONFIRM}
         cancelLabel={DISCONNECT_KEEP}
-        confirmLabel="Disconnect"
+        confirmLabel={DISCONNECT_ACTION}
+        confirmRole="destructive"
         onConfirm={() => {
           disconnectFormRef.current?.requestSubmit();
         }}

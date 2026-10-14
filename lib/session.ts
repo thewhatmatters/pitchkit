@@ -1,5 +1,6 @@
 import { hasLiveAuthSecrets, readSecrets } from "./env";
-import { persistOwnerDisconnect, readGraphSnapshotByHandle } from "./graph-store";
+import { eraseCreatorData } from "./creator-erase";
+import { readGraphSnapshotByHandle } from "./graph-store";
 import type { HiddenKitAccess } from "./hidden-kit-kv";
 import { DEMO_HANDLE, DEMO_USER_ID, seedUsers } from "./seed";
 import { createServerSession, deleteServerSession, readServerSession } from "./session-store";
@@ -214,15 +215,16 @@ export async function stubSignOut(request: Request): Promise<Response> {
 }
 
 /**
- * Disconnect severs the Pitchkit↔Instagram connection for the signed-in owner.
- * Disconnect = delete server session + cookie clear + `disconnected_at` on the
- * Graph snapshot + null tokens.
+ * Disconnect = real data delete for the signed-in owner (`lib/creator-erase.ts`):
+ * SQL `users` + `media`, every KV key for the creator (`graph:*`, `hidden:`,
+ * all indexed `session:` records), then both cookies clear. The kit URL 404s.
+ * Idempotent; reconnecting starts from an empty kit.
  */
 export async function disconnectOwner(request: Request): Promise<Response> {
   const value = readRequestCookie(request, SESSION_COOKIE);
   const session = await resolveSession(value, "route");
   if (session) {
-    await persistOwnerDisconnect(session, "route");
+    await eraseCreatorData({ userId: session.userId, handle: session.handle }, "route");
   }
   await deleteServerSession(value, "route");
   return signOutResponse(request);

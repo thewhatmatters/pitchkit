@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AppFrame } from "@/components/app-frame";
 import { PageCard, PageCopy } from "@/components/page-card";
 import { SupportFooter } from "@/components/support-footer";
+import { TextLink } from "@/components/wmds";
 
 export const metadata: Metadata = {
   title: "Delete your data",
@@ -12,15 +13,20 @@ export default function DeletePage() {
     <AppFrame>
       <PageCard title="Delete your data">
         <PageCopy>
-          Disconnect deletes your kit and the copies we stored. That is the same as
-          delete-all: the creator row, fetched posts, and R2 files under your user id.
-          The kit URL returns 404. We start immediately and finish within 24 hours.
+          Disconnect deletes your data. Open Account settings from your avatar on
+          Insights and choose Disconnect or Delete account. Both do the same thing.
         </PageCopy>
         <PageCopy>
-          Disconnect on Insights or Settings is that control: it signs you out,
-          stamps the kit disconnected (public URL 404s), and stops Graph polling.
-          SQL and R2 file purge still finish within 24 hours when Hyperdrive is bound.
-          This page does not delete anything by itself.
+          We erase your stored profile, posts and their metrics, Insights,
+          audience breakdowns, your intro, past brands, hidden&#8209;post settings, your
+          Instagram tokens and every Pitchkit sign-in. It happens right away, your
+          kit link stops working, and it can&rsquo;t be undone.
+        </PageCopy>
+        <PageCopy>
+          If you connect again later, you start with an empty kit. Removing
+          Pitchkit from your Instagram settings also deletes your data. See{" "}
+          <TextLink href="/data-deletion">data deletion</TextLink>
+          .
         </PageCopy>
       </PageCard>
       <SupportFooter />

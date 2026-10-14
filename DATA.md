@@ -4,7 +4,7 @@
 
 Canonical list of Postgres tables and columns. Product rules: [PLAN.md](./PLAN.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md).
 
-SQL: `db/001_users.sql`, `db/002_media.sql`, `db/003_detections.sql`, `db/004_weekly_counts.sql`, `db/005_media_hidden_from_kit.sql`. Types: `lib/schema.ts`. Query rows from postgres.js are `SqlQueryRow` (`lib/postgres.ts`); OpenNext typecheck asserts them through `unknown` (`asQueryRows`) — do not `as T[]`. Host is **Supabase Postgres via Hyperdrive**. Client: `postgres` (postgres.js) over `env.HYPERDRIVE.connectionString` when the binding is present (`lib/postgres.ts`, `lib/sql-store.ts`) — not `@supabase/supabase-js` and not a Neon/Supabase serverless driver. Hyperdrive origin is the Supabase **direct** DB URI (port 5432), not the transaction pooler (6543). In-repo seed (same columns, not Graph): `lib/seed.ts`. Handle `demo` is frozen. Live kits freeze `users.handle` at first successful connect **by default**; optional update on reconnect if the Instagram username differs (WHA-313). Until Hyperdrive exists the Worker reads that seed and KV `graph:` snapshots. When `HYPERDRIVE` / `HYPERDRIVE_PREVIEW` is bound (non-empty `connectionString`), SQL is preferred SoT for `users` / `media` / `hidden_from_kit_at`. `writeGraphSnapshot` still falls back to KV `graph:` if that SQL write fails, throws, or the SQL client is missing — do not refuse KV solely because Hyperdrive is bound. `wrangler.jsonc` Hyperdrive bindings are commented (emergency KV-only) until SQL persist is fixed; the `pitchkit` config id stays in the TODO. Apply once: `HYPERDRIVE_LOCAL_CONNECTION_STRING='…' npm run db:apply`. `TOKEN_KEY` is not required for seed rows (tokens stay null). The Pitchkit session is an httpOnly cookie (`pitchkit_session` = random opaque token; KV `HIDDEN_KIT` `session:<sha256(token)>` → `{ handle, userId }`, 30-day TTL, deleted on sign out / disconnect — `lib/session-store.ts`), not a Graph column and not the Instagram token.
+SQL: `db/001_users.sql`, `db/002_media.sql`, `db/003_detections.sql`, `db/004_weekly_counts.sql`, `db/005_media_hidden_from_kit.sql`. Types: `lib/schema.ts`. Query rows from postgres.js are `SqlQueryRow` (`lib/postgres.ts`); OpenNext typecheck asserts them through `unknown` (`asQueryRows`) — do not `as T[]`. Host is **Supabase Postgres via Hyperdrive**. Client: `postgres` (postgres.js) over `env.HYPERDRIVE.connectionString` when the binding is present (`lib/postgres.ts`, `lib/sql-store.ts`) — not `@supabase/supabase-js` and not a Neon/Supabase serverless driver. Hyperdrive origin is the Supabase **direct** DB URI (port 5432), not the transaction pooler (6543). In-repo seed (same columns, not Graph): `lib/seed.ts`. Handle `demo` is frozen. Live kits freeze `users.handle` at first successful connect **by default**; optional update on reconnect if the Instagram username differs (WHA-313). Until Hyperdrive exists the Worker reads that seed and KV `graph:` snapshots. When `HYPERDRIVE` / `HYPERDRIVE_PREVIEW` is bound (non-empty `connectionString`), SQL is preferred SoT for `users` / `media` / `hidden_from_kit_at`. `writeGraphSnapshot` still falls back to KV `graph:` if that SQL write fails, throws, or the SQL client is missing — do not refuse KV solely because Hyperdrive is bound. `wrangler.jsonc` Hyperdrive bindings are commented (emergency KV-only) until SQL persist is fixed; the `pitchkit` config id stays in the TODO. Apply once: `HYPERDRIVE_LOCAL_CONNECTION_STRING='…' npm run db:apply`. `TOKEN_KEY` is not required for seed rows (tokens stay null). The Pitchkit session is an httpOnly cookie (`pitchkit_session` = random opaque token; KV `HIDDEN_KIT` `session:<sha256(token)>` → `{ handle, userId }`, 30-day TTL; `session-index:<userId>` lists that owner's hashed keys; sign out deletes the one session, disconnect deletes all of them — `lib/session-store.ts`), not a Graph column and not the Instagram token.
 
 Photos live in object storage (R2), **publicly readable** for kit objects (already public posts). Do not use expiring signed URLs for the kit. SQL stores keys, not image bytes.
 
@@ -29,7 +29,7 @@ One row per creator.
 | `refresh_encrypted` | Instagram refresh token | OAuth | on new token |
 | `token_expires_at` | | OAuth | on new token |
 | `connected_at` | | us | once |
-| `disconnected_at` | null while live | us | on disconnect |
+| `disconnected_at` | null while live | us | legacy stamp; disconnect now deletes the row |
 | `consent_index` | bool, **default false** | us | when they opt into anonymized rollups. **Not** the connect-screen disclosure |
 | `ig_account_type` | e.g. Business / Media_Creator | Graph, if returned | login / refresh. Identity Professional chip labels Business or Creator; hide when missing |
 | `disclosure_version` | int, currently `1` | us | when connect-screen copy changes |
@@ -116,14 +116,14 @@ No columns for:
 |---|---|
 | Profile photo | R2, key on `users.avatar_r2_key` |
 | Post image or video poster | R2, key on `media.r2_key` (carousel: first frame; video: poster only) |
-| Prefix on disconnect | R2 `{user_id}/` — start immediately, finish within 24 hours |
+| Prefix on disconnect | R2 `{user_id}/` — none written yet (`r2_key` holds Instagram CDN URLs); purge lands with R2 copies |
 | Bucket | `pitchkit-media` (planned name) |
 
 ---
 
 ## Disconnect
 
-When Hyperdrive is bound, stamp `users.disconnected_at` and null `token_encrypted` / `refresh_encrypted` / `token_expires_at` on the SQL row. Until then, stamp the same fields on the KV Graph snapshot. `assemblePublicKit` then 404s `/k/[handle]`. Session cookies clear. SQL delete of `users` + `media` + R2 `{user_id}/` still finishes within 24 hours.
+`POST /auth/disconnect` (and Delete account) is a real data delete (`lib/creator-erase.ts`): SQL `users` + `media` rows when Hyperdrive owns the user, and every KV key for the creator (`graph:id:`, `graph:handle:`, `graph:ig:`, `graph:payload:`, `hidden:`, all `session:` records via `session-index:<userId>`). That covers profile, tokens, posts + metrics, Insights (`reach_series`), audience breakdowns, intro, past brands, theme, and hidden-post settings. Idempotent; reconnecting starts from an empty kit. Both cookies clear and `/k/[handle]` 404s immediately. Meta's data deletion callback `POST /api/meta/data-deletion` runs the same erase for the `signed_request` `user_id` (matched on `ig_user_id`) after HMAC-SHA256 verification with env `META_APP_SECRET` (unset → 503), and stores only `deletion:<code>` → `{ status, requested_at }` for `/data-deletion/status?code=`.
 
 `weekly_counts` rows stay only if they cannot identify anyone.
 

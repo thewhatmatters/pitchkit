@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { AlertDialog, Button } from "@/components/wmds";
-import { DISCONNECT_CONFIRM, DISCONNECT_KEEP, DISCONNECT_TITLE } from "@/lib/copy";
+import { DISCONNECT_ACTION, DISCONNECT_CONFIRM, DISCONNECT_KEEP, DISCONNECT_TITLE } from "@/lib/copy";
 
 export function DisconnectControl() {
   const [open, setOpen] = useState(false);
@@ -19,7 +19,8 @@ export function DisconnectControl() {
         title={DISCONNECT_TITLE}
         description={DISCONNECT_CONFIRM}
         cancelLabel={DISCONNECT_KEEP}
-        confirmLabel="Disconnect"
+        confirmLabel={DISCONNECT_ACTION}
+        confirmRole="destructive"
         onConfirm={() => {
           formRef.current?.requestSubmit();
         }}
