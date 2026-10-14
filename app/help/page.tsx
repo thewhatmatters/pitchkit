@@ -20,8 +20,8 @@ export default function HelpPage() {
           in Pitchkit. To pull them in right away, tap Refresh on Insights.
         </PageCopy>
         <PageCopy>
-          To take your kit down, open Settings and choose Disconnect Instagram. Brands see only
-          your public kit, never your private Insights.
+          To take your kit down, open Settings and remove Instagram from Pitchkit. Your public
+          kit comes down right away. Brands see only your public kit, never your private Insights.
         </PageCopy>
       </PageCard>
       <SupportFooter />

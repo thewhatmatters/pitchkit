@@ -45,4 +45,8 @@ describe("public kit has no email", () => {
     assert.doesNotMatch(help, /mailto:|SUPPORT_EMAIL/);
     assert.doesNotMatch(help, EMAIL_ADDRESS);
   });
+
+  it("help page never says disconnect", () => {
+    assert.doesNotMatch(read("app/help/page.tsx"), /disconnect/i);
+  });
 });
