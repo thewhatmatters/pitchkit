@@ -115,7 +115,7 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(page, /MoreMenu|Hide from kit|label="Edit"|Coming soon|PitchKitComingSoon|OwnerPitchKit/);
     assert.match(kit, /Instagram performance summary/);
     assert.match(kit, /Selected posts/);
-    assert.match(kit, /TextLink/);
+    assert.doesNotMatch(kit, /TextLink|mailto:/);
     assert.match(kit, /PublicPastBrands/);
     assert.match(kit, /PublicIntro/);
     assert.match(kit, /examples-pitchkit--intro-public|PATTERN_INTRO_STACK_CLASS/);
