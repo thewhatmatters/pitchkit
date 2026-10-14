@@ -741,9 +741,9 @@ describe("critical page contracts", () => {
     assert.match(copy, /RECONNECT_INSTAGRAM_ACTION = "Reconnect Instagram"/);
     assert.match(copy, /DISCONNECT_INSTAGRAM_ACTION = "Disconnect Instagram"/);
     assert.match(read("components/support-footer.tsx"), /\/privacy/);
-    assert.match(read("components/support-footer.tsx"), /mailto:\$\{SUPPORT_EMAIL\}/);
+    assert.match(read("components/support-footer.tsx"), /href="\/help"/);
     assert.match(read("components/support-footer.tsx"), />Privacy</);
-    assert.match(read("components/support-footer.tsx"), />Support</);
+    assert.match(read("components/support-footer.tsx"), />Help</);
     assert.match(read("components/support-footer.tsx"), /PATTERN_FOOTER_BAND_CLASS/);
     assert.match(read("components/support-footer.tsx"), /TextLink/);
     assert.doesNotMatch(read("components/support-footer.tsx"), /Reconnect Instagram|scroll-to-top|Vercel|Cloudflare/);

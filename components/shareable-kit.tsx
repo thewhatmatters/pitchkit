@@ -9,9 +9,6 @@ import {
   PATTERN_CALLOUT_BODY_CLASS,
   PATTERN_CALLOUT_CARD_CLASS,
   PATTERN_CARD_WELL_CLASS,
-  PATTERN_CONTACT_CARD_CLASS,
-  PATTERN_CONTACT_ROW_CLASS,
-  PATTERN_CONTACT_ROWS_CLASS,
   PATTERN_PUBLIC_COUNTRIES_CARD_CLASS,
   PATTERN_PUBLIC_REACH_CARD_CLASS,
   PATTERN_PUBLIC_STACK_CLASS,
@@ -31,7 +28,6 @@ import {
   PATTERN_PUBLIC_REACH_CHART_MIN_HEIGHT,
   PATTERN_PUBLIC_STAT_CLASS,
   PATTERN_REACH_EMPTY_COPY_CLASS,
-  PATTERN_SECTION_EYEBROW_CLASS,
   PATTERN_STATS_BAND_CLASS,
   PATTERN_SUPPORTING_CLASS,
 } from "@/components/pattern-tokens";
@@ -41,7 +37,6 @@ import {
   Card,
   Chart,
   Stat,
-  TextLink,
   cardSubtitleClasses,
   cardTitleClasses,
   chartSeriesConfigFromKeys,
@@ -54,7 +49,6 @@ import {
   REACH_NO_DATA_LABEL,
 } from "@/lib/copy";
 import { formatCount, formatEngagementRate } from "@/lib/engagement";
-import { sourcedContactDetail } from "@/lib/kit-chips";
 import { publicReachState } from "@/lib/kit";
 import type { PastBrand } from "@/lib/kit-profile";
 import {
@@ -82,7 +76,6 @@ export type ShareableKitProps = {
   countries?: readonly RankedShare[];
   pastBrands?: readonly PastBrand[];
   intro?: string | null;
-  contact?: string | null;
   /**
    * Unsigned visitor who is not the kit owner.
    * Omit for the kit owner and for signed-in viewers of someone else's kit.
@@ -266,14 +259,12 @@ export function ShareableKit({
   countries = [],
   pastBrands = [],
   intro = null,
-  contact = null,
   showCreateBand = false,
   introSlot,
   brandsSlot,
   renderPostHeader,
   postNotice = null,
 }: ShareableKitProps) {
-  const contactDetail = sourcedContactDetail(contact);
   const identity = creatorIdentityFromUser(user);
   const reachState = publicReachState(hasInsights, reachSeries);
   const shownEngagement = reachState === "resolved" ? engagementRate : null;
@@ -372,48 +363,6 @@ export function ShareableKit({
           ))}
         </div>
       </section>
-
-      {contactDetail ? (
-        <section className={PATTERN_POSTS_SECTION_CLASS}>
-          <div className={PATTERN_POSTS_HEADER_CLASS}>
-            <div>
-              <h2 className={cardTitleClasses}>Contact</h2>
-              <p className={PATTERN_SUPPORTING_CLASS}>
-                Creator-entered details for brand outreach.
-              </p>
-            </div>
-          </div>
-          <Card
-            variant="outlined"
-            padding="md"
-            shape="rounded"
-            className={PATTERN_CONTACT_CARD_CLASS}
-          >
-            <div className={PATTERN_CONTACT_ROWS_CLASS}>
-              {contactDetail.kind === "email" ? (
-                <div className={PATTERN_CONTACT_ROW_CLASS}>
-                  <span className={PATTERN_SECTION_EYEBROW_CLASS}>Email</span>
-                  <TextLink href={contactDetail.href}>{contactDetail.value}</TextLink>
-                </div>
-              ) : null}
-              {contactDetail.kind === "website" ? (
-                <div className={PATTERN_CONTACT_ROW_CLASS}>
-                  <span className={PATTERN_SECTION_EYEBROW_CLASS}>Website</span>
-                  <TextLink href={contactDetail.href} external>
-                    {contactDetail.value}
-                  </TextLink>
-                </div>
-              ) : null}
-              {contactDetail.kind === "text" ? (
-                <div className={PATTERN_CONTACT_ROW_CLASS}>
-                  <span className={PATTERN_SECTION_EYEBROW_CLASS}>Contact</span>
-                  <span className={PATTERN_SUPPORTING_CLASS}>{contactDetail.value}</span>
-                </div>
-              ) : null}
-            </div>
-          </Card>
-        </section>
-      ) : null}
 
       {brandsSlot ?? <PublicPastBrands brands={pastBrands} />}
 
