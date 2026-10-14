@@ -8,6 +8,7 @@ const JSDOM_KEYS = [
   "window",
   "document",
   "HTMLElement",
+  "SVGElement",
   "Node",
   "Element",
   "HTMLDivElement",
@@ -124,7 +125,14 @@ describe("fail-closed: Delete account AlertDialog initial focus lands on Cancel"
     installJsdom();
   });
 
-  const settle = () => new Promise((resolve) => setTimeout(resolve, 120));
+  // Poll (up to 3s) instead of a fixed sleep so a loaded CI box doesn't flake the focus check.
+  const settle = async () => {
+    for (let i = 0; i < 60; i += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      const active = document.activeElement as HTMLElement | null;
+      if (active?.closest('[role="dialog"], [role="alertdialog"]')) return;
+    }
+  };
 
   function assertFocusOnCancel(where: string) {
     const active = document.activeElement as HTMLElement | null;
