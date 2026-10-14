@@ -186,6 +186,74 @@ describe("fail-closed: Delete account AlertDialog initial focus lands on Cancel"
     host.remove();
   });
 
+  it("type-to-confirm: Delete account stays disabled until the username matches; focus stays on Cancel", async () => {
+    const { createElement, act, useState } = await import("react");
+    const { createRoot } = await import("react-dom/client");
+    const { AlertDialog, Input } = await import("@whatmatters/wmds");
+    const copy = await import("./copy");
+    (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+    const handle = "Demo.Creator";
+    function Harness() {
+      const [typed, setTyped] = useState("");
+      return createElement(AlertDialog, {
+        open: true,
+        onOpenChange: () => {},
+        title: copy.DELETE_ACCOUNT_TITLE,
+        description: createElement(Input, {
+          "aria-label": "confirm",
+          value: typed,
+          onChange: (e: { target: { value: string } }) => setTyped(e.target.value),
+        }),
+        cancelLabel: copy.DELETE_ACCOUNT_CANCEL,
+        confirmLabel: copy.DELETE_ACCOUNT_ACTION,
+        confirmRole: "destructive",
+        confirmDisabled: !copy.deleteConfirmMatches(typed, handle),
+        onConfirm: () => {},
+      });
+    }
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const root = createRoot(host);
+    await act(async () => root.render(createElement(Harness)));
+    await act(settle);
+    assertFocusOnCancel("type-to-confirm");
+    const confirm = () =>
+      [...document.querySelectorAll("button")].find((el) => el.textContent?.trim() === "Delete account") as HTMLButtonElement;
+    assert.equal(confirm().disabled, true, "disabled at first");
+    const input = document.querySelector('input[aria-label="confirm"]') as HTMLInputElement;
+    const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")!.set!;
+    const type = async (v: string) =>
+      act(async () => {
+        setter.call(input, v);
+        input.dispatchEvent(new window.Event("input", { bubbles: true }));
+      });
+    await type("someone.else");
+    assert.equal(confirm().disabled, true, "wrong username stays disabled");
+    await type("  @demo.creator ");
+    assert.equal(confirm().disabled, false, "right username enables");
+    await act(async () => root.unmount());
+    host.remove();
+  });
+
+  it("deleteConfirmMatches trims, ignores a leading @ and case", async () => {
+    const { deleteConfirmMatches } = await import("./copy");
+    assert.equal(deleteConfirmMatches("", "demo"), false);
+    assert.equal(deleteConfirmMatches("dem", "demo"), false);
+    assert.equal(deleteConfirmMatches("demo2", "demo"), false);
+    assert.equal(deleteConfirmMatches("DEMO", "demo"), true);
+    assert.equal(deleteConfirmMatches(" @Demo ", "demo"), true);
+    assert.equal(deleteConfirmMatches("@@demo", "demo"), false);
+    assert.equal(deleteConfirmMatches("", ""), false);
+  });
+
+  it("Danger zone control gates confirm, clears on close, keeps WMDS focus", () => {
+    const control = readFileSync(join(process.cwd(), "components/delete-account-control.tsx"), "utf8");
+    assert.match(control, /confirmDisabled=\{!matches\}/);
+    assert.match(control, /if \(!next\) setTyped\(""\)/);
+    assert.match(control, /<strong>@\{handle\}<\/strong>/);
+    assert.match(control, /<Input/);
+  });
+
   it("user-facing copy never says disconnect", () => {
     const files = ["lib/copy.ts", "app/privacy/page.tsx", "app/delete/page.tsx", "app/data-deletion/page.tsx", "app/data-deletion/status/page.tsx", "app/not-found.tsx", "components/account-settings.tsx", "components/delete-account-control.tsx"];
     for (const f of files) {

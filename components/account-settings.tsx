@@ -240,7 +240,7 @@ export function AccountSettingsDialog({
               </div>
             </Card.Body>
           </Card>
-          <DeleteAccountControl onBeforeDelete={() => onOpenChange(false)} />
+          <DeleteAccountControl handle={identity.handle} onBeforeDelete={() => onOpenChange(false)} />
         </div>
       </Dialog.Content>
     </Dialog>

@@ -50,10 +50,19 @@ export const EMPTY_GRID = "Pulling your grid…";
 /** Account settings Delete confirm — RE memo, Pattern — account settings (owner). */
 export const DELETE_ACCOUNT_TITLE = "Delete your Pitchkit account?";
 export const DELETE_ACCOUNT_CONFIRM =
-  "Your kit page goes offline right away, and we erase your account and every bit of Instagram data we stored. Your Instagram account itself isn't touched. This can't be\u00a0undone.";
+  "Your kit link stops working right away, so anyone you've sent it to will see it's gone. We erase your account and all the Instagram data we stored. Your Instagram account itself isn't touched. This can't be\u00a0undone.";
+/** Field label is "Type @handle to confirm" with the handle in bold. */
+export const DELETE_ACCOUNT_TYPE_PREFIX = "Type ";
+export const DELETE_ACCOUNT_TYPE_SUFFIX = " to confirm";
 export const DELETE_ACCOUNT_CANCEL = "Cancel";
 export const DELETE_ACCOUNT_ACTION = "Delete account";
 export const DELETE_ACCOUNT_TRIGGER = "Delete account…";
+/** Trimmed, optional leading @, case-insensitive. */
+export function deleteConfirmMatches(typed: string, handle: string): boolean {
+  const norm = (v: string) => v.trim().replace(/^@/, "").toLowerCase();
+  return norm(handle) !== "" && norm(typed) === norm(handle);
+}
+
 export const DANGER_ZONE_CAPTION = "Danger zone";
 export const DANGER_ZONE_LINE = "Permanently delete your Pitchkit account and\u00a0kit.";
 export const ACCOUNT_DELETED_TOAST = "Your account was deleted.";
