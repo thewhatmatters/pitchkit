@@ -7,17 +7,23 @@ import {
   PATTERN_AUDIENCE_EMPTY_WELL_CLASS,
   PATTERN_AUDIENCE_SECTION_CLASS,
   PATTERN_AUDIENCE_WELL_CLASS,
-  PATTERN_EMPTY_BODY_CLASS,
-  PATTERN_EMPTY_TITLE_CLASS,
   PATTERN_REACH_CHART_MIN_HEIGHT,
   PATTERN_SECTION_EYEBROW_CLASS,
 } from "@/components/pattern-tokens";
-import { Badge, Card, Chart, cardSubtitleClasses, cardTitleClasses } from "@/components/wmds";
+import { Card, Chart, cardSubtitleClasses, cardTitleClasses } from "@/components/wmds";
 import { audienceFitSurface, visibleAudienceMix, type RankedShare } from "@/lib/audience";
+import { OwnerEmptyState } from "@/components/owner-empty-state";
 import {
-  AUDIENCE_INSUFFICIENT_BODY,
-  AUDIENCE_INSUFFICIENT_TITLE,
-  REACH_NO_DATA_LABEL,
+  AUDIENCE_EMPTY_BADGE,
+  AUDIENCE_EMPTY_BODY,
+  AUDIENCE_EMPTY_NEXT,
+  AUDIENCE_EMPTY_TITLE,
+  AUDIENCE_MIN_FOLLOWERS,
+  AUDIENCE_UNDER_MIN_BADGE,
+  AUDIENCE_UNDER_MIN_BODY,
+  AUDIENCE_UNDER_MIN_NEXT,
+  audienceUnderMinProgress,
+  audienceUnderMinTitle,
 } from "@/lib/copy";
 
 type AudienceFitProps = {
@@ -25,6 +31,8 @@ type AudienceFitProps = {
   city?: RankedShare[] | null;
   age?: RankedShare[] | null;
   gender?: RankedShare[] | null;
+  /** Under 100 followers Instagram withholds demographics — show progress, not "no data". */
+  followers?: number | null;
   retrieving?: boolean;
 };
 
@@ -59,6 +67,7 @@ export function AudienceFit({
   city,
   age,
   gender,
+  followers = null,
   retrieving = false,
 }: AudienceFitProps) {
   const countries = toBars(country);
@@ -66,7 +75,15 @@ export function AudienceFit({
   const ages = toBars(age);
   const genders = toBars(gender);
   const surface = audienceFitSurface({ country, city, age, gender });
-  const slot = retrieving ? "retrieving" : surface === "bars" ? "bars" : "empty";
+  const underMin =
+    followers != null && followers >= 0 && followers < AUDIENCE_MIN_FOLLOWERS;
+  const slot = retrieving
+    ? "retrieving"
+    : surface === "bars"
+      ? "bars"
+      : underMin
+        ? "min-followers"
+        : "empty";
 
   return (
     <Card
@@ -96,11 +113,24 @@ export function AudienceFit({
             className={PATTERN_AUDIENCE_EMPTY_WELL_CLASS}
             style={{ minHeight: PATTERN_REACH_CHART_MIN_HEIGHT } satisfies CSSProperties}
           >
-            <div className={PATTERN_AUDIENCE_EMPTY_COPY_CLASS}>
-              <Badge variant="neutral" emphasis="muted">{REACH_NO_DATA_LABEL}</Badge>
-              <h3 className={PATTERN_EMPTY_TITLE_CLASS}>{AUDIENCE_INSUFFICIENT_TITLE}</h3>
-              <p className={PATTERN_EMPTY_BODY_CLASS}>{AUDIENCE_INSUFFICIENT_BODY}</p>
-            </div>
+            {underMin ? (
+              <OwnerEmptyState
+                className={PATTERN_AUDIENCE_EMPTY_COPY_CLASS}
+                badge={AUDIENCE_UNDER_MIN_BADGE}
+                title={audienceUnderMinTitle(followers ?? 0)}
+                body={AUDIENCE_UNDER_MIN_BODY}
+                detail={audienceUnderMinProgress(followers ?? 0)}
+                next={AUDIENCE_UNDER_MIN_NEXT}
+              />
+            ) : (
+              <OwnerEmptyState
+                className={PATTERN_AUDIENCE_EMPTY_COPY_CLASS}
+                badge={AUDIENCE_EMPTY_BADGE}
+                title={AUDIENCE_EMPTY_TITLE}
+                body={AUDIENCE_EMPTY_BODY}
+                next={AUDIENCE_EMPTY_NEXT}
+              />
+            )}
           </div>
         ) : (
           <div className={PATTERN_AUDIENCE_WELL_CLASS}>

@@ -92,16 +92,64 @@ export function toastThemeSavedDescription(theme: string): string {
   return `Public kit appearance is ${theme}.`;
 }
 
-/** State — insufficient reach data (`examples-pitchkit--insufficient-reach-data`). */
-export const REACH_INSUFFICIENT_TITLE = "No reach data yet";
-export const REACH_INSUFFICIENT_BODY =
-  "Connect more Instagram activity to plot the last 30 days.";
+/**
+ * Owner empty states (Product Designer spec, 2026-10-14). Each says why it is
+ * empty and what happens next. Brands never see these: `/k/<handle>` hides the
+ * section instead. Pitchkit has no background sync — data pulls when the
+ * creator opens Insights or Settings (last pull older than 6 hours) or taps
+ * Refresh — so never promise a daily check.
+ */
+export const REACH_EMPTY_BADGE = "Building";
+export const REACH_EMPTY_TITLE = "Reach fills in as you post";
+export const REACH_EMPTY_BODY =
+  "Each post you share adds to this chart. A few posts over a week or two is enough for a clear line.";
+export const REACH_EMPTY_NEXT = "Brands don’t see this card until there’s something to show.";
 
-/** Chart.Cartesian hatch + insufficient empty-well Badge (`examples-pitchkit--insufficient-*-data`). */
+/** Chart.Cartesian hatch label for in-series gaps (`examples-pitchkit--insufficient-*-data`). */
 export const REACH_NO_DATA_LABEL = "No data";
 
-/** State — insufficient audience data (`examples-pitchkit--insufficient-audience-data`). */
-export const AUDIENCE_INSUFFICIENT_TITLE = "No audience data yet";
-export const AUDIENCE_INSUFFICIENT_BODY =
-  "Connect Instagram Insights demographics when available.";
+export const AUDIENCE_EMPTY_BADGE = "Updates when you open Pitchkit";
+export const AUDIENCE_EMPTY_TITLE = "No audience data yet";
+export const AUDIENCE_EMPTY_BODY =
+  "Instagram hasn’t shared who follows you yet. That’s normal for new or newly switched Professional accounts.";
+export const AUDIENCE_EMPTY_NEXT =
+  "We check again each time you open Insights or Settings, or tap Refresh.";
 
+/** Instagram withholds follower demographics under 100 followers. */
+export const AUDIENCE_MIN_FOLLOWERS = 100;
+export const AUDIENCE_UNDER_MIN_BADGE = "Unlocks at 100 followers";
+export function audienceUnderMinTitle(followers: number): string {
+  const toGo = Math.max(1, AUDIENCE_MIN_FOLLOWERS - Math.max(0, Math.floor(followers)));
+  return toGo === 1 ? "1 follower to go" : `${toGo} followers to go`;
+}
+export function audienceUnderMinProgress(followers: number): string {
+  return `${Math.max(0, Math.floor(followers))} of ${AUDIENCE_MIN_FOLLOWERS} followers`;
+}
+export const AUDIENCE_UNDER_MIN_BODY =
+  "Instagram shares follower age, gender and location once an account reaches 100 followers.";
+export const AUDIENCE_UNDER_MIN_NEXT =
+  "It appears here on its own. Until then, brands see your posts, reach and engagement.";
+
+/** Few posts (fewer than 4 on the kit). */
+export const FEW_POSTS_TARGET = 4;
+export function fewPostsBadge(count: number): string {
+  return count === 1 ? "1 post" : `${count} posts`;
+}
+export function fewPostsProgress(count: number): string {
+  return `${count} of ${FEW_POSTS_TARGET} posts so far.`;
+}
+export const POSTS_SYNC_NOTE = "New Instagram posts show up the next time your numbers refresh.";
+export const FEW_POSTS_BRANDS_NOTE = "Brands only see your real posts.";
+
+/** No past brands (owner). Public kit hides the section. */
+export const PAST_BRANDS_EMPTY_BADGE = "Optional";
+export const PAST_BRANDS_EMPTY_TITLE = "No past brands yet";
+export const PAST_BRANDS_EMPTY_BODY =
+  "Worked with a brand, even for free product? Add it here. Brands like seeing who’s trusted you.";
+export const PAST_BRANDS_EMPTY_NEXT =
+  "Just starting out? Leave this empty. It stays hidden on your public kit until you add one.";
+export const PAST_BRANDS_EMPTY_ACTION = "Add a brand";
+
+/** Posts section on the kit (public and owner preview). */
+export const POSTS_SECTION_TITLE = "Recent posts";
+export const POSTS_SECTION_SUPPORTING = "Straight from Instagram.";

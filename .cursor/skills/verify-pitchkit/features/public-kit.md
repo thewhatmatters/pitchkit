@@ -6,7 +6,7 @@ The public kit is what a brand sees at `/k/demo` without a Pitchkit session: Pat
 
 - `kit-identity` shows Demo Creator, `@demo`, followers as context, and the Professional **Business** chip (seed `ig_account_type`). Hide the display name when Graph `name` is missing.
 - `kit-stats` shows Followers, Typical reach (`—` when seed Insights are missing), and Typical saves. Engagement rate is hidden when reach cannot be plotted (public seed). Compact Reach over 30 days keeps the empty well — do not expect a chart or a percent from ÷ followers.
-- `kit-posts` shows at most six **Selected posts** (fewer if some are hidden) with likes/comments only.
+- `kit-posts` shows at most six **Recent posts** (fewer if some are hidden) with likes/comments only.
 - `kit-no-insights` omits SegmentedControl, PageHeader Insights, Recent proof, Share kit, Edit, and reach series.
 - `kit-404` unknown handles (`/k/nope`) are not found.
 
@@ -25,7 +25,7 @@ Preconditions:
 - If a prior hide left posts out, this kit may show fewer than six — still valid. Do not hide more here.
 
 - **Open signed out.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /k/demo --fresh`. Title is `Demo Creator (@demo) · Pitchkit`. Status 200.
-- **Kit freeze.** Body shows a PitchKit wordmark, **Demo Creator**, `@demo` · followers context, Professional **Business** chip, Pitchkit-owned intro when the seed/snapshot is filled (omit when empty — not Instagram biography), **Followers** Stat (`10,000` on a complete seed), **Typical reach** / **Typical saves** (`—` on public seed), compact **Reach over 30 days** empty well (no Engagement rate Stat when reach is missing), **Selected posts**, and Past brands `{ id, name, logo_key?, result_label? }` (curated mark or letter Avatar; Chip only when result is set; overflow marquee) when filled (omit when empty). Contact stays hidden when blank. Top countries omit when Graph has no country series.
+- **Kit freeze.** Body shows a PitchKit wordmark, **Demo Creator**, `@demo` · followers context, Professional **Business** chip, Pitchkit-owned intro when the seed/snapshot is filled (omit when empty — not Instagram biography), **Followers** Stat (`10,000` on a complete seed), **Typical reach** / **Typical saves** (`—` on public seed), compact **Reach over 30 days** empty well (no Engagement rate Stat when reach is missing), **Recent posts**, and Past brands `{ id, name, logo_key?, result_label? }` (curated mark or letter Avatar; Chip only when result is set; overflow marquee) when filled (omit when empty). Contact stays hidden when blank. Top countries omit when Graph has no country series.
 - **Posts.** Selected-post cards, six-or-fewer. Public seed has no Insights on posts — likes/comments, not reach/saves. No MoreMenu / hide / swap.
 - **No owner chrome.** There is no **PitchKit primary navigation**, no PageHeader **Insights**, no **Recent proof**, no **Share kit**, no **30-day account reach**, no **Private to you**, no **Edit** switch.
 - **Unknown handle.** Run `node .cursor/skills/verify-pitchkit/helpers/control-pitchkit.mjs goto /k/nope --fresh`. Title is `Not found` (or the not-found page). Not a kit card.

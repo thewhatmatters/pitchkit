@@ -22,7 +22,8 @@ export default function HelpPage() {
         </PageCopy>
         <PageCopy>
           To take your kit down, open Settings and choose Delete account under Danger zone. Your
-          kit link stops working right away.
+          kit link stops working right away. To fully remove access, also remove Pitchkit under
+          Apps and websites in Instagram settings.
         </PageCopy>
       </PageCard>
       <SupportFooter />

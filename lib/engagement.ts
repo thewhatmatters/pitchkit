@@ -67,8 +67,9 @@ export function formatEngagementRate(rate: number | null): string {
   return `${(rate * 100).toFixed(1)}%`;
 }
 
+/** Counts are whole numbers on screen: a median like 51.5 shows as 52. */
 export function formatCount(value: number): string {
-  return new Intl.NumberFormat("en-US").format(value);
+  return new Intl.NumberFormat("en-US").format(Math.round(value));
 }
 
 /** Typical post metric — median of present values. Empty → hide (never paint 0). */
@@ -89,16 +90,17 @@ export function median(values: number[]): number | null {
 export function typicalFromPosts(
   posts: Array<{ reach: number | null; saves: number | null }>,
 ): { typicalReach: number | null; typicalSaves: number | null } {
+  const whole = (value: number | null) => (value == null ? null : Math.round(value));
   return {
-    typicalReach: median(
+    typicalReach: whole(median(
       posts
         .map((post) => post.reach)
         .filter((value): value is number => value != null && Number.isFinite(value) && value > 0),
-    ),
-    typicalSaves: median(
+    )),
+    typicalSaves: whole(median(
       posts
         .map((post) => post.saves)
         .filter((value): value is number => value != null && Number.isFinite(value) && value > 0),
-    ),
+    )),
   };
 }

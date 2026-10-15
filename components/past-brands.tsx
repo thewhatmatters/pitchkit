@@ -19,7 +19,16 @@ import {
   PATTERN_BRAND_ROW_START_CLASS,
   PATTERN_POSTS_HEADER_CLASS,
   PATTERN_POSTS_SECTION_CLASS,
+  PATTERN_SECTION_EMPTY_CLASS,
 } from "@/components/pattern-tokens";
+import { OwnerEmptyState } from "@/components/owner-empty-state";
+import {
+  PAST_BRANDS_EMPTY_ACTION,
+  PAST_BRANDS_EMPTY_BADGE,
+  PAST_BRANDS_EMPTY_BODY,
+  PAST_BRANDS_EMPTY_NEXT,
+  PAST_BRANDS_EMPTY_TITLE,
+} from "@/lib/copy";
 import {
   Avatar,
   Button,
@@ -381,9 +390,18 @@ export function OwnerPastBrands({ brands, onBrandsChange }: OwnerPastBrandsProps
         ) : null}
       </div>
       {brands.length === 0 ? (
-        <Button role="ghost" onClick={openAdd}>
-          Add brands you've worked with
-        </Button>
+        <OwnerEmptyState
+          className={PATTERN_SECTION_EMPTY_CLASS}
+          badge={PAST_BRANDS_EMPTY_BADGE}
+          title={PAST_BRANDS_EMPTY_TITLE}
+          body={PAST_BRANDS_EMPTY_BODY}
+          next={PAST_BRANDS_EMPTY_NEXT}
+          action={
+            <Button role="secondary" size="sm" icon={<Plus />} onClick={openAdd}>
+              {PAST_BRANDS_EMPTY_ACTION}
+            </Button>
+          }
+        />
       ) : (
         <div className={PATTERN_BRAND_LIST_CLASS}>
           {brands.map((brand, index) => {

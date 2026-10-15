@@ -3,22 +3,26 @@
 import type { ComponentProps, CSSProperties, ReactNode } from "react";
 import {
   PATTERN_CARD_WELL_CLASS,
-  PATTERN_EMPTY_BODY_CLASS,
-  PATTERN_EMPTY_TITLE_CLASS,
   PATTERN_REACH_CARD_CLASS,
   PATTERN_REACH_CHART_MIN_HEIGHT,
   PATTERN_REACH_EMPTY_COPY_CLASS,
   PATTERN_REACH_EMPTY_WELL_CLASS,
 } from "@/components/pattern-tokens";
 import {
-  Badge,
   Card,
   Chart,
   cardSubtitleClasses,
   cardTitleClasses,
   chartSeriesConfigFromKeys,
 } from "@/components/wmds";
-import { REACH_INSUFFICIENT_BODY, REACH_INSUFFICIENT_TITLE, REACH_NO_DATA_LABEL } from "@/lib/copy";
+import { OwnerEmptyState } from "@/components/owner-empty-state";
+import {
+  REACH_EMPTY_BADGE,
+  REACH_EMPTY_BODY,
+  REACH_EMPTY_NEXT,
+  REACH_EMPTY_TITLE,
+  REACH_NO_DATA_LABEL,
+} from "@/lib/copy";
 import {
   hasTypicalReachReference,
   reachChartSurface,
@@ -75,11 +79,13 @@ export function ReachChart({
           className={PATTERN_REACH_EMPTY_WELL_CLASS}
           style={{ minHeight: PATTERN_REACH_CHART_MIN_HEIGHT } satisfies CSSProperties}
         >
-          <div className={PATTERN_REACH_EMPTY_COPY_CLASS}>
-            <Badge variant="neutral" emphasis="muted">{REACH_NO_DATA_LABEL}</Badge>
-            <h3 className={PATTERN_EMPTY_TITLE_CLASS}>{REACH_INSUFFICIENT_TITLE}</h3>
-            <p className={PATTERN_EMPTY_BODY_CLASS}>{REACH_INSUFFICIENT_BODY}</p>
-          </div>
+          <OwnerEmptyState
+            className={PATTERN_REACH_EMPTY_COPY_CLASS}
+            badge={REACH_EMPTY_BADGE}
+            title={REACH_EMPTY_TITLE}
+            body={REACH_EMPTY_BODY}
+            next={REACH_EMPTY_NEXT}
+          />
         </div>
       </ReachChartCard>
     );

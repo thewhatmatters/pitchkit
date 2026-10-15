@@ -114,7 +114,7 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(page, /sessionOwnsHandle|KitEdit|OwnerNav|AppFrame/);
     assert.doesNotMatch(page, /MoreMenu|Hide from kit|label="Edit"|Coming soon|PitchKitComingSoon|OwnerPitchKit/);
     assert.match(kit, /Instagram performance summary/);
-    assert.match(kit, /Selected posts/);
+    assert.match(kit, /POSTS_SECTION_TITLE/);
     assert.doesNotMatch(kit, /TextLink|mailto:/);
     assert.match(kit, /PublicPastBrands/);
     assert.match(kit, /PublicIntro/);
@@ -427,8 +427,8 @@ describe("critical page contracts", () => {
     assert.match(chart, /Chart\.Cartesian/);
     assert.match(chart, /variant="outlined"/);
     assert.match(chart, /Reach over 30 days/);
-    assert.match(chart, /REACH_INSUFFICIENT_TITLE/);
-    assert.match(chart, /<Badge variant="neutral" emphasis="muted">\{REACH_NO_DATA_LABEL\}<\/Badge>/);
+    assert.match(chart, /REACH_EMPTY_TITLE/);
+    assert.match(chart, /<OwnerEmptyState/);
     assert.doesNotMatch(chart, /ExampleGridControls|pitchKitStyles|PitchKitExample/);
     assert.doesNotMatch(audience, /ExampleGridControls|pitchKitStyles|PitchKitExample/);
     assert.doesNotMatch(
@@ -446,19 +446,15 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(chrome, /audience \?\? SEED_AUDIENCE/);
     assert.doesNotMatch(chrome, /SEED_AUDIENCE/);
     assert.match(chrome, /resolveOwnerAudience\(audience\)/);
-    assert.match(audience, /AUDIENCE_INSUFFICIENT_TITLE/);
+    assert.match(audience, /AUDIENCE_EMPTY_TITLE/);
     assert.match(audience, /PATTERN_AUDIENCE_EMPTY_WELL_CLASS/);
     assert.match(audience, /PATTERN_AUDIENCE_EMPTY_COPY_CLASS/);
-    assert.match(audience, /<Badge variant="neutral" emphasis="muted">\{REACH_NO_DATA_LABEL\}<\/Badge>/);
+    assert.match(audience, /<OwnerEmptyState/);
     assert.doesNotMatch(audience, /PATTERN_REACH_EMPTY_COPY_CLASS/);
     assert.match(audience, /audienceFitSurface/);
     assert.match(audience, /data-audience-slot=\{slot\}/);
     assert.doesNotMatch(audience, /if \(!visible\) \{\s*return null/);
-    assert.match(read("lib/copy.ts"), /AUDIENCE_INSUFFICIENT_TITLE = "No audience data yet"/);
-    assert.match(
-      read("lib/copy.ts"),
-      /AUDIENCE_INSUFFICIENT_BODY =\s*"Connect Instagram Insights demographics when available\."/,
-    );
+    assert.match(read("lib/copy.ts"), /AUDIENCE_EMPTY_TITLE = "No audience data yet"/);
     assert.doesNotMatch(read("lib/copy.ts"), /Not enough audience data yet/);
     assert.match(read("lib/audience.ts"), /resolveOwnerAudience/);
     assert.match(read("lib/audience.ts"), /Never EXAMPLE/);
@@ -551,22 +547,18 @@ describe("critical page contracts", () => {
       /PATTERN_REACH_EMPTY_COPY_CLASS =\s*"[^"]*gap-3/,
     );
     assert.match(read("components/reach-chart.tsx"), /PATTERN_REACH_EMPTY_COPY_CLASS/);
-    assert.match(read("components/reach-chart.tsx"), /<Badge variant="neutral" emphasis="muted">\{REACH_NO_DATA_LABEL\}<\/Badge>/);
-    assert.match(read("components/audience-fit.tsx"), /<Badge variant="neutral" emphasis="muted">\{REACH_NO_DATA_LABEL\}<\/Badge>/);
+    assert.match(read("components/reach-chart.tsx"), /<OwnerEmptyState/);
+    assert.match(read("components/audience-fit.tsx"), /<OwnerEmptyState/);
     assert.match(
       read("components/pattern-tokens.ts"),
       /PATTERN_AUDIENCE_EMPTY_COPY_CLASS = PATTERN_REACH_EMPTY_COPY_CLASS/,
     );
     assert.match(chrome, /<ReachChart[\s\S]*<AudienceFit/);
-    assert.match(chart, /REACH_INSUFFICIENT_TITLE/);
-    assert.match(audience, /AUDIENCE_INSUFFICIENT_TITLE/);
+    assert.match(chart, /REACH_EMPTY_TITLE/);
+    assert.match(audience, /AUDIENCE_EMPTY_TITLE/);
     assert.match(read("components/pattern-tokens.ts"), /PATTERN_HEADER_SKELETON_COPY_CLASS/);
     assert.match(read("components/pattern-tokens.ts"), /PATTERN_REACH_CHART_MIN_HEIGHT = 344/);
-    assert.match(read("lib/copy.ts"), /REACH_INSUFFICIENT_TITLE = "No reach data yet"/);
-    assert.match(
-      read("lib/copy.ts"),
-      /REACH_INSUFFICIENT_BODY =\s*"Connect more Instagram activity to plot the last 30 days\."/,
-    );
+    assert.match(read("lib/copy.ts"), /REACH_EMPTY_TITLE = "Reach fills in as you post"/);
     assert.doesNotMatch(read("lib/copy.ts"), /Not enough reach history yet|invent a chart from a/);
     assert.match(chart, /noData=\{\{ label: REACH_NO_DATA_LABEL \}\}/);
     assert.match(chart, /as ComponentProps<typeof Chart\.Cartesian>/);
