@@ -56,7 +56,7 @@ export async function GET(
         </div>
         <div style={{ display: "flex", flexDirection: "column", marginLeft: 56, maxWidth: 664, gap: 8 }}>
           <div style={{ fontSize: nameSize, lineHeight: 1.1, display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 664 }}>{name}</div>
-          <div style={{ fontSize: 40, color: MUTED }}>@{kit.user.handle}</div>
+          <div style={{ fontSize: 40, color: MUTED }}>{`@${kit.user.handle}`}</div>
           {preview.kpis ? (
             <div style={{ display: "flex", gap: 48, marginTop: 36 }}>
               <div style={{ display: "flex", flexDirection: "column" }}>

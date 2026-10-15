@@ -95,7 +95,7 @@ export const PATTERN_AUDIENCE_EMPTY_COPY_CLASS = PATTERN_REACH_EMPTY_COPY_CLASS;
 
 export const PATTERN_EMPTY_TITLE_CLASS = "type-heading-2 text-fg";
 
-export const PATTERN_EMPTY_BODY_CLASS = "type-body text-fg text-muted";
+export const PATTERN_EMPTY_BODY_CLASS = "type-body text-fg text-muted text-pretty";
 
 export const PATTERN_HEADER_SKELETON_COPY_CLASS = "flex max-w-2xl flex-col gap-2";
 
@@ -313,7 +313,7 @@ export function publicStatClass(index: number, count: number): string {
 }
 
 /** "What happens next" line under an owner empty state (WMDS type token, muted). */
-export const PATTERN_EMPTY_NEXT_CLASS = "type-supporting text-muted";
+export const PATTERN_EMPTY_NEXT_CLASS = "type-supporting text-muted text-pretty";
 
 /** Left-aligned owner empty block inside a section (posts, past brands). */
 export const PATTERN_SECTION_EMPTY_CLASS = `col-span-full ${PATTERN_EMPTY_COPY_CLASS} items-start`;
