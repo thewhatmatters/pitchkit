@@ -311,3 +311,9 @@ export function publicStatClass(index: number, count: number): string {
   if (count === 3) return index === 0 ? PATTERN_PUBLIC_STAT_LEAD_CLASS : PATTERN_PUBLIC_STAT_THIRD_CLASS;
   return PATTERN_PUBLIC_STAT_CLASS;
 }
+
+/** "What happens next" line under an owner empty state (WMDS type token, muted). */
+export const PATTERN_EMPTY_NEXT_CLASS = "type-supporting text-muted";
+
+/** Left-aligned owner empty block inside a section (posts, past brands). */
+export const PATTERN_SECTION_EMPTY_CLASS = `col-span-full ${PATTERN_EMPTY_COPY_CLASS} items-start`;

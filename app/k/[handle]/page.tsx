@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { notFound } from "next/navigation";
 import {
   CREATOR_INSIGHTS_BODY_BAND_CLASS,
@@ -12,6 +12,13 @@ import {
 import { ShareableKit } from "@/components/shareable-kit";
 import { SupportFooter } from "@/components/support-footer";
 import { kitPath } from "@/lib/kit";
+import {
+  OG_IMAGE_HEIGHT,
+  OG_IMAGE_WIDTH,
+  PITCHKIT_ORIGIN,
+  shareImagePath,
+  sharePreview,
+} from "@/lib/share-preview";
 import { resolveSession, SESSION_COOKIE } from "@/lib/session";
 import { hiddenOverlayForHandle, loadPublicKit } from "@/lib/store";
 
@@ -27,12 +34,36 @@ export async function generateMetadata({ params }: KitPageProps): Promise<Metada
     return { title: "Not found" };
   }
 
+  const preview = sharePreview(kit);
+  // og:image must be absolute and served by this deployment (previews too).
+  const host = (await headers()).get("host");
+  const local = host != null && /^(127\.0\.0\.1|localhost)(:|$)/.test(host);
+  const origin = host ? `${local ? "http" : "https"}://${host}` : PITCHKIT_ORIGIN;
+  const image = {
+    url: `${origin}${shareImagePath(kit.user.handle)}`,
+    width: OG_IMAGE_WIDTH,
+    height: OG_IMAGE_HEIGHT,
+    alt: preview.imageAlt,
+    type: "image/png",
+  };
+
   return {
-    title: `${kit.user.name} (@${kit.user.handle})`,
-    description: "Instagram media kit on Pitchkit.",
+    title: { absolute: preview.title },
+    description: preview.description,
+    alternates: { canonical: `${PITCHKIT_ORIGIN}${kitPath(kit.user.handle)}` },
     openGraph: {
-      title: `${kit.user.name} (@${kit.user.handle})`,
-      url: kitPath(kit.user.handle),
+      type: "profile",
+      siteName: "Pitchkit",
+      title: preview.title,
+      description: preview.description,
+      url: `${PITCHKIT_ORIGIN}${kitPath(kit.user.handle)}`,
+      images: [image],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: preview.title,
+      description: preview.description,
+      images: [{ url: image.url, alt: image.alt }],
     },
   };
 }

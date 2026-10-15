@@ -12,8 +12,6 @@ import {
   PATTERN_PUBLIC_COUNTRIES_CARD_CLASS,
   PATTERN_PUBLIC_REACH_CARD_CLASS,
   PATTERN_PUBLIC_STACK_CLASS,
-  PATTERN_EMPTY_BODY_CLASS,
-  PATTERN_EMPTY_TITLE_CLASS,
   PATTERN_IDENTITY_NAMEPLATE_CLASS,
   PATTERN_INTRO_STACK_CLASS,
   PATTERN_KIT_POST_METRICS_CLASS,
@@ -30,6 +28,7 @@ import {
   PATTERN_PUBLIC_POST_CARD_CLASS,
   publicStatClass,
   PATTERN_REACH_EMPTY_COPY_CLASS,
+  PATTERN_EMPTY_NEXT_CLASS,
   PATTERN_STATS_BAND_CLASS,
   PATTERN_SUPPORTING_CLASS,
 } from "@/components/pattern-tokens";
@@ -45,10 +44,18 @@ import {
 } from "@/components/wmds";
 import { publicCountries, type RankedShare } from "@/lib/audience";
 import { creatorIdentityFromUser } from "@/lib/creator-identity";
+import { OwnerEmptyState } from "@/components/owner-empty-state";
 import {
-  REACH_INSUFFICIENT_BODY,
-  REACH_INSUFFICIENT_TITLE,
+  FEW_POSTS_BRANDS_NOTE,
+  FEW_POSTS_TARGET,
+  POSTS_SYNC_NOTE,
+  REACH_EMPTY_BADGE,
+  REACH_EMPTY_BODY,
+  REACH_EMPTY_NEXT,
+  REACH_EMPTY_TITLE,
   REACH_NO_DATA_LABEL,
+  fewPostsBadge,
+  fewPostsProgress,
 } from "@/lib/copy";
 import { publicStats } from "@/lib/public-stats";
 import { publicReachState } from "@/lib/kit";
@@ -196,11 +203,13 @@ function PublicReachCard({
             className={`${PATTERN_CARD_WELL_CLASS} items-center justify-center text-center`}
             style={{ minHeight: PATTERN_PUBLIC_REACH_CHART_MIN_HEIGHT } satisfies CSSProperties}
           >
-            <div className={PATTERN_REACH_EMPTY_COPY_CLASS}>
-              <Badge variant="neutral" emphasis="muted">{REACH_NO_DATA_LABEL}</Badge>
-              <h3 className={PATTERN_EMPTY_TITLE_CLASS}>{REACH_INSUFFICIENT_TITLE}</h3>
-              <p className={PATTERN_EMPTY_BODY_CLASS}>{REACH_INSUFFICIENT_BODY}</p>
-            </div>
+            <OwnerEmptyState
+              className={PATTERN_REACH_EMPTY_COPY_CLASS}
+              badge={REACH_EMPTY_BADGE}
+              title={REACH_EMPTY_TITLE}
+              body={REACH_EMPTY_BODY}
+              next={REACH_EMPTY_NEXT}
+            />
           </div>
         )}
       </Card.Body>
@@ -288,6 +297,8 @@ export function ShareableKit({
   const showReach = !hideEmpty || reachHasChart;
   const showStack = showReach || publicCountries(countries).length > 0;
   const showPosts = !hideEmpty || posts.length > 0;
+  /** Owner only: fewer than 4 posts gets a count and the real sync timing. */
+  const fewPosts = !hideEmpty && posts.length < FEW_POSTS_TARGET;
 
   return (
     <>
@@ -332,9 +343,20 @@ export function ShareableKit({
             <div>
               <h2 className={cardTitleClasses}>Selected posts</h2>
               <p className={PATTERN_SUPPORTING_CLASS}>
-                {postNotice ?? "Proof from the current Instagram set."}
+                {postNotice ??
+                  (fewPosts
+                    ? `${fewPostsProgress(posts.length)} ${FEW_POSTS_BRANDS_NOTE}`
+                    : "Proof from the current Instagram set.")}
               </p>
+              {fewPosts ? (
+                <p className={PATTERN_EMPTY_NEXT_CLASS}>{POSTS_SYNC_NOTE}</p>
+              ) : null}
             </div>
+            {fewPosts ? (
+              <Badge variant="neutral" emphasis="muted" size="sm">
+                {fewPostsBadge(posts.length)}
+              </Badge>
+            ) : null}
           </div>
           <div className={PATTERN_POSTS_PANEL_CLASS}>
             {posts.map((post, index) => (

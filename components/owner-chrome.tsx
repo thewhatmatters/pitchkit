@@ -119,6 +119,7 @@ export function OwnerChrome({
             city={mixes.city}
             age={mixes.age}
             gender={mixes.gender}
+            followers={user.followers}
             retrieving={retrieving}
           />
         </div>
