@@ -149,3 +149,7 @@ export const PAST_BRANDS_EMPTY_BODY =
 export const PAST_BRANDS_EMPTY_NEXT =
   "Just starting out? Leave this empty. It stays hidden on your public kit until you add one.";
 export const PAST_BRANDS_EMPTY_ACTION = "Add a brand";
+
+/** Posts section on the kit (public and owner preview). */
+export const POSTS_SECTION_TITLE = "Recent posts";
+export const POSTS_SECTION_SUPPORTING = "Straight from Instagram.";

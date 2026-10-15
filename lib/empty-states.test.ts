@@ -48,3 +48,13 @@ describe("empty-state copy", () => {
     assert.equal(fewPostsProgress(2), "2 of 4 posts so far.");
   });
 });
+
+describe("help page", () => {
+  it("tells creators how to fully remove Instagram access", () => {
+    const help = readFileSync("app/help/page.tsx", "utf8").replace(/\s+/g, " ");
+    assert.match(
+      help,
+      /To fully remove access, also remove Pitchkit under Apps and websites in Instagram settings\./,
+    );
+  });
+});

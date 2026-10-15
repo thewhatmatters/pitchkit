@@ -114,7 +114,7 @@ describe("critical page contracts", () => {
     assert.doesNotMatch(page, /sessionOwnsHandle|KitEdit|OwnerNav|AppFrame/);
     assert.doesNotMatch(page, /MoreMenu|Hide from kit|label="Edit"|Coming soon|PitchKitComingSoon|OwnerPitchKit/);
     assert.match(kit, /Instagram performance summary/);
-    assert.match(kit, /Selected posts/);
+    assert.match(kit, /POSTS_SECTION_TITLE/);
     assert.doesNotMatch(kit, /TextLink|mailto:/);
     assert.match(kit, /PublicPastBrands/);
     assert.match(kit, /PublicIntro/);

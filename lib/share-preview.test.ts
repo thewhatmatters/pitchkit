@@ -35,3 +35,25 @@ describe("share preview", () => {
     assert.equal(shareImagePath("maya.makes"), "/k/maya.makes/og");
   });
 });
+
+describe("Example data pill", () => {
+  it("is on /k/demo only", () => {
+    assert.equal(sharePreview({ user: seedUsers[0], engagementRate: null, hasInsights: false }).example, true);
+  });
+  it("never on a real kit", () => {
+    const real = { ...base, id: "11111111-1111-4111-8111-111111111111" };
+    const p = sharePreview({ user: real, engagementRate: 0.05, hasInsights: true, reach_series: series as never });
+    assert.equal(p.example, false);
+    assert.doesNotMatch(p.description, /Example/);
+  });
+  it("never on a real creator whose handle is demo", () => {
+    const p = sharePreview({ user: { ...base, id: "22222222-2222-4222-8222-222222222222", handle: "demo" }, engagementRate: null, hasInsights: false });
+    assert.equal(p.example, false);
+  });
+  it("og route only draws the pill from preview.example", async () => {
+    const { readFileSync } = await import("node:fs");
+    const route = readFileSync("app/k/[handle]/og/route.tsx", "utf8");
+    assert.match(route, /\{preview\.example \? \(/);
+    assert.equal((route.match(/Example data/g) ?? []).length, 1);
+  });
+});

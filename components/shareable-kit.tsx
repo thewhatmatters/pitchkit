@@ -48,6 +48,8 @@ import { OwnerEmptyState } from "@/components/owner-empty-state";
 import {
   FEW_POSTS_BRANDS_NOTE,
   FEW_POSTS_TARGET,
+  POSTS_SECTION_SUPPORTING,
+  POSTS_SECTION_TITLE,
   POSTS_SYNC_NOTE,
   REACH_EMPTY_BADGE,
   REACH_EMPTY_BODY,
@@ -341,12 +343,12 @@ export function ShareableKit({
         <section className={PATTERN_POSTS_SECTION_CLASS}>
           <div className={PATTERN_POSTS_HEADER_CLASS}>
             <div>
-              <h2 className={cardTitleClasses}>Selected posts</h2>
+              <h2 className={cardTitleClasses}>{POSTS_SECTION_TITLE}</h2>
               <p className={PATTERN_SUPPORTING_CLASS}>
                 {postNotice ??
                   (fewPosts
                     ? `${fewPostsProgress(posts.length)} ${FEW_POSTS_BRANDS_NOTE}`
-                    : "Proof from the current Instagram set.")}
+                    : POSTS_SECTION_SUPPORTING)}
               </p>
               {fewPosts ? (
                 <p className={PATTERN_EMPTY_NEXT_CLASS}>{POSTS_SYNC_NOTE}</p>

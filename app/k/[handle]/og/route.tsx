@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { geistBoldWoff } from "@/lib/og-fonts/geist-bold";
 import { publicObjectUrl } from "@/lib/r2";
 import { OG_IMAGE_HEIGHT, OG_IMAGE_WIDTH, sharePreview } from "@/lib/share-preview";
 import { hiddenOverlayForHandle, loadPublicKit } from "@/lib/store";
@@ -55,7 +56,7 @@ export async function GET(
           )}
         </div>
         <div style={{ display: "flex", flexDirection: "column", marginLeft: 56, maxWidth: 664, gap: 8 }}>
-          <div style={{ fontSize: nameSize, lineHeight: 1.1, display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 664 }}>{name}</div>
+          <div style={{ fontSize: nameSize, lineHeight: 1.1, fontFamily: "Geist Bold", fontWeight: 700, display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 664 }}>{name}</div>
           <div style={{ fontSize: 40, color: MUTED }}>{`@${kit.user.handle}`}</div>
           {preview.kpis ? (
             <div style={{ display: "flex", gap: 48, marginTop: 36 }}>
@@ -85,6 +86,7 @@ export async function GET(
     {
       width: OG_IMAGE_WIDTH,
       height: OG_IMAGE_HEIGHT,
+      fonts: [{ name: "Geist Bold", data: geistBoldWoff(), weight: 700, style: "normal" }],
       headers: { "Cache-Control": "public, max-age=3600, s-maxage=86400" },
     },
   );

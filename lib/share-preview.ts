@@ -1,6 +1,6 @@
 import { formatCount, formatEngagementRate } from "./engagement";
 import { publicReachState, type PublicKit } from "./kit";
-import { DEMO_HANDLE } from "./seed";
+import { DEMO_HANDLE, DEMO_USER_ID } from "./seed";
 
 /** Link-preview card size (Apple TN3156: ≥900px wide). */
 export const OG_IMAGE_WIDTH = 1200;
@@ -27,7 +27,8 @@ export function sharePreview(kit: Pick<PublicKit, "user" | "engagementRate" | "h
   const title = user.name?.trim() ? `${name} (@${user.handle})` : `@${user.handle}`;
   const resolved = publicReachState(kit.hasInsights, kit.reach_series) === "resolved";
   const engagement = resolved && kit.engagementRate != null ? kit.engagementRate : null;
-  const example = user.handle === DEMO_HANDLE;
+  // Only the in-repo seed kit at /k/demo. Never a real creator, even one whose handle is "demo".
+  const example = user.handle === DEMO_HANDLE && user.id === DEMO_USER_ID;
   const enough = user.followers >= SHARE_MIN_FOLLOWERS;
   const kpis = enough
     ? {
