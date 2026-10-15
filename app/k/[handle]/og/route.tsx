@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { geistBoldWoff } from "@/lib/og-fonts/geist-bold";
+import { geistBoldWoff, geistRegularWoff } from "@/lib/og-fonts/geist-bold";
 import { publicObjectUrl } from "@/lib/r2";
 import { OG_IMAGE_HEIGHT, OG_IMAGE_WIDTH, sharePreview } from "@/lib/share-preview";
 import { hiddenOverlayForHandle, loadPublicKit } from "@/lib/store";
@@ -44,7 +44,7 @@ export async function GET(
 
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", background: BG, padding: 60, position: "relative", color: FG }}>
+      <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", background: BG, fontFamily: "Geist", fontWeight: 400, padding: 60, position: "relative", color: FG }}>
         <div style={{ width: 300, height: 300, borderRadius: 300, background: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
           {avatar ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -86,7 +86,10 @@ export async function GET(
     {
       width: OG_IMAGE_WIDTH,
       height: OG_IMAGE_HEIGHT,
-      fonts: [{ name: "Geist Bold", data: geistBoldWoff(), weight: 700, style: "normal" }],
+      fonts: [
+        { name: "Geist", data: geistRegularWoff(), weight: 400, style: "normal" },
+        { name: "Geist Bold", data: geistBoldWoff(), weight: 700, style: "normal" },
+      ],
       headers: { "Cache-Control": "public, max-age=3600, s-maxage=86400" },
     },
   );
