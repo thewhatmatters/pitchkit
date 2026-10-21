@@ -150,3 +150,37 @@ Does the split match the customer?
 **Insights** — Instagram account analytics the creator connected. Typical reach, saves, the chart, Engagement rate, and country / city / age / gender mix require this. Public-only kits show Followers; Engagement rate hides (or —) until Insights reach exists.
 
 Country / city / age / gender mix are v1 objects (not Stats): % of located sample (`value / sum(results)`), never % of `followers_count`. Hide bars if omitted, <100 followers, or empty — keep the owner Audience Card with **No audience data yet**. Never EXAMPLE %. No IG User location field. No industry. Impressions stay off. `biography` / `website` are Public; hide if empty. Backend persists demo counts as objects when Insights lands; no extra Graph columns. Engagement rate is `(likes + comments + saves + shares) ÷ reach` (sum÷sum; hide when reach is missing).
+
+## Reference: Graph reach time-series contract (from pr-2-docs, 2026-09-05)
+
+> Historical reference merged from `pr-2-docs`. Product locks above (and PLAN.md) win: Engagement rate is ÷ reach, charts are WMDS `Chart` on visx (not Nivo), empty reach keeps the Card's insufficient well. Kept for the Graph endpoint, params, range and lag facts.
+
+Instagram Login Insights for the **one** WMDS Chart (30-day account reach area). Stamp with Design. Interviews unrun.
+
+**Endpoint:** `GET https://graph.instagram.com/v25.0/{ig-user-id}/insights` (or pinned `GRAPH_API_VERSION`).
+Permissions: `instagram_business_basic` + `instagram_business_manage_insights`.
+
+**Params:** `metric=reach` · `period=day` · `metric_type=time_series` · `since` / `until` = Unix seconds (inclusive).
+- **Omit since/until → last 24h only** — Chart must set them for 30 days.
+- Do **not** pass `breakdown` with `time_series` (dropped). `timeframe` is demographics-only — ignore for Chart.
+- Example: `?metric=reach&period=day&metric_type=time_series&since={now-30d}&until={now}`
+
+**Point shape (Graph):** `data[0].values[]` → `{ "value": 12, "end_time": "2018-01-11T08:00:00+0000" }`
+- `value` = integer unique accounts that day (estimated)
+- `end_time` = ISO 8601 with offset (Meta day boundary, often `…T08:00:00+0000`) — treat as **day key**, not creator TZ
+
+**What reach is:** account-level unique accounts that saw any of posts / stories / reels / videos / live **including ads**. Not typical feed-post reach. Estimated.
+
+**Range:** User metrics retained ~**90 days**. We **lock Chart to 30 days** via `since`/`until` (Graph has no `last_30_days` for reach). Never rely on the 24h default.
+
+**Lag:** up to **48 hours**. Newest 1–2 day buckets may be missing or revise later.
+
+**Empty / omit:** unavailable → empty `data` / empty `values`, **not zeros**. Hide Chart. Do not paint a flat zero series.
+
+**Persist for FE:**
+```ts
+reach_series: Array<{ day: string; reach: number }> // day = YYYY-MM-DD from end_time UTC date
+```
+Omit field / empty array → hide Chart. One series only.
+
+**Gaps vs typical-vs-spike job:** We **can** show a daily account reach line for ~30 days (spike = high point). We **cannot** from this series alone: organic vs ads / stories vs feed; which post caused the spike; Graph-supplied “typical” percentile; creator-local midnight; impressions / `views` as this Chart.

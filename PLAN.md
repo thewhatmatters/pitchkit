@@ -2,7 +2,7 @@
 
 **Docs:** [README](./README.md) · [plan](./PLAN.md) · [architecture](./ARCHITECTURE.md) · [data](./DATA.md) · [glossary](./GLOSSARY.md) · [AGENTS](./AGENTS.md)
 
-Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md). Stats vocabulary: [GLOSSARY.md](./GLOSSARY.md).
+Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCHITECTURE.md](./ARCHITECTURE.md). Stats vocabulary: [GLOSSARY.md](./GLOSSARY.md). Kit-space SWOT: [SWOT.md](./SWOT.md). Free promise / lights-on: [LIGHTS-ON.md](./LIGHTS-ON.md). IA: [IA.md](./IA.md).
 
 **Look:** WMDS (`@whatmatters/wmds`). Name on the site is Pitchkit.
 
@@ -22,6 +22,7 @@ Product lives on **pitchkit.app**. Columns: [DATA.md](./DATA.md). Picture: [ARCH
 | Files | R2 `pitchkit-media` |
 | Auth | Instagram Login + Pitchkit httpOnly cookie |
 | Charts | WMDS `Chart` only (`@visx/visx` peer). No Nivo in Pitchkit `package.json`. |
+
 
 **Not used:** D1, Vercel, shadcn, Browser Run, Queues, Workers AI.
 
@@ -67,6 +68,20 @@ No extra onboarding. No PDF in v1. No TikTok in v1. No bio, website, rates, “c
 **Chart series:** Insights kit payload exposes one `reach_series` (`{ day, reach }`, `day` = YYYY-MM-DD UTC). Account reach day buckets (stories + ads). When Insights exist but the series is missing, too thin, or all-zero, keep the Reach Card and paint State — insufficient reach data (`No reach data yet` / `Connect more Instagram activity to plot the last 30 days.`) — centered empty well (muted **Badge** “No data” → title → body, title↔subtext `gap-2` / ~0.5rem, same centered Badge stack), do not hide the band, do not use Skeleton / `Chart.Loading`, and do not invent 30 zeros. Partial calendar holes in a plottable window use Chart.Cartesian `noData` hatch (`null` / omitted days; `0` is plotted) — keep the Show-code `noData` label, wire it type-safely onto `Chart.Cartesian` so deploy typecheck does not require cached `ChartCartesianProps` to declare `noData`, do not invent hatch UI, and do not hatch the full-card empty or loading wells. Graph-unavailable (`!hasInsights`) still **omits** the optional Reach region. `/insights` reads `owner.reach_series` only. Pattern ReachCard: `Chart.Cartesian` at `minHeight` 344 with daily reach plus a constant Typical reach reference from the existing `typicalReach` median (not a second Graph time series), `Chart.Legend`, `animate="none"`. Header: **Reach over 30 days**. First Graph connect / `?grid=pulling` copies Pattern — creator Insights (loading) (Stat `loading` + Skeleton Reach/Audience wells + six proof placeholders). Retrieving after chrome is up / Refresh is Header + `Chart.Loading` (`?grid=retrieving`). No Stat `trend` deltas. Audience uses `Chart.RankedBars` from live `follower_demographics`. Empty mixes (0 rows / &lt;100 followers / omitted) keep the Audience Card with State — insufficient audience data (`No audience data yet` / `Connect Instagram Insights demographics when available.`) — centered empty well (muted **Badge** “No data” → title → body, title↔subtext `gap-2` / ~0.5rem), do not omit the Card, do not use Skeleton / `Chart.Loading` for that empty, and never EXAMPLE percents or `audience ?? SEED_AUDIENCE`. When both Graph series are unusable, keep both Cards (`examples-pitchkit--insufficient-reach-and-audience-data`). Honest `0` only when Graph returned a zero count. Owner demo seed (no token) includes ~30 labeled example reach points; audience stays empty (insufficient well, not EXAMPLE mixes). Public `/k/demo` omits Insights. Live token → Graph poll on Insights load when `fetched_at` / `polled_at` is older than 6 hours, or Refresh.
 
 **Carousel:** first child frame (cover) into R2. **Video:** poster only on the kit, never the file.
+
+**Own objects (Randy unlocked country, age, gender 2026-09-02):** not Stats. Meanings: [GLOSSARY.md](./GLOSSARY.md). `follower_demographics` breakdowns `country` / `city` / `age` / `gender` are live (v25/v26 Insights, Instagram Login). ≥100 followers or the metric is omitted — keep the owner Audience Card with the insufficient-data well (see below); don’t paint invented zeros. Top 45 only. Graph returns integer counts in `total_value.breakdowns.results.value`, not percents. Our math: % of located sample = `value / sum(results)`. **Never** % of `followers_count`. Backend persists those counts as objects when Insights lands; no extra Graph columns.
+
+- **Country mix** — own object. Insights only. Hide until connected / omitted / empty. Top 45. Ranked % of located sample. **Not a map.**
+- **City mix** — finer country job. Same Graph path / math. Audience city ≠ hometown.
+- **Age mix** + **gender mix** — still v1 own objects (Randy; not skipped). Same Graph family and math. Age = API brackets as bars. Gender = what Meta returns.
+- **Bio** — IG User `biography` (Public). Hide if empty. Not a typed Later blurb.
+- **Website** — IG User `website` (Public). Hide if empty.
+
+No IG User location field. No industry. Impressions stay off.
+
+**Later skip:** Rates / From $100 / Contact Me. Stories as a kit section. Profile views + bio-link clicks in the overview. Average likes as a Stat. Stats as a prose paragraph. Look: gallery, custom colors (kit theme light/dark/soft is unlocked). Impressions (deprecated). Industry unless sourced (Later form, not Graph). Creator location unless sourced from IG (none today). Shares: media insights `shares` (not media object `shares_count`, Facebook Login only) — fifth Stat only if the row has room.
+
+**Later vs us (note, not a lock flip):** Later public kit period is last 90 days; we locked a 30-day reach chart. Later IG kit Engagement rate is `(likes + comments + saves + shares) ÷ (reel reach + post reach)` — ours is the same family as of 2026-09-18: `(likes + comments + saves + shares) ÷ reach`, sum÷sum. Later labels “Average” but docs say median (outliers removed) for post/story stats; our typical reach is already median. Later also lists profile views, avg impressions, stories, reels as separate sections — we skip those. If no posts in 90 days, Later omits (not zeros); same honesty: empty > zeros.
 
 ---
 
@@ -149,6 +164,13 @@ Landing (disclosure + Professional note + support)
 ---
 
 ## Product surface
+
+**Jobs (locked, User Research + Design, 2026-09-02):**
+
+| Who | Job |
+|---|---|
+| Brand on `/k/[handle]` | Spend or pass in ~30s — is the audience real, how many people actually see a post, is the content worth keeping. |
+| Creator on Insights | Same numbers as `/k/[handle]`, labeled — will this kit survive a brand checking the public grid before they share the link. |
 
 | Route | Who | What |
 |---|---|---|
