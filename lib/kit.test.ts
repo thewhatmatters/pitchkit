@@ -8,6 +8,8 @@ import {
   kitHasInsights,
   publicReachState,
   selectSixPosts,
+  kitPath,
+  kitShareUrl,
 } from "./kit";
 import type { Media, User } from "./schema";
 import { MEDIA_COLUMNS, USER_COLUMNS } from "./schema";
@@ -328,5 +330,16 @@ describe("reach_series kit payload", () => {
     assert.equal(publicReachState(false, seedReachSeries), "insufficient");
     assert.equal(publicReachState(true, []), "insufficient");
     assert.equal(publicReachState(true, seedReachSeries), "resolved");
+  });
+});
+
+describe("kit share URL", () => {
+  it("uses the session owner handle, not a hardcoded demo path", () => {
+    assert.equal(kitPath("rxndy.dxniel"), "/k/rxndy.dxniel");
+    assert.equal(
+      kitShareUrl("https://pitchkit.app", "rxndy.dxniel"),
+      "https://pitchkit.app/k/rxndy.dxniel",
+    );
+    assert.equal(kitShareUrl("https://pitchkit.app/", DEMO_HANDLE), "https://pitchkit.app/k/demo");
   });
 });

@@ -8,7 +8,7 @@ import {
   TOAST_KIT_COPY_FAILED_DESCRIPTION,
   TOAST_KIT_COPY_FAILED_TITLE,
 } from "@/lib/copy";
-import { kitPath } from "@/lib/kit";
+import { kitShareUrl } from "@/lib/kit";
 
 type ShareKitButtonProps = {
   handle: string;
@@ -17,7 +17,7 @@ type ShareKitButtonProps = {
 
 /** Copy `/k/{handle}` — toast title + description. Owner PitchKit + account menu. */
 export async function copyKitLink(handle: string, onCopyFailed?: (url: string) => void) {
-  const url = `${window.location.origin}${kitPath(handle)}`;
+  const url = kitShareUrl(window.location.origin, handle);
   try {
     await navigator.clipboard.writeText(url);
     toast.add({
